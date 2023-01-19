@@ -57,7 +57,7 @@ class CoreApiNode(BaseConfig):
 
 class DataAggregatorSetting:
     release: str = None
-    repo: str = "radixdlt/ng-data-aggregator"
+    repo: str = "radixdlt/babylon-ng-data-aggregator"
     restart: str = "unless-stopped"
     NetworkName: str = None
     coreApiNode: CoreApiNode = CoreApiNode({})
@@ -100,7 +100,7 @@ class DataAggregatorSetting:
 
 class GatewayAPIDockerSettings(BaseConfig):
     release: str = None
-    repo: str = "radixdlt/ng-gateway-api"
+    repo: str = "radixdlt/babylon-ng-gateway-api"
     coreApiNode: CoreApiNode = CoreApiNode({})
     restart = "unless-stopped"
     enable_swagger = "true"

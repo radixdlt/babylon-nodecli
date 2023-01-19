@@ -160,7 +160,7 @@ class Docker(Base):
                     latest_gateway_release, 'GATEWAY', autoapprove)
 
         if all_config.get("common_config").get("nginx_settings"):
-            latest_nginx_release = github.latest_release("radixdlt/radixdlt-nginx")
+            latest_nginx_release = github.latest_release("radixdlt/babylon-nginx")
             current_nginx_release = all_config['common_config']["nginx_settings"]["release"]
             updated_config['common_config']["nginx_settings"]["release"] = Prompts.confirm_version_updates(
                 current_nginx_release, latest_nginx_release, "RADIXDLT NGINX", autoapprove

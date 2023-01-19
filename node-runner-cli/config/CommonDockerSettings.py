@@ -12,7 +12,7 @@ class NginxConfig(BaseConfig):
     enable_transaction_api = "false"
     protect_core: str = "true"
     release = None
-    repo = "radixdlt/radixdlt-nginx"
+    repo = "radixdlt/babylon-nginx"
 
 
 class CommonDockerSettings(BaseConfig):
@@ -62,7 +62,7 @@ class CommonDockerSettings(BaseConfig):
         self.set_genesis_json_location(Base.path_to_genesis_json(self.network_id))
 
     def ask_nginx_release(self):
-        latest_nginx_release = github.latest_release("radixdlt/radixdlt-nginx")
+        latest_nginx_release = github.latest_release("radixdlt/babylon-nginx")
         self.nginx_settings.release = latest_nginx_release
         if "DETAILED" in SetupMode.instance().mode:
             self.nginx_settings.release = Prompts.get_nginx_release(latest_nginx_release)
