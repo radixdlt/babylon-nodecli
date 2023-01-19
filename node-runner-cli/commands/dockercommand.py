@@ -298,6 +298,6 @@ def dependencies(args):
     Run this command on fresh VM or on a existing VM  as the command is tested to be idempotent
     """
     Base.dependencies()
-    ansible_dir = f'https://raw.githubusercontent.com/radixdlt/node-runner/{Helpers.cli_version()}/node-runner-cli'
+    ansible_dir = f'https://raw.githubusercontent.com/radixdlt/babylon-nodecli/{Helpers.cli_version()}/node-runner-cli'
     AnsibleRunner(ansible_dir).check_install_ansible(False)
     Base.add_user_docker_group()
