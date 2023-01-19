@@ -33,6 +33,7 @@ class QuestionKeys:
     postgres_db_password = "postgres_db_password"
     gateway_release = "gateway_release"
     aggregator_release = "aggregator_release"
+    continue_systemd_install = "continue_systemd_install"
 
 class PromptFeeder:
     _instance = None
