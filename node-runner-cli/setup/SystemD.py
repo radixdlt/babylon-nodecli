@@ -2,8 +2,12 @@ import os
 import sys
 from pathlib import Path
 
-from env_vars import UNZIPPED_NODE_DIST_FOLDER, APPEND_DEFAULT_CONFIG_OVERIDES
+from config.SystemDConfig import SystemDSettings, KeyDetails
+from env_vars import UNZIPPED_NODE_DIST_FOLDER, APPEND_DEFAULT_CONFIG_OVERIDES, NODE_BINARY_OVERIDE, \
+    NGINX_BINARY_OVERIDE
+from github.github import latest_release
 from setup.Base import Base
+from utils.PromptFeeder import QuestionKeys
 from utils.utils import run_shell_command, Helpers
 
 
@@ -62,21 +66,28 @@ class SystemD(Base):
         run_shell_command('sudo chown radixdlt:radixdlt -R /data', shell=True)
 
     @staticmethod
-    def generatekey(keyfile_path, keyfile_name="node-keystore.ks", keygen_tag="1.0.0"):
+    def generatekey(keyfile_path, keyfile_name="node-keystore.ks", keygen_tag="1.0.0", keystore_password=None, new=False):
         run_shell_command(f'mkdir -p {keyfile_path}', shell=True)
-        keystore_password, keyfile_location = Base.generatekey(keyfile_path, keyfile_name, keygen_tag)
-        return keystore_password, keyfile_location
+        keystore_password, keyfile_location = Base.generatekey(keyfile_path, keyfile_name, keygen_tag,
+                                                               keystore_password, new)
+
+        key_details = KeyDetails()
+        key_details.keystore_password = keystore_password
+        key_details.keyfile_name = keyfile_name
+        key_details.keygen_tag = keygen_tag
+        key_details.keyfile_path = keyfile_path
+        return key_details
 
     @staticmethod
     def fetch_universe_json(trustenode, extraction_path):
         Base.fetch_universe_json(trustenode, extraction_path)
 
     @staticmethod
-    def backup_file(filepath, filename, backup_time):
+    def backup_file(filepath, filename, backup_time, auto_approve=False):
         if os.path.isfile(f"{filepath}/{filename}"):
-            # TODO AutoApprove
-            backup_yes = input(f"{filename} file exists. Do you want to back up [Y/n]:")
-            if Helpers.check_Yes(backup_yes):
+            if not auto_approve:
+                backup_yes = input(f"{filename} file exists. Do you want to back up [Y/n]:")
+            if Helpers.check_Yes(backup_yes) or auto_approve:
                 Path(f"{backup_time}").mkdir(parents=True, exist_ok=True)
                 run_shell_command(f"cp {filepath}/{filename} {backup_time}/{filename}", shell=True)
 
@@ -90,7 +101,8 @@ class SystemD(Base):
         run_shell_command(command, shell=True)
 
     @staticmethod
-    def setup_default_config(trustednode, hostip, node_dir, node_type, keyfile_name="node-keystore.ks",
+    def setup_default_config(trustednode, hostip, node_dir, node_type, keyfile_location="/etc/radixdlt/node/secrets",
+                             keyfile_name="node-keystore.ks",
                              transactions_enable="false"):
         network_id = SystemD.get_network_id()
         genesis_json_location = Base.path_to_genesis_json(network_id)
@@ -105,7 +117,7 @@ class SystemD(Base):
             ntp.pool=pool.ntp.org
             network.id={network_id}
             {network_genesis_file_for_testnets}
-            node.key.path=/etc/radixdlt/node/secrets/{keyfile_name}
+            node.key.path={keyfile_location}/{keyfile_name}
             network.p2p.listen_port=30001
             network.p2p.broadcast_port=30000
             network.p2p.seed_nodes={trustednode}
@@ -166,9 +178,9 @@ class SystemD(Base):
         run_shell_command(command, shell=True)
 
     @staticmethod
-    def download_binaries(binarylocationUrl, node_dir, node_version):
+    def download_binaries(binary_location_url, node_dir, node_version):
         run_shell_command(
-            ['wget', '--no-check-certificate', '-O', 'radixdlt-dist.zip', binarylocationUrl])
+            ['wget', '--no-check-certificate', '-O', 'radixdlt-dist.zip', binary_location_url])
         run_shell_command('unzip radixdlt-dist.zip', shell=True)
         run_shell_command(f'mkdir -p {node_dir}/{node_version}', shell=True)
         if os.listdir(f'{node_dir}/{node_version}'):
@@ -315,3 +327,51 @@ class SystemD(Base):
     def stop_node_service():
         run_shell_command('sudo systemctl stop radixdlt-node.service', shell=True)
         run_shell_command('sudo systemctl disable radixdlt-node.service', shell=True)
+
+    @staticmethod
+    def confirm_config(nodetype, release, node_binary_url, nginx_config_url) -> str:
+        answer = Helpers.input_guestion(
+            f"\nGoing to setup node type {nodetype} for version {release} from location {node_binary_url} and {nginx_config_url}. \n Do you want to continue Y/n:",
+            QuestionKeys.continue_systemd_install)
+        if not Helpers.check_Yes(answer):
+            print(" Quitting ....")
+            sys.exit()
+        return
+
+    @staticmethod
+    def parse_config_from_args(args):
+        settings = SystemDSettings()
+        if not args.trustednode:
+            settings.trusted_node = args.trustednode
+        if not args.hostip:
+            settings.host_ip = args.hostip
+        if not args.enabletransactions:
+            settings.enable_transaction = args.enabletransactions
+
+        if not args.release:
+            settings.core_release = latest_release()
+        else:
+            settings.core_release = args.release
+
+        if not args.nginxrelease:
+            settings.nginx_release = latest_release("radixdlt/radixdlt-nginx")
+        else:
+            settings.nginx_release = args.nginxrelease
+
+        settings.node_binary_url = os.getenv(NODE_BINARY_OVERIDE,
+                                             f"https://github.com/radixdlt/radixdlt/releases/download/{settings.core_release}/radixdlt-dist-{settings.core_release}.zip")
+
+        settings.nginx_config_url = os.getenv(NGINX_BINARY_OVERIDE,
+                                              f"https://github.com/radixdlt/radixdlt-nginx/releases/download/{settings.nginx_release}/radixdlt-nginx-{settings.node_type}-conf.zip")
+
+        settings.node_version = settings.node_binary_url.rsplit('/', 2)[-2]
+        return settings
+
+    @staticmethod
+    def load_settings():
+        if not os.path.isfile(f'systemd.settings.pickle')
+            print(f"No configuration found. Execute 'radixnode systemd config' first")
+            sys.exit()
+        with open(f'systemd.settings.pickle', 'rb') as file:
+            settings = pickle.load(file)
+        return settings
