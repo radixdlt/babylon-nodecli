@@ -1,14 +1,8 @@
-import os
 import pickle
 import sys
-
-from config.SystemDConfig import SystemDSettings
-from utils.Prompts import Prompts
 from argparse import ArgumentParser
 
 from commands.subcommand import get_decorator, argument
-from env_vars import NODE_BINARY_OVERIDE, NGINX_BINARY_OVERIDE
-from github.github import latest_release
 from setup import SystemD, Base
 from utils.utils import Helpers
 
@@ -18,7 +12,9 @@ systemdcli = ArgumentParser(
 systemd_parser = systemdcli.add_subparsers(dest="systemdcommand")
 
 
-def systemdcommand(systemdcommand_args=[], parent=systemd_parser):
+def systemdcommand(systemdcommand_args=None, parent=systemd_parser):
+    if systemdcommand_args is None:
+        systemdcommand_args = []
     return get_decorator(systemdcommand_args, parent)
 
 
@@ -166,7 +162,7 @@ def restart(args):
 
 
 @systemdcommand([])
-def dependencies(args):
+def dependencies():
     """
     This commands installs all necessary software on the Virtual Machine(VM).
     Run this command on fresh VM or on a existing VM  as the command is tested to be idempotent

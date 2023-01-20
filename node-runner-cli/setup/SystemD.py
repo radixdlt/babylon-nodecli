@@ -1,4 +1,5 @@
 import os
+import pickle
 import sys
 from pathlib import Path
 
@@ -369,7 +370,7 @@ class SystemD(Base):
 
     @staticmethod
     def load_settings():
-        if not os.path.isfile(f'systemd.settings.pickle')
+        if not os.path.isfile(f'systemd.settings.pickle'):
             print(f"No configuration found. Execute 'radixnode systemd config' first")
             sys.exit()
         with open(f'systemd.settings.pickle', 'rb') as file:
