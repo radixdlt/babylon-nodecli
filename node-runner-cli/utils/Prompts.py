@@ -1,4 +1,5 @@
 import os
+import sys
 
 from env_vars import SUPPRESS_API_COMMAND_WARN
 from utils.PromptFeeder import QuestionKeys
@@ -329,10 +330,3 @@ class Prompts:
                 f"Do you want to update to latest version {latest_version},"
                 f"Press ENTER to accept latest version or type in version you want to install:")
             return Helpers.check_Yes(Prompts.check_default(answer, latest_version))
-
-    @staticmethod
-    def ask_continue_systemd_install(nodetype, release, node_binary_url, nginx_config_url) -> str:
-        answer = Helpers.input_guestion(
-            f"\nGoing to setup node type {nodetype} for version {release} from location {node_binary_url} and {nginx_config_url}. \n Do you want to continue Y/n:",
-            QuestionKeys.continue_systemd_install)
-        return answer
