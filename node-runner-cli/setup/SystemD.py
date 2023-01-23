@@ -1,7 +1,9 @@
 import os
-import pickle
 import sys
 from pathlib import Path
+
+import yaml
+from yaml import UnsafeLoader
 
 from config.SystemDConfig import SystemDSettings, KeyDetails
 from env_vars import UNZIPPED_NODE_DIST_FOLDER, APPEND_DEFAULT_CONFIG_OVERIDES, NODE_BINARY_OVERIDE, \
@@ -378,10 +380,15 @@ class SystemD(Base):
         return settings
 
     @staticmethod
+    def save_settings(settings):
+        with open('systemd.settings.yml', 'w') as f:
+            yaml.dump(settings, f, sort_keys=False, default_flow_style=False)
+
+    @staticmethod
     def load_settings():
-        if not os.path.isfile(f'systemd.settings.pickle'):
+        if not os.path.isfile(f'systemd.settings.yml'):
             print(f"No configuration found. Execute 'radixnode systemd config' first.")
             sys.exit()
-        with open(f'systemd.settings.pickle', 'rb') as file:
-            settings = pickle.load(file)
+        with open('systemd.settings.yml', 'r') as f:
+            settings = yaml.load(f, Loader=UnsafeLoader)
         return settings
