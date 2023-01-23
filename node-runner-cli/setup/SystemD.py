@@ -67,12 +67,13 @@ class SystemD(Base):
         run_shell_command('sudo chown radixdlt:radixdlt -R /data', shell=True)
 
     @staticmethod
-    def generatekey(keyfile_path, keyfile_name="node-keystore.ks", keygen_tag="1.0.0", keystore_password=None, new=False):
+    def generatekey(keyfile_path, keyfile_name="node-keystore.ks", keygen_tag="1.0.0", keystore_password=None,
+                    new=False):
         run_shell_command(f'mkdir -p {keyfile_path}', shell=True)
         keystore_password, keyfile_location = Base.generatekey(keyfile_path, keyfile_name, keygen_tag,
                                                                keystore_password, new)
 
-        key_details = KeyDetails()
+        key_details = KeyDetails({})
         key_details.keystore_password = keystore_password
         key_details.keyfile_name = keyfile_name
         key_details.keygen_tag = keygen_tag
@@ -86,6 +87,7 @@ class SystemD(Base):
     @staticmethod
     def backup_file(filepath, filename, backup_time, auto_approve=False):
         if os.path.isfile(f"{filepath}/{filename}"):
+            backup_yes = "Y"
             if not auto_approve:
                 backup_yes = input(f"{filename} file exists. Do you want to back up [Y/n]:")
             if Helpers.check_Yes(backup_yes) or auto_approve:
@@ -104,14 +106,16 @@ class SystemD(Base):
     @staticmethod
     def setup_default_config(trustednode, hostip, node_dir, node_type, keyfile_location="/etc/radixdlt/node/secrets",
                              keyfile_name="node-keystore.ks",
-                             transactions_enable="false"):
-        network_id = SystemD.get_network_id()
+                             transactions_enable="false",
+                             network_id=1,
+                             data_folder="~/data"):
+
         genesis_json_location = Base.path_to_genesis_json(network_id)
 
         network_genesis_file_for_testnets = f"network.genesis_file={genesis_json_location}" if genesis_json_location else ""
         enable_client_api = "true" if node_type == "archivenode" else "false"
 
-        data_folder = Base.get_data_dir()
+
         command = f"""
         cat > {node_dir}/default.config << EOF
             ntp=false
@@ -148,10 +152,11 @@ class SystemD(Base):
 
     @staticmethod
     def setup_service_file(node_version_dir, node_dir="/etc/radixdlt/node",
-                           node_secrets_path="/etc/radixdlt/node/secrets"):
+                           node_secrets_path="/etc/radixdlt/node/secrets",
+                           service_file_path="/etc/systemd/system/radixdlt-node.service"):
 
         command = f"""
-        sudo cat > /etc/systemd/system/radixdlt-node.service << EOF
+        sudo cat > {service_file_path} << EOF
             [Unit]
             Description=Radix DLT Validator
             After=local-fs.target
@@ -336,19 +341,23 @@ class SystemD(Base):
             QuestionKeys.continue_systemd_install)
         if not Helpers.check_Yes(answer):
             print(" Quitting ....")
-            sys.exit()
+            sys.exit(1)
         return
 
     @staticmethod
     def parse_config_from_args(args):
         settings = SystemDSettings()
-        if not args.trustednode:
-            settings.trusted_node = args.trustednode
-        if not args.hostip:
-            settings.host_ip = args.hostip
-        if not args.enabletransactions:
-            settings.enable_transaction = args.enabletransactions
-
+        settings.trusted_node = args.trustednode
+        settings.host_ip = args.hostip
+        settings.enable_transaction = args.enabletransactions
+        settings.data_directory = args.data_directory
+        if args.network in ["s", "S", "stokenet"]:
+            settings.network_id = 2
+        elif args.network in ["m", "M", "mainnet"]:
+            settings.network_id = 1
+        else:
+            print("Pleese enter s or m for stokenet or mainnet.")
+            sys.exit()
         if not args.release:
             settings.core_release = latest_release()
         else:
@@ -371,7 +380,7 @@ class SystemD(Base):
     @staticmethod
     def load_settings():
         if not os.path.isfile(f'systemd.settings.pickle'):
-            print(f"No configuration found. Execute 'radixnode systemd config' first")
+            print(f"No configuration found. Execute 'radixnode systemd config' first.")
             sys.exit()
         with open(f'systemd.settings.pickle', 'rb') as file:
             settings = pickle.load(file)
