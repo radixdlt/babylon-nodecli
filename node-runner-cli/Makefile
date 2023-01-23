@@ -15,3 +15,8 @@ local: install
 .PHONEY: cmds-reference
 cmds-reference: local
 	./generate-cmds-help.sh
+
+.PHONEY: test
+test: test
+	 python -m unittest tests.test_systemd
+

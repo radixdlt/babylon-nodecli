@@ -51,6 +51,7 @@ def check_latest_cli():
                     sudo mv radixnode /usr/local/bin
                 """)
 
+
 def main():
     args = cli.parse_args(sys.argv[1:2])
 
