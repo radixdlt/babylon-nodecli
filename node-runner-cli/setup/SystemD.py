@@ -117,7 +117,6 @@ class SystemD(Base):
         network_genesis_file_for_testnets = f"network.genesis_file={genesis_json_location}" if genesis_json_location else ""
         enable_client_api = "true" if node_type == "archivenode" else "false"
 
-
         command = f"""
         cat > {node_dir}/default.config << EOF
             ntp=false
@@ -186,14 +185,17 @@ class SystemD(Base):
         run_shell_command(command, shell=True)
 
     @staticmethod
-    def download_binaries(binary_location_url, node_dir, node_version):
+    def download_binaries(binary_location_url, node_dir, node_version, auto_approve=None):
         run_shell_command(
             ['wget', '--no-check-certificate', '-O', 'radixdlt-dist.zip', binary_location_url])
         run_shell_command('unzip radixdlt-dist.zip', shell=True)
         run_shell_command(f'mkdir -p {node_dir}/{node_version}', shell=True)
         if os.listdir(f'{node_dir}/{node_version}'):
-            print(f"Directory {node_dir}/{node_version} is not empty")
-            okay = input("Should the directory be removed [Y/n]?:")
+            if not auto_approve:
+                print(f"Directory {node_dir}/{node_version} is not empty")
+                okay = input("Should the directory be removed [Y/n]?:")
+            else:
+                okay = "Y"
             if Helpers.check_Yes(okay):
                 run_shell_command(f"rm -rf {node_dir}/{node_version}/*", shell=True)
         unzipped_folder_name = os.getenv(UNZIPPED_NODE_DIST_FOLDER, f"radixdlt-{node_version}")
@@ -218,7 +220,7 @@ class SystemD(Base):
         run_shell_command('sudo mkdir -p /etc/nginx/secrets', shell=True)
 
     @staticmethod
-    def setup_nginx_config(nginx_config_location_Url, node_type, nginx_etc_dir, backup_time):
+    def setup_nginx_config(nginx_config_location_Url, node_type, nginx_etc_dir, backup_time, auto_approve=None):
         SystemD.install_nginx()
         if node_type == "archivenode":
             conf_file = 'nginx-archive.conf'
@@ -228,17 +230,23 @@ class SystemD(Base):
             print(f"Node type - {node_type} specificed should be either archivenode or fullnode")
             sys.exit()
 
-        backup_yes = input("Do you want to backup existing nginx config [Y/n]?:")
-        if Helpers.check_Yes(backup_yes):
-            Path(f"{backup_time}/nginx-config").mkdir(parents=True, exist_ok=True)
-            run_shell_command(f"sudo cp -r {nginx_etc_dir} {backup_time}/nginx-config", shell=True)
+        if not auto_approve:
+            backup_yes = input("Do you want to backup existing nginx config [Y/n]?:")
+            if Helpers.check_Yes(backup_yes):
+                Path(f"{backup_time}/nginx-config").mkdir(parents=True, exist_ok=True)
+                run_shell_command(f"sudo cp -r {nginx_etc_dir} {backup_time}/nginx-config", shell=True)
 
-        # TODO AutoApprove
-        continue_nginx = input("Do you want to continue with nginx setup [Y/n]?:")
-        if Helpers.check_Yes(continue_nginx):
+        if not auto_approve:
+            continue_nginx = input("Do you want to continue with nginx setup [Y/n]?:")
+        else:
+            continue_nginx = "Y"
+        if Helpers.check_Yes(continue_nginx) or auto_approve:
+            additional_options = ""
+            if auto_approve:
+                additional_options = "-o"
             run_shell_command(
                 ['wget', '--no-check-certificate', '-O', 'radixdlt-nginx.zip', nginx_config_location_Url])
-            run_shell_command(f'sudo unzip radixdlt-nginx.zip -d {nginx_etc_dir}', shell=True)
+            run_shell_command(f'sudo unzip {additional_options} radixdlt-nginx.zip -d {nginx_etc_dir}', shell=True)
             run_shell_command(f'sudo mv {nginx_etc_dir}/{conf_file}  /etc/nginx/nginx.conf', shell=True)
             run_shell_command(f'sudo mkdir -p /var/cache/nginx/radixdlt-hot', shell=True)
             return True
@@ -246,17 +254,18 @@ class SystemD(Base):
             return False
 
     @staticmethod
-    def create_ssl_certs(secrets_dir):
+    def create_ssl_certs(secrets_dir, auto_approve=None):
         SystemD.make_nginx_secrets_directory()
         if os.path.isfile(f'{secrets_dir}/server.key') and os.path.isfile(f'{secrets_dir}/server.pem'):
-            print(f"Files  {secrets_dir}/server.key and os.path.isfile(f'{secrets_dir}/server.pem already exists")
-            answer = input("Do you want to regenerate y/n :")
-            if Helpers.check_Yes(answer):
-                run_shell_command(f"""
-                     sudo openssl req  -nodes -new -x509 -nodes -subj '/CN=localhost' \
-                      -keyout "{secrets_dir}/server.key" \
-                      -out "{secrets_dir}/server.pem"
-                     """, shell=True)
+            if not auto_approve:
+                print(f"Files  {secrets_dir}/server.key and os.path.isfile(f'{secrets_dir}/server.pem already exists")
+                answer = input("Do you want to regenerate y/n :")
+                if Helpers.check_Yes(answer):
+                    run_shell_command(f"""
+                         sudo openssl req  -nodes -new -x509 -nodes -subj '/CN=localhost' \
+                          -keyout "{secrets_dir}/server.key" \
+                          -out "{secrets_dir}/server.pem"
+                         """, shell=True)
         else:
 
             run_shell_command(f"""
@@ -266,10 +275,11 @@ class SystemD(Base):
             """, shell=True)
 
         if os.path.isfile(f'{secrets_dir}/dhparam.pem'):
-            print(f"File {secrets_dir}/dhparam.pem already exists")
-            answer = input("Do you want to regenerate y/n :")
-            if Helpers.check_Yes(answer):
-                run_shell_command(f"sudo openssl dhparam -out {secrets_dir}/dhparam.pem  4096", shell=True)
+            if not auto_approve:
+                print(f"File {secrets_dir}/dhparam.pem already exists")
+                answer = input("Do you want to regenerate y/n :")
+                if Helpers.check_Yes(answer):
+                    run_shell_command(f"sudo openssl dhparam -out {secrets_dir}/dhparam.pem  4096", shell=True)
         else:
             print("Generating a dhparam.pem file")
             run_shell_command(f"sudo openssl dhparam -out {secrets_dir}/dhparam.pem  4096", shell=True)
