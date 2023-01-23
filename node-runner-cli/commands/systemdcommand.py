@@ -1,4 +1,3 @@
-import pickle
 import sys
 from argparse import ArgumentParser
 
@@ -72,8 +71,9 @@ def config(args):
     SystemD.backup_file("/etc/systemd/system", "radixdlt-node.service", backup_time, auto_approve)
 
     # save it
-    with open(f'systemd.settings.pickle', 'wb') as file:
-        pickle.dump(settings, file)
+    SystemD.save_settings(settings)
+
+
 
 
 @systemdcommand([
