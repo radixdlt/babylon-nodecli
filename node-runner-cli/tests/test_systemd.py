@@ -66,6 +66,12 @@ class SystemdUnitTests(unittest.TestCase):
         new_settings = SystemD.load_settings()
         self.assertEqual(settings.host_ip, new_settings.host_ip)
 
+    @unittest.skip("Can only be executed on Ubuntu")
+    def test_systemd_dependencies(self):
+        with patch("sys.argv",
+                   ["main", "systemd", "dependencies"]):
+            main()
+
 
 def suite():
     """ This defines all the tests of a module"""
