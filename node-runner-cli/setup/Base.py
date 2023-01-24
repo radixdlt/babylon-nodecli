@@ -65,7 +65,7 @@ class Base:
     @staticmethod
     def setup_node_optimisation_config(version):
         ansibleRunner = AnsibleRunner(
-            f'https://raw.githubusercontent.com/radixdlt/node-runner/{version}/node-runner-cli')
+            f'https://raw.githubusercontent.com/radixdlt/babylon-nodecli/{version}/node-runner-cli')
         file = 'ansible/project/provision.yml'
         ansibleRunner.check_install_ansible()
         ansibleRunner.download_ansible_file(file)
