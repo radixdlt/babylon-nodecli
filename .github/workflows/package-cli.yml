@@ -354,7 +354,8 @@ jobs:
           sudo su radixdlt
           export DISABLE_VERSION_CHECK=true
           export COMPOSE_HTTP_TIMEOUT=360
-          /home/ubuntu/_work/babylon-nodecli/babylon-nodecli/radixnode systemd install -a true
+          whoami
+          sudo /home/ubuntu/_work/babylon-nodecli/babylon-nodecli/radixnode systemd install -a true
           sleep 60
           NODE_END_POINT="https://18.133.170.30" NGINX=true ./radixnode api system health
           curl -k -f -u "admin:$NGINX_ADMIN_PASSWORD" https://18.133.170.30
