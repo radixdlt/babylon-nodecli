@@ -34,7 +34,7 @@ cwd = os.getcwd()
 
 
 def check_latest_cli():
-    cli_latest_version = latest_release("radixdlt/node-runner")
+    cli_latest_version = latest_release("radixdlt/babylon-nodecli")
 
     if os.getenv(DISABLE_VERSION_CHECK, "False").lower() not in ("true", "yes"):
         if Helpers.cli_version() != cli_latest_version:
@@ -44,7 +44,7 @@ def check_latest_cli():
             print(f"""
                 ---------------------------------------------------------------
                 Update the CLI by running these commands
-                    wget -O radixnode https://github.com/radixdlt/node-runner/releases/download/{cli_latest_version}/radixnode-{os_name}
+                    wget -O radixnode https://github.com/radixdlt/babylon-nodecli/releases/download/{cli_latest_version}/radixnode-{os_name}
                     chmod +x radixnode
                     sudo mv radixnode /usr/local/bin
                 """)
