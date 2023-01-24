@@ -14,7 +14,10 @@ def latest_release(repo_name="radixdlt/radixdlt"):
     prepared.headers['user-agent'] = 'radixnode-cli'
     resp = Helpers.send_request(prepared, print_response=False)
     if not resp.ok:
-        print("Failed to get latest release from github. Exitting the command...")
+        print("Failed to get latest release from github. The response was:")
+        print(f"https://api.github.com/repos/{repo_name}/releases/latest")
+        print(f"HTTP Code: {resp.status_code}")
+        print("Exitting the command...")
         sys.exit()
 
     json_response = json.loads(resp.content)
