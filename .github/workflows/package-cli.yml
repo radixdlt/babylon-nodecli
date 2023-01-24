@@ -195,7 +195,7 @@ jobs:
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
           ./radixnode docker install -f $HOME/node-config/config.yaml -a
           sleep 60
-          export DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu
+          export DOCKER_COMPOSE_FOLDER_PREFIX=radixdlt
           ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
           NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system health
           ./radixnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
@@ -265,9 +265,9 @@ jobs:
           #Below PATH require when ansible is installed as part of pip
           export PATH="$PATH:/home/radixdlt/.local/bin"
 
-          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
-          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
-          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-gateway-password -m DOCKER -p $NGINX_GATEWAY_PASSWORD
+          DOCKER_COMPOSE_FOLDER_PREFIX=radixdlt ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
+          DOCKER_COMPOSE_FOLDER_PREFIX=radixdlt ./radixnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
+          DOCKER_COMPOSE_FOLDER_PREFIX=radixdlt ./radixnode auth set-gateway-password -m DOCKER -p $NGINX_GATEWAY_PASSWORD
 
           ./radixnode monitoring stop
           ./radixnode monitoring config \
