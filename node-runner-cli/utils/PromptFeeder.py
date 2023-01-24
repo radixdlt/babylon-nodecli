@@ -62,12 +62,8 @@ class PromptFeeder:
 
     @classmethod
     def get_answer(cls, question_key):
-        print("get_answer")
         if len(cls.prompts_feed) != 0:
-            print("not empty list")
-            print(cls.prompts_feed)
             first, *remaining = cls.prompts_feed
-            print(first)
             cls.prompts_feed = remaining
             return first.get(question_key)
         return None
