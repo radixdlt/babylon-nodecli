@@ -342,8 +342,8 @@ jobs:
           chmod +x ./radixnode
           pwd
           sudo su radixdlt
-          mv /home/ubuntu/radixnode /home/radixdlt/radixnode 
-          ./radixnode systemd config -a true \
+
+          /home/ubuntu/_work/babylon-nodecli/babylon-nodecli/radixnode systemd config -a true \
             -t "radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210" \
             -i "18.133.170.30" -kp "${KEYSTORE_PASSWORD}" -n S -dd "$HOME/data"
           cat systemd.settings.yml
@@ -354,7 +354,7 @@ jobs:
           sudo su radixdlt
           export DISABLE_VERSION_CHECK=true
           export COMPOSE_HTTP_TIMEOUT=360
-          ./radixnode systemd install -a true
+          /home/ubuntu/_work/babylon-nodecli/babylon-nodecli/radixnode systemd install -a true
           sleep 60
           NODE_END_POINT="https://18.133.170.30" NGINX=true ./radixnode api system health
           curl -k -f -u "admin:$NGINX_ADMIN_PASSWORD" https://18.133.170.30
