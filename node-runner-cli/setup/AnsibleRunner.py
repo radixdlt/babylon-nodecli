@@ -19,7 +19,7 @@ class AnsibleRunner:
 
         resp = Helpers.send_request(prepared, print_response=False)
         if not resp.ok:
-            print(f"{resp.status_code} error retrieving ansible playbook.. Existing the command...")
+            print(f"{resp.status_code} error retrieving ansible playbook.. Exiting the command...")
             sys.exit()
 
         directory = file.rsplit('/', 1)[0]

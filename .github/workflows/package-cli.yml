@@ -342,8 +342,8 @@ jobs:
           chmod +x ./radixnode
           pwd
           sudo su radixdlt
-
-          /home/ubuntu/_work/babylon-nodecli/babylon-nodecli/radixnode systemd config -a true \
+          whoami 
+          sudo /home/ubuntu/_work/babylon-nodecli/babylon-nodecli/radixnode systemd config -a true \
             -t "radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210" \
             -i "18.133.170.30" -kp "${KEYSTORE_PASSWORD}" -n S -dd "$HOME/data"
           cat systemd.settings.yml
