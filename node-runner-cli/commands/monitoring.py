@@ -1,5 +1,6 @@
 import sys
 from argparse import ArgumentParser
+from os import path
 from pathlib import Path
 
 import yaml
@@ -24,6 +25,9 @@ def monitoringcommand(args=[], parent=monitoring_parser):
 
 def read_monitoring_config(args):
     yaml.add_representer(type(None), Helpers.represent_none)
+    if not path.is_file(args.monitoringconfigfile):
+        print("There is no monitoring config file. It seems like monitoring was not set up. Nothing to do here")
+        exit(0)
     with open(args.monitoringconfigfile, 'r') as file:
         all_config = yaml.safe_load(file)
     return all_config
