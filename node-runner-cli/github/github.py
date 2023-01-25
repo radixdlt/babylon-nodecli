@@ -8,22 +8,20 @@ from utils.utils import Helpers
 
 def latest_release(repo_name="radixdlt/radixdlt"):
     if repo_name == "radixdlt/radixdlt":
-        return os.environ.get('RADIXDLT_APP_VERSION_OVERRIDE')
+        if os.environ.get('RADIXDLT_APP_VERSION_OVERRIDE') is not None:
+            return os.environ.get('RADIXDLT_APP_VERSION_OVERRIDE')
 
-    if repo_name == "radixdlt/radixdlt-nginx":
-        return os.environ.get('RADIXDLT_NGINX_VERSION_OVERRIDE')
-    if repo_name == "radixdlt/babylon-nginx":
-        return os.environ.get('RADIXDLT_NGINX_VERSION_OVERRIDE')
+    if repo_name == "radixdlt/radixdlt-nginx" or repo_name == "radixdlt/babylon-nginx":
+        if os.environ.get('RADIXDLT_NGINX_VERSION_OVERRIDE') is not None:
+            return os.environ.get('RADIXDLT_NGINX_VERSION_OVERRIDE')
 
-    if repo_name == "radixdlt/node-runner":
-        return os.environ.get('RADIXDLT_CLI_VERSION_OVERRIDE')
-    if repo_name == "radixdlt/babylon-nodecli":
-        return os.environ.get('RADIXDLT_CLI_VERSION_OVERRIDE')
+    if repo_name == "radixdlt/node-runner" or repo_name == "radixdlt/babylon-nodecli":
+        if os.environ.get('RADIXDLT_CLI_VERSION_OVERRIDE') is not None:
+            return os.environ.get('RADIXDLT_CLI_VERSION_OVERRIDE')
 
-    if repo_name == "radixdlt/babylon-gateway":
-        return os.environ.get('RADIXDLT_GATEWAY_VERSION_OVERRIDE')
-    if repo_name == "radixdlt/radixdlt-network-gateway":
-        return os.environ.get('RADIXDLT_GATEWAY_VERSION_OVERRIDE')
+    if repo_name == "radixdlt/babylon-gateway" or repo_name == "radixdlt/radixdlt-network-gateway":
+        if os.environ.get('RADIXDLT_GATEWAY_VERSION_OVERRIDE'):
+            return os.environ.get('RADIXDLT_GATEWAY_VERSION_OVERRIDE')
 
     req = requests.Request('GET',
                            f'https://api.github.com/repos/{repo_name}/releases/latest')
