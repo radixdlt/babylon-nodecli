@@ -382,10 +382,10 @@ RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
             settings.common_settings.nginx_settings.release = args.nginxrelease
 
         settings.core_node_settings.core_binary_url = os.getenv(NODE_BINARY_OVERIDE,
-                                             f"https://github.com/radixdlt/radixdlt/releases/download/{settings.core_node_settings.core_release}/radixdlt-dist-{settings.core_node_settings.core_release}.zip")
+                                                                f"https://github.com/radixdlt/radixdlt/releases/download/{settings.core_node_settings.core_release}/radixdlt-dist-{settings.core_node_settings.core_release}.zip")
 
         settings.common_settings.nginx_settings.config_url = os.getenv(NGINX_BINARY_OVERIDE,
-                                              f"https://github.com/radixdlt/radixdlt-nginx/releases/download/{settings.common_settings.nginx_settings.release}/radixdlt-nginx-{settings.core_node_settings.nodetype}-conf.zip")
+                                                                       f"https://github.com/radixdlt/radixdlt-nginx/releases/download/{settings.common_settings.nginx_settings.release}/radixdlt-nginx-{settings.core_node_settings.nodetype}-conf.zip")
 
         settings.node_version = settings.core_node_settings.core_binary_url.rsplit('/', 2)[-2]
         return settings
@@ -396,10 +396,10 @@ RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
             yaml.dump(settings, f, sort_keys=True, default_flow_style=False)
 
     @staticmethod
-    def load_settings() -> SystemDSettings:
-        if not os.path.isfile(f'systemd.settings.yml'):
+    def load_settings(config_file) -> SystemDSettings:
+        if not os.path.isfile(config_file):
             print(f"No configuration found. Execute 'radixnode systemd config' first.")
             sys.exit()
-        with open('systemd.settings.yml', 'r') as f:
+        with open(config_file, 'r') as f:
             settings = yaml.load(f, Loader=UnsafeLoader)
         return settings
