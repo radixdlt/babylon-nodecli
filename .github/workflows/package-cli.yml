@@ -409,6 +409,7 @@ jobs:
           ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
           NODE_END_POINT="https://18.133.170.30" NGINX=true ./radixnode api system health
           curl -k -f -u "admin:$NGINX_ADMIN_PASSWORD" https://18.133.170.30
+          ./radixnode  systemd stop
         env:
           RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_NGINX_VERSION_OVERRIDE: "1.3.2"
