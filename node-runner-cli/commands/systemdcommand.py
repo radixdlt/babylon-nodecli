@@ -41,10 +41,10 @@ def config(args):
     backup_time = Helpers.get_current_date_time()
 
     if auto_approve:
-        SystemD.backup_file(settings.node_secrets_dir, "node-keystore.ks", backup_time, auto_approve)
+        SystemD.backup_file(settings.common_settings.node_secrets_dir, "node-keystore.ks", backup_time, auto_approve)
 
-    settings.keydetails = SystemD.generatekey(keyfile_path=settings.node_secrets_dir,
-                                              keygen_tag=settings.core_release,
+    settings.core_node_settings.keydetails = SystemD.generatekey(keyfile_path=settings.common_settings.node_secrets_dir,
+                                              keygen_tag=settings.core_node_settings.core_release,
                                               keystore_password=keystore_password,
                                               new=auto_approve)
 
@@ -53,21 +53,21 @@ def config(args):
     if settings.data_directory is None:
         settings.data_directory = Base.get_data_dir()
 
-    SystemD.setup_default_config(trustednode=settings.trusted_node,
-                                 hostip=settings.host_ip,
-                                 node_dir=settings.node_dir,
-                                 node_type=settings.node_type,
-                                 transactions_enable=settings.enable_transaction,
-                                 keyfile_location=settings.keydetails.keyfile_path,
+    SystemD.setup_default_config(trustednode=settings.core_node_settings.trusted_node,
+                                 hostip=settings.common_settings.host_ip,
+                                 node_dir=settings.common_settings.node_dir,
+                                 node_type=settings.core_node_settings.nodetype,
+                                 transactions_enable=settings.core_node_settings.enable_transaction,
+                                 keyfile_location=settings.core_node_settings.keyfile_path,
                                  network_id=settings.network_id,
                                  data_folder=settings.data_directory)
 
-    SystemD.backup_file(settings.node_secrets_dir, "environment", backup_time, auto_approve)
+    SystemD.backup_file(settings.common_settings.node_secrets_dir, "environment", backup_time, auto_approve)
 
-    SystemD.set_environment_variables(keystore_password=settings.keydetails.keystore_password,
-                                      node_secrets_dir=settings.node_secrets_dir)
+    SystemD.set_environment_variables(keystore_password=settings.core_node_settings.keydetails.keystore_password,
+                                      node_secrets_dir=settings.common_settings.node_secrets_dir)
 
-    SystemD.backup_file(settings.node_dir, f"default.config", backup_time, auto_approve)
+    SystemD.backup_file(settings.common_settings.node_dir, f"default.config", backup_time, auto_approve)
 
     SystemD.backup_file("/etc/systemd/system", "radixdlt-node.service", backup_time, auto_approve)
 
@@ -85,16 +85,16 @@ def install(args):
     settings = SystemD.load_settings()
 
     if not auto_approve:
-        SystemD.confirm_config(settings.node_type,
-                               settings.core_release,
-                               settings.node_binary_url,
-                               settings.nginx.config_url)
+        SystemD.confirm_config(settings.core_node_settings.nodetype,
+                               settings.core_node_settings.core_release,
+                               settings.core_node_settings.core_binary_url,
+                               settings.common_settings.nginx_settings.config_url)
 
     SystemD.checkUser()
 
-    SystemD.download_binaries(binary_location_url=settings.node_binary_url,
-                              node_dir=settings.node_dir,
-                              node_version=settings.node_version,
+    SystemD.download_binaries(binary_location_url=settings.core_node_settings.core_binary_url,
+                              node_dir=settings.common_settings.node_dir,
+                              node_version=settings.core_node_settings.core_release,
                               auto_approve=auto_approve)
 
     backup_time = Helpers.get_current_date_time()
@@ -106,14 +106,14 @@ def install(args):
 
     # This is actually a download command. Again check against dependencies.
     # Missing PromptFeeder
-    nginx_configured = SystemD.setup_nginx_config(nginx_config_location_Url=settings.nginx.config_url,
-                                                  node_type=settings.node_type,
-                                                  nginx_etc_dir=settings.nginx.dir, backup_time=backup_time,
+    nginx_configured = SystemD.setup_nginx_config(nginx_config_location_Url=settings.common_settings.nginx_settings.config_url,
+                                                  node_type=settings.core_node_settings.nodetype,
+                                                  nginx_etc_dir=settings.common_settings.nginx_settings.dir, backup_time=backup_time,
                                                   auto_approve=auto_approve)
 
-    SystemD.setup_service_file(node_version_dir=settings.node_version,
-                               node_dir=settings.node_dir,
-                               node_secrets_path=settings.node_secrets_dir)
+    SystemD.setup_service_file(node_version_dir=settings.core_node_settings.core_release,
+                               node_dir=settings.common_settings.node_dir,
+                               node_secrets_path=settings.common_settings.node_secrets_dir)
 
     # This can only be tested in E2E environment. This is the core functionality of this command in my eyes.
     if not args.update:

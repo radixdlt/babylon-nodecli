@@ -358,45 +358,45 @@ RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
         return
 
     @staticmethod
-    def parse_config_from_args(args):
-        settings = SystemDSettings()
-        settings.trusted_node = args.trustednode
+    def parse_config_from_args(args) -> SystemDSettings:
+        settings = SystemDSettings({})
+        settings.core_node_settings.trusted_node = args.trustednode
         settings.host_ip = args.hostip
-        settings.enable_transaction = args.enabletransactions
-        settings.data_directory = args.data_directory
+        settings.core_node_settings.enable_transaction = args.enabletransactions
+        settings.core_node_settings.data_directory = args.data_directory
         if args.network in ["s", "S", "stokenet"]:
-            settings.network_id = 2
+            settings.core_node_settings.network_id = 2
         elif args.network in ["m", "M", "mainnet"]:
-            settings.network_id = 1
+            settings.core_node_settings.network_id = 1
         else:
             print("Pleese enter s or m for stokenet or mainnet.")
             sys.exit()
         if not args.release:
-            settings.core_release = latest_release()
+            settings.core_node_settings.core_release = latest_release()
         else:
-            settings.core_release = args.release
+            settings.core_node_settings.core_release = args.release
 
         if not args.nginxrelease:
-            settings.nginx.release = latest_release("radixdlt/radixdlt-nginx")
+            settings.common_settings.nginx_settings.release = latest_release("radixdlt/radixdlt-nginx")
         else:
-            settings.nginx.release = args.nginxrelease
+            settings.common_settings.nginx_settings.release = args.nginxrelease
 
-        settings.node_binary_url = os.getenv(NODE_BINARY_OVERIDE,
-                                             f"https://github.com/radixdlt/radixdlt/releases/download/{settings.core_release}/radixdlt-dist-{settings.core_release}.zip")
+        settings.core_node_settings.core_binary_url = os.getenv(NODE_BINARY_OVERIDE,
+                                             f"https://github.com/radixdlt/radixdlt/releases/download/{settings.core_node_settings.core_release}/radixdlt-dist-{settings.core_node_settings.core_release}.zip")
 
-        settings.nginx.config_url = os.getenv(NGINX_BINARY_OVERIDE,
-                                              f"https://github.com/radixdlt/radixdlt-nginx/releases/download/{settings.nginx_release}/radixdlt-nginx-{settings.node_type}-conf.zip")
+        settings.common_settings.nginx_settings.config_url = os.getenv(NGINX_BINARY_OVERIDE,
+                                              f"https://github.com/radixdlt/radixdlt-nginx/releases/download/{settings.common_settings.nginx_settings.release}/radixdlt-nginx-{settings.core_node_settings.nodetype}-conf.zip")
 
-        settings.node_version = settings.node_binary_url.rsplit('/', 2)[-2]
+        settings.node_version = settings.core_node_settings.core_binary_url.rsplit('/', 2)[-2]
         return settings
 
     @staticmethod
     def save_settings(settings):
         with open('systemd.settings.yml', 'w') as f:
-            yaml.dump(settings, f, sort_keys=False, default_flow_style=False)
+            yaml.dump(settings, f, sort_keys=True, default_flow_style=False)
 
     @staticmethod
-    def load_settings():
+    def load_settings() -> SystemDSettings:
         if not os.path.isfile(f'systemd.settings.yml'):
             print(f"No configuration found. Execute 'radixnode systemd config' first.")
             sys.exit()

@@ -89,7 +89,7 @@ class CoreDockerSettings(BaseConfig):
         return self
 
 
-class DockerConfig:
+class DockerConfig(BaseConfig):
     core_node_settings: CoreDockerSettings = CoreDockerSettings({})
     common_settings: CommonDockerSettings = CommonDockerSettings({})
     gateway_settings: GatewayDockerSettings = GatewayDockerSettings({})
@@ -115,3 +115,11 @@ class DockerConfig:
             self.core_node_settings.keydetails = KeyDetails(core_node.get("keydetails", None))
             self.core_node_settings.trusted_node = core_node.get("trusted_node", None)
             self.core_node_settings.existing_docker_compose = core_node.get("docker_compose", None)
+
+    def to_yaml(self):
+        config_to_dump = dict(self)
+        config_to_dump["common_settings"] = dict(self.common_settings)
+        config_to_dump["core_node_settings"] = dict(self.core_node_settings)
+        config_to_dump["gateway_settings"] = dict(self.gateway_settings)
+        return yaml.dump(config_to_dump, sort_keys=False, default_flow_style=False, explicit_start=True,
+                         allow_unicode=True)
