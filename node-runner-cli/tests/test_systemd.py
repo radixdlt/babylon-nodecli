@@ -57,9 +57,9 @@ class SystemdUnitTests(unittest.TestCase):
 
     def test_systemd_config_can_be_saved_and_restored_as_yaml(self):
         # Make Python Class YAML Serializable
-        settings = SystemDSettings()
+        settings = SystemDSettings({})
         key_details = KeyDetails({})
-        settings.keydetails = key_details
+        settings.core_node_settings.keydetails = key_details
         settings.host_ip = "6.6.6.6"
 
         SystemD.save_settings(settings)
