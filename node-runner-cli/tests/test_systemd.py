@@ -2,11 +2,12 @@ import os
 import unittest
 from unittest.mock import patch
 
-from config.SystemDConfig import SystemDSettings
 from config.KeyDetails import KeyDetails
+from config.SystemDConfig import SystemDSettings
 from radixnode import main
 from setup import SystemD
 from utils.PromptFeeder import PromptFeeder
+from utils.utils import Helpers
 
 
 class SystemdUnitTests(unittest.TestCase):
@@ -64,7 +65,8 @@ class SystemdUnitTests(unittest.TestCase):
 
         SystemD.save_settings(settings)
 
-        new_settings = SystemD.load_settings()
+        config_file = f"{Helpers.get_default_node_config_dir()}/config.yaml"
+        new_settings = SystemD.load_settings(config_file)
         self.assertEqual(settings.host_ip, new_settings.host_ip)
 
     @unittest.skip("Can only be executed on Ubuntu")
