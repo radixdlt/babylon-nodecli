@@ -391,8 +391,8 @@ RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
         return settings
 
     @staticmethod
-    def save_settings(settings):
-        with open('systemd.settings.yml', 'w') as f:
+    def save_settings(settings, config_file):
+        with open(config_file, 'w') as f:
             yaml.dump(settings, f, sort_keys=True, default_flow_style=False)
 
     @staticmethod

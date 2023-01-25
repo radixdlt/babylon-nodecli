@@ -63,9 +63,9 @@ class SystemdUnitTests(unittest.TestCase):
         settings.core_node_settings.keydetails = key_details
         settings.host_ip = "6.6.6.6"
 
-        SystemD.save_settings(settings)
-
         config_file = f"{Helpers.get_default_node_config_dir()}/config.yaml"
+        SystemD.save_settings(settings, config_file)
+
         new_settings = SystemD.load_settings(config_file)
         self.assertEqual(settings.host_ip, new_settings.host_ip)
 
