@@ -377,14 +377,14 @@ RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
             settings.core_release = args.release
 
         if not args.nginxrelease:
-            settings.nginx_release = latest_release("radixdlt/radixdlt-nginx")
+            settings.nginx.release = latest_release("radixdlt/radixdlt-nginx")
         else:
-            settings.nginx_release = args.nginxrelease
+            settings.nginx.release = args.nginxrelease
 
         settings.node_binary_url = os.getenv(NODE_BINARY_OVERIDE,
                                              f"https://github.com/radixdlt/radixdlt/releases/download/{settings.core_release}/radixdlt-dist-{settings.core_release}.zip")
 
-        settings.nginx_config_url = os.getenv(NGINX_BINARY_OVERIDE,
+        settings.nginx.config_url = os.getenv(NGINX_BINARY_OVERIDE,
                                               f"https://github.com/radixdlt/radixdlt-nginx/releases/download/{settings.nginx_release}/radixdlt-nginx-{settings.node_type}-conf.zip")
 
         settings.node_version = settings.node_binary_url.rsplit('/', 2)[-2]

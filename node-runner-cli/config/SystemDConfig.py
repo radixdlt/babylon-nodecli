@@ -1,9 +1,11 @@
 from config.BaseConfig import BaseConfig
 from config.KeyDetails import KeyDetails
+from config.Nginx import SystemdNginxConfig
 from utils.utils import Helpers
 
 
 class SystemDSettings(BaseConfig):
+    nginx: SystemdNginxConfig
     service_user: str
     data_directory: str
     host_ip: str
@@ -11,10 +13,6 @@ class SystemDSettings(BaseConfig):
     node_dir: str
     node_secrets_dir: str
     node_version: str
-    nginx_dir: str
-    nginx_secrets_dir: str
-    nginx_release: str
-    nginx_binary_url: str
     core_release: str
     core_binary_url: str
     enable_transaction: str
@@ -40,10 +38,7 @@ class SystemDSettings(BaseConfig):
                  node_dir='/etc/radixdlt/node',
                  node_secrets_dir='/etc/radixdlt/node/secrets',
                  node_version=None,
-                 nginx_dir='/etc/nginx',
-                 nginx_secrets_dir='/etc/nginx/secrets',
-                 nginx_release=None,
-                 nginx_binary_url=None,
+                 nginx_settings=SystemdNginxConfig(),
                  core_release=None,
                  core_binary_url="radixdlt/radixdlt-core",
                  enable_transaction="false",
@@ -55,6 +50,7 @@ class SystemDSettings(BaseConfig):
                            "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts " \
                            "-Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom " \
                            "-DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"):
+        self.nginx = nginx_settings
         self.service_user = service_user
         self.data_directory = data_directory
         self.host_ip = host_ip
@@ -62,10 +58,6 @@ class SystemDSettings(BaseConfig):
         self.node_dir = node_dir
         self.node_secrets_dir = node_secrets_dir
         self.node_version = node_version
-        self.nginx_dir = nginx_dir
-        self.nginx_secrets_dir = nginx_secrets_dir
-        self.nginx_release = nginx_release
-        self.nginx_binary_url = nginx_binary_url
 
         self.core_release = core_release
         self.core_binary_url = core_binary_url
