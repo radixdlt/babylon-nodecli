@@ -5,7 +5,8 @@ from pathlib import Path
 import yaml
 from yaml import UnsafeLoader
 
-from config.SystemDConfig import SystemDSettings, KeyDetails
+from config.SystemDConfig import SystemDSettings
+from config.KeyDetails import KeyDetails
 from env_vars import UNZIPPED_NODE_DIST_FOLDER, APPEND_DEFAULT_CONFIG_OVERIDES, NODE_BINARY_OVERIDE, \
     NGINX_BINARY_OVERIDE
 from github.github import latest_release

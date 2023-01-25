@@ -2,7 +2,8 @@ import os
 import unittest
 from unittest.mock import patch
 
-from config.SystemDConfig import SystemDSettings, KeyDetails
+from config.SystemDConfig import SystemDSettings
+from config.KeyDetails import KeyDetails
 from radixnode import main
 from setup import SystemD
 from utils.PromptFeeder import PromptFeeder

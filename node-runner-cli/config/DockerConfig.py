@@ -7,17 +7,11 @@ import yaml
 from config.BaseConfig import BaseConfig, SetupMode
 from config.CommonDockerSettings import CommonDockerSettings
 from config.GatewayDockerConfig import GatewayDockerSettings
+from config.KeyDetails import KeyDetails
 from env_vars import MOUNT_LEDGER_VOLUME
 from setup import Base
 from utils.Prompts import Prompts
 from utils.utils import Helpers
-
-
-class KeyDetails(BaseConfig):
-    keyfile_path: str = Helpers.get_default_node_config_dir()
-    keyfile_name: str = "node-keystore.ks"
-    keygen_tag: str = None
-    keystore_password: str = None
 
 
 class CoreDockerSettings(BaseConfig):
