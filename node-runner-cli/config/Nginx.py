@@ -8,3 +8,24 @@ class DockerNginxConfig(BaseConfig):
     protect_core: str = "true"
     release = None
     repo = "radixdlt/radixdlt-nginx"
+
+
+class SystemdNginxConfig:
+    dir: str
+    secrets_dir: str
+    release: str
+    config_url: str
+
+    def __init__(self, nginx_dir='/etc/nginx',
+                 nginx_secrets_dir='/etc/nginx/secrets',
+                 nginx_release=None,
+                 nginx_binary_url=None):
+        self.dir = nginx_dir
+        self.secrets_dir = nginx_secrets_dir
+        self.release = nginx_release
+        self.config_url = nginx_binary_url
+
+    def __repr__(self):
+        return "%s (dir=%r, secrets_dir=%r, release=%r, config_url=%r)" % (
+            self.__class__.__name__, self.dir, self.secrets_dir,
+            self.release, self.config_url)

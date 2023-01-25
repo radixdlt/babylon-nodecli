@@ -88,7 +88,7 @@ def install(args):
         SystemD.confirm_config(settings.node_type,
                                settings.core_release,
                                settings.node_binary_url,
-                               settings.nginx_config_url)
+                               settings.nginx.config_url)
 
     SystemD.checkUser()
 
@@ -102,13 +102,13 @@ def install(args):
 
     # Missing PromptFeeder
     # Creates file. Should verify file existence and structure. ----BEGIN CERT--- etc. Maybe cert validity,expiry,etc?
-    SystemD.create_ssl_certs(settings.nginx_secrets_dir, auto_approve)
+    SystemD.create_ssl_certs(settings.nginx.secrets_dir, auto_approve)
 
     # This is actually a download command. Again check against dependencies.
     # Missing PromptFeeder
-    nginx_configured = SystemD.setup_nginx_config(nginx_config_location_Url=settings.nginx_config_url,
+    nginx_configured = SystemD.setup_nginx_config(nginx_config_location_Url=settings.nginx.config_url,
                                                   node_type=settings.node_type,
-                                                  nginx_etc_dir=settings.nginx_dir, backup_time=backup_time,
+                                                  nginx_etc_dir=settings.nginx.dir, backup_time=backup_time,
                                                   auto_approve=auto_approve)
 
     SystemD.setup_service_file(node_version_dir=settings.node_version,
