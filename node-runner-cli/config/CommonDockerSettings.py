@@ -1,25 +1,17 @@
 import json
 
 from config.BaseConfig import BaseConfig, SetupMode
+from config.Nginx import DockerNginxConfig
 from github import github
 from setup import Base
 from utils.Prompts import Prompts, Helpers
-
-
-class NginxConfig(BaseConfig):
-    protect_gateway: str = "true"
-    gateway_behind_auth: str = "true"
-    enable_transaction_api = "false"
-    protect_core: str = "true"
-    release = None
-    repo = "radixdlt/radixdlt-nginx"
 
 
 class CommonDockerSettings(BaseConfig):
     network_id: int = None
     network_name: str = None
     genesis_json_location: str = None
-    nginx_settings: NginxConfig = NginxConfig({})
+    nginx_settings: DockerNginxConfig = DockerNginxConfig({})
     docker_compose: str = f"{Helpers.get_home_dir()}/docker-compose.yml"
 
     def __init__(self, settings: dict):
