@@ -46,15 +46,15 @@ def config(args):
     if auto_approve:
         SystemD.backup_file(settings.common_settings.node_secrets_dir, "node-keystore.ks", backup_time, auto_approve)
 
-    settings.core_node_settings.keydetails = SystemD.generatekey(keyfile_path=settings.common_settings.node_secrets_dir,
+    settings.core_node_settings.keydetails = SystemD.generatekey(keyfile_path=settings.core_node_settings.keydetails.keyfile_path,
                                                                  keygen_tag=settings.core_node_settings.core_release,
                                                                  keystore_password=keystore_password,
                                                                  new=auto_approve)
 
     if settings.common_settings.network_id is None:
         settings.common_settings.network_id = SystemD.get_network_id()
-    if settings.data_directory is None:
-        settings.data_directory = Base.get_data_dir()
+    if settings.core_node_settings.data_directory is None:
+        settings.core_node_settings.data_directory = Base.get_data_dir()
 
     SystemD.setup_default_config(trustednode=settings.core_node_settings.trusted_node,
                                  hostip=settings.common_settings.host_ip,
@@ -63,7 +63,7 @@ def config(args):
                                  transactions_enable=settings.core_node_settings.enable_transaction,
                                  keyfile_location=settings.core_node_settings.keydetails.keyfile_path,
                                  network_id=settings.common_settings.network_id,
-                                 data_folder=settings.data_directory)
+                                 data_folder=settings.core_node_settings.data_directory)
 
     SystemD.backup_file(settings.common_settings.node_secrets_dir, "environment", backup_time, auto_approve)
 

@@ -118,6 +118,7 @@ RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
         network_genesis_file_for_testnets = f"network.genesis_file={genesis_json_location}" if genesis_json_location else ""
         enable_client_api = "true" if node_type == "archivenode" else "false"
 
+        print(node_dir)
         command = f"""
         cat > {node_dir}/default.config << EOF
             ntp=false
@@ -364,6 +365,9 @@ RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
         settings.host_ip = args.hostip
         settings.core_node_settings.enable_transaction = args.enabletransactions
         settings.core_node_settings.data_directory = args.data_directory
+        settings.common_settings.node_dir = args.configdir
+        if args.configdir is not None:
+            settings.common_settings.node_secrets_dir = f"{settings.common_settings.node_dir}/secrets"
         if args.network in ["s", "S", "stokenet"]:
             settings.core_node_settings.network_id = 2
         elif args.network in ["m", "M", "mainnet"]:

@@ -30,12 +30,12 @@ class CommonSystemdSettings(BaseConfig):
     node_dir: str = '/etc/radixdlt/node'
     node_secrets_dir: str = '/etc/radixdlt/node/secrets'
     node_version: str = None
-    network_id: str = "2"
+    network_id: int = 1
 
 
 class SystemDSettings(BaseConfig):
     core_node_settings: CoreSystemdSettings = CoreSystemdSettings({})
-    common_settings: CommonSystemdSettings =  CommonSystemdSettings({})
+    common_settings: CommonSystemdSettings = CommonSystemdSettings({})
     gateway_settings: None
 
     def __iter__(self):
