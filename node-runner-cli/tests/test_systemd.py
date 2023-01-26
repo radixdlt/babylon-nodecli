@@ -51,7 +51,7 @@ class SystemdUnitTests(unittest.TestCase):
                     "-a",
                     "-t", "somenode",
                     "-i", "123.123.123.123",
-                    "-kp", "password",
+                    "-k", "password",
                     "-n", "S",
                     "-d", "/tmp/config",
                     "-dd", "/tmp/data"]):

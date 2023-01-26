@@ -1,4 +1,3 @@
-import json
 import os
 import sys
 from argparse import ArgumentParser
@@ -9,13 +8,13 @@ import yaml
 from deepdiff import DeepDiff
 
 from commands.subcommand import get_decorator, argument
-from config.BaseConfig import SetupMode
 from config.DockerConfig import DockerConfig, CoreDockerSettings
 from config.GatewayDockerConfig import GatewayDockerSettings
 from config.Renderer import Renderer
 from github.github import latest_release
 from setup import Docker, Base
 from setup.AnsibleRunner import AnsibleRunner
+from config.SystemDConfig import extract_network_id_from_arg
 from utils.Prompts import Prompts
 from utils.utils import Helpers, run_shell_command, bcolors
 
@@ -31,26 +30,13 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
 
 
 @dockercommand([
-    argument("-t", "--trustednode",
-             help="Trusted node on radix network."
-                  "Example format: 'radix://rn1qthu8yn06k75dnwpkysyl8smtwn0v4xy29auzjlcrw7vgduxvnwnst6derj@54.216.99.177'."
-                  "This is required only if you are creating config to run a CORE node and "
-                  "if not provided you will be prompted to enter a value",
-             default="",
-             action="store"),
+    argument("-a", "--autoapprove", help="Set this to true to run without any prompts and in mode CORE or GATEWAY."
+                                         "Prompts still appear if you run in DETAILED mode "
+                                         "Use this for automation purpose only", action="store_true"),
     argument("-d", "--configdir",
              help=f"Path to node-config directory where config file will stored. Default value is {Helpers.get_default_node_config_dir()}",
              action="store",
              default=f"{Helpers.get_default_node_config_dir()}"),
-    argument("-n", "--networkid",
-             help="Network id of network you want to connect.For stokenet it is 2 and for mainnet it is 1."
-                  "If not provided you will be prompted to enter a value ",
-             action="store",
-             default=""),
-    argument("-p", "--postgrespassword",
-             help="Network Gateway uses Postgres as datastore. This is password for the user `postgres`.",
-             action="store",
-             default=""),
     argument("-k", "--keystorepassword",
              help=f"""Core Node requires a keystore. This is the password for the keystore file
                     the CLI will create new key with name `node-keystore.ks` in config directory.
@@ -59,15 +45,6 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
              """,
              action="store",
              default=""),
-    argument("-nk", "--newkeystore", help="Set this to true to create a new store without any prompts using location"
-                                          " defined in argument configdir", action="store_true"),
-    argument("-xc", "--disablenginxforcore", help="Core Node API's are protected by Basic auth setting."
-                                                  "Set this to disable to nginx for core",
-             action="store", default="", choices=["true", "false"]),
-    argument("-xg", "--disablenginxforgateway", help="GateWay API's end points are protected by Basic auth settings. "
-                                                     "Set this to disable to nginx for gateway",
-             action="store", default="", choices=["true", "false"]),
-
     argument("-m", "--setupmode", nargs="+",
              required=True,
              help="""Quick config mode with assumed defaults. It supports two quick modes and a detailed config mode.
@@ -76,9 +53,31 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
                   \n\nDETAILED: Default value if not provided. This mode takes your through series of questions.
                   """,
              choices=["CORE", "GATEWAY", "DETAILED"], action="store"),
-    argument("-a", "--autoapprove", help="Set this to true to run without any prompts and in mode CORE or GATEWAY."
-                                         "Prompts still appear if you run in DETAILED mode "
-                                         "Use this for automation purpose only", action="store_true")
+    argument("-n", "--networkid",
+             help="Network id of network you want to connect.For stokenet it is 2 and for mainnet it is 1."
+                  "If not provided you will be prompted to enter a value ",
+             action="store",
+             default=""),
+    argument("-nk", "--newkeystore", help="Set this to true to create a new store without any prompts using location"
+                                          " defined in argument configdir", action="store_true"),
+    argument("-t", "--trustednode",
+             help="Trusted node on radix network."
+                  "Example format: 'radix://rn1qthu8yn06k75dnwpkysyl8smtwn0v4xy29auzjlcrw7vgduxvnwnst6derj@54.216.99.177'."
+                  "This is required only if you are creating config to run a CORE node and "
+                  "if not provided you will be prompted to enter a value",
+             default="",
+             action="store"),
+    argument("-p", "--postgrespassword",
+             help="Network Gateway uses Postgres as datastore. This is password for the user `postgres`.",
+             action="store",
+             default=""),
+    argument("-xc", "--disablenginxforcore", help="Core Node API's are protected by Basic auth setting."
+                                                  "Set this to disable to nginx for core",
+             action="store", default="", choices=["true", "false"]),
+    argument("-xg", "--disablenginxforgateway", help="GateWay API's end points are protected by Basic auth settings. "
+                                                     "Set this to disable to nginx for gateway",
+             action="store", default="", choices=["true", "false"]),
+
 ])
 def config(args):
     """
@@ -90,7 +89,7 @@ def config(args):
     setupmode = SetupMode.instance()
     setupmode.mode = args.setupmode
     trustednode = args.trustednode if args.trustednode != "" else None
-    networkid = args.networkid if args.networkid != "" else None
+    networkid = extract_network_id_from_arg(args.networkid)
     keystore_password = args.keystorepassword if args.keystorepassword != "" else None
     postgrespassword = args.postgrespassword if args.postgrespassword != "" else None
     nginx_on_gateway = args.disablenginxforgateway if args.disablenginxforgateway != "" else None
