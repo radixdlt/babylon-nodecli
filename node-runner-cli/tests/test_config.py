@@ -8,6 +8,7 @@ from pathlib import Path
 from config.DockerConfig import DockerConfig
 from config.Nginx import SystemdNginxConfig
 from config.SystemDConfig import SystemDSettings, extract_network_id_from_arg
+from setup import Base
 
 
 class ConfigUnitTests(unittest.TestCase):
@@ -114,14 +115,14 @@ gateway_settings:
         self.assertEqual(config_as_yaml, fixture)
 
     def test_network_id_can_be_parsed(self):
-        self.assertEqual(extract_network_id_from_arg("1"), 1)
-        self.assertEqual(extract_network_id_from_arg("m"), 1)
-        self.assertEqual(extract_network_id_from_arg("M"), 1)
-        self.assertEqual(extract_network_id_from_arg("mainnet"), 1)
-        self.assertEqual(extract_network_id_from_arg("2"), 2)
-        self.assertEqual(extract_network_id_from_arg("s"), 2)
-        self.assertEqual(extract_network_id_from_arg("S"), 2)
-        self.assertEqual(extract_network_id_from_arg("stokenet"), 2)
+        self.assertEqual(Base.validate_network_id_input("1"), 1)
+        self.assertEqual(Base.validate_network_id_input("m"), 1)
+        self.assertEqual(Base.validate_network_id_input("M"), 1)
+        self.assertEqual(Base.validate_network_id_input("mainnet"), 1)
+        self.assertEqual(Base.validate_network_id_input("2"), 2)
+        self.assertEqual(Base.validate_network_id_input("s"), 2)
+        self.assertEqual(Base.validate_network_id_input("S"), 2)
+        self.assertEqual(Base.validate_network_id_input("stokenet"), 2)
 
 
 

@@ -5,7 +5,7 @@ from unittest.mock import patch
 from config.KeyDetails import KeyDetails
 from config.SystemDConfig import SystemDSettings
 from radixnode import main
-from setup import SystemD
+from setup.SystemD import SystemD
 from utils.PromptFeeder import PromptFeeder
 from utils.utils import Helpers
 

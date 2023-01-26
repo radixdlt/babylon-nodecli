@@ -1,3 +1,4 @@
+import ipaddress
 import os
 import sys
 
@@ -330,3 +331,15 @@ class Prompts:
                 f"Do you want to update to latest version {latest_version},"
                 f"Press ENTER to accept latest version or type in version you want to install:")
             return Helpers.check_Yes(Prompts.check_default(answer, latest_version))
+
+    @classmethod
+    def ask_host_ip(cls) -> str:
+        print("\nEnter the host ip of this node:")
+        answer = input(
+                "\nEnter the host ip of this node:")
+        try:
+            ipaddress.ip_address(answer)
+        except ValueError:
+            print("'{ip_string}' is not a valid ip address.")
+            sys.exit(1)
+        return answer
