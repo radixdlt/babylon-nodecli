@@ -59,7 +59,7 @@ common_settings:
   service_user: radixdlt
   node_dir: /etc/radixdlt/node
   node_secrets_dir: /etc/radixdlt/node/secrets
-  network_id: '2'
+  network_id: 1
 """
         self.assertEqual(config_as_yaml, fixture)
 
