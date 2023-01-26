@@ -48,7 +48,7 @@ class SystemdUnitTests(unittest.TestCase):
     def test_systemd_config_can_run_without_prompt(self):
         with patch("sys.argv",
                    ["main", "systemd", "config",
-                    "-a", "true",
+                    "-a",
                     "-t", "somenode",
                     "-i", "123.123.123.123",
                     "-kp", "password",
