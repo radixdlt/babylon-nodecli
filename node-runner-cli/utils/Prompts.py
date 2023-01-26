@@ -339,6 +339,6 @@ class Prompts:
         try:
             ipaddress.ip_address(answer)
         except ValueError:
-            print("'{ip_string}' is not a valid ip address.")
+            print(f"'{ip_string}' is not a valid ip address.")
             sys.exit(1)
         return answer
