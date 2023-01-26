@@ -51,8 +51,8 @@ def config(args):
                                                                  keystore_password=keystore_password,
                                                                  new=auto_approve)
 
-    if settings.network_id is None:
-        settings.network_id = SystemD.get_network_id()
+    if settings.common_settings.network_id is None:
+        settings.common_settings.network_id = SystemD.get_network_id()
     if settings.data_directory is None:
         settings.data_directory = Base.get_data_dir()
 
@@ -61,8 +61,8 @@ def config(args):
                                  node_dir=settings.common_settings.node_dir,
                                  node_type=settings.core_node_settings.nodetype,
                                  transactions_enable=settings.core_node_settings.enable_transaction,
-                                 keyfile_location=settings.core_node_settings.keyfile_path,
-                                 network_id=settings.network_id,
+                                 keyfile_location=settings.core_node_settings.keydetails.keyfile_path,
+                                 network_id=settings.common_settings.network_id,
                                  data_folder=settings.data_directory)
 
     SystemD.backup_file(settings.common_settings.node_secrets_dir, "environment", backup_time, auto_approve)
@@ -75,7 +75,7 @@ def config(args):
     SystemD.backup_file("/etc/systemd/system", "radixdlt-node.service", backup_time, auto_approve)
 
     # save it
-    SystemD.save_settings(settings,f"{args.configdir}/config.yaml")
+    SystemD.save_settings(settings, f"{args.configdir}/config.yaml")
 
 
 @systemdcommand([
@@ -108,12 +108,8 @@ def install(args):
     backup_time = Helpers.get_current_date_time()
     SystemD.backup_file("/lib/systemd/system", "nginx.service", backup_time, auto_approve)
 
-    # Missing PromptFeeder
-    # Creates file. Should verify file existence and structure. ----BEGIN CERT--- etc. Maybe cert validity,expiry,etc?
-    SystemD.create_ssl_certs(settings.nginx.secrets_dir, auto_approve)
+    SystemD.create_ssl_certs(settings.common_settings.nginx_settings.secrets_dir, auto_approve)
 
-    # This is actually a download command. Again check against dependencies.
-    # Missing PromptFeeder
     nginx_configured = SystemD.setup_nginx_config(
         nginx_config_location_Url=settings.common_settings.nginx_settings.config_url,
         node_type=settings.core_node_settings.nodetype,
@@ -124,7 +120,6 @@ def install(args):
                                node_dir=settings.common_settings.node_dir,
                                node_secrets_path=settings.common_settings.node_secrets_dir)
 
-    # This can only be tested in E2E environment. This is the core functionality of this command in my eyes.
     if not args.update:
         SystemD.start_node_service()
     else:
