@@ -50,23 +50,31 @@ class SystemDSettings(BaseConfig):
             elif self.__getattribute__(attr):
                 yield attr, self.__getattribute__(attr)
 
-    def __repr__(self):
-        return "%s (service_user=%r, data_directory=%r, host_ip=%r, node_type=%r, node_dir=%r, node_secrets_dir=%r, " \
-               "node_version=%r, nginx_dir=%r, nginx_secrets_dir=%r, nginx_release=%r, nginx_binary_url=%r, " \
-               "core_release=%r, core_binary_url=%r, enable_transaction=%r, trusted_node=%r, keydetails=%r, " \
-               "java_opts=%r)" % (
-            self.__class__.__name__, self.service_user, self.data_directory, self.host_ip, self.node_type,
-            self.node_dir, self.node_secrets_dir, self.node_version, self.nginx_dir, self.nginx_secrets_dir,
-            self.nginx_release, self.nginx_binary_url, self.core_release, self.core_binary_url,
-            self.enable_transaction, self.trusted_node, self.keydetails, self.java_opts)
-
     def to_yaml(self):
         config_to_dump = dict(self)
         config_to_dump["core_node_settings"] = dict(self.core_node_settings)
         config_to_dump["core_node_settings"]["keydetails"] = dict(self.core_node_settings.keydetails)
         config_to_dump["common_settings"] = dict(self.common_settings)
         config_to_dump["common_settings"]["nginx_settings"] = dict(self.common_settings.nginx_settings)
-        return yaml.dump(config_to_dump, sort_keys=False, default_flow_style=False, explicit_start=True, allow_unicode=True)
+        return yaml.dump(config_to_dump, sort_keys=False, default_flow_style=False, explicit_start=True,
+                         allow_unicode=True)
+
+    def to_file(self, config_file):
+        config_to_dump = dict(self)
+        config_to_dump["core_node_settings"] = dict(self.core_node_settings)
+        config_to_dump["core_node_settings"]["keydetails"] = dict(self.core_node_settings.keydetails)
+        config_to_dump["common_settings"] = dict(self.common_settings)
+        config_to_dump["common_settings"]["nginx_settings"] = dict(self.common_settings.nginx_settings)
+        with open(config_file, 'w') as f:
+            yaml.dump(config_to_dump, f, sort_keys=True, default_flow_style=False)
+
+
+def from_dict(dictionary: dict) -> SystemDSettings:
+    settings = SystemDSettings({})
+    settings.core_node_settings =CoreSystemdSettings(dictionary["core_node_settings"])
+    settings.core_node_settings.keydetails = KeyDetails(dictionary["core_node_settings"]["keydetails"])
+    settings.common_settings.nginx_settings = SystemdNginxConfig(dictionary["common_settings"]["nginx_settings"])
+    return settings
 
 
 def extract_network_id_from_arg(networkid_arg) -> int:

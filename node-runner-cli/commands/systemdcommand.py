@@ -191,20 +191,11 @@ def dependencies(args):
     Run this command on fresh VM or on a existing VM  as the command is tested to be idempotent
     """
 
-    # apt-get
     Base.dependencies()
-    # apt-get
     SystemD.install_java()
-    # Linux specific user creation
     SystemD.setup_user()
-    # basic folder operations. Too simple to test
     SystemD.make_etc_directory()
-    # basic folder operations. Too simple to test
     SystemD.make_data_directory()
-    # User Password change.
-    # Promptfeed required but not possible/easy
     SystemD.create_service_user_password()
-    # basic file operations. Too simple to test
     SystemD.create_initial_service_file()
-    # Info screen. Testable but nonsense
     SystemD.sudoers_instructions()
