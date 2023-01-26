@@ -5,7 +5,7 @@ from pathlib import Path
 import yaml
 from yaml import UnsafeLoader
 
-from config.SystemDConfig import SystemDSettings
+from config.SystemDConfig import SystemDSettings, extract_network_id_from_arg
 from config.KeyDetails import KeyDetails
 from env_vars import UNZIPPED_NODE_DIST_FOLDER, APPEND_DEFAULT_CONFIG_OVERIDES, NODE_BINARY_OVERIDE, \
     NGINX_BINARY_OVERIDE
@@ -358,6 +358,8 @@ RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
             sys.exit(1)
         return
 
+
+
     @staticmethod
     def parse_config_from_args(args) -> SystemDSettings:
         settings = SystemDSettings({})
@@ -368,13 +370,9 @@ RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
         settings.common_settings.node_dir = args.configdir
         if args.configdir is not None:
             settings.common_settings.node_secrets_dir = f"{settings.common_settings.node_dir}/secrets"
-        if args.network in ["s", "S", "stokenet"]:
-            settings.core_node_settings.network_id = 2
-        elif args.network in ["m", "M", "mainnet"]:
-            settings.core_node_settings.network_id = 1
-        else:
-            print("Pleese enter s or m for stokenet or mainnet.")
-            sys.exit()
+
+        settings.core_node_settings.network_id = extract_network_id_from_arg(args.networkid)
+
         if not args.release:
             settings.core_node_settings.core_release = latest_release()
         else:

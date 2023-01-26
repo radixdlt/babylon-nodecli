@@ -390,7 +390,7 @@ jobs:
           whoami 
           ./radixnode systemd config -a true \
             -t "radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210" \
-            -i "18.133.170.30" -kp "${KEYSTORE_PASSWORD}" -n S -dd "$HOME/data"
+            -i "18.133.170.30" -k "${KEYSTORE_PASSWORD}" -n S -dd "$HOME/data"
           cat systemd.settings.yml
         env:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}

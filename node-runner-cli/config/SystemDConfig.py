@@ -1,3 +1,5 @@
+import sys
+
 import yaml
 
 from config.BaseConfig import BaseConfig
@@ -65,3 +67,15 @@ class SystemDSettings(BaseConfig):
         config_to_dump["common_settings"] = dict(self.common_settings)
         config_to_dump["common_settings"]["nginx_settings"] = dict(self.common_settings.nginx_settings)
         return yaml.dump(config_to_dump, sort_keys=False, default_flow_style=False, explicit_start=True, allow_unicode=True)
+
+
+def extract_network_id_from_arg(networkid_arg) -> int:
+    if networkid_arg == 1 or networkid_arg == 2:
+        return networkid_arg
+    elif networkid_arg in ["2", "s", "S", "stokenet"]:
+        return 2
+    elif networkid_arg in ["1", "m", "M", "mainnet"]:
+        return 1
+    print(
+        "Not a valid argument for network id. Please enter either '1' 'm' 'M' 'mainnet' or '2' 's' 'S' 'stokenet'")
+    sys.exit(1)
