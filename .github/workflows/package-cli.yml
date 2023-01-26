@@ -388,7 +388,7 @@ jobs:
           chmod +x ./radixnode
           pwd        
           whoami 
-          ./radixnode systemd config -a true \
+          ./radixnode systemd config -a \
             -t "radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210" \
             -i "18.133.170.30" -k "${KEYSTORE_PASSWORD}" -n S -dd "$HOME/data"
           cat systemd.settings.yml
@@ -403,7 +403,7 @@ jobs:
           export DISABLE_VERSION_CHECK=true
           export COMPOSE_HTTP_TIMEOUT=360
           whoami
-          ./radixnode systemd install -a true
+          ./radixnode systemd install -a
           sleep 60
           export DOCKER_COMPOSE_FOLDER_PREFIX=radixdlt
           ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
