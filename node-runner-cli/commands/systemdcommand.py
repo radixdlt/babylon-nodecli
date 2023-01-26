@@ -3,6 +3,7 @@ from argparse import ArgumentParser
 
 from commands.subcommand import get_decorator, argument
 from config.BaseConfig import SetupMode
+from config.SystemDConfig import SystemDSettings
 from setup import SystemD, Base
 from utils.utils import Helpers
 
@@ -67,12 +68,13 @@ def config(args):
     keystore_password = args.keystorepassword
     backup_time = Helpers.get_current_date_time()
 
-    settings = SystemD.parse_config_from_args(args)
+    settings: SystemDSettings = SystemD.parse_config_from_args(args)
 
     settings.common_settings.ask_host_ip(args.hostip)
     settings.core_node_settings.ask_enable_transaction(args.enabletransactions)
     settings.core_node_settings.ask_trusted_node(args.trustednode)
     settings.common_settings.ask_network_id(args.networkid)
+    settings.core_node_settings.ask_data_directory(args.data_directory)
 
     if auto_approve:
         SystemD.backup_file(settings.common_settings.node_secrets_dir, "node-keystore.ks", backup_time, auto_approve)
@@ -82,12 +84,6 @@ def config(args):
         keygen_tag=settings.core_node_settings.core_release,
         keystore_password=keystore_password,
         new=auto_approve)
-
-    if settings.common_settings.network_id is None:
-        settings.common_settings.network_id = SystemD.get_network_id()
-
-    if settings.core_node_settings.data_directory is None:
-        settings.core_node_settings.data_directory = Base.get_data_dir()
 
     SystemD.setup_default_config(trustednode=settings.core_node_settings.trusted_node,
                                  hostip=settings.common_settings.host_ip,
