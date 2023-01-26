@@ -282,16 +282,10 @@ class Helpers:
 
     @staticmethod
     def input_guestion(question, question_key=None):
-        print("PROMPT_FEEDS")
-        print(os.getenv("PROMPT_FEEDS"))
         PromptFeeder.instance()
         prompt_feed = None
         if question_key:
             prompt_feed = PromptFeeder.instance().get_answer(question_key)
-            print("questionkey is")
-            print(question_key)
-            print("promptfeed is")
-            print(prompt_feed)
         if not prompt_feed:
             return input(f"\n{bcolors.WARNING}{question}{bcolors.ENDC}")
         else:
