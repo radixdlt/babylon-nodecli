@@ -37,6 +37,13 @@ def systemdcommand(systemdcommand_args=None, parent=systemd_parser):
              """,
              action="store",
              default=""),
+    argument("-m", "--setupmode", nargs="+",
+             required=True,
+             help="""Quick config mode with assumed defaults. It supports two quick modes and a detailed config mode.
+              \n\nCORE: Use this value to setup CORE using defaults.
+              \n\nDETAILED: Default value if not provided. This mode takes your through series of questions.
+              """,
+             choices=["CORE" "DETAILED"], action="store"),
     argument("-n", "--networkid",
              help="Network id of network you want to connect.For stokenet it is 2 and for mainnet it is 1."
                   "If not provided you will be prompted to enter a value ",
@@ -45,7 +52,7 @@ def systemdcommand(systemdcommand_args=None, parent=systemd_parser):
     argument("-r", "--release",
              help="Version of node software to install",
              action="store"),
-    argument("-t", "--trustednode", required=True, help="Trusted node on radix network", action="store"),
+    argument("-t", "--trustednode", help="Trusted node on radix network", action="store"),
     argument("-ts", "--enabletransactions", help="Enable transaction stream api", action="store_true"),
     argument("-x", "--nginxrelease", help="Version of radixdlt nginx release ", action="store"),
 ])
