@@ -1,9 +1,6 @@
 import getpass
 import os
 import sys
-from pathlib import Path
-
-import requests
 
 from setup.AnsibleRunner import AnsibleRunner
 from utils.PromptFeeder import QuestionKeys
@@ -98,7 +95,7 @@ class Base:
         network_prompt = Helpers.input_guestion(
             "Select the network you want to connect [S]Stokenet or [M]Mainnet or network_id:",
             QuestionKeys.select_network)
-        network_id = validate_network_id(network_prompt)
+        network_id = Base.validate_network_id(network_prompt)
         return network_id
 
     @staticmethod

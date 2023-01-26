@@ -3,7 +3,7 @@ import json
 from config.BaseConfig import BaseConfig, SetupMode
 from config.Nginx import DockerNginxConfig
 from github import github
-from setup import Base
+from setup.Base import Base
 from utils.Prompts import Prompts, Helpers
 
 

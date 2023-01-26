@@ -4,8 +4,6 @@ import sys
 
 import yaml
 
-from config.BaseConfig import SetupMode
-from config.GatewayDockerConfig import PostGresSettings
 from env_vars import DOCKER_COMPOSE_FOLDER_PREFIX, COMPOSE_HTTP_TIMEOUT, RADIXDLT_NODE_KEY_PASSWORD, POSTGRES_PASSWORD
 from github import github
 from setup.AnsibleRunner import AnsibleRunner

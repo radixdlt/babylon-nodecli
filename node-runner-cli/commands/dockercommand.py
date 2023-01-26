@@ -13,8 +13,9 @@ from config.DockerConfig import DockerConfig, CoreDockerSettings
 from config.GatewayDockerConfig import GatewayDockerSettings
 from config.Renderer import Renderer
 from github.github import latest_release
-from setup import Docker, Base
 from setup.AnsibleRunner import AnsibleRunner
+from setup.Base import Base
+from setup.Docker import Docker
 from utils.Prompts import Prompts
 from utils.utils import Helpers, run_shell_command, bcolors
 
@@ -113,7 +114,7 @@ def config(args):
         "\nCreating config file using the answers from the questions that would be asked in next steps."
         f"\nLocation of the config file: {bcolors.OKBLUE}{config_file}{bcolors.ENDC}")
 
-    configuration.common_settings.ask_network_id(networkid)
+    configuration.common_settings.ask_network_id(args.networkid)
     configuration.common_settings.ask_existing_docker_compose_file()
 
     config_to_dump = {"version": "0.1"}
