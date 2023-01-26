@@ -98,17 +98,17 @@ class Base:
         network_prompt = Helpers.input_guestion(
             "Select the network you want to connect [S]Stokenet or [M]Mainnet or network_id:",
             QuestionKeys.select_network)
-        network_id = Base.validate_network_id_input(network_prompt)
+        network_id = validate_network_id(network_prompt)
         return network_id
 
     @staticmethod
-    def validate_network_id_input(network_prompt):
+    def validate_network_id(network_prompt):
         if network_prompt.lower() in ["s", "S", "stokenet"]:
             network_id = 2
         elif network_prompt.lower() in ["m", "M", "mainnet"]:
             network_id = 1
         elif network_prompt in ["1", "2", "3", "4", "5", "6", "7", "8"]:
-            network_id = network_prompt
+            network_id = int(network_prompt)
         else:
             print("Input for network id is wrong. Exiting command")
             sys.exit()

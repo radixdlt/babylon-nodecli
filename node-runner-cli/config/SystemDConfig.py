@@ -39,13 +39,15 @@ class CoreSystemdSettings(BaseConfig):
         self.trusted_node = trusted_node
 
     def ask_data_directory(self, data_directory):
-        if not data_directory:
-            if "DETAILED" in SetupMode.instance().mode:
-                self.data_directory = Base.get_data_dir(create_dir=False)
-            if os.environ.get(MOUNT_LEDGER_VOLUME, "true").lower() == "false":
-                self.data_directory = None
-            if self.data_directory:
-                Path(self.data_directory).mkdir(parents=True, exist_ok=True)
+        if data_directory is not None and data_directory != "":
+            self.data_directory = data_directory
+        if "DETAILED" in SetupMode.instance().mode:
+            self.data_directory = Base.get_data_dir(create_dir=False)
+        if os.environ.get(MOUNT_LEDGER_VOLUME, "true").lower() == "false":
+            self.data_directory = None
+        if self.data_directory:
+            Path(self.data_directory).mkdir(parents=True, exist_ok=True)
+
 
 class CommonSystemdSettings(BaseConfig):
     nginx_settings: SystemdNginxConfig = SystemdNginxConfig({})
@@ -80,7 +82,7 @@ class CommonSystemdSettings(BaseConfig):
     def ask_network_id(self, network_id):
         if not network_id:
             network_id = Base.get_network_id()
-        self.set_network_id(int(network_id))
+        self.set_network_id(validate_network_id(network_id))
         self.set_genesis_json_location(Base.path_to_genesis_json(self.network_id))
 
 
@@ -139,3 +141,16 @@ def extract_network_id_from_arg(network_id_arg) -> int:
         print(
             "Not a valid argument for network id. Please enter either '1' 'm' 'M' 'mainnet' or '2' 's' 'S' 'stokenet'")
         sys.exit(1)
+
+
+def validate_network_id(network_prompt):
+    if network_prompt.lower() in ["s", "S", "stokenet"]:
+        network_id = 2
+    elif network_prompt.lower() in ["m", "M", "mainnet"]:
+        network_id = 1
+    elif network_prompt in ["1", "2", "3", "4", "5", "6", "7", "8"]:
+        network_id = int(network_prompt)
+    else:
+        print("Input for network id is wrong. Exiting command")
+        sys.exit()
+    return network_id

@@ -9,7 +9,7 @@ from config.DockerConfig import DockerConfig
 from config.Nginx import SystemdNginxConfig
 from config.SystemDConfig import SystemDSettings, extract_network_id_from_arg
 from setup import Base
-from setup.SystemD import SystemD
+from setup.SystemD import SystemD, validate_network_id
 
 
 class ConfigUnitTests(unittest.TestCase):
@@ -116,16 +116,14 @@ gateway_settings:
         self.assertEqual(config_as_yaml, fixture)
 
     def test_network_id_can_be_parsed(self):
-        self.assertEqual(SystemD.validate_network_id_input("1"), 1)
-        self.assertEqual(SystemD.validate_network_id_input("m"), 1)
-        self.assertEqual(SystemD.validate_network_id_input("M"), 1)
-        self.assertEqual(SystemD.validate_network_id_input("mainnet"), 1)
-        self.assertEqual(SystemD.validate_network_id_input("2"), 2)
-        self.assertEqual(SystemD.validate_network_id_input("s"), 2)
-        self.assertEqual(SystemD.validate_network_id_input("S"), 2)
-        self.assertEqual(SystemD.validate_network_id_input("stokenet"), 2)
-
-
+        self.assertEqual(validate_network_id("1"), 1)
+        self.assertEqual(validate_network_id("m"), 1)
+        self.assertEqual(validate_network_id("M"), 1)
+        self.assertEqual(validate_network_id("mainnet"), 1)
+        self.assertEqual(validate_network_id("2"), 2)
+        self.assertEqual(validate_network_id("s"), 2)
+        self.assertEqual(validate_network_id("S"), 2)
+        self.assertEqual(validate_network_id("stokenet"), 2)
 
 def suite():
     """ This defines all the tests of a module"""

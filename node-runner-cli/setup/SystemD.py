@@ -358,19 +358,6 @@ RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
             sys.exit(1)
         return
 
-    def validate_network_id_input(self, network_prompt):
-        if network_prompt.lower() in ["s", "S", "stokenet"]:
-            network_id = 2
-        elif network_prompt.lower() in ["m", "M", "mainnet"]:
-            network_id = 1
-        elif network_prompt in ["1", "2", "3", "4", "5", "6", "7", "8"]:
-            network_id = network_prompt
-        else:
-            print("Input for network id is wrong. Exiting command")
-            sys.exit()
-        return network_id
-
-
     @staticmethod
     def parse_config_from_args(args) -> SystemDSettings:
         settings = SystemDSettings({})
@@ -379,7 +366,7 @@ RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
         settings.core_node_settings.enable_transaction = args.enabletransactions
         settings.core_node_settings.data_directory = args.data_directory
         settings.common_settings.node_dir = args.configdir
-        settings.core_node_settings.network_id = SystemD.validate_network_id_input(args.networkid)
+        settings.core_node_settings.network_id = validate_network_id(args.networkid)
         if args.configdir is not None:
             settings.common_settings.node_secrets_dir = f"{settings.common_settings.node_dir}/secrets"
 
@@ -416,3 +403,18 @@ RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
         with open(config_file, 'r') as f:
             dictionary = yaml.load(f, Loader=UnsafeLoader)
         return from_dict(dictionary)
+
+
+def validate_network_id(network_prompt):
+    if network_prompt.lower() in ["s", "S", "stokenet"]:
+        network_id = 2
+    elif network_prompt.lower() in ["m", "M", "mainnet"]:
+        network_id = 1
+    elif network_prompt in ["1", "2", "3", "4", "5", "6", "7", "8"]:
+        network_id = int(network_prompt)
+    elif network_prompt is None or network_prompt == "":
+        return None
+    else:
+        print("Input for network id is wrong. Exiting command")
+        sys.exit()
+    return network_id

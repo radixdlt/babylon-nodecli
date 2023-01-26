@@ -136,3 +136,5 @@ dmypy.json
 
 node-runner-cli/src
 node-runner-cli/systemd.settings.yml
+
+.DS_Store
