@@ -5,7 +5,7 @@ from pathlib import Path
 import yaml
 from yaml import UnsafeLoader
 
-from config.SystemDConfig import SystemDSettings, extract_network_id_from_arg
+from config.SystemDConfig import SystemDSettings, extract_network_id_from_arg, from_dict
 from config.KeyDetails import KeyDetails
 from env_vars import UNZIPPED_NODE_DIST_FOLDER, APPEND_DEFAULT_CONFIG_OVERIDES, NODE_BINARY_OVERIDE, \
     NGINX_BINARY_OVERIDE
@@ -393,9 +393,8 @@ RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
         return settings
 
     @staticmethod
-    def save_settings(settings, config_file):
-        with open(config_file, 'w') as f:
-            yaml.dump(settings, f, sort_keys=True, default_flow_style=False)
+    def save_settings(settings: SystemDSettings, config_file: str):
+        settings.to_file(config_file)
 
     @staticmethod
     def load_settings(config_file) -> SystemDSettings:
@@ -403,5 +402,5 @@ RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
             print(f"No configuration found. Execute 'radixnode systemd config' first.")
             sys.exit()
         with open(config_file, 'r') as f:
-            settings = yaml.load(f, Loader=UnsafeLoader)
-        return settings
+            dictionary = yaml.load(f, Loader=UnsafeLoader)
+        return from_dict(dictionary)
