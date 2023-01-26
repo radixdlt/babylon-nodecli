@@ -91,7 +91,7 @@ class SystemD(Base):
     def backup_file(filepath, filename, backup_time, auto_approve=False):
         if os.path.isfile(f"{filepath}/{filename}"):
             backup_yes = "Y"
-            if not auto_approve:
+            if auto_approve is None:
                 backup_yes = input(f"{filename} file exists. Do you want to back up [Y/n]:")
             if Helpers.check_Yes(backup_yes) or auto_approve:
                 Path(f"{backup_time}").mkdir(parents=True, exist_ok=True)
@@ -193,7 +193,7 @@ RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
         run_shell_command('unzip radixdlt-dist.zip', shell=True)
         run_shell_command(f'mkdir -p {node_dir}/{node_version}', shell=True)
         if os.listdir(f'{node_dir}/{node_version}'):
-            if not auto_approve:
+            if auto_approve is None:
                 print(f"Directory {node_dir}/{node_version} is not empty")
                 okay = input("Should the directory be removed [Y/n]?:")
             else:
@@ -232,13 +232,13 @@ RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
             print(f"Node type - {node_type} specificed should be either archivenode or fullnode")
             sys.exit()
 
-        if not auto_approve:
+        if auto_approve is None:
             backup_yes = input("Do you want to backup existing nginx config [Y/n]?:")
             if Helpers.check_Yes(backup_yes):
                 Path(f"{backup_time}/nginx-config").mkdir(parents=True, exist_ok=True)
                 run_shell_command(f"sudo cp -r {nginx_etc_dir} {backup_time}/nginx-config", shell=True)
 
-        if not auto_approve:
+        if auto_approve is None:
             continue_nginx = input("Do you want to continue with nginx setup [Y/n]?:")
         else:
             continue_nginx = "Y"
@@ -259,7 +259,7 @@ RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
     def create_ssl_certs(secrets_dir, auto_approve=None):
         SystemD.make_nginx_secrets_directory()
         if os.path.isfile(f'{secrets_dir}/server.key') and os.path.isfile(f'{secrets_dir}/server.pem'):
-            if not auto_approve:
+            if auto_approve is None:
                 print(f"Files  {secrets_dir}/server.key and os.path.isfile(f'{secrets_dir}/server.pem already exists")
                 answer = input("Do you want to regenerate y/n :")
                 if Helpers.check_Yes(answer):
@@ -277,7 +277,7 @@ RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
             """, shell=True)
 
         if os.path.isfile(f'{secrets_dir}/dhparam.pem'):
-            if not auto_approve:
+            if auto_approve is None:
                 print(f"File {secrets_dir}/dhparam.pem already exists")
                 answer = input("Do you want to regenerate y/n :")
                 if Helpers.check_Yes(answer):
