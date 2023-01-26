@@ -18,5 +18,6 @@ cmds-reference: local
 
 .PHONEY: test
 test: test
+ 	python -m unittest tests.test_config
 	 python -m unittest tests.test_systemd
 

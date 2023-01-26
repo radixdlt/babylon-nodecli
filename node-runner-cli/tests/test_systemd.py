@@ -28,7 +28,7 @@ class SystemdUnitTests(unittest.TestCase):
         SystemD.set_environment_variables("dummypw", "/tmp")
         self.assertTrue(os.path.isfile("/tmp/environment"))
 
-    @unittest.skip("Tests with PROMPT_FEEDS can only be run individually")
+
     def test_systemd_creates_default_config_without_asking(self):
         os.environ['PROMPT_FEEDS'] = "test-prompts/individual-prompts/systemd_install_default_config.yml"
         PromptFeeder.instance().load_prompt_feeds()
@@ -44,7 +44,7 @@ class SystemdUnitTests(unittest.TestCase):
         SystemD.setup_service_file("someversion", "/tmp", "/tmp/secrets", "/tmp/servicefile")
         self.assertTrue(os.path.isfile("/tmp/servicefile"))
 
-    @unittest.skip("Fails for some reason")
+
     def test_systemd_config_can_run_without_prompt(self):
         with patch("sys.argv",
                    ["main", "systemd", "config",
@@ -53,6 +53,7 @@ class SystemdUnitTests(unittest.TestCase):
                     "-i", "123.123.123.123",
                     "-kp", "password",
                     "-n", "S",
+                    "-d", "/tmp/config",
                     "-dd", "/tmp/data"]):
             main()
 
