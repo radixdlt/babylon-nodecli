@@ -35,6 +35,7 @@ jobs:
       - name: Execute Unit tests
         run: |
           cd node-runner-cli
+          make install
           make test
 
   package_ubuntu_cli:
