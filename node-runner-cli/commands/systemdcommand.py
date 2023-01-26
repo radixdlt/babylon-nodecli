@@ -4,7 +4,8 @@ from argparse import ArgumentParser
 from commands.subcommand import get_decorator, argument
 from config.BaseConfig import SetupMode
 from config.SystemDConfig import SystemDSettings
-from setup import SystemD, Base
+from setup.Base import Base
+from setup.SystemD import SystemD
 from utils.utils import Helpers
 
 systemdcli = ArgumentParser(
@@ -41,9 +42,10 @@ def systemdcommand(systemdcommand_args=None, parent=systemd_parser):
              required=True,
              help="""Quick config mode with assumed defaults. It supports two quick modes and a detailed config mode.
               \n\nCORE: Use this value to setup CORE using defaults.
+              \n\nGATEWAY: Use this value to setup GATEWAY using defaults.
               \n\nDETAILED: Default value if not provided. This mode takes your through series of questions.
               """,
-             choices=["CORE" "DETAILED"], action="store"),
+             choices=["CORE", "GATEWAY", "DETAILED"], action="store"),
     argument("-n", "--networkid",
              help="Network id of network you want to connect.For stokenet it is 2 and for mainnet it is 1."
                   "If not provided you will be prompted to enter a value ",
@@ -58,10 +60,9 @@ def systemdcommand(systemdcommand_args=None, parent=systemd_parser):
 ])
 def config(args):
     """
-    This commands allows node-runners and gateway admins to create a config file, which can persist their custom settings.
-    Thus it allows is to decouple the updates from configuration.
-    Config is created only once as such and if there is a version change in the config file,
-    then it updated by doing a migration to newer version
+    This commands allows node-runners and gateway admins to create a config file, which can persist their custom
+    settings. Thus, it allows is to decouple the updates from configuration. Config is created only once as such and
+    if there is a version change in the config file, then it updated by doing a migration to newer version
     """
 
     # make default object
@@ -210,7 +211,7 @@ def restart(args):
 def dependencies(args):
     """
     This commands installs all necessary software on the Virtual Machine(VM).
-    Run this command on fresh VM or on a existing VM  as the command is tested to be idempotent
+    Run this command on fresh VM or on an existing VM  as the command is tested to be idempotent
     """
 
     Base.dependencies()

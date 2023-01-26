@@ -334,9 +334,8 @@ class Prompts:
 
     @classmethod
     def ask_host_ip(cls) -> str:
-        print("\nEnter the host ip of this node:")
         answer = input(
-                "\nEnter the host ip of this node:")
+                f"\n{bcolors.WARNING}Enter the host ip of this node:{bcolors.ENDC}")
         try:
             ipaddress.ip_address(answer)
         except ValueError:

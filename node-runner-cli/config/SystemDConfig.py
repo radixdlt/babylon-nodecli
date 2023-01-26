@@ -8,7 +8,7 @@ from config.BaseConfig import BaseConfig, SetupMode
 from config.KeyDetails import KeyDetails
 from config.Nginx import SystemdNginxConfig
 from env_vars import MOUNT_LEDGER_VOLUME
-from setup import Base
+from setup.Base import Base
 from utils.Prompts import Prompts
 from utils.utils import Helpers
 
