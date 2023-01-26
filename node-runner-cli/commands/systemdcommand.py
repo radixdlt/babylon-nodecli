@@ -1,3 +1,4 @@
+import ipaddress
 import sys
 from argparse import ArgumentParser
 
@@ -68,6 +69,13 @@ def config(args):
     # make default object
     # add values from arguments and do validations
     # ask for values and do validation differently -> do validations the same way.
+
+    if args.hostip:
+        try:
+            ipaddress.ip_address(args.hostip)
+        except ValueError:
+            print(f"'{args.hostip}' is not a valid ip address.")
+            sys.exit(1)
 
     setupmode = SetupMode.instance()
     setupmode.mode = args.setupmode
