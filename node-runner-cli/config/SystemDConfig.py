@@ -1,10 +1,13 @@
+import os
 import sys
+from pathlib import Path
 
 import yaml
 
 from config.BaseConfig import BaseConfig, SetupMode
 from config.KeyDetails import KeyDetails
 from config.Nginx import SystemdNginxConfig
+from env_vars import MOUNT_LEDGER_VOLUME
 from setup import Base
 from utils.Prompts import Prompts
 from utils.utils import Helpers
@@ -30,11 +33,19 @@ class CoreSystemdSettings(BaseConfig):
         if "DETAILED" in SetupMode.instance().mode:
             self.enable_transaction = Prompts.ask_enable_transaction()
 
-    def set_trusted_node(self, trusted_node):
+    def ask_trusted_node(self, trusted_node):
         if not trusted_node:
             trusted_node = Prompts.ask_trusted_node()
         self.trusted_node = trusted_node
 
+    def ask_data_directory(self, data_directory):
+        if not data_directory:
+            if "DETAILED" in SetupMode.instance().mode:
+                self.data_directory = Base.get_data_dir(create_dir=False)
+            if os.environ.get(MOUNT_LEDGER_VOLUME, "true").lower() == "false":
+                self.data_directory = None
+            if self.data_directory:
+                Path(self.data_directory).mkdir(parents=True, exist_ok=True)
 
 class CommonSystemdSettings(BaseConfig):
     nginx_settings: SystemdNginxConfig = SystemdNginxConfig({})

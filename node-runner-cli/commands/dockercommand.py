@@ -8,6 +8,7 @@ import yaml
 from deepdiff import DeepDiff
 
 from commands.subcommand import get_decorator, argument
+from config.BaseConfig import SetupMode
 from config.DockerConfig import DockerConfig, CoreDockerSettings
 from config.GatewayDockerConfig import GatewayDockerSettings
 from config.Renderer import Renderer
