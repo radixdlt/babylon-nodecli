@@ -356,7 +356,7 @@ RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
         if not Helpers.check_Yes(answer):
             print(" Quitting ....")
             sys.exit(1)
-        return
+        return answer
 
     @staticmethod
     def parse_config_from_args(args) -> SystemDSettings:

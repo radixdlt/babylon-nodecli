@@ -8,7 +8,6 @@ from pathlib import Path
 from config.DockerConfig import DockerConfig
 from config.Nginx import SystemdNginxConfig
 from config.SystemDConfig import SystemDSettings, extract_network_id_from_arg
-from setup import Base
 from setup.SystemD import SystemD, validate_network_id
 
 
