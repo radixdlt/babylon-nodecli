@@ -222,7 +222,7 @@ RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
         run_shell_command('sudo mkdir -p /etc/nginx/secrets', shell=True)
 
     @staticmethod
-    def setup_nginx_config(nginx_config_location_Url, node_type, nginx_etc_dir, backup_time, auto_approve=None):
+    def setup_nginx_config(nginx_config_location_url, node_type, nginx_etc_dir, backup_time, auto_approve=None):
         SystemD.install_nginx()
         if node_type == "archivenode":
             conf_file = 'nginx-archive.conf'
@@ -247,7 +247,7 @@ RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
             if auto_approve:
                 additional_options = "-o"
             run_shell_command(
-                ['wget', '--no-check-certificate', '-O', 'radixdlt-nginx.zip', nginx_config_location_Url])
+                ['wget', '--no-check-certificate', '-O', 'radixdlt-nginx.zip', nginx_config_location_url])
             run_shell_command(f'sudo unzip {additional_options} radixdlt-nginx.zip -d {nginx_etc_dir}', shell=True)
             run_shell_command(f'sudo mv {nginx_etc_dir}/{conf_file}  /etc/nginx/nginx.conf', shell=True)
             run_shell_command(f'sudo mkdir -p /var/cache/nginx/radixdlt-hot', shell=True)

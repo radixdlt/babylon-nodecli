@@ -89,7 +89,6 @@ def config(args):
     setupmode = SetupMode.instance()
     setupmode.mode = args.setupmode
     trustednode = args.trustednode if args.trustednode != "" else None
-    networkid = extract_network_id_from_arg(args.networkid)
     keystore_password = args.keystorepassword if args.keystorepassword != "" else None
     postgrespassword = args.postgrespassword if args.postgrespassword != "" else None
     nginx_on_gateway = args.disablenginxforgateway if args.disablenginxforgateway != "" else None
