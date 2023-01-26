@@ -15,7 +15,6 @@ from config.Renderer import Renderer
 from github.github import latest_release
 from setup import Docker, Base
 from setup.AnsibleRunner import AnsibleRunner
-from config.SystemDConfig import extract_network_id_from_arg
 from utils.Prompts import Prompts
 from utils.utils import Helpers, run_shell_command, bcolors
 
