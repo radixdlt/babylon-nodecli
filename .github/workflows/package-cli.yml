@@ -12,6 +12,22 @@ on:
     branches:
       - main
 jobs:
+  run_unit_tests:
+    name: "Unit tests"
+    runs-on: [node-only]
+    steps:
+      - name: cancel running workflows
+        uses: styfle/cancel-workflow-action@0.8.0
+        with:
+          access_token: ${{ github.token }}
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Build the binary for ubuntu
+        run: |
+          cd node-runner-clie
+          make test
   package_ubuntu_cli:
     name: "Package cli for Ubuntu"
     runs-on: [node-only]

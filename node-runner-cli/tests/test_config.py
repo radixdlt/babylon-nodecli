@@ -1,17 +1,13 @@
 import os
 import unittest
-from unittest.mock import patch
 
 import yaml
 from yaml import UnsafeLoader
+from pathlib import Path
 
 from config.DockerConfig import DockerConfig
-from config.SystemDConfig import SystemDSettings, extract_network_id_from_arg
 from config.Nginx import SystemdNginxConfig
-from config.KeyDetails import KeyDetails
-from radixnode import main
-from setup import SystemD
-from utils.PromptFeeder import PromptFeeder
+from config.SystemDConfig import SystemDSettings, extract_network_id_from_arg
 
 
 class ConfigUnitTests(unittest.TestCase):
@@ -22,7 +18,7 @@ class ConfigUnitTests(unittest.TestCase):
         self.assertEqual(config.common_settings.node_dir, "/etc/radixdlt/node")
 
     def test_config_systemd_nginx_can_be_serialized(self):
-        config = SystemdNginxConfig(dict({}))
+        config = SystemdNginxConfig({})
         config.config_url = "randomurl"
         config.release = "1.0.0"
         with open('/tmp/nginxconfig.yaml', 'w') as f:
@@ -38,16 +34,16 @@ class ConfigUnitTests(unittest.TestCase):
     def test_config_systemd_defaut_config_matches_fixture(self):
         config=SystemDSettings({})
         config_as_yaml = config.to_yaml()
-        # print(config_as_yaml)
         self.maxDiff = None
-        fixture = """---
+        home_directory = Path.home()
+        fixture = f"""---
 core_node_settings:
   nodetype: fullnode
   keydetails:
-    keyfile_path: /Users/kim.fehrs/node-config
+    keyfile_path: {home_directory}/node-config
     keyfile_name: node-keystore.ks
   repo: radixdlt/radixdlt-core
-  data_directory: /Users/kim.fehrs/data
+  data_directory: {home_directory}/data
   enable_transaction: 'false'
   java_opts: --enable-preview -server -Xms8g -Xmx8g  -XX:MaxDirectMemorySize=2048m
     -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts
@@ -66,16 +62,16 @@ common_settings:
     def test_config_docker_defaut_config_matches_fixture(self):
         config = DockerConfig({})
         config_as_yaml = config.to_yaml()
-        # print(config_as_yaml)
+        home_directory = Path.home()
         self.maxDiff = None
-        fixture = """---
+        fixture = f"""---
 core_node_settings:
   nodetype: fullnode
   keydetails:
-    keyfile_path: /Users/kim.fehrs/node-config
+    keyfile_path: {home_directory}/node-config
     keyfile_name: node-keystore.ks
   repo: radixdlt/radixdlt-core
-  data_directory: /Users/kim.fehrs/data
+  data_directory: {home_directory}/data
   enable_transaction: 'false'
   java_opts: --enable-preview -server -Xms8g -Xmx8g  -XX:MaxDirectMemorySize=2048m
     -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts
@@ -87,7 +83,7 @@ common_settings:
     enable_transaction_api: 'false'
     protect_core: 'true'
     repo: radixdlt/radixdlt-nginx
-  docker_compose: /Users/kim.fehrs/docker-compose.yml
+  docker_compose: {home_directory}/docker-compose.yml
 gateway_settings:
   data_aggregator:
     repo: radixdlt/ng-data-aggregator
