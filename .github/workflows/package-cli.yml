@@ -389,7 +389,7 @@ jobs:
           chmod +x ./radixnode
           pwd        
           whoami 
-          ./radixnode systemd config -a \
+          ./radixnode systemd config -a -m CORE \
             -t "radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210" \
             -i "18.133.170.30" -k "${KEYSTORE_PASSWORD}" -n S -dd "$HOME/data"
         env:
