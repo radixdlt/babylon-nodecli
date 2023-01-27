@@ -46,7 +46,7 @@ jobs:
   upload-asset-store:
     environment: AWS_ARTIFACT
     runs-on: [ubuntu-latest]
-    if: ${{ github.event_name == 'push' }}
+   #if: ${{ github.event_name == 'push' }}
     needs:
       - package_ubuntu_cli
     steps:
