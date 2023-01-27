@@ -242,13 +242,10 @@ RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
             continue_nginx = input("Do you want to continue with nginx setup [Y/n]?:")
         else:
             continue_nginx = "Y"
-        if Helpers.check_Yes(continue_nginx) or auto_approve:
-            additional_options = ""
-            if auto_approve:
-                additional_options = "-o"
+        if Helpers.check_Yes(continue_nginx):
             run_shell_command(
                 ['wget', '--no-check-certificate', '-O', 'radixdlt-nginx.zip', nginx_config_location_url])
-            run_shell_command(f'sudo unzip {additional_options} radixdlt-nginx.zip -d {nginx_etc_dir}', shell=True)
+            run_shell_command(f'sudo unzip -o radixdlt-nginx.zip -d {nginx_etc_dir}', shell=True)
             run_shell_command(f'sudo mv {nginx_etc_dir}/{conf_file}  /etc/nginx/nginx.conf', shell=True)
             run_shell_command(f'sudo mkdir -p /var/cache/nginx/radixdlt-hot', shell=True)
             return True
