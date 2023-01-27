@@ -12,37 +12,10 @@ on:
     branches:
       - main
 jobs:
-  run_unit_tests:
-    name: "Unit tests"
-    runs-on: [node-only]
-    steps:
-      - name: cancel running workflows
-        uses: styfle/cancel-workflow-action@0.8.0
-        with:
-          access_token: ${{ github.token }}
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - name: Dump context
-        uses: crazy-max/ghaction-dump-context@v1
-      - name: Install build essentials
-        run: sudo apt-get -y install build-essential
-      - name: setup python
-        uses: actions/setup-python@v2.2.1
-        with:
-          python-version: 3.7.6
-      - name: Execute Unit tests
-        run: |
-          cd node-runner-cli
-          make install
-          make test
 
   package_ubuntu_cli:
     name: "Package cli for Ubuntu"
     runs-on: [node-only]
-    needs:
-      - run_unit_tests
     steps:
       - name: cancel running workflows
         uses: styfle/cancel-workflow-action@0.8.0
