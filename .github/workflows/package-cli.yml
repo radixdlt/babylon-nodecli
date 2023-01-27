@@ -135,7 +135,7 @@ jobs:
           RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_NGINX_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_CLI_VERSION_OVERRIDE: "0.0.1"
-          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "1.3.2"
+          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "1.1.8"
       - name: corenode-01
         run: |
           ls -a
@@ -148,7 +148,7 @@ jobs:
           RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_NGINX_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_CLI_VERSION_OVERRIDE: "0.0.1"
-          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "1.3.2"
+          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "1.1.8"
       - name: corenode-02
         run: |
           ls -a
@@ -160,7 +160,7 @@ jobs:
           RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_NGINX_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_CLI_VERSION_OVERRIDE: "0.0.1"
-          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "1.3.2"
+          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "1.1.8"
       - name: gateway-remote-core-local-postgress
         run: |
           ls -a
@@ -172,7 +172,7 @@ jobs:
           RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_NGINX_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_CLI_VERSION_OVERRIDE: "0.0.1"
-          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "1.3.2"
+          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "1.1.8"
       - name: gateway-remote-core-remote-postgress
         run: |
           ls -a
@@ -184,7 +184,7 @@ jobs:
           RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_NGINX_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_CLI_VERSION_OVERRIDE: "0.0.1"
-          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "1.3.2"
+          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "1.1.8"
 
   test-core-only-node:
     runs-on: [node-only]
@@ -213,7 +213,7 @@ jobs:
           RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_NGINX_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_CLI_VERSION_OVERRIDE: "0.0.1"
-          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "1.3.2"
+          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "1.1.8"
       - name: Run CLI setup
         run: |
           export DISABLE_VERSION_CHECK=true
@@ -232,7 +232,7 @@ jobs:
           RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_NGINX_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_CLI_VERSION_OVERRIDE: "0.0.1"
-          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "1.3.2"
+          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "1.1.8"
 
   test-core-api:
     runs-on: [node-only]
@@ -288,7 +288,7 @@ jobs:
           RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_NGINX_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_CLI_VERSION_OVERRIDE: "0.0.1"
-          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "1.3.2"
+          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "1.1.8"
       - name: Run CLI setup
         run: |
           export DISABLE_VERSION_CHECK=true
@@ -329,7 +329,7 @@ jobs:
           RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_NGINX_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_CLI_VERSION_OVERRIDE: "0.0.1"
-          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "1.3.2"
+          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "1.1.8"
 
 
   test-full-stack-no-nginx:
@@ -356,7 +356,7 @@ jobs:
           RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_NGINX_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_CLI_VERSION_OVERRIDE: "0.0.1"
-          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "1.3.2"
+          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "1.1.8"
       - name: Run CLI setup
         run: |
           export DISABLE_VERSION_CHECK=true
@@ -373,7 +373,7 @@ jobs:
           RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_NGINX_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_CLI_VERSION_OVERRIDE: "0.0.1"
-          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "1.3.2"
+          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "1.1.8"
   
   test-systemd:
     runs-on: [node-cli-without-nginx]
@@ -397,7 +397,7 @@ jobs:
           RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_NGINX_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_CLI_VERSION_OVERRIDE: "0.0.1"
-          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "1.3.2"
+          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "1.1.8"
       - name: Run CLI setup
         run: |
           export DISABLE_VERSION_CHECK=true
@@ -414,7 +414,7 @@ jobs:
           RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_NGINX_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_CLI_VERSION_OVERRIDE: "0.0.1"
-          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "1.3.2"
+          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "1.1.8"
           NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
           NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
           NGINX_GATEWAY_PASSWORD: ${{secrets.NGINX_GATEWAY_PASSWORD}}
