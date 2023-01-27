@@ -393,6 +393,7 @@ RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
 
     @staticmethod
     def save_settings(settings: SystemDSettings, config_file: str):
+        print(f"Saving configuration to {config_file}")
         settings.to_file(config_file)
 
     @staticmethod
