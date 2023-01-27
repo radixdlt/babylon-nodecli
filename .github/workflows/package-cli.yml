@@ -403,7 +403,7 @@ jobs:
           export DISABLE_VERSION_CHECK=true
           export COMPOSE_HTTP_TIMEOUT=360
           whoami
-          ./radixnode systemd install -a
+          ./radixnode systemd install -a -f /etc/radixdlt/node/config.yaml
           sleep 60
           export DOCKER_COMPOSE_FOLDER_PREFIX=radixdlt
           ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
