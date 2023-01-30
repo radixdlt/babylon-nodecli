@@ -34,9 +34,11 @@ class ConfigUnitTests(unittest.TestCase):
 
     def test_config_systemd_defaut_config_matches_fixture(self):
         config=SystemDSettings({})
+        home_directory = Path.home()
+        config.common_settings.node_dir = f"/someDir/node-config"
+        config.common_settings.node_secrets_dir = f"/someDir/node-config/secret"
         config_as_yaml = config.to_yaml()
         self.maxDiff = None
-        home_directory = Path.home()
         fixture = f"""---
 core_node_settings:
   nodetype: fullnode
@@ -54,8 +56,8 @@ common_settings:
     dir: /etc/nginx
     secrets_dir: /etc/nginx/secrets
   service_user: radixdlt
-  node_dir: /etc/radixdlt/node
-  node_secrets_dir: /etc/radixdlt/node/secrets
+  node_dir: /someDir/node-config
+  node_secrets_dir: /someDir/node-config/secret
   network_id: 1
 """
         self.assertEqual(config_as_yaml, fixture)
