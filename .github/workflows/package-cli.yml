@@ -246,6 +246,15 @@ jobs:
          export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
          ./radixnode docker install -f $HOME/node-config/config.yaml -a
          sleep 60
+         echo "======================================================="
+         echo "Showing debug informations about docker containers"
+         echo "======================================================="
+         docker ps
+         docker inspect radixdlt_core_1
+         docker logs radixdlt_core_1 --tail 100
+         echo "======================================================="
+         echo "Running Commands against system health api
+         echo "======================================================="
          export DOCKER_COMPOSE_FOLDER_PREFIX=runner
          ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
          NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system health
