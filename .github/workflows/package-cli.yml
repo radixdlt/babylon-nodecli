@@ -235,6 +235,7 @@ jobs:
          ./radixnode docker config -d $HOME/node-config \
           -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 -m CORE -n 2 \
           -k $KEYSTORE_PASSWORD -nk -a
+         openssl pkcs12 -in /home/runner/node-config/node-keystore.ks -noout -passin pass:${KEYSTORE_PASSWORD}
        env:
          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
          RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
@@ -246,22 +247,23 @@ jobs:
          export DISABLE_VERSION_CHECK=true
          export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
          ./radixnode docker install -f $HOME/node-config/config.yaml -a
-         sleep 60
-         echo "======================================================="
-         echo "Showing debug informations about docker containers"
-         echo "======================================================="
-         docker ps
-         docker inspect runner_core_1
-         docker logs runner_core_1 --tail 100
-         echo "======================================================="
-         echo "Running Commands against system health api
-         echo "======================================================="
-         export DOCKER_COMPOSE_FOLDER_PREFIX=runner
-         ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
-         NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system health
-         ./radixnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
-         ./radixnode auth set-superadmin-password -m DOCKER -p $NGINX_SUPERADMIN_PASSWORD
+        #  sleep 60
+        #  echo "======================================================="
+        #  echo "Showing debug informations about docker containers"
+        #  echo "======================================================="
+        #  docker ps
+        #  docker inspect runner_core_1
+        #  docker logs runner_core_1 --tail 100
+        #  echo "======================================================="
+        #  echo "Running Commands against system health api
+        #  echo "======================================================="
+        #  export DOCKER_COMPOSE_FOLDER_PREFIX=runner
+        #  ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
+        #  NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system health
+        #  ./radixnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
+        #  ./radixnode auth set-superadmin-password -m DOCKER -p $NGINX_SUPERADMIN_PASSWORD
        env:
+         KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
          NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
          NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
          NGINX_SUPERADMIN_PASSWORD: ${{secrets.NGINX_SUPERADMIN_PASSWORD}}
@@ -434,35 +436,35 @@ jobs:
           RADIXDLT_NGINX_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_CLI_VERSION_OVERRIDE: "0.0.1"
           RADIXDLT_GATEWAY_VERSION_OVERRIDE: "1.1.8"
-      - name: Run CLI setup
-        run: |
-          export DISABLE_VERSION_CHECK=true
-          export COMPOSE_HTTP_TIMEOUT=360
-          whoami
-          echo "showing contents of the config file"
-          cat "$HOME/node-config/config.yaml"
+      # - name: Run CLI setup
+      #   run: |
+      #     export DISABLE_VERSION_CHECK=true
+      #     export COMPOSE_HTTP_TIMEOUT=360
+      #     whoami
+      #     echo "showing contents of the config file"
+      #     cat "$HOME/node-config/config.yaml"
 
-          ./radixnode systemd install -a -f "$HOME/node-config/config.yaml" -m
-          cat $HOME/node-config/radixdlt-node.service
+      #     ./radixnode systemd install -a -f "$HOME/node-config/config.yaml" -m
+      #     cat $HOME/node-config/radixdlt-node.service
           
-          # manually start the systemd resources as from this link: 
-          # https://github.com/eriksjolund/user-systemd-service-actions-workflow
+      #     # manually start the systemd resources as from this link: 
+      #     # https://github.com/eriksjolund/user-systemd-service-actions-workflow
 
-          cp $HOME/node-config/radixdlt-node.service ~/.config/systemd/user/
-          systemctl --user daemon-reload
-          systemctl --user start radixdlt-node.service
+      #     cp $HOME/node-config/radixdlt-node.service ~/.config/systemd/user/
+      #     systemctl --user daemon-reload
+      #     systemctl --user start radixdlt-node.service
 
-          sleep 20
-          export DOCKER_COMPOSE_FOLDER_PREFIX=runner
-          # ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
-          # NODE_END_POINT="https://18.133.170.30" NGINX=true ./radixnode api system health
-          # curl -k -f -u "admin:$NGINX_ADMIN_PASSWORD" https://18.133.170.30
-          # ./radixnode systemd stop
-        env:
-          RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
-          RADIXDLT_NGINX_VERSION_OVERRIDE: "1.3.2"
-          RADIXDLT_CLI_VERSION_OVERRIDE: "0.0.1"
-          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "1.1.8"
-          NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
-          NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
-          NGINX_GATEWAY_PASSWORD: ${{secrets.NGINX_GATEWAY_PASSWORD}}
+      #     sleep 20
+      #     export DOCKER_COMPOSE_FOLDER_PREFIX=runner
+      #     # ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
+      #     # NODE_END_POINT="https://18.133.170.30" NGINX=true ./radixnode api system health
+      #     # curl -k -f -u "admin:$NGINX_ADMIN_PASSWORD" https://18.133.170.30
+      #     # ./radixnode systemd stop
+      #   env:
+      #     RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
+      #     RADIXDLT_NGINX_VERSION_OVERRIDE: "1.3.2"
+      #     RADIXDLT_CLI_VERSION_OVERRIDE: "0.0.1"
+      #     RADIXDLT_GATEWAY_VERSION_OVERRIDE: "1.1.8"
+      #     NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
+      #     NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
+      #     NGINX_GATEWAY_PASSWORD: ${{secrets.NGINX_GATEWAY_PASSWORD}}
