@@ -50,7 +50,7 @@ jobs:
       - name: Build the binary for ubuntu
         run: |
           sudo apt update
-          sudo apt install -y  docker.io wget unzip docker-compose rng-tools
+          sudo apt install -y  docker.io wget unzip docker-compose rng-tools containerd runc
           sudo rngd -r /dev/random
           sudo useradd -m -s /bin/bash radixdlt
           sudo usermod -aG docker radixdlt
