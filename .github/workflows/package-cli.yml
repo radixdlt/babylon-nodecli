@@ -49,9 +49,18 @@ jobs:
     steps:
       - name: Build the binary for ubuntu
         run: |
+          sudo apt update
+          sudo apt install -y  docker.io wget unzip docker-compose rng-tools
+          sudo rngd -r /dev/random
+          sudo useradd -m -s /bin/bash radixdlt
+          sudo usermod -aG docker radixdlt
           sudo touch /etc/systemd/system/radixdlt-node.service
-          sudo echo "test" > /etc/systemd/system/radixdlt-node.service
-          sudo cat /etc/systemd/system/radixdlt-node.service
+          sudo echo "radixdlt ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/radixdlt
+          sudo chown radixdlt:radixdlt /etc/systemd/system/radixdlt-node.service
+          sudo mkdir -p /etc/radixdlt/
+          sudo chown radixdlt:radixdlt -R /etc/radixdlt
+          sudo su - radixdlt
+          echo "sudo touch /etc/systemd/system/radixdlt-node.service"
 
 
   package_ubuntu_cli:
