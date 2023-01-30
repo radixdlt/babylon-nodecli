@@ -197,7 +197,7 @@ jobs:
        run: |
          chmod +x ./radixnode
          sudo apt update
-         sudo apt install -y containerd
+         sudo apt install -y containerd runc
          ./radixnode docker dependencies
      - name: Setup config
        run: |
