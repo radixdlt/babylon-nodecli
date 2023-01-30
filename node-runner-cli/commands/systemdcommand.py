@@ -128,6 +128,9 @@ def config(args):
                   f"The default value is `/etc/radixdlt/node/config.yaml` if not provided",
              default=f"/etc/radixdlt/node/config.yaml",
              action="store"),
+    argument("-m", "--manual", help="Only generate systemd file but not put it into systemd folder."
+                                    "This is mainly used for automation in unprivileged environments.",
+             action="store_false"),
 ])
 def install(args):
     """This sets up the systemd service for the core node."""
@@ -164,21 +167,26 @@ def install(args):
 
     SystemD.backup_file("/etc/systemd/system", "radixdlt-node.service", backup_time, auto_approve)
 
+    service_file_path = None
+    if args.manual:
+        service_file_path = f"{settings.common_settings.node_dir}/radixdlt-node.service"
     SystemD.setup_service_file(node_version_dir=settings.core_node_settings.core_release,
                                node_dir=settings.common_settings.node_dir,
-                               node_secrets_path=settings.common_settings.node_secrets_dir)
+                               node_secrets_path=settings.common_settings.node_secrets_dir,
+                               service_file_path=service_file_path)
 
-    if not args.update:
-        SystemD.start_node_service()
-    else:
-        SystemD.restart_node_service()
+    if not args.manual:
+        if not args.update:
+            SystemD.start_node_service()
+        else:
+            SystemD.restart_node_service()
 
-    if nginx_configured and not args.update:
-        SystemD.start_nginx_service()
-    elif nginx_configured and args.update:
-        SystemD.start_nginx_service()
-    else:
-        print("Nginx not configured or not updated")
+        if nginx_configured and not args.update:
+            SystemD.start_nginx_service()
+        elif nginx_configured and args.update:
+            SystemD.start_nginx_service()
+        else:
+            print("Nginx not configured or not updated")
 
 
 @systemdcommand([
