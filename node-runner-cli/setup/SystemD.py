@@ -231,7 +231,7 @@ RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
             conf_file = 'nginx-fullnode.conf'
         else:
             print(f"Node type - {node_type} specificed should be either archivenode or fullnode")
-            sys.exit()
+            sys.exit(1)
 
         if auto_approve is None:
             backup_yes = input("Do you want to backup existing nginx config [Y/n]?:")
@@ -327,7 +327,7 @@ RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
         result = run_shell_command(f'whoami | grep radixdlt', shell=True, fail_on_error=False)
         if result.returncode != 0:
             print(" You are not logged as radixdlt user. Logout and login as radixdlt user")
-            sys.exit()
+            sys.exit(1)
         else:
             print("User on the terminal is radixdlt")
 
@@ -398,7 +398,7 @@ RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
     def load_settings(config_file) -> SystemDSettings:
         if not os.path.isfile(config_file):
             print(f"No configuration found. Execute 'radixnode systemd config' first.")
-            sys.exit()
+            sys.exit(1)
         with open(config_file, 'r') as f:
             dictionary = yaml.load(f, Loader=UnsafeLoader)
         return from_dict(dictionary)
@@ -415,5 +415,5 @@ def validate_network_id(network_prompt):
         return None
     else:
         print("Input for network id is wrong. Exiting command")
-        sys.exit()
+        sys.exit(1)
     return network_id

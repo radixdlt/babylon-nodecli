@@ -193,7 +193,7 @@ def stop(args):
         SystemD.stop_node_service()
     else:
         print(f"Invalid service name {args.services}")
-        sys.exit()
+        sys.exit(1)
 
 
 @systemdcommand([
@@ -212,7 +212,7 @@ def restart(args):
         SystemD.restart_node_service()
     else:
         print(f"Invalid service name {args.services}")
-        sys.exit()
+        sys.exit(1)
 
 
 @systemdcommand([])

@@ -102,7 +102,7 @@ def config(args):
               f"\nDETAILED option goes through asking each and every question that to customize setup. "
               f"Hence cannot be clubbed together with options"
               f"{bcolors.ENDC}")
-        sys.exit()
+        sys.exit(1)
     release = latest_release()
 
     Path(f"{Helpers.get_default_node_config_dir()}").mkdir(parents=True, exist_ok=True)

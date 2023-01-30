@@ -64,6 +64,6 @@ class DefaultApiHelper(API):
                 bcolors.WARNING)
             proceed = input(print("Do you want to continue [Y/n]?"))
             if not Helpers.check_Yes(proceed):
-                sys.exit()
+                sys.exit(1)
         return health    
 

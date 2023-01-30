@@ -107,7 +107,7 @@ def entity(args):
             )
 
         core_api_helper.entity(entityIdentifier, True)
-        sys.exit()
+        sys.exit(1)
     if args.address:
         if args.subPreparedStake:
             metadata = SubEntityMetadata(validator=validator_address)
@@ -135,10 +135,10 @@ def entity(args):
                 address=account_address,
             )
         core_api_helper.entity(entityIdentifier, True)
-        sys.exit()
+        sys.exit(1)
     if args.p2p:
         core_api_helper.entity(key_list_response.public_keys[0].identifiers.p2p_node, True)
-        sys.exit()
+        sys.exit(1)
 
 
 @corecommand()

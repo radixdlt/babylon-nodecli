@@ -20,7 +20,7 @@ class AnsibleRunner:
         resp = Helpers.send_request(prepared, print_response=False)
         if not resp.ok:
             print(f"{resp.status_code} error retrieving ansible playbook.. Exiting the command...")
-            sys.exit()
+            sys.exit(1)
 
         directory = file.rsplit('/', 1)[0]
         Path(directory).mkdir(parents=True, exist_ok=True)
@@ -40,7 +40,7 @@ class AnsibleRunner:
             print("----------------------------------------------------------------------------------------\n"
                   f"{bcolors.WARNING}Ansible installed successfully. You need exit shell and login back{bcolors.ENDC}")
             if exit_cmd:
-                sys.exit()
+                sys.exit(1)
         return
 
     @classmethod
