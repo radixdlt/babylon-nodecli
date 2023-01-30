@@ -2,6 +2,7 @@ from config.BaseConfig import BaseConfig
 
 
 class DockerNginxConfig(BaseConfig):
+    mode: str = "docker"
     protect_gateway: str = "true"
     gateway_behind_auth: str = "true"
     enable_transaction_api = "false"
@@ -11,6 +12,9 @@ class DockerNginxConfig(BaseConfig):
 
 
 class SystemdNginxConfig(BaseConfig):
+    mode: str = "systemd"
+    enable_transaction_api = "false"
+    protect_core: str = "true"
     dir: str = '/etc/nginx'
     secrets_dir: str = '/etc/nginx/secrets'
     release: str = None

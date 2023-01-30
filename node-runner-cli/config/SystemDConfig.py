@@ -9,6 +9,7 @@ from config.KeyDetails import KeyDetails
 from config.Nginx import SystemdNginxConfig
 from env_vars import MOUNT_LEDGER_VOLUME
 from setup.Base import Base
+from utils.Network import Network
 from utils.Prompts import Prompts
 from utils.utils import Helpers
 
@@ -18,10 +19,11 @@ class CoreSystemdSettings(BaseConfig):
     keydetails: KeyDetails = KeyDetails({})
     core_release: str = None
     core_binary_url: str = None
-    repo: str = "radixdlt/radixdlt-core"
     data_directory: str = f"{Helpers.get_home_dir()}/data"
     enable_transaction: str = "false"
     trusted_node: str = None
+    node_dir: str = '/etc/radixdlt/node'
+    node_secrets_dir: str = '/etc/radixdlt/node/secrets'
     java_opts: str = "--enable-preview -server -Xms8g -Xmx8g  " \
                      "-XX:MaxDirectMemorySize=2048m " \
                      "-XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops " \
@@ -53,8 +55,6 @@ class CommonSystemdSettings(BaseConfig):
     nginx_settings: SystemdNginxConfig = SystemdNginxConfig({})
     host_ip: str = None
     service_user: str = "radixdlt"
-    node_dir: str = '/etc/radixdlt/node'
-    node_secrets_dir: str = '/etc/radixdlt/node/secrets'
     network_id: int = 1
 
     def set_network_id(self, network_id: int):
@@ -65,10 +65,8 @@ class CommonSystemdSettings(BaseConfig):
         self.genesis_json_location = genesis_json_location
 
     def set_network_name(self):
-        if self.network_id == 1:
-            self.network_name = "mainnet"
-        elif self.network_id == 2:
-            self.network_name = "stokenet"
+        if self.network_id:
+            self.network_name = Network.get_network_name(self.network_id)
         else:
             raise ValueError("Network id is set incorrect")
 
@@ -81,9 +79,9 @@ class CommonSystemdSettings(BaseConfig):
 
     def ask_network_id(self, network_id):
         if not network_id:
-            network_id = Base.get_network_id()
-        self.set_network_id(validate_network_id(network_id))
-        self.set_genesis_json_location(Base.path_to_genesis_json(self.network_id))
+            network_id = Network.get_network_id()
+        self.set_network_id(network_id)
+        self.set_genesis_json_location(Network.path_to_genesis_json(self.network_id))
 
 
 class SystemDSettings(BaseConfig):

@@ -89,33 +89,5 @@ class Base:
             run_shell_command(f'sudo mkdir -p {data_dir_path}', shell=True)
         return data_dir_path
 
-    @staticmethod
-    def get_network_id():
-        # Network id
-        network_prompt = Helpers.input_guestion(
-            "Select the network you want to connect [S]Stokenet or [M]Mainnet or network_id:",
-            QuestionKeys.select_network)
-        network_id = Base.validate_network_id(network_prompt)
-        return network_id
 
-    @staticmethod
-    def validate_network_id(network_prompt):
-        if network_prompt.lower() in ["s", "S", "stokenet"]:
-            network_id = 2
-        elif network_prompt.lower() in ["m", "M", "mainnet"]:
-            network_id = 1
-        elif network_prompt in ["10", "11", "32", "33", "34", "35", "36"]:
-            network_id = int(network_prompt)
-        else:
-            print("Input for network id is wrong. Exiting command")
-            sys.exit(1)
-        return network_id
 
-    @staticmethod
-    def path_to_genesis_json(network_id):
-        if network_id not in [1, 2]:
-            genesis_json_location = input("Enter absolute path to genesis json:")
-        else:
-            genesis_json_location = None
-
-        return genesis_json_location

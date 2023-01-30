@@ -11,6 +11,7 @@ from env_vars import UNZIPPED_NODE_DIST_FOLDER, APPEND_DEFAULT_CONFIG_OVERIDES, 
     NGINX_BINARY_OVERIDE
 from github.github import latest_release
 from setup.Base import Base
+from utils.Network import Network
 from utils.PromptFeeder import QuestionKeys
 from utils.utils import run_shell_command, Helpers
 
@@ -114,12 +115,13 @@ RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
                              network_id=1,
                              data_folder="~/data"):
 
-        genesis_json_location = Base.path_to_genesis_json(network_id)
+        genesis_json_location = Network.path_to_genesis_json(network_id)
 
         network_genesis_file_for_testnets = f"network.genesis_file={genesis_json_location}" if genesis_json_location else ""
         enable_client_api = "true" if node_type == "archivenode" else "false"
 
         print(node_dir)
+        # This may need to be moved to jinja template
         command = f"""
         cat > {node_dir}/default.config << EOF
             ntp=false
@@ -158,7 +160,7 @@ RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
     def setup_service_file(node_version_dir, node_dir="/etc/radixdlt/node",
                            node_secrets_path="/etc/radixdlt/node/secrets",
                            service_file_path="/etc/systemd/system/radixdlt-node.service"):
-
+        # This may need to be moved to jinja template
         command = f"""
         sudo cat > {service_file_path} << EOF
             [Unit]
@@ -364,11 +366,9 @@ RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
         settings.core_node_settings.enable_transaction = args.enabletransactions
         settings.core_node_settings.data_directory = args.data_directory
         settings.common_settings.node_dir = args.configdir
-        settings.core_node_settings.network_id = Base.validate_network_id(args.networkid)
         if args.configdir is not None:
-            settings.common_settings.node_secrets_dir = f"{settings.common_settings.node_dir}/secrets"
-
-        settings.core_node_settings.network_id = extract_network_id_from_arg(args.networkid)
+            settings.core_node_settings.node_secrets_dir = f"{settings.core_node_settings.node_dir}/secrets"
+        settings.core_node_settings.network_id = args.networkid
 
         if not args.release:
             settings.core_node_settings.core_release = latest_release()
@@ -379,13 +379,10 @@ RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
             settings.common_settings.nginx_settings.release = latest_release("radixdlt/radixdlt-nginx")
         else:
             settings.common_settings.nginx_settings.release = args.nginxrelease
-
         settings.core_node_settings.core_binary_url = os.getenv(NODE_BINARY_OVERIDE,
                                                                 f"https://github.com/radixdlt/radixdlt/releases/download/{settings.core_node_settings.core_release}/radixdlt-dist-{settings.core_node_settings.core_release}.zip")
-
         settings.common_settings.nginx_settings.config_url = os.getenv(NGINX_BINARY_OVERIDE,
                                                                        f"https://github.com/radixdlt/radixdlt-nginx/releases/download/{settings.common_settings.nginx_settings.release}/radixdlt-nginx-{settings.core_node_settings.nodetype}-conf.zip")
-
         settings.node_version = settings.core_node_settings.core_binary_url.rsplit('/', 2)[-2]
         return settings
 

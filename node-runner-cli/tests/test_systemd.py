@@ -57,8 +57,8 @@ class SystemdUnitTests(unittest.TestCase):
         # Make Python Class YAML Serializable
         settings = SystemDSettings({})
         home_directory = Path.home()
-        settings.common_settings.node_dir = "/somedir/node-config"
-        settings.common_settings.node_secrets_dir = "/somedir/node-config/secret"
+        settings.core_node_settings.node_dir = "/somedir/node-config"
+        settings.core_node_settings.node_secrets_dir = "/somedir/node-config/secret"
         key_details = KeyDetails({})
         settings.core_node_settings.keydetails = key_details
         settings.common_settings.host_ip = "6.6.6.6"
@@ -68,7 +68,7 @@ class SystemdUnitTests(unittest.TestCase):
 
         new_settings = SystemD.load_settings(config_file)
         self.assertEqual(new_settings.to_yaml(), settings.to_yaml())
-        self.assertEqual(new_settings.common_settings.node_dir, "/somedir/node-config")
+        self.assertEqual(new_settings.core_node_settings.node_dir, "/somedir/node-config")
 
     @unittest.skip("Can only be executed on Ubuntu")
     def test_systemd_dependencies(self):
