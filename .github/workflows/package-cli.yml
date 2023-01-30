@@ -12,6 +12,32 @@ on:
     branches:
       - main
 jobs:
+  run_unit_tests:
+    name: "Package cli for Ubuntu"
+    runs-on: ubuntu-20.04
+    steps:
+      - name: cancel running workflows
+        uses: styfle/cancel-workflow-action@0.8.0
+        with:
+          access_token: ${{ github.token }}
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Dump context
+        uses: crazy-max/ghaction-dump-context@v1
+      - name: Install build essentials
+        run: sudo apt-get -y install build-essential
+      - name: setup python
+        uses: actions/setup-python@v2.2.1
+        with:
+          python-version: 3.7.6
+      - name: Build the binary for ubuntu
+        run: |
+          cd node-runner-cli
+          make install
+          make local
+          make test
 
   package_ubuntu_cli:
     name: "Package cli for Ubuntu"
@@ -220,7 +246,7 @@ jobs:
          export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
          ./radixnode docker install -f $HOME/node-config/config.yaml -a
          sleep 60
-         export DOCKER_COMPOSE_FOLDER_PREFIX=radixdlt
+         export DOCKER_COMPOSE_FOLDER_PREFIX=runner
          ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
          NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system health
          ./radixnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
