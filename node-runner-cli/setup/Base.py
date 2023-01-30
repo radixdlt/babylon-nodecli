@@ -104,7 +104,7 @@ class Base:
             network_id = 2
         elif network_prompt.lower() in ["m", "M", "mainnet"]:
             network_id = 1
-        elif network_prompt in ["1", "2", "3", "4", "5", "6", "7", "8"]:
+        elif network_prompt in ["10", "11", "32", "33", "34", "35", "36"]:
             network_id = int(network_prompt)
         else:
             print("Input for network id is wrong. Exiting command")

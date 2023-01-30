@@ -142,16 +142,3 @@ def extract_network_id_from_arg(network_id_arg) -> int:
         print(
             "Not a valid argument for network id. Please enter either '1' 'm' 'M' 'mainnet' or '2' 's' 'S' 'stokenet'")
         sys.exit(1)
-
-
-def validate_network_id(network_prompt):
-    if network_prompt.lower() in ["s", "S", "stokenet"]:
-        network_id = 2
-    elif network_prompt.lower() in ["m", "M", "mainnet"]:
-        network_id = 1
-    elif network_prompt in ["1", "2", "3", "4", "5", "6", "7", "8"]:
-        network_id = int(network_prompt)
-    else:
-        print("Input for network id is wrong. Exiting command")
-        sys.exit(1)
-    return network_id
