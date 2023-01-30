@@ -152,5 +152,5 @@ def validate_network_id(network_prompt):
         network_id = int(network_prompt)
     else:
         print("Input for network id is wrong. Exiting command")
-        sys.exit()
+        sys.exit(1)
     return network_id

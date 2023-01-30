@@ -27,7 +27,7 @@ def read_monitoring_config(args):
     yaml.add_representer(type(None), Helpers.represent_none)
     if not exists(args.monitoringconfigfile):
         print("There is no monitoring config file. It seems like monitoring was not set up. Nothing to do here")
-        sys.exit(0)
+        sys.exit(1)
     with open(args.monitoringconfigfile, 'r') as file:
         all_config = yaml.safe_load(file)
     return all_config
@@ -77,7 +77,7 @@ def config(args):
               f"\nDETAILED option goes through asking each and every question that to customize setup. "
               f"Hence cannot be clubbed together with options"
               f"{bcolors.ENDC}")
-        sys.exit()
+        sys.exit(1)
 
     config_file = f"{args.monitoringconfigdir}/monitoring_config.yaml"
     Path(args.monitoringconfigdir).mkdir(parents=True, exist_ok=True)

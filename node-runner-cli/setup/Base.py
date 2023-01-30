@@ -43,7 +43,7 @@ class Base:
                 if Helpers.check_Yes(ask_keystore_exists):
                     print(
                         f"\nCopy the keystore file '{keyfile_name}' to the location {keyfile_path} and then rerun the command")
-                    sys.exit()
+                    sys.exit(1)
 
             print(f"""
             \nGenerating new keystore file. Don't forget to backup the key from location {keyfile_path}/{keyfile_name}
@@ -108,7 +108,7 @@ class Base:
             network_id = int(network_prompt)
         else:
             print("Input for network id is wrong. Exiting command")
-            sys.exit()
+            sys.exit(1)
         return network_id
 
     @staticmethod
