@@ -80,7 +80,7 @@ class SystemdUnitTests(unittest.TestCase):
         with patch("sys.argv",
                    ["main", "systemd", "config","-m", "CORE", "-i", "18.133.170.30", "-t",
                     "radix://tn1q28eygvxshszxk48jhjxdmyne06m3x6hfyvxg7a45qt8cksffx6z7uu6392@15.236.228.96",
-                    "-n", "2", "-k", "radix", "-d", "/tmp", "-dd", "/tmp"]):
+                    "-n", "2", "-k", "radix", "-d", "/tmp", "-dd", "/tmp", "-a"]):
             main()
 
 
