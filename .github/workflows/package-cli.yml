@@ -403,6 +403,9 @@ jobs:
           export DISABLE_VERSION_CHECK=true
           export COMPOSE_HTTP_TIMEOUT=360
           whoami
+          echo "showing contents of the config file"
+          cat "$HOME/node-config/config.yaml"
+
           ./radixnode systemd install -a -f "$HOME/node-config/config.yaml"
           sleep 20
           export DOCKER_COMPOSE_FOLDER_PREFIX=radixdlt
