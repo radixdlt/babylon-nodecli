@@ -11,6 +11,7 @@ on:
   pull_request:
     branches:
       - main
+      - DO-28-systemd-configfile
 jobs:
   run_unit_tests:
     name: "Unit tests"
@@ -251,7 +252,7 @@ jobs:
          echo "======================================================="
          echo "Showing debug informations about docker containers"
          echo "======================================================="
-         docker ps
+         docker ps  
          docker inspect runner_core_1
          docker logs runner_core_1 --tail 100
          echo "======================================================="
