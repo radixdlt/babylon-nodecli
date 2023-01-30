@@ -13,7 +13,7 @@ services:
       RADIXDLT_NETWORK_USE_PROXY_PROTOCOL: '{{core_node.use_proxy_protocol or 'false'}}'
       RADIXDLT_SIGN_ENABLE: 'true'
       RADIXDLT_TRANSACTIONS_API_ENABLE: '{{core_node.enable_transaction}}'
-      RADIXDLT_VALIDATOR_KEY_LOCATION: '{{core_node.keydetails.keyfile_path}}/{{core_node.keydetails.keyfile_name}}'
+      RADIXDLT_VALIDATOR_KEY_LOCATION: '/home/radixdlt/node-keystore.ks'
       RADIX_NODE_KEYSTORE_PASSWORD: {{core_node.keydetails.keystore_password}}
       {% if common_config.genesis_json_location is defined %}
       RADIXDLT_GENESIS_FILE: "{{common_config.genesis_json_location}}"

@@ -247,21 +247,21 @@ jobs:
          export DISABLE_VERSION_CHECK=true
          export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
          ./radixnode docker install -f $HOME/node-config/config.yaml -a
-        #  sleep 60
-        #  echo "======================================================="
-        #  echo "Showing debug informations about docker containers"
-        #  echo "======================================================="
-        #  docker ps
-        #  docker inspect runner_core_1
-        #  docker logs runner_core_1 --tail 100
-        #  echo "======================================================="
-        #  echo "Running Commands against system health api
-        #  echo "======================================================="
-        #  export DOCKER_COMPOSE_FOLDER_PREFIX=runner
-        #  ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
-        #  NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system health
-        #  ./radixnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
-        #  ./radixnode auth set-superadmin-password -m DOCKER -p $NGINX_SUPERADMIN_PASSWORD
+         sleep 60
+         echo "======================================================="
+         echo "Showing debug informations about docker containers"
+         echo "======================================================="
+         docker ps
+         docker inspect runner_core_1
+         docker logs runner_core_1 --tail 100
+         echo "======================================================="
+         echo "Running Commands against system health api"
+         echo "======================================================="
+         export DOCKER_COMPOSE_FOLDER_PREFIX=runner
+         ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
+         NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system health
+         ./radixnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
+         ./radixnode auth set-superadmin-password -m DOCKER -p $NGINX_SUPERADMIN_PASSWORD
        env:
          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
          NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
