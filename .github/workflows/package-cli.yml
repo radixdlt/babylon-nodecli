@@ -49,10 +49,8 @@ jobs:
     steps:
       - name: Build the binary for ubuntu
         run: |
-          touch /etc/systemd/system/radixdlt-node.service
-          echo "test" > /etc/systemd/system/radixdlt-node.service
+          sudo touch /etc/systemd/system/radixdlt-node.service
           sudo echo "test" > /etc/systemd/system/radixdlt-node.service
-          cat /etc/systemd/system/radixdlt-node.service
           sudo cat /etc/systemd/system/radixdlt-node.service
 
 
