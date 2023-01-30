@@ -59,7 +59,8 @@ jobs:
           sudo mkdir -p /etc/radixdlt/
           sudo chown radixdlt:radixdlt -R /etc/radixdlt
           sudo su - radixdlt
-          sudo echo "test" > /etc/systemd/system/radixdlt-node.service
+          sudo ls -la
+          sudo echo "test" >> /etc/systemd/system/radixdlt-node.service
 
 
   package_ubuntu_cli:
