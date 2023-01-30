@@ -133,6 +133,10 @@ def install(args):
     """This sets up the systemd service for the core node."""
     auto_approve = args.auto
     settings = SystemD.load_settings(args.configfile)
+    print("--------------------------------")
+    print("\nUsing following configuration:")
+    print("\n--------------------------------")
+    print(settings.to_yaml())
 
     if auto_approve is None:
         SystemD.confirm_config(settings.core_node_settings.nodetype,
