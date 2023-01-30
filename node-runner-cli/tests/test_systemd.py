@@ -1,5 +1,6 @@
 import os
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
 from config.KeyDetails import KeyDetails
@@ -55,15 +56,19 @@ class SystemdUnitTests(unittest.TestCase):
     def test_systemd_config_can_be_saved_and_restored_as_yaml(self):
         # Make Python Class YAML Serializable
         settings = SystemDSettings({})
+        home_directory = Path.home()
+        settings.common_settings.node_dir = "/somedir/node-config"
+        settings.common_settings.node_secrets_dir = "/somedir/node-config/secret"
         key_details = KeyDetails({})
         settings.core_node_settings.keydetails = key_details
         settings.common_settings.host_ip = "6.6.6.6"
 
-        config_file = f"{Helpers.get_default_node_config_dir()}/config.yaml"
+        config_file = f"/tmp/config.yaml"
         SystemD.save_settings(settings, config_file)
 
         new_settings = SystemD.load_settings(config_file)
         self.assertEqual(new_settings.to_yaml(), settings.to_yaml())
+        self.assertEqual(new_settings.common_settings.node_dir, "/somedir/node-config")
 
     @unittest.skip("Can only be executed on Ubuntu")
     def test_systemd_dependencies(self):

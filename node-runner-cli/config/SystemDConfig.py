@@ -124,6 +124,7 @@ def from_dict(dictionary: dict) -> SystemDSettings:
     settings = SystemDSettings({})
     settings.core_node_settings = CoreSystemdSettings(dictionary["core_node_settings"])
     settings.core_node_settings.keydetails = KeyDetails(dictionary["core_node_settings"]["keydetails"])
+    settings.common_settings = CommonSystemdSettings(dictionary["common_settings"])
     settings.common_settings.nginx_settings = SystemdNginxConfig(dictionary["common_settings"]["nginx_settings"])
     return settings
 
