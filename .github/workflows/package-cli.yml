@@ -41,7 +41,8 @@ jobs:
 
   package_ubuntu_cli:
     name: "Package cli for Ubuntu"
-    runs-on: ubuntu-20.04
+    #runs-on: ubuntu-20.04
+    runs-on: [node-only]
     steps:
       - name: cancel running workflows
         uses: styfle/cancel-workflow-action@0.8.0
@@ -250,8 +251,8 @@ jobs:
          echo "Showing debug informations about docker containers"
          echo "======================================================="
          docker ps
-         docker inspect radixdlt_core_1
-         docker logs radixdlt_core_1 --tail 100
+         docker inspect runner_core_1
+         docker logs runner_core_1 --tail 100
          echo "======================================================="
          echo "Running Commands against system health api
          echo "======================================================="
