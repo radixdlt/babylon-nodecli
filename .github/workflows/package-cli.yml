@@ -13,9 +13,11 @@ on:
       - main
       - DO-28-systemd-configfile
 jobs:
-  run_unit_tests:
+  run-unit-tests:
     name: "Unit tests"
     runs-on: ubuntu-20.04
+    needs:
+      - test-dependency-check
     steps:
       - name: cancel running workflows
         uses: styfle/cancel-workflow-action@0.8.0
@@ -40,10 +42,27 @@ jobs:
           make local
           make test
 
+  test-dependency-check:
+    name: "Check dependencies of test environment"
+    runs-on: ubuntu-20.04
+    #runs-on: [node-only]
+    steps:
+      - name: Build the binary for ubuntu
+        run: |
+          touch /etc/systemd/system/radixdlt-node.service
+          echo "test" > /etc/systemd/system/radixdlt-node.service
+          sudo echo "test" > /etc/systemd/system/radixdlt-node.service
+          cat /etc/systemd/system/radixdlt-node.service
+          sudo cat /etc/systemd/system/radixdlt-node.service
+
+
   package_ubuntu_cli:
     name: "Package cli for Ubuntu"
     #runs-on: ubuntu-20.04
     runs-on: [node-only]
+    needs:
+      - test-dependency-check
+      - run-unit-tests
     steps:
       - name: cancel running workflows
         uses: styfle/cancel-workflow-action@0.8.0
@@ -78,7 +97,6 @@ jobs:
     needs:
       - package_ubuntu_cli
     steps:
-
       - name: Checkout
         uses: actions/checkout@v2
       - name: set branchname with commit
@@ -437,35 +455,26 @@ jobs:
           RADIXDLT_NGINX_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_CLI_VERSION_OVERRIDE: "0.0.1"
           RADIXDLT_GATEWAY_VERSION_OVERRIDE: "1.1.8"
-      # - name: Run CLI setup
-      #   run: |
-      #     export DISABLE_VERSION_CHECK=true
-      #     export COMPOSE_HTTP_TIMEOUT=360
-      #     whoami
-      #     echo "showing contents of the config file"
-      #     cat "$HOME/node-config/config.yaml"
+      - name: Run CLI setup
+        run: |
+          export DISABLE_VERSION_CHECK=true
+          export COMPOSE_HTTP_TIMEOUT=360
+          whoami
+          echo "showing contents of the config file"
+          cat "$HOME/node-config/config.yaml"
 
-      #     ./radixnode systemd install -a -f "$HOME/node-config/config.yaml" -m
-      #     cat $HOME/node-config/radixdlt-node.service
-          
-      #     # manually start the systemd resources as from this link: 
-      #     # https://github.com/eriksjolund/user-systemd-service-actions-workflow
-
-      #     cp $HOME/node-config/radixdlt-node.service ~/.config/systemd/user/
-      #     systemctl --user daemon-reload
-      #     systemctl --user start radixdlt-node.service
-
-      #     sleep 20
-      #     export DOCKER_COMPOSE_FOLDER_PREFIX=runner
-      #     # ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
-      #     # NODE_END_POINT="https://18.133.170.30" NGINX=true ./radixnode api system health
-      #     # curl -k -f -u "admin:$NGINX_ADMIN_PASSWORD" https://18.133.170.30
-      #     # ./radixnode systemd stop
-      #   env:
-      #     RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
-      #     RADIXDLT_NGINX_VERSION_OVERRIDE: "1.3.2"
-      #     RADIXDLT_CLI_VERSION_OVERRIDE: "0.0.1"
-      #     RADIXDLT_GATEWAY_VERSION_OVERRIDE: "1.1.8"
-      #     NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
-      #     NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
-      #     NGINX_GATEWAY_PASSWORD: ${{secrets.NGINX_GATEWAY_PASSWORD}}
+          ./radixnode systemd install -a -f "$HOME/node-config/config.yaml"
+          sleep 60
+          export DOCKER_COMPOSE_FOLDER_PREFIX=runner
+          # ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
+          # NODE_END_POINT="https://18.133.170.30" NGINX=true ./radixnode api system health
+          # curl -k -f -u "admin:$NGINX_ADMIN_PASSWORD" https://18.133.170.30
+          # ./radixnode systemd stop
+        env:
+          RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
+          RADIXDLT_NGINX_VERSION_OVERRIDE: "1.3.2"
+          RADIXDLT_CLI_VERSION_OVERRIDE: "0.0.1"
+          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "1.1.8"
+          NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
+          NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
+          NGINX_GATEWAY_PASSWORD: ${{secrets.NGINX_GATEWAY_PASSWORD}}
