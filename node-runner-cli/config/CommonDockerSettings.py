@@ -40,10 +40,8 @@ class CommonDockerSettings(BaseConfig):
         self.genesis_json_location = genesis_json_location
 
     def set_network_name(self):
-        if self.network_id == 1:
-            self.network_name = "mainnet"
-        elif self.network_id == 2:
-            self.network_name = "stokenet"
+        if self.network_id:
+            self.network_name = Network.get_network_name(self.network_id)
         else:
             raise ValueError("Network id is set incorrect")
 
