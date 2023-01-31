@@ -7,7 +7,7 @@ import yaml
 from config.BaseConfig import BaseConfig, SetupMode
 from config.CommonDockerSettings import CommonDockerSettings
 from config.GatewayDockerConfig import GatewayDockerSettings
-from env_vars import MOUNT_LEDGER_VOLUME
+from env_vars import MOUNT_LEDGER_VOLUME, RADIXDLT_NODE_REPO_OVERRIDE
 from setup import Base
 from utils.Prompts import Prompts
 from utils.utils import Helpers
@@ -63,6 +63,8 @@ class CoreDockerSettings(BaseConfig):
         self.keydetails = keydetails
 
     def set_core_release(self, release):
+        repo = os.getenv(RADIXDLT_NODE_REPO_OVERRIDE, "radixdlt/babylon-node")
+        self.repo = repo
         self.core_release = release
         self.keydetails.keygen_tag = self.core_release
 
