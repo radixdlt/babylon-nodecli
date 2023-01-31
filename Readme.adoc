@@ -132,4 +132,21 @@ export RADIXDLT_GATEWAY_VERSION_OVERRIDE=1.5.0
 /tmp/radixnode docker config -m CORE GATEWAY
 
 
+# Will try to download ansible playbooks as a resource from a github release at:
+# https://raw.githubusercontent.com/radixdlt/babylon-nodecli/<NODE_CLI_VERSION>/node-runner-cli
+# Make sure your CLI version is set to a released version of the babylon-nodecli.
+# This is done by setting a tag at the current commit before building the binary.
+# It will also try to download docker images. As these are not public yet, it is
+# mandatory to download the image you are trying to test youself beforehand.
+# For this you need to log in to the google registry, download the image and
+# then retag it to the expected format. See the example
+
+
+docker login eu.gcr.io # keeping this secret
+docker pull eu.gcr.io/dev-container-repo/babylon-node:pr-247
+docker tag eu.gcr.io/dev-container-repo/babylon-node:pr-247 radixdlt/babylon-node:$RADIXDLT_APP_VERSION_OVERRIDE
+docker pull radixdlt/babylon-nginx:development-latest
+docker tag radixdlt/babylon-nginx:development-latest radixdlt/babylon-nginx:$RADIXDLT_NGINX_VERSION_OVERRIDE
+
+/tmp/radixnode docker install
 ----
