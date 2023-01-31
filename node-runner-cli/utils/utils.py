@@ -327,6 +327,19 @@ class Helpers:
         import shutil
         shutil.copy2(source, dest)
 
+    @staticmethod
+    def is_valid_file(file: str):
+        if not os.access(file, os.W_OK):
+            try:
+                open(file, 'w').close()
+                os.unlink(file)
+            except OSError:
+                print(f"OS error occurred trying to open {file}")
+                sys.exit(1)
+            except Exception as err:
+                print(f"Unexpected error opening {file} is", repr(err))
+                sys.exit(1)
+
 
 class bcolors:
     HEADER = '\033[95m'

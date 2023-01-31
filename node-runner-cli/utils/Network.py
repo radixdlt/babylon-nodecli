@@ -32,6 +32,7 @@ class Network:
     def path_to_genesis_json(network_id: int) -> str:
         if network_id not in [1, 2]:
             genesis_json_location = input("Enter absolute path to genesis json:")
+            Helpers.is_valid_file(genesis_json_location)
         else:
             genesis_json_location = None
 
