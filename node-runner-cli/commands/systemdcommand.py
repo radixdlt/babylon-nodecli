@@ -1,13 +1,16 @@
 import ipaddress
 import sys
 from argparse import ArgumentParser
+from deepdiff import DeepDiff
+import yaml
 
 from commands.subcommand import get_decorator, argument
 from config.BaseConfig import SetupMode
-from config.SystemDConfig import SystemDSettings
+from config.SystemDConfig import SystemDSettings, CoreSystemdSettings, CommonSystemdSettings
+from github.github import latest_release
 from setup.Base import Base
 from setup.SystemD import SystemD
-from utils.utils import Helpers
+from utils.utils import Helpers, bcolors
 
 systemdcli = ArgumentParser(
     description='Subcommand to help setup CORE using systemD service',
@@ -22,7 +25,7 @@ def systemdcommand(systemdcommand_args=None, parent=systemd_parser):
 
 
 @systemdcommand([
-    argument("-a", "--autoapprove", help="Set this to true to run without any prompts and in mode CORE or GATEWAY."
+    argument("-a", "--autoapprove", help="Set this to true to run without any prompts and in mode CORE."
                                          "Prompts still appear if you run in DETAILED mode "
                                          "Use this for automation purpose only", action="store_true"),
     argument("-d", "--configdir",
@@ -43,21 +46,24 @@ def systemdcommand(systemdcommand_args=None, parent=systemd_parser):
              required=True,
              help="""Quick config mode with assumed defaults. It supports two quick modes and a detailed config mode.
               \n\nCORE: Use this value to setup CORE using defaults.
-              \n\nGATEWAY: Use this value to setup GATEWAY using defaults.
               \n\nDETAILED: Default value if not provided. This mode takes your through series of questions.
               """,
-             choices=["CORE", "GATEWAY", "DETAILED"], action="store"),
+             choices=["CORE", "DETAILED"], action="store"),
     argument("-n", "--networkid",
              help="Network id of network you want to connect.For stokenet it is 2 and for mainnet it is 1."
                   "If not provided you will be prompted to enter a value ",
              action="store",
              default=""),
+    argument("-nk", "--newkeystore", help="Set this to true to create a new store without any prompts using location"
+                                          " defined in argument configdir", action="store_true"),
     argument("-r", "--release",
              help="Version of node software to install",
              action="store"),
     argument("-t", "--trustednode", help="Trusted node on radix network", action="store"),
-    argument("-ts", "--enabletransactions", help="Enable transaction stream api", action="store_true"),
     argument("-x", "--nginxrelease", help="Version of radixdlt nginx release ", action="store"),
+    argument("-xc", "--disablenginxforcore", help="Core Node API's are protected by Basic auth setting."
+                                                  "Set this to disable to nginx for core",
+             action="store", default="", choices=["true", "false"]),
 ])
 def config(args):
     """
@@ -81,30 +87,54 @@ def config(args):
     setupmode.mode = args.setupmode
 
     auto_approve = args.autoapprove
-    keystore_password = args.keystorepassword
+    trustednode = args.trustednode if args.trustednode != "" else None
+    keystore_password = args.keystorepassword if args.keystorepassword != "" else None
+    nginx_on_core = args.disablenginxforcore if args.disablenginxforcore != "" else None
+    data_directory = args.data_directory
+    new_keystore = args.newkeystore
     backup_time = Helpers.get_current_date_time()
 
-    settings: SystemDSettings = SystemD.parse_config_from_args(args)
-
-    settings.common_settings.ask_host_ip(args.hostip)
-    settings.core_node_settings.ask_enable_transaction(args.enabletransactions)
-    settings.core_node_settings.ask_trusted_node(args.trustednode)
-    settings.common_settings.ask_network_id(args.networkid)
-    settings.core_node_settings.ask_data_directory(args.data_directory)
-
-    if auto_approve:
-        SystemD.backup_file(settings.core_node_settings.node_secrets_dir, "node-keystore.ks", backup_time, auto_approve)
-
+    Helpers.section_headline("CONFIG FILE")
     config_file = f"{args.configdir}/config.yaml"
+    print(
+        "\nCreating config file using the answers from the questions that would be asked in next steps."
+        f"\nLocation of the config file: {bcolors.OKBLUE}{config_file}{bcolors.ENDC}")
+    config_to_dump = {"version": "0.1"}
+    if not args.release:
+        release = latest_release()
+    else:
+        release = args.release
 
-    settings.core_node_settings.keydetails = SystemD.generatekey(
-        keyfile_path=settings.core_node_settings.keydetails.keyfile_path,
-        keygen_tag=settings.core_node_settings.core_release,
-        keystore_password=keystore_password,
-        new=auto_approve)
+    configuration = SystemDSettings({})
 
-    SystemD.save_settings(settings, config_file)
+    configuration.core_node_settings = CoreSystemdSettings({}).create_config(release, data_directory,
+                                                                             trustednode,
+                                                                             keystore_password, new_keystore)
+    configuration.common_settings = CommonSystemdSettings({})
+    configuration.common_settings.ask_network_id(args.networkid)
+    configuration.common_settings.ask_enable_nginx_for_core(nginx_on_core)
+    config_to_dump["core_node"] = dict(configuration.core_node_settings)
 
+    if configuration.common_settings.check_nginx_required():
+        configuration.common_settings.ask_nginx_release()
+    else:
+        configuration.common_settings.nginx_settings = None
+
+    config_to_dump["common_config"] = dict(configuration.common_settings)
+
+    yaml.add_representer(type(None), Helpers.represent_none)
+    Helpers.section_headline("CONFIG is Generated as below")
+    print(f"\n{yaml.dump(config_to_dump)}")
+
+    old_config = SystemD.load_all_config(config_file)
+    if len(old_config) != 0:
+        print(f"""
+                {Helpers.section_headline("Differences")}
+                Difference between existing config file and new config that you are creating
+                {dict(DeepDiff(old_config, config_to_dump))}
+                  """)
+
+    SystemD.backup_save_config(config_file, config_to_dump, auto_approve, backup_time)
 
 @systemdcommand([
     argument("-a", "--auto", help="Automatically approve all Yes/No prompts", action="store_true"),
