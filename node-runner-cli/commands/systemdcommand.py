@@ -106,12 +106,12 @@ def config(args):
         release = args.release
 
     configuration = SystemDSettings({})
+    configuration.common_settings.ask_network_id(args.networkid)
 
     configuration.core_node_settings = CoreSystemdSettings({}).create_config(release, data_directory,
                                                                              trustednode,
                                                                              keystore_password, new_keystore)
     configuration.common_settings = CommonSystemdSettings({})
-    configuration.common_settings.ask_network_id(args.networkid)
     configuration.common_settings.ask_enable_nginx_for_core(nginx_on_core)
     config_to_dump["core_node"] = dict(configuration.core_node_settings)
 
