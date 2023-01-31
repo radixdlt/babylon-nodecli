@@ -96,7 +96,7 @@ class Docker(Base):
     def check_run_local_postgreSQL(all_config):
         postgres_db = all_config.get('gateway', {}).get('postgres_db')
         if Docker.check_post_db_local(all_config):
-            ansible_dir = f'https://raw.githubusercontent.com/radixdlt/node-runner/{Helpers.cli_version()}/node-runner-cli'
+            ansible_dir = f'https://raw.githubusercontent.com/radixdlt/babylon-nodecli/{Helpers.cli_version()}/node-runner-cli'
             AnsibleRunner(ansible_dir).run_setup_postgress(
                 postgres_db.get("password"),
                 postgres_db.get("user"),
@@ -146,7 +146,7 @@ class Docker(Base):
                                                                                           latest_core_release, 'CORE',
                                                                                           autoapprove)
         if all_config.get("gateway"):
-            latest_gateway_release = github.latest_release("radixdlt/radixdlt-network-gateway")
+            latest_gateway_release = github.latest_release("radixdlt/babylon-gateway")
             current_gateway_release = all_config['gateway']["data_aggregator"]["release"]
 
             if all_config.get('gateway', {}).get('data_aggregator'):
@@ -160,7 +160,7 @@ class Docker(Base):
                     latest_gateway_release, 'GATEWAY', autoapprove)
 
         if all_config.get("common_config").get("nginx_settings"):
-            latest_nginx_release = github.latest_release("radixdlt/radixdlt-nginx")
+            latest_nginx_release = github.latest_release("radixdlt/babylon-nginx")
             current_nginx_release = all_config['common_config']["nginx_settings"]["release"]
             updated_config['common_config']["nginx_settings"]["release"] = Prompts.confirm_version_updates(
                 current_nginx_release, latest_nginx_release, "RADIXDLT NGINX", autoapprove
