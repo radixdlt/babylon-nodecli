@@ -142,7 +142,7 @@ class Prompts:
     def check_for_fullnode() -> str:
         Helpers.section_headline("FULL NODE")
         print(
-            f"\nDo you want to setup a fullnode or a validator? For more information refer "
+            f"\nDo you want to setup a core node that is either fullnode or a validator? For more information refer "
             "https://docs.radixdlt.com/main/node-and-gateway/node-introduction.html#_what_is_a_radix_node")
         answer = Helpers.input_guestion(
             "Default is Y to setup fullnode , Press ENTER to accept default or type in [Y/N]:",
