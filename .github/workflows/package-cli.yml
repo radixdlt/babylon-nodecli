@@ -117,7 +117,12 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ubuntu 20.04
-
+      - name: Get dependencies
+        run: |
+          chmod +x ./radixnode
+          sudo apt-get update
+          sudo apt-get install containerd runc
+          ./radixnode docker dependencies
       - name: core-gateway-all-local
         run: |
           ls -a
@@ -186,6 +191,8 @@ jobs:
       - name: Run configure command
         run: |
           chmod +x ./radixnode
+          sudo apt-get update
+          sudo apt-get install containerd runc
           ./radixnode docker dependencies
       - name: Setup config
         run: |
@@ -255,6 +262,12 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ubuntu 20.04
+      - name: Get dependencies
+        run: |
+          chmod +x ./radixnode
+          sudo apt-get update
+          sudo apt-get install containerd runc
+          ./radixnode docker dependencies
       - name: Setup config
         run: |
           chmod +x ./radixnode
@@ -322,6 +335,12 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ubuntu 20.04
+      - name: Get dependencies
+        run: |
+          chmod +x ./radixnode
+          sudo apt-get update
+          sudo apt-get install containerd runc
+          ./radixnode docker dependencies
       - name: Setup config
         run: |
           chmod +x ./radixnode
