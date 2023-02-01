@@ -4,7 +4,7 @@
 - setup_fullnode: Y
 - input_seednode: "radix://node_tdx_21_1qfpu6e4xjnjv0anuadnf935kktd2cvycd5evavk9an56y9pzl3rtk0vzdy5@35.170.44.1"
 - have_keystore_file: Y
-- input_path_keystore: "/home/ubuntu/node-config"
+- input_path_keystore: "/home/runner/node-config"
 - enter_keystore_name: "node-keystore.ks"
 - input_ledger_path: "/home/runner/data"
 - input_transaction_api: "true"
