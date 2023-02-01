@@ -7,9 +7,7 @@ from argparse import ArgumentParser
 import urllib3
 
 from api.DefaultApiHelper import DefaultApiHelper
-from commands import othercommands
 from commands.authcommand import authcli
-from commands.coreapi import handle_core
 from commands.dockercommand import dockercli
 from commands.key import keycli
 from commands.monitoring import monitoringcli
@@ -18,7 +16,6 @@ from commands.systemapi import handle_systemapi
 from commands.systemdcommand import systemdcli
 from env_vars import DISABLE_VERSION_CHECK
 from github.github import latest_release
-from setup import Base
 from utils.utils import Helpers
 
 urllib3.disable_warnings()
@@ -86,8 +83,6 @@ if __name__ == "__main__":
                 defaultApi.prometheus_metrics()
             elif apicli_args.apicommand == "system":
                 handle_systemapi()
-            elif apicli_args.apicommand == "core":
-                handle_core()
             else:
                 print(f"Invalid api command {apicli_args.apicommand}")
 
