@@ -119,7 +119,7 @@ def config(args):
     configuration.common_settings.ask_network_id(networkid)
     configuration.common_settings.ask_existing_docker_compose_file()
 
-    config_to_dump = {"version": "0.1"}
+    config_to_dump = {"version": "0.2"}
 
     if "CORE" in setupmode.mode:
         quick_node_settings: CoreDockerSettings = CoreDockerSettings({}).create_config(release, trustednode,
@@ -128,12 +128,12 @@ def config(args):
         configuration.common_settings.ask_enable_nginx_for_core(nginx_on_core)
         config_to_dump["core_node"] = dict(configuration.core_node_settings)
 
-    if "GATEWAY" in setupmode.mode:
-        quick_gateway_settings: GatewayDockerSettings = GatewayDockerSettings({}).create_config(postgrespassword)
-
-        configuration.gateway_settings = quick_gateway_settings
-        configuration.common_settings.ask_enable_nginx_for_gateway(nginx_on_gateway)
-        config_to_dump["gateway"] = dict(configuration.gateway_settings)
+    # if "GATEWAY" in setupmode.mode:
+    #     quick_gateway_settings: GatewayDockerSettings = GatewayDockerSettings({}).create_config(postgrespassword)
+    #
+    #     configuration.gateway_settings = quick_gateway_settings
+    #     configuration.common_settings.ask_enable_nginx_for_gateway(nginx_on_gateway)
+    #     config_to_dump["gateway"] = dict(configuration.gateway_settings)
 
     if "DETAILED" in setupmode.mode:
         run_fullnode = Prompts.check_for_fullnode()
@@ -146,15 +146,15 @@ def config(args):
         else:
             configuration.common_settings.nginx_settings.protect_core = "false"
 
-        run_gateway = Prompts.check_for_gateway()
-        if run_gateway:
-            detailed_gateway_settings: GatewayDockerSettings = GatewayDockerSettings({}).create_config(
-                postgrespassword)
-            configuration.gateway_settings = detailed_gateway_settings
-            configuration.common_settings.ask_enable_nginx_for_gateway(nginx_on_gateway)
-            config_to_dump["gateway"] = dict(configuration.gateway_settings)
-        else:
-            configuration.common_settings.nginx_settings.protect_gateway = "false"
+        # run_gateway = Prompts.check_for_gateway()
+        # if run_gateway:
+        #     detailed_gateway_settings: GatewayDockerSettings = GatewayDockerSettings({}).create_config(
+        #         postgrespassword)
+        #     configuration.gateway_settings = detailed_gateway_settings
+        #     configuration.common_settings.ask_enable_nginx_for_gateway(nginx_on_gateway)
+        #     config_to_dump["gateway"] = dict(configuration.gateway_settings)
+        # else:
+        #     configuration.common_settings.nginx_settings.protect_gateway = "false"
 
     if configuration.common_settings.check_nginx_required():
         configuration.common_settings.ask_nginx_release()
@@ -228,6 +228,8 @@ def install(args):
             {Helpers.section_headline("Differences between existing compose file and new compose file")}
             Difference between existing config file and new config that you are creating
             {compose_file_difference}
+            
+            if the differences is showing root objects only then it could be you are running for first time.  
               """)
         to_update = ""
         if autoapprove:

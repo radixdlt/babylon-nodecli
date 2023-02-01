@@ -125,9 +125,11 @@ class Docker(Base):
     @staticmethod
     def get_existing_compose_file(all_config):
         compose_file = all_config['common_config']['docker_compose']
+        Helpers.section_headline("Checking if you have existing docker compose file")
         if os.path.exists(compose_file):
             return compose_file, Helpers.yaml_as_dict(compose_file)
         else:
+            Helpers.print_info("Seems you are creating docker compose file for first time")
             return compose_file, {}
 
     @staticmethod

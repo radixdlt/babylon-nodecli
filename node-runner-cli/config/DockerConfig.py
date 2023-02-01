@@ -7,7 +7,7 @@ import yaml
 from config.BaseConfig import BaseConfig, SetupMode
 from config.CommonDockerSettings import CommonDockerSettings
 from config.GatewayDockerConfig import GatewayDockerSettings
-from env_vars import MOUNT_LEDGER_VOLUME
+from env_vars import MOUNT_LEDGER_VOLUME, CORE_DOCKER_REPO_OVERRIDE
 from setup import Base
 from utils.Prompts import Prompts
 from utils.utils import Helpers
@@ -25,7 +25,7 @@ class CoreDockerSettings(BaseConfig):
     composefileurl: str = None
     keydetails: KeyDetails = KeyDetails({})
     core_release: str = None
-    repo: str = "radixdlt/babylon-node"
+    repo: str = os.getenv(CORE_DOCKER_REPO_OVERRIDE, "radixdlt/babylon-node")
     data_directory: str = f"{Helpers.get_home_dir()}/data"
     enable_transaction: str = "false"
     trusted_node: str = None
@@ -64,7 +64,8 @@ class CoreDockerSettings(BaseConfig):
 
     def set_core_release(self, release):
         self.core_release = release
-        self.keydetails.keygen_tag = self.core_release
+        # Using hardcoded tag value till we publish keygen image
+        self.keydetails.keygen_tag = "1.3.2"
 
     def ask_data_directory(self):
         if "DETAILED" in SetupMode.instance().mode:

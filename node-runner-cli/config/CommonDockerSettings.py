@@ -7,8 +7,9 @@ from utils.Prompts import Prompts, Helpers
 
 
 class NginxConfig(BaseConfig):
-    protect_gateway: str = "true"
-    gateway_behind_auth: str = "true"
+    # uncomment below when support to gateway is added
+    # protect_gateway: str = "true"
+    # gateway_behind_auth: str = "true"
     enable_transaction_api = "false"
     protect_core: str = "true"
     release = None
@@ -78,8 +79,8 @@ class CommonDockerSettings(BaseConfig):
             self.nginx_settings.protect_gateway = Prompts.ask_enable_nginx(service="GATEWAY").lower()
 
     def check_nginx_required(self):
-        if json.loads(self.nginx_settings.protect_gateway.lower()) or json.loads(
-                self.nginx_settings.protect_core.lower()):
+        # When gateway is supported add back the condition to check gateway
+        if json.loads(self.nginx_settings.protect_core.lower()):
             return True
         else:
             return False
