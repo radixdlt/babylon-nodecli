@@ -10,4 +10,4 @@
 - input_ledger_path: "/home/runner/data"
 - input_transaction_api: "false"
 - core_nginx_setup: "false"
-- setup_gateway: "false"
+#- setup_gateway: "false"
