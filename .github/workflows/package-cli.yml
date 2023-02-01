@@ -212,13 +212,13 @@ jobs:
         run: |
           export DISABLE_VERSION_CHECK=true
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
-          /tmp/radixnode docker install -f $HOME/node-config/config.yaml -a
+          ./radixnode docker install -f $HOME/node-config/config.yaml -a
           sleep 60
             
-          /tmp/radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
+          ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
           NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system health
-          /tmp/radixnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
-          /tmp/radixnode auth set-superadmin-password -m DOCKER -p $NGINX_SUPERADMIN_PASSWORD
+          ./radixnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
+          ./radixnode auth set-superadmin-password -m DOCKER -p $NGINX_SUPERADMIN_PASSWORD
         env:
           NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
           NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
