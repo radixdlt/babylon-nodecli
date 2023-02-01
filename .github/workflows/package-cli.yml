@@ -205,19 +205,20 @@ jobs:
            -k $KEYSTORE_PASSWORD -nk -a
         env:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
+          CORE_DOCKER_REPO_OVERRIDE: "radixdlt/radixdlt-core"
           RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
       - name: Run CLI setup
         run: |
           export DISABLE_VERSION_CHECK=true
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
-          ./radixnode docker install -f $HOME/node-config/config.yaml -a
+          /tmp/radixnode docker install -f $HOME/node-config/config.yaml -a
           sleep 60
-          export DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu
-          ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
+            
+          /tmp/radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
           NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system health
-          ./radixnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
-          ./radixnode auth set-superadmin-password -m DOCKER -p $NGINX_SUPERADMIN_PASSWORD
+          /tmp/radixnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
+          /tmp/radixnode auth set-superadmin-password -m DOCKER -p $NGINX_SUPERADMIN_PASSWORD
         env:
           NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
           NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
@@ -282,6 +283,7 @@ jobs:
         env:
           POSTGRESS_PASSWORD: ${{secrets.POSTGRESS_PASSWORD}}
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
+          CORE_DOCKER_REPO_OVERRIDE: "radixdlt/radixdlt-core"
           RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
       - name: Run CLI setup
@@ -353,6 +355,7 @@ jobs:
         env:
           POSTGRESS_PASSWORD: ${{secrets.POSTGRESS_PASSWORD}}
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
+          CORE_DOCKER_REPO_OVERRIDE: "radixdlt/radixdlt-core"
           RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
       - name: Run CLI setup
@@ -368,6 +371,6 @@ jobs:
           NODE_END_POINT="http://localhost:3333" NGINX=false ./radixnode api system health
           curl -k -f -u "admin:$NGINX_ADMIN_PASSWORD" http://localhost:5207
         env:
-          CORE_DOCKER_REPO_OVERRIDE: "radixdlt/radixdlt-core"
+          CORE_DOCKER_REPO_OVERRIDE: "radixdlt/radixdlt-core"          
           RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
