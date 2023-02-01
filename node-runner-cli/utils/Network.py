@@ -1,7 +1,8 @@
 import sys
 
 from utils.PromptFeeder import QuestionKeys
-from utils.utils import Helpers
+from utils.Prompts import Prompts
+from utils.utils import Helpers, bcolors
 
 
 class Network:
@@ -31,8 +32,12 @@ class Network:
     @staticmethod
     def path_to_genesis_json(network_id: int) -> str:
         if network_id not in [1, 2]:
-            genesis_json_location = input("Enter absolute path to genesis json:")
+            config_dir = f"Helpers.get_default_node_config_dir()/genesis.json"
+            genesis_json_location = Prompts.check_default(Helpers.input_guestion(
+                f"Enter absolute path to genesis json. Default location is {bcolors.OKBLUE}{config_dir}{bcolors.ENDC}:",
+                QuestionKeys.genesis_location), config_dir)
             Helpers.is_valid_file(genesis_json_location)
+
         else:
             genesis_json_location = None
 
@@ -58,5 +63,5 @@ class Network:
         return [str(network_id) for network_id in Network.get_network_id_names().keys()]
 
     @staticmethod
-    def get_network_name(network_id:  int) -> str:
+    def get_network_name(network_id: int) -> str:
         return Network.get_network_id_names()[network_id]

@@ -33,6 +33,7 @@ class QuestionKeys:
     postgres_db_password = "postgres_db_password"
     gateway_release = "gateway_release"
     aggregator_release = "aggregator_release"
+    genesis_location= "genesis_location"
 
 class PromptFeeder:
     _instance = None

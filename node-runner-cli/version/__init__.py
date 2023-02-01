@@ -1,2 +1,2 @@
-__version__= "0.1.1-18-g4d8116d"
-__base_version__= "0.1.1"
+__version__= "2.0.0-rc-1-g8039ee1"
+__base_version__= "2.0.0-rc"
