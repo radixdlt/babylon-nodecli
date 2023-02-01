@@ -21,14 +21,14 @@ def handle_systemapi():
 def systemapicommand(args=[], parent=systemapi_parser):
     return get_decorator(args, parent)
 
-
-@systemapicommand()
-def metrics(args):
-    """
-    This command helps to list the metrics that are exposed from the metrics endpoint of the node
-    """
-    defaultApiHelper = DefaultApiHelper(verify_ssl=False)
-    defaultApiHelper.metrics()
+# This command is currently not pointing to a valid endpoint
+# @systemapicommand()
+# def metrics(args):
+#     """
+#     This command helps to list the metrics that are exposed from the metrics endpoint of the node
+#     """
+#     defaultApiHelper = DefaultApiHelper(verify_ssl=False)
+#     defaultApiHelper.metrics()
 
 
 @systemapicommand()
