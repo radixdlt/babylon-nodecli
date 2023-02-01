@@ -215,6 +215,7 @@ jobs:
           NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
           NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
           NGINX_SUPERADMIN_PASSWORD: ${{secrets.NGINX_SUPERADMIN_PASSWORD}}
+          CORE_DOCKER_REPO_OVERRIDE: "radixdlt/radixdlt-core"
           RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
 
@@ -307,6 +308,7 @@ jobs:
           NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
           NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
           NGINX_GATEWAY_PASSWORD: ${{secrets.NGINX_GATEWAY_PASSWORD}}
+          CORE_DOCKER_REPO_OVERRIDE: "radixdlt/radixdlt-core"
           RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
 
@@ -347,5 +349,6 @@ jobs:
           NODE_END_POINT="http://localhost:3333" NGINX=false ./radixnode api system health
           curl -k -f -u "admin:$NGINX_ADMIN_PASSWORD" http://localhost:5207
         env:
+          CORE_DOCKER_REPO_OVERRIDE: "radixdlt/radixdlt-core"
           RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
