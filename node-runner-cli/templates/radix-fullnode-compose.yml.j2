@@ -16,7 +16,7 @@ services:
       RADIXDLT_VALIDATOR_KEY_LOCATION: /home/radixdlt/node-keystore.ks
       RADIX_NODE_KEYSTORE_PASSWORD: {{core_node.keydetails.keystore_password}}
       {% if common_config.genesis_json_location is defined %}
-      RADIXDLT_GENESIS_FILE: "{{common_config.genesis_json_location}}"
+      RADIXDLT_GENESIS_FILE: "/home/radixdlt/genesis.json"
       {% endif %}
     image: {{core_node.repo}}:{{core_node.core_release}}
     init: true
