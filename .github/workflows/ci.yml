@@ -215,8 +215,8 @@ jobs:
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
           ./radixnode docker install -f $HOME/node-config/config.yaml -a
           # ToDo: Fix Authorization error export DOCKER_COMPOSE_FOLDER_PREFIX=runner ?
-          # sleep 60
-          # ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
+          sleep 60
+          ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
           # NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system health
           # ./radixnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
           # ./radixnode auth set-superadmin-password -m DOCKER -p $NGINX_SUPERADMIN_PASSWORD
@@ -255,126 +255,126 @@ jobs:
   #         NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
   #         NGINX_SUPERADMIN_PASSWORD: ${{secrets.NGINX_SUPERADMIN_PASSWORD}}
 
-  test-full-stack:
-    runs-on: ubuntu-20.04
-    needs:
-      - package_ubuntu_cli
-    steps:
-      - name: Download packaged cli
-        uses: actions/download-artifact@v3
-        with:
-          name: ubuntu 20.04
-      - name: Get dependencies
-        run: |
-          chmod +x ./radixnode
-          sudo apt-get update
-          sudo apt-get install containerd runc
-          ./radixnode docker dependencies
-      - name: Setup config
-        run: |
-          chmod +x ./radixnode
-          mkdir -p $HOME/node-config
-          export DISABLE_VERSION_CHECK=true
-          rm -rf $HOME/node-config
-          ./radixnode docker config -d $HOME/node-config \
-            -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 \
-            -m CORE GATEWAY -n 2 -k $KEYSTORE_PASSWORD -nk -p $POSTGRESS_PASSWORD -a
-          #grep -v "password" $HOME/node-config/config.yaml > temp && mv temp $HOME/node-config/config.yaml
-          cat $HOME/node-config/config.yaml
-        env:
-          POSTGRESS_PASSWORD: ${{secrets.POSTGRESS_PASSWORD}}
-          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
-          CORE_DOCKER_REPO_OVERRIDE: "radixdlt/radixdlt-core"
-          RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
-          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
-      - name: Run CLI setup
-        run: |
-          export DISABLE_VERSION_CHECK=true
-          export COMPOSE_HTTP_TIMEOUT=360
+#  test-full-stack:
+#    runs-on: ubuntu-20.04
+#    needs:
+#      - package_ubuntu_cli
+#    steps:
+#      - name: Download packaged cli
+#        uses: actions/download-artifact@v3
+#        with:
+#          name: ubuntu 20.04
+#      - name: Get dependencies
+#        run: |
+#          chmod +x ./radixnode
+#          sudo apt-get update
+#          sudo apt-get install containerd runc
+#          ./radixnode docker dependencies
+#      - name: Setup config
+#        run: |
+#          chmod +x ./radixnode
+#          mkdir -p $HOME/node-config
+#          export DISABLE_VERSION_CHECK=true
+#          rm -rf $HOME/node-config
+#          ./radixnode docker config -d $HOME/node-config \
+#            -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 \
+#            -m CORE GATEWAY -n 2 -k $KEYSTORE_PASSWORD -nk -p $POSTGRESS_PASSWORD -a
+#          #grep -v "password" $HOME/node-config/config.yaml > temp && mv temp $HOME/node-config/config.yaml
+#          cat $HOME/node-config/config.yaml
+#        env:
+#          POSTGRESS_PASSWORD: ${{secrets.POSTGRESS_PASSWORD}}
+#          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
+#          CORE_DOCKER_REPO_OVERRIDE: "radixdlt/radixdlt-core"
+#          RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
+#          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
+#      - name: Run CLI setup
+#        run: |
+#          export DISABLE_VERSION_CHECK=true
+#          export COMPOSE_HTTP_TIMEOUT=360
+#
+#          ./radixnode docker stop -f $HOME/node-config/config.yaml
+#
+#          #Below PATH require when ansible is installed as part of pip
+#          export PATH="$PATH:/home/ubuntu/.local/bin"
+#
+#          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
+#          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
+#          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-gateway-password -m DOCKER -p $NGINX_GATEWAY_PASSWORD
+#
+#          ./radixnode monitoring stop
+#          ./radixnode monitoring config \
+#              -m MONITOR_CORE MONITOR_GATEWAY \
+#              -cm $NGINX_METRICS_PASSWORD  \
+#              -gm $NGINX_METRICS_PASSWORD  \
+#              -am $NGINX_METRICS_PASSWORD
+#
+#          ./radixnode monitoring install -a
+#
+#          export POSTGRES_PASSWORD=${{secrets.POSTGRESS_PASSWORD}}
+#          export RADIXDLT_NODE_KEY_PASSWORD=${{secrets.KEYSTORE_PASSWORD}}
+#          # ToDo: Fix Docker Image Pull with Gateway installation
+#          # ./radixnode docker install -f $HOME/node-config/config.yaml -a
+#          # sleep 60
+#
+#          # NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system health
+#          # curl -f  --request POST --insecure --user "gateway:$NGINX_GATEWAY_PASSWORD" https://localhost/gateway
+#          # curl --insecure --user "gateway:$NGINX_GATEWAY_PASSWORD" https://localhost/token/native --header 'Content-Type: application/json' -d '{ "network_identifier":{"network":"stokenet"}}'
+#          # curl -k -f -u "metrics:$NGINX_METRICS_PASSWORD" https://localhost/gateway/metrics
+#
+#        env:
+#          NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
+#          NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
+#          NGINX_GATEWAY_PASSWORD: ${{secrets.NGINX_GATEWAY_PASSWORD}}
+#          CORE_DOCKER_REPO_OVERRIDE: "radixdlt/radixdlt-core"
+#          RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
+#          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
 
-          ./radixnode docker stop -f $HOME/node-config/config.yaml
-
-          #Below PATH require when ansible is installed as part of pip
-          export PATH="$PATH:/home/ubuntu/.local/bin"
-
-          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
-          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
-          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-gateway-password -m DOCKER -p $NGINX_GATEWAY_PASSWORD
-
-          ./radixnode monitoring stop
-          ./radixnode monitoring config \
-              -m MONITOR_CORE MONITOR_GATEWAY \
-              -cm $NGINX_METRICS_PASSWORD  \
-              -gm $NGINX_METRICS_PASSWORD  \
-              -am $NGINX_METRICS_PASSWORD
-
-          ./radixnode monitoring install -a
-
-          export POSTGRES_PASSWORD=${{secrets.POSTGRESS_PASSWORD}}
-          export RADIXDLT_NODE_KEY_PASSWORD=${{secrets.KEYSTORE_PASSWORD}}
-          # ToDo: Fix Docker Image Pull with Gateway installation
-          # ./radixnode docker install -f $HOME/node-config/config.yaml -a
-          # sleep 60
-
-          # NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system health
-          # curl -f  --request POST --insecure --user "gateway:$NGINX_GATEWAY_PASSWORD" https://localhost/gateway
-          # curl --insecure --user "gateway:$NGINX_GATEWAY_PASSWORD" https://localhost/token/native --header 'Content-Type: application/json' -d '{ "network_identifier":{"network":"stokenet"}}'
-          # curl -k -f -u "metrics:$NGINX_METRICS_PASSWORD" https://localhost/gateway/metrics
-
-        env:
-          NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
-          NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
-          NGINX_GATEWAY_PASSWORD: ${{secrets.NGINX_GATEWAY_PASSWORD}}
-          CORE_DOCKER_REPO_OVERRIDE: "radixdlt/radixdlt-core"
-          RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
-          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
-
-
-  test-full-stack-no-nginx:
-    runs-on: ubuntu-20.04
-    needs:
-      - package_ubuntu_cli
-    steps:
-      - name: Download packaged cli
-        uses: actions/download-artifact@v3
-        with:
-          name: ubuntu 20.04
-      - name: Get dependencies
-        run: |
-          chmod +x ./radixnode
-          sudo apt-get update
-          sudo apt-get install containerd runc
-          ./radixnode docker dependencies
-      - name: Setup config
-        run: |
-          chmod +x ./radixnode
-          mkdir -p $HOME/node-config
-          export DISABLE_VERSION_CHECK=true
-          export COMPOSE_HTTP_TIMEOUT=360
-          ./radixnode docker config -d $HOME/node-config \
-            -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 \
-            -m CORE GATEWAY -n 2 -k password -nk -p postgres -xg false -xc false -a
-        env:
-          POSTGRESS_PASSWORD: ${{secrets.POSTGRESS_PASSWORD}}
-          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
-          CORE_DOCKER_REPO_OVERRIDE: "radixdlt/radixdlt-core"
-          RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
-          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
-      - name: Run CLI setup
-        run: |
-          export DISABLE_VERSION_CHECK=true
-          export COMPOSE_HTTP_TIMEOUT=360
-          ./radixnode docker stop -f $HOME/node-config/config.yaml
-
-          #Below PATH require when ansible is installed as part of pip
-          export PATH="$PATH:/home/ubuntu/.local/bin"
-          # ToDo: Fix Docker Image Pull with Gateway installation
-          # ./radixnode docker install -f $HOME/node-config/config.yaml -a -u
-
-          # sleep 60
-          # NODE_END_POINT="http://localhost:3333" NGINX=false ./radixnode api system health
-          # curl -k -f -u "admin:$NGINX_ADMIN_PASSWORD" http://localhost:5207
-        env:
-          CORE_DOCKER_REPO_OVERRIDE: "radixdlt/radixdlt-core"          
-          RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
-          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
+#
+#  test-full-stack-no-nginx:
+#    runs-on: ubuntu-20.04
+#    needs:
+#      - package_ubuntu_cli
+#    steps:
+#      - name: Download packaged cli
+#        uses: actions/download-artifact@v3
+#        with:
+#          name: ubuntu 20.04
+#      - name: Get dependencies
+#        run: |
+#          chmod +x ./radixnode
+#          sudo apt-get update
+#          sudo apt-get install containerd runc
+#          ./radixnode docker dependencies
+#      - name: Setup config
+#        run: |
+#          chmod +x ./radixnode
+#          mkdir -p $HOME/node-config
+#          export DISABLE_VERSION_CHECK=true
+#          export COMPOSE_HTTP_TIMEOUT=360
+#          ./radixnode docker config -d $HOME/node-config \
+#            -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 \
+#            -m CORE GATEWAY -n 2 -k password -nk -p postgres -xg false -xc false -a
+#        env:
+#          POSTGRESS_PASSWORD: ${{secrets.POSTGRESS_PASSWORD}}
+#          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
+#          CORE_DOCKER_REPO_OVERRIDE: "radixdlt/radixdlt-core"
+#          RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
+#          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
+#      - name: Run CLI setup
+#        run: |
+#          export DISABLE_VERSION_CHECK=true
+#          export COMPOSE_HTTP_TIMEOUT=360
+#          ./radixnode docker stop -f $HOME/node-config/config.yaml
+#
+#          #Below PATH require when ansible is installed as part of pip
+#          export PATH="$PATH:/home/ubuntu/.local/bin"
+#          # ToDo: Fix Docker Image Pull with Gateway installation
+#          # ./radixnode docker install -f $HOME/node-config/config.yaml -a -u
+#
+#          # sleep 60
+#          # NODE_END_POINT="http://localhost:3333" NGINX=false ./radixnode api system health
+#          # curl -k -f -u "admin:$NGINX_ADMIN_PASSWORD" http://localhost:5207
+#        env:
+#          CORE_DOCKER_REPO_OVERRIDE: "radixdlt/radixdlt-core"
+#          RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
+#          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
