@@ -217,6 +217,7 @@ jobs:
           EOF
           ./radixnode docker config -m DETAILED \
            -k $KEYSTORE_PASSWORD -nk -a
+
 #          ./radixnode docker config -d $HOME/node-config \
 #           -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 -m CORE -n 2 \
 #           -k $KEYSTORE_PASSWORD -nk -a
