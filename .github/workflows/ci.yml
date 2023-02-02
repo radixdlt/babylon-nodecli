@@ -189,6 +189,10 @@ jobs:
     needs:
       - package_ubuntu_cli
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Download packaged cli
         uses: actions/download-artifact@v3
         with:
