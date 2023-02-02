@@ -1,4 +1,4 @@
-name: Package cli
+name: CI
 
 on:
   release:
@@ -14,7 +14,7 @@ on:
 jobs:
   package_ubuntu_cli:
     name: "Package cli for Ubuntu"
-    runs-on: ubuntu-20.04
+    runs-on: [node-only]
     steps:
       - name: cancel running workflows
         uses: styfle/cancel-workflow-action@0.8.0
