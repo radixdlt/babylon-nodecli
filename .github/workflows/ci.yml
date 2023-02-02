@@ -207,9 +207,15 @@ jobs:
           export CORE_DOCKER_REPO_OVERRIDE="eu.gcr.io/dev-container-repo/radixdlt-core"
           export RADIXDLT_APP_VERSION_OVERRIDE="release-betanet-v2-0a079cc1d"
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
-          ./radixnode docker config -d $HOME/node-config \
-           -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 -m CORE -n 2 \
+          export PROMPT_FEEDS="node-runner-cli/test-prompts/core-gateway-all-local.yml"
+          cat > /home/runner/genesis.json <<EOF
+          {"genesis":"0321bf94398a862c0f6ed48ca7d512ccd0f2f5a2b000913f2eb99db943bd814b21038f8dbbd66648e1356911f5aba38b8e9b366e3f1ffe14f05007a30731305fd22a0345bbbd4c236968cda7e8b901d6337e47ce59b6a369cffea3d8f53e7b6a1b69470351ebefbd755ea3c29c32d29d3d870156baadd799ba911a022b6dee449a2082cb"}
+          EOF
+          ./radixnode docker config -m DETAILED \
            -k $KEYSTORE_PASSWORD -nk -a
+#          ./radixnode docker config -d $HOME/node-config \
+#           -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 -m CORE -n 2 \
+#           -k $KEYSTORE_PASSWORD -nk -a
         env:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
           CORE_DOCKER_REPO_OVERRIDE: "radixdlt/radixdlt-core"

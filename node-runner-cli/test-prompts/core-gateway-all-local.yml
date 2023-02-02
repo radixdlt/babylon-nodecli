@@ -1,9 +1,9 @@
 ---
-- select_network: "33"
+- select_network: "34"
 - genesis_location: "/home/runner/genesis.json"
 - first_time_config: Y
 - setup_fullnode: Y
-- input_seednode: "radix://node_tdx_21_1qfpu6e4xjnjv0anuadnf935kktd2cvycd5evavk9an56y9pzl3rtk0vzdy5@35.170.44.1"
+- input_seednode: "radix://node_tdx_22_1qvsml9pe32rzcrmw6jx204gjeng09adzkqqfz0ewhxwmjsaas99jzrje4u3@34.243.93.185"
 - have_keystore_file: Y
 - input_path_keystore: "/home/runner/node-config"
 - enter_keystore_name: "node-keystore.ks"
