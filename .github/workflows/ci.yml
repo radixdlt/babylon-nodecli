@@ -257,6 +257,7 @@ jobs:
           sleep 60
           ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
           NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system health
+          NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system version
           # ./radixnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
           # ./radixnode auth set-superadmin-password -m DOCKER -p $NGINX_SUPERADMIN_PASSWORD
         env:
