@@ -41,16 +41,16 @@ do
   command_help_doc "docker" "$subcommand" "$filename"
 done
 
-
-cat <<EOT >> "$filename"
-=== Radix node CLI command reference
-Below are the list of commands supported in cli to setup a core node process as a systemd process
-EOT
-declare -a systemdsubcommands=("dependencies" "install" "restart" "stop")
-for subcommand in "${systemdsubcommands[@]}"
-do
-  command_help_doc "systemd" "$subcommand" "$filename"
-done
+#Systemd not supported yet
+#cat <<EOT >> "$filename"
+#=== Radix node CLI command reference
+#Below are the list of commands supported in cli to setup a core node process as a systemd process
+#EOT
+#declare -a systemdsubcommands=("dependencies" "install" "restart" "stop")
+#for subcommand in "${systemdsubcommands[@]}"
+#do
+#  command_help_doc "systemd" "$subcommand" "$filename"
+#done
 
 cat <<EOT >> "$filename"
 === Set passwords for the Nginx server
@@ -90,16 +90,17 @@ do
   command_help_doc "monitoring" "$subcommand" "$filename"
 done
 
-cat <<EOT >> "$filename"
-=== CLI helper commands to interact with keystore
-Using CLI, for a key file, you can print out the validator address. This feature is in beta and currently only below commands supported.
-EOT
-
-declare -a keyCommands=("info" )
-for subcommand in "${keyCommands[@]}"
-do
-  command_help_doc "key" "$subcommand" "$filename"
-done
+#Not supported yet
+#cat <<EOT >> "$filename"
+#=== CLI helper commands to interact with keystore
+#Using CLI, for a key file, you can print out the validator address. This feature is in beta and currently only below commands supported.
+#EOT
+#
+#declare -a keyCommands=("info" )
+#for subcommand in "${keyCommands[@]}"
+#do
+#  command_help_doc "key" "$subcommand" "$filename"
+#done
 
 
 cat <<EOT >> "$filename"
