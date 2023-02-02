@@ -1,5 +1,5 @@
 ---
-- select_network: 33
+- select_network: "33"
 - genesis_location: "/home/runner/genesis.json"
 - first_time_config: Y
 - setup_fullnode: Y
