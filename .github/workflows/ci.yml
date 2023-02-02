@@ -182,6 +182,10 @@ jobs:
 
   test-core-only-node:
     runs-on: ubuntu-20.04
+    permissions:
+      id-token: write
+      pull-requests: read
+      contents: read
     needs:
       - package_ubuntu_cli
     steps:
@@ -200,6 +204,8 @@ jobs:
           chmod +x ./radixnode
           mkdir -p $HOME/node-config
           export DISABLE_VERSION_CHECK=true
+          export CORE_DOCKER_REPO_OVERRIDE="eu.gcr.io/dev-container-repo/radixdlt-core"
+          export RADIXDLT_APP_VERSION_OVERRIDE="release-betanet-v2-0a079cc1d"
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
           ./radixnode docker config -d $HOME/node-config \
            -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 -m CORE -n 2 \
@@ -209,6 +215,28 @@ jobs:
           CORE_DOCKER_REPO_OVERRIDE: "radixdlt/radixdlt-core"
           RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
+#      - id: auth
+#        uses: google-github-actions/auth@a61909d048e0be579b6c15b27088d19668493851
+#        with:
+#          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDP }}
+#          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+#      - name: 'Register gcloud as Docker credential helper'
+#        run: |
+#          gcloud auth configure-docker -q
+      - uses: radixdlt/iac-resuable-artifacts/fetch-secrets@v0.8.0
+        with:
+          role_name: "arn:aws:iam::308190735829:role/gh-common-secrets-read-access"
+          app_name: "dashboard"
+          step_name: "push-dash"
+          secret_prefix: "GH_GCR_JSON_KEY"
+          secret_name: "arn:aws:secretsmanager:eu-west-2:308190735829:secret:github-actions/common/gcr-credentials-OeJwWi"
+          parse_json: false
+      - name: Login to GCR
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+        with:
+          registry: eu.gcr.io
+          username: _json_key
+          password: ${{ env.GH_GCR_JSON_KEY }}
       - name: Run CLI setup
         run: |
           export DISABLE_VERSION_CHECK=true

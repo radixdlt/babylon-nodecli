@@ -228,8 +228,6 @@ def install(args):
             {Helpers.section_headline("Differences between existing compose file and new compose file")}
             Difference between existing config file and new config that you are creating
             {compose_file_difference}
-            
-            if the differences is showing root objects only then it could be you are running for first time.  
               """)
         to_update = ""
         if autoapprove:
