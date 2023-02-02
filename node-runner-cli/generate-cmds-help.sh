@@ -62,15 +62,16 @@ do
   command_help_doc "auth" "$subcommand" "$filename"
 done
 
-cat <<EOT >> "$filename"
-=== Accessing core endpoints using CLI
-Once the nginx basic auth passwords for admin, superadmin, metrics users are setup , radixnode cli can be used to access the node endpoints
-EOT
-declare -a coreapicommands=("entity" "key-list" "mempool" "mempool-transaction" "update-validator-config" "signal-protocol-update-readiness" "retract-protocol-update-readiness")
-for subcommand in "${coreapicommands[@]}"
-do
-  command_api_help_doc "core" "$subcommand" "$filename"
-done
+#Systemd not supported yet
+#cat <<EOT >> "$filename"
+#=== Accessing core endpoints using CLI
+#Once the nginx basic auth passwords for admin, superadmin, metrics users are setup , radixnode cli can be used to access the node endpoints
+#EOT
+#declare -a coreapicommands=("entity" "key-list" "mempool" "mempool-transaction" "update-validator-config" "signal-protocol-update-readiness" "retract-protocol-update-readiness")
+#for subcommand in "${coreapicommands[@]}"
+#do
+#  command_api_help_doc "core" "$subcommand" "$filename"
+#done
 
 
 declare -a systemapicommands=("metrics" "health" "version")
