@@ -2,6 +2,8 @@ import getpass
 import os
 import sys
 
+import yaml
+
 from setup.AnsibleRunner import AnsibleRunner
 from utils.PromptFeeder import QuestionKeys
 from utils.Prompts import Prompts
@@ -90,32 +92,28 @@ class Base:
         return data_dir_path
 
     @staticmethod
-    def get_network_id():
-        # Network id
-        network_prompt = Helpers.input_guestion(
-            "Select the network you want to connect [S]Stokenet or [M]Mainnet or network_id:",
-            QuestionKeys.select_network)
-        network_id = Base.validate_network_id(network_prompt)
-        return network_id
+    def load_all_config(configfile):
+        yaml.add_representer(type(None), Helpers.represent_none)
+
+        if os.path.exists(configfile):
+            with open(configfile, 'r') as file:
+                all_config = yaml.safe_load(file)
+                return all_config
+        else:
+            print(f"Config file '{configfile}' doesn't exist");
+            return {}
+
 
     @staticmethod
-    def validate_network_id(network_prompt):
-        if network_prompt.lower() in ["s", "S", "stokenet"]:
-            network_id = 2
-        elif network_prompt.lower() in ["m", "M", "mainnet"]:
-            network_id = 1
-        elif network_prompt in ["1", "2", "3", "4", "5", "6", "7", "8"]:
-            network_id = int(network_prompt)
+    def backup_save_config(config_file, new_config, autoapprove, backup_time):
+        to_update = ""
+        if autoapprove:
+            print("In Auto mode - Updating the file as suggested in above changes")
         else:
-            print("Input for network id is wrong. Exiting command")
-            sys.exit(1)
-        return network_id
-
-    @staticmethod
-    def path_to_genesis_json(network_id):
-        if network_id not in [1, 2]:
-            genesis_json_location = input("Enter absolute path to genesis json:")
-        else:
-            genesis_json_location = None
-
-        return genesis_json_location
+            to_update = input("\nOkay to update the config file [Y/n]?:")
+        if Helpers.check_Yes(to_update) or autoapprove:
+            if os.path.exists(config_file):
+                Helpers.backup_file(config_file, f"{config_file}_{backup_time}")
+            print(f"\n\n Saving to file {config_file} ")
+            with open(config_file, 'w') as f:
+                yaml.dump(new_config, f, default_flow_style=False, explicit_start=True, allow_unicode=True)

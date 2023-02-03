@@ -3,7 +3,7 @@ import json
 from config.BaseConfig import BaseConfig, SetupMode
 from config.Nginx import DockerNginxConfig
 from github import github
-from setup.Base import Base
+from utils.Network import Network
 from utils.Prompts import Prompts, Helpers
 
 
@@ -40,18 +40,16 @@ class CommonDockerSettings(BaseConfig):
         self.genesis_json_location = genesis_json_location
 
     def set_network_name(self):
-        if self.network_id == 1:
-            self.network_name = "mainnet"
-        elif self.network_id == 2:
-            self.network_name = "stokenet"
+        if self.network_id:
+            self.network_name = Network.get_network_name(self.network_id)
         else:
             raise ValueError("Network id is set incorrect")
 
     def ask_network_id(self, network_id):
         if not network_id:
-            network_id = Base.get_network_id()
+            network_id = Network.get_network_id()
         self.set_network_id(int(network_id))
-        self.set_genesis_json_location(Base.path_to_genesis_json(self.network_id))
+        self.set_genesis_json_location(Network.path_to_genesis_json(self.network_id))
 
     def ask_nginx_release(self):
         latest_nginx_release = github.latest_release("radixdlt/radixdlt-nginx")
@@ -83,5 +81,3 @@ class CommonDockerSettings(BaseConfig):
             self.docker_compose = Prompts.ask_existing_compose_file()
         else:
             open(self.docker_compose, mode='a').close()
-
-
