@@ -69,9 +69,9 @@ def addressbook(args):
     """
 
     systemApiHelper = SystemApiHelper()
-    systemApiHelper.addressbook(print_response=True) \
- \
- \
+    systemApiHelper.addressbook(print_response=True)
+
+
 @systemapicommand()
 def network_sync_status(args):
     """
