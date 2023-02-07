@@ -1,7 +1,6 @@
 import sys
 from argparse import ArgumentParser
 
-from api.DefaultApiHelper import DefaultApiHelper
 from api.SystemApiHelper import SystemApiHelper
 from commands.subcommand import get_decorator
 
@@ -80,11 +79,3 @@ def network_sync_status(args):
     systemApiHelper = SystemApiHelper()
     systemApiHelper.network_sync_status(print_response=True)
 
-
-@systemapicommand()
-def metrics(args):
-    """
-    This command displays prometheus metrics. The response that is printed out is in bytes.
-    """
-    systemApiHelper = SystemApiHelper(user_type="metrics", default_username="metrics")
-    systemApiHelper.prometheus_metrics(print_response=True)
