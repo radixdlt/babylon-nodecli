@@ -51,7 +51,7 @@ def install(args):
     nginx_secrets_dir = f"{nginx_dir}/secrets"
     node_secrets_dir = f"{node_dir}/secrets"
     node_binary_url = os.getenv(NODE_BINARY_OVERIDE,
-                                f"https://github.com/radixdlt/radixdlt/releases/download/{release}/radixdlt-dist-{release}.zip")
+                                f"https://github.com/radixdlt/babylon-node/releases/download/{release}/radixdlt-dist-{release}.zip")
 
     # TODO add method to fetch latest nginx release
     nginx_config_url = os.getenv(NGINX_BINARY_OVERIDE,
