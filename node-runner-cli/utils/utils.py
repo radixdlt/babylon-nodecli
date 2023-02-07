@@ -103,6 +103,7 @@ class Helpers:
 
         if print_response:
             print(response_content)
+        s.close()
         return resp
 
     @staticmethod

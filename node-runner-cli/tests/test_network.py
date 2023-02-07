@@ -55,7 +55,7 @@ class NetworkUtilsUnitTests(unittest.TestCase):
 def suite():
     """ This defines all the tests of a module"""
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(SystemdUnitTests))
+    suite.addTest(unittest.makeSuite(NetworkUtilsUnitTests))
     return suite
 
 
