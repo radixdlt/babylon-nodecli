@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 import requests
@@ -15,7 +16,11 @@ class AnsibleRunner:
     def download_ansible_file(self, file):
         print(f"Downloading artifacts from {self.ansible_dir}\n")
         req = requests.Request('GET', f'{self.ansible_dir}/{file}')
+        token = os.getenv('GITHUB_TOKEN')
         prepared = req.prepare()
+        if token is not None:
+            prepared.headers['Authorization'] = token
+        resp = Helpers.send_request(prepared, print_response=False)
 
         resp = Helpers.send_request(prepared, print_response=False)
         if not resp.ok:

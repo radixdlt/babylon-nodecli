@@ -7,9 +7,8 @@ from argparse import ArgumentParser
 import urllib3
 
 from api.DefaultApiHelper import DefaultApiHelper
-from commands import othercommands
+from api.SystemApiHelper import SystemApiHelper
 from commands.authcommand import authcli
-from commands.coreapi import handle_core
 from commands.dockercommand import dockercli
 from commands.key import keycli
 from commands.monitoring import monitoringcli
@@ -18,7 +17,6 @@ from commands.systemapi import handle_systemapi
 from commands.systemdcommand import systemdcli
 from env_vars import DISABLE_VERSION_CHECK
 from github.github import latest_release
-from setup import Base
 from utils.utils import Helpers
 
 urllib3.disable_warnings()
@@ -36,7 +34,7 @@ cwd = os.getcwd()
 
 
 def check_latest_cli():
-    cli_latest_version = latest_release("radixdlt/node-runner")
+    cli_latest_version = latest_release("radixdlt/babylon-nodecli")
 
     if os.getenv(DISABLE_VERSION_CHECK, "False").lower() not in ("true", "yes"):
         if Helpers.cli_version() != cli_latest_version:
@@ -46,7 +44,7 @@ def check_latest_cli():
             print(f"""
                 ---------------------------------------------------------------
                 Update the CLI by running these commands
-                    wget -O radixnode https://github.com/radixdlt/node-runner/releases/download/{cli_latest_version}/radixnode-{os_name}
+                    wget -O radixnode https://github.com/radixdlt/babylon-nodecli/releases/download/{cli_latest_version}/radixnode-{os_name}
                     chmod +x radixnode
                     sudo mv radixnode /usr/local/bin
                 """)
@@ -82,12 +80,10 @@ if __name__ == "__main__":
             apicli.print_help()
         else:
             if apicli_args.apicommand == "metrics":
-                defaultApi = DefaultApiHelper(verify_ssl=False)
-                defaultApi.prometheus_metrics()
+                systemApiHelper = SystemApiHelper(user_type="metrics", default_username="metrics")
+                systemApiHelper.prometheus_metrics(print_response=True)
             elif apicli_args.apicommand == "system":
                 handle_systemapi()
-            elif apicli_args.apicommand == "core":
-                handle_core()
             else:
                 print(f"Invalid api command {apicli_args.apicommand}")
 

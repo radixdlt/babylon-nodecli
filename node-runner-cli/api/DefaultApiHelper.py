@@ -1,3 +1,4 @@
+# TODO this needs updating when a new python client is created
 import sys
 
 import system_client as system_api
@@ -65,5 +66,4 @@ class DefaultApiHelper(API):
             proceed = input(print("Do you want to continue [Y/n]?"))
             if not Helpers.check_Yes(proceed):
                 sys.exit()
-        return health    
-
+        return health

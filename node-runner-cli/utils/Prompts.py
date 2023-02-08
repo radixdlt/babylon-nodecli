@@ -142,7 +142,7 @@ class Prompts:
     def check_for_fullnode() -> str:
         Helpers.section_headline("FULL NODE")
         print(
-            f"\nDo you want to setup a fullnode or a validator? For more information refer "
+            f"\nDo you want to setup a core node that is either fullnode or a validator? For more information refer "
             "https://docs.radixdlt.com/main/node-and-gateway/node-introduction.html#_what_is_a_radix_node")
         answer = Helpers.input_guestion(
             "Default is Y to setup fullnode , Press ENTER to accept default or type in [Y/N]:",
@@ -204,10 +204,10 @@ class Prompts:
                                        "- https://docs.radixdlt.com/main/node-and-gateway/seed-nodes.html"
                                        "\nType in the node you want to connect to in format radix://<node-peer-2-peer-address>@<ip>"
                                        "\n OR press Enter to accept default "
-                                       "radix://rn1qthu8yn06k75dnwpkysyl8smtwn0v4xy29auzjlcrw7vgduxvnwnst6derj@54.216.99.177:",
+                                       "radix://node_tdx_21_1qfpu6e4xjnjv0anuadnf935kktd2cvycd5evavk9an56y9pzl3rtk0vzdy5@35.170.44.1:",
                                        QuestionKeys.input_seednode)
         trustednode = Prompts.check_default(value,
-                                            "radix://rn1qthu8yn06k75dnwpkysyl8smtwn0v4xy29auzjlcrw7vgduxvnwnst6derj@54.216.99.177")
+                                            "radix://node_tdx_21_1qfpu6e4xjnjv0anuadnf935kktd2cvycd5evavk9an56y9pzl3rtk0vzdy5@35.170.44.1")
         Helpers.parse_trustednode(trustednode)
         return trustednode
 
@@ -248,7 +248,7 @@ class Prompts:
         Helpers.section_headline("NGINX CONFIG")
         print(f"Latest release of radixdlt-nginx is {bcolors.OKBLUE}{latest_nginx_release}{bcolors.ENDC}.")
         answer = Helpers.input_guestion(
-            f"\nPress Enter to accept default or Type in radixdlt/radixdlt-nginx release tag:",
+            f"\nPress Enter to accept default or Type in radixdlt/babylon-nginx release tag:",
             QuestionKeys.input_nginx_release)
         return Prompts.check_default(answer, latest_nginx_release)
 

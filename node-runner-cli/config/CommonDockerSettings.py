@@ -2,17 +2,18 @@ import json
 
 from config.BaseConfig import BaseConfig, SetupMode
 from github import github
-from setup import Base
+from utils.Network import Network
 from utils.Prompts import Prompts, Helpers
 
 
 class NginxConfig(BaseConfig):
-    protect_gateway: str = "true"
-    gateway_behind_auth: str = "true"
+    # uncomment below when support to gateway is added
+    # protect_gateway: str = "true"
+    # gateway_behind_auth: str = "true"
     enable_transaction_api = "false"
     protect_core: str = "true"
     release = None
-    repo = "radixdlt/radixdlt-nginx"
+    repo = "radixdlt/babylon-nginx"
 
 
 class CommonDockerSettings(BaseConfig):
@@ -48,21 +49,19 @@ class CommonDockerSettings(BaseConfig):
         self.genesis_json_location = genesis_json_location
 
     def set_network_name(self):
-        if self.network_id == 1:
-            self.network_name = "mainnet"
-        elif self.network_id == 2:
-            self.network_name = "stokenet"
+        if self.network_id:
+            self.network_name = Network.get_network_name(self.network_id)
         else:
             raise ValueError("Network id is set incorrect")
 
     def ask_network_id(self, network_id):
         if not network_id:
-            network_id = Base.get_network_id()
+            network_id = Network.get_network_id()
         self.set_network_id(int(network_id))
-        self.set_genesis_json_location(Base.path_to_genesis_json(self.network_id))
+        self.set_genesis_json_location(Network.path_to_genesis_json(self.network_id))
 
     def ask_nginx_release(self):
-        latest_nginx_release = github.latest_release("radixdlt/radixdlt-nginx")
+        latest_nginx_release = github.latest_release("radixdlt/babylon-nginx")
         self.nginx_settings.release = latest_nginx_release
         if "DETAILED" in SetupMode.instance().mode:
             self.nginx_settings.release = Prompts.get_nginx_release(latest_nginx_release)
@@ -80,8 +79,8 @@ class CommonDockerSettings(BaseConfig):
             self.nginx_settings.protect_gateway = Prompts.ask_enable_nginx(service="GATEWAY").lower()
 
     def check_nginx_required(self):
-        if json.loads(self.nginx_settings.protect_gateway.lower()) or json.loads(
-                self.nginx_settings.protect_core.lower()):
+        # When gateway is supported add back the condition to check gateway
+        if json.loads(self.nginx_settings.protect_core.lower()):
             return True
         else:
             return False

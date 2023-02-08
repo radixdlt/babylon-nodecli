@@ -2,12 +2,12 @@
 - select_network: S
 - first_time_config: Y
 - setup_fullnode: Y
-- input_seednode: "radix://rn1qthu8yn06k75dnwpkysyl8smtwn0v4xy29auzjlcrw7vgduxvnwnst6derj@54.216.99.177"
+- input_seednode: "radix://node_tdx_21_1qfpu6e4xjnjv0anuadnf935kktd2cvycd5evavk9an56y9pzl3rtk0vzdy5@35.170.44.1"
 - have_keystore_file: Y
-- input_path_keystore: "/home/ubuntu/node-config"
+- input_path_keystore: "/home/runner/node-config"
 - enter_keystore_name: "node-keystore.ks"
 - input_ledger_path: "/home/runner/data"
 - input_transaction_api: "true"
 - core_nginx_setup: "true"
-- setup_gateway: "false"
+#- setup_gateway: "false"
 - input_nginx_release: "1.3.1"

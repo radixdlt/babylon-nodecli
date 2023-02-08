@@ -39,7 +39,7 @@ def install(args):
         release = args.release
 
     if not args.nginxrelease:
-        nginx_release = latest_release("radixdlt/radixdlt-nginx")
+        nginx_release = latest_release("radixdlt/babylon-nginx")
     else:
         nginx_release = args.nginxrelease
 
@@ -51,11 +51,11 @@ def install(args):
     nginx_secrets_dir = f"{nginx_dir}/secrets"
     node_secrets_dir = f"{node_dir}/secrets"
     node_binary_url = os.getenv(NODE_BINARY_OVERIDE,
-                                f"https://github.com/radixdlt/radixdlt/releases/download/{release}/radixdlt-dist-{release}.zip")
+                                f"https://github.com/radixdlt/babylon-node/releases/download/{release}/radixdlt-dist-{release}.zip")
 
     # TODO add method to fetch latest nginx release
     nginx_config_url = os.getenv(NGINX_BINARY_OVERIDE,
-                                 f"https://github.com/radixdlt/radixdlt-nginx/releases/download/{nginx_release}/radixdlt-nginx-{node_type_name}-conf.zip")
+                                 f"https://github.com/radixdlt/babylon-nginx/releases/download/{nginx_release}/radixdlt-nginx-{node_type_name}-conf.zip")
     # TODO AutoApprove
     continue_setup = input(
         f"Going to setup node type {args.nodetype} for version {release} from location {node_binary_url} and {nginx_config_url}. \n Do you want to continue Y/n:")

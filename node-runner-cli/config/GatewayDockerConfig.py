@@ -57,7 +57,7 @@ class CoreApiNode(BaseConfig):
 
 class DataAggregatorSetting:
     release: str = None
-    repo: str = "radixdlt/ng-data-aggregator"
+    repo: str = "radixdlt/babylon-ng-data-aggregator"
     restart: str = "unless-stopped"
     NetworkName: str = None
     coreApiNode: CoreApiNode = CoreApiNode({})
@@ -67,7 +67,7 @@ class DataAggregatorSetting:
             setattr(self, key, value)
 
     def ask_gateway_release(self):
-        latest_gateway_release = github.latest_release("radixdlt/radixdlt-network-gateway")
+        latest_gateway_release = github.latest_release("radixdlt/babylon-gateway")
         self.release = latest_gateway_release
         if "DETAILED" in SetupMode.instance().mode:
             self.release = Prompts.get_gateway_release("data_aggregator", latest_gateway_release)
@@ -100,14 +100,14 @@ class DataAggregatorSetting:
 
 class GatewayAPIDockerSettings(BaseConfig):
     release: str = None
-    repo: str = "radixdlt/ng-gateway-api"
+    repo: str = "radixdlt/babylon-ng-gateway-api"
     coreApiNode: CoreApiNode = CoreApiNode({})
     restart = "unless-stopped"
     enable_swagger = "true"
     max_page_size = "30"
 
     def ask_gateway_release(self):
-        latest_gateway_release = github.latest_release("radixdlt/radixdlt-network-gateway")
+        latest_gateway_release = github.latest_release("radixdlt/babylon-gateway")
         self.release = latest_gateway_release
         if "DETAILED" in SetupMode.instance().mode:
             self.release = Prompts.get_gateway_release("gateway_api", latest_gateway_release)

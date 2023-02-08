@@ -1,6 +1,7 @@
+#TODO this needs updating when a new python client is created
 import os
 
-from env_vars import PRINT_RESPONSE, NGINX
+from env_vars import PRINT_RESPONSE, NGINX, NODE_END_POINT
 from utils.utils import Helpers
 
 
@@ -9,7 +10,7 @@ class API:
     @staticmethod
     def get_host_info():
         scheme = os.getenv("API_SCHEME", "https")
-        node_host = os.getenv("NODE_END_POINT", f'{scheme}://localhost')
+        node_host = os.getenv(NODE_END_POINT, f'{scheme}://localhost')
         return node_host
 
     @staticmethod

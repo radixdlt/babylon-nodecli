@@ -65,7 +65,7 @@ class Base:
     @staticmethod
     def setup_node_optimisation_config(version):
         ansibleRunner = AnsibleRunner(
-            f'https://raw.githubusercontent.com/radixdlt/node-runner/{version}/node-runner-cli')
+            f'https://raw.githubusercontent.com/radixdlt/babylon-nodecli/{version}/node-runner-cli')
         file = 'ansible/project/provision.yml'
         ansibleRunner.check_install_ansible()
         ansibleRunner.download_ansible_file(file)
@@ -92,28 +92,3 @@ class Base:
             run_shell_command(f'sudo mkdir -p {data_dir_path}', shell=True)
         return data_dir_path
 
-    @staticmethod
-    def get_network_id():
-        # Network id
-        network_prompt = Helpers.input_guestion(
-            "Select the network you want to connect [S]Stokenet or [M]Mainnet or network_id:",
-            QuestionKeys.select_network)
-        if network_prompt.lower() in ["s", "stokenet"]:
-            network_id = 2
-        elif network_prompt.lower() in ["m", "mainnet"]:
-            network_id = 1
-        elif network_prompt in ["1", "2", "3", "4", "5", "6", "7", "8"]:
-            network_id = network_prompt
-        else:
-            print("Input for network id is wrong. Exiting command")
-            sys.exit()
-        return network_id
-
-    @staticmethod
-    def path_to_genesis_json(network_id):
-        if network_id not in [1, 2]:
-            genesis_json_location = input("Enter absolute path to genesis json:")
-        else:
-            genesis_json_location = None
-
-        return genesis_json_location

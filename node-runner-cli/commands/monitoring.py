@@ -1,5 +1,6 @@
 import sys
 from argparse import ArgumentParser
+from os.path import exists
 from pathlib import Path
 
 import yaml
@@ -24,6 +25,9 @@ def monitoringcommand(args=[], parent=monitoring_parser):
 
 def read_monitoring_config(args):
     yaml.add_representer(type(None), Helpers.represent_none)
+    if not exists(args.monitoringconfigfile):
+        print("There is no monitoring config file. It seems like monitoring was not set up. Nothing to do here")
+        sys.exit(1)
     with open(args.monitoringconfigfile, 'r') as file:
         all_config = yaml.safe_load(file)
     return all_config
@@ -128,7 +132,7 @@ def install(args):
     This commands setups up the software and deploys it based on what is stored in the config.yaml file.
     To update software versions, most of the time it is required to update the versions in config file and run this command
     """
-    monitor_url_dir = f'https://raw.githubusercontent.com/radixdlt/node-runner/{Helpers.cli_version()}/monitoring'
+    monitor_url_dir = f'https://raw.githubusercontent.com/radixdlt/babylon-nodecli/{Helpers.cli_version()}/monitoring'
     print(f"Downloading artifacts from {monitor_url_dir}\n==")
     autoapprove = args.autoapprove
     all_config = read_monitoring_config(args)

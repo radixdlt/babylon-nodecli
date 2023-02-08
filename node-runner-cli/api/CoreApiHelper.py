@@ -1,4 +1,4 @@
-import sys, json
+#TODO this needs updating when a new python client is created
 
 from core_client import Configuration, ApiException
 from core_client.api import network_api, entity_api, key_api, mempool_api, construction_api, engine_api
