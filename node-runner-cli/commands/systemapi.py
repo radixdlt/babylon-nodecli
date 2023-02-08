@@ -1,7 +1,7 @@
 import sys
 from argparse import ArgumentParser
 
-from api.DefaultApiHelper import DefaultApiHelper
+from api.SystemApiHelper import SystemApiHelper
 from commands.subcommand import get_decorator
 
 systemapicli = ArgumentParser(
@@ -21,23 +21,14 @@ def handle_systemapi():
 def systemapicommand(args=[], parent=systemapi_parser):
     return get_decorator(args, parent)
 
-# This command is currently not pointing to a valid endpoint
-# @systemapicommand()
-# def metrics(args):
-#     """
-#     This command helps to list the metrics that are exposed from the metrics endpoint of the node
-#     """
-#     defaultApiHelper = DefaultApiHelper(verify_ssl=False)
-#     defaultApiHelper.metrics()
-
 
 @systemapicommand()
 def version(args):
     """
     This command displays the version of node software that is currently running
     """
-    defaultApiHelper = DefaultApiHelper(verify_ssl=False)
-    defaultApiHelper.version()
+    systemApiHelper = SystemApiHelper()
+    systemApiHelper.version(print_response=True)
 
 
 @systemapicommand()
@@ -45,5 +36,46 @@ def health(args):
     """
     This command displays the health of the node on whether it is syncing, or booting or up
     """
-    defaultApiHelper = DefaultApiHelper(verify_ssl=False)
-    defaultApiHelper.health(print_response=True)
+
+    systemApiHelper = SystemApiHelper()
+    systemApiHelper.health(print_response=True)
+
+
+@systemapicommand()
+def configuration(args):
+    """
+    This command displays the configuration of the node
+    """
+
+    systemApiHelper = SystemApiHelper()
+    systemApiHelper.configuration(print_response=True)
+
+
+@systemapicommand()
+def peers(args):
+    """
+    This command displays peers that node sees on the network
+    """
+
+    systemApiHelper = SystemApiHelper()
+    systemApiHelper.peers(print_response=True)
+
+
+@systemapicommand()
+def addressbook(args):
+    """
+    This command displays address book on the data the node has stored
+    """
+
+    systemApiHelper = SystemApiHelper()
+    systemApiHelper.addressbook(print_response=True)
+
+
+@systemapicommand()
+def network_sync_status(args):
+    """
+    This command displays information on the status with respect to syncing to network.
+    """
+    systemApiHelper = SystemApiHelper()
+    systemApiHelper.network_sync_status(print_response=True)
+

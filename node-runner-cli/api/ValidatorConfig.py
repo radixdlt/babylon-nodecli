@@ -1,3 +1,5 @@
+#TODO this needs updating when a new python client is created
+
 import json
 from typing import List
 
