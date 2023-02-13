@@ -39,6 +39,17 @@ class ValidatorUnitTests(unittest.TestCase):
         compose_yml_str = str(compose_yml)
         self.assertTrue(validator_address_fixture in compose_yml_str)
 
+    def test_validator_address_gets_omitted_in_docker_compose_if_not_set(self):
+        settings = {'core_node': {'repo': 'some',
+                                  'core_release': '2.4',
+                                  'keydetails': {'something': 'else'}
+                                  },
+                    'common_config': {'test': 'test'}}
+        compose_yml = Renderer().load_file_based_template("radix-fullnode-compose.yml.j2").render(
+            dict(settings)).to_yaml()
+        compose_yml_str = str(compose_yml)
+        self.assertFalse("RADIXDLT_CONSENSUS_VALIDATOR_ADDRESS" in compose_yml_str)
+
     def test_validator_address_included_in_dict_from_object(self):
         config = DockerConfig("1.0.0")
         config.core_node_settings = CoreDockerSettings({})
