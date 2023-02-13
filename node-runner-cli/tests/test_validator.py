@@ -1,3 +1,4 @@
+import os
 import unittest
 from io import StringIO
 from unittest import mock
@@ -6,6 +7,7 @@ import yaml
 
 from config.DockerConfig import CoreDockerSettings, DockerConfig
 from config.Renderer import Renderer
+from utils.PromptFeeder import PromptFeeder
 from utils.Prompts import Prompts
 
 
@@ -45,6 +47,14 @@ class ValidatorUnitTests(unittest.TestCase):
         yaml_config = yaml.dump(config, default_flow_style=False, explicit_start=True, allow_unicode=True)
         self.assertTrue("validator_address" in str(yaml_config))
         self.assertTrue("validator_mock" in str(yaml_config))
+
+    @mock.patch('sys.stdout', new_callable=StringIO)
+    def test_validator_promptfeed(self, mock_out):
+        os.environ['PROMPT_FEEDS'] = "test-prompts/individual-prompts/validator_address.yml"
+        PromptFeeder.prompts_feed = PromptFeeder.instance().load_prompt_feeds()
+        address = Prompts.ask_validator_address()
+        self.assertEqual("validator_mock", address)
+
 
 
 def suite():

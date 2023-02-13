@@ -33,7 +33,10 @@ class QuestionKeys:
     postgres_db_password = "postgres_db_password"
     gateway_release = "gateway_release"
     aggregator_release = "aggregator_release"
-    genesis_location= "genesis_location"
+    genesis_location = "genesis_location"
+    have_validator_address = "have_validator_address"
+    validator_address = "validator_address"
+
 
 class PromptFeeder:
     _instance = None
@@ -45,8 +48,7 @@ class PromptFeeder:
 
     @classmethod
     def load_prompt_feeds(cls):
-        feed_prompts_file = os.getenv(PROMPT_FEEDS, None)
-
+        feed_prompts_file = os.getenv(PROMPT_FEEDS, "")
         if feed_prompts_file and os.path.exists(feed_prompts_file):
             with open(feed_prompts_file, "r") as file:
                 prompt_feeds = yaml.safe_load(file)
