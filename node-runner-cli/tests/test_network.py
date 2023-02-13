@@ -51,6 +51,10 @@ class NetworkUtilsUnitTests(unittest.TestCase):
             self.assertEqual(mock_stdout.getvalue(), "OS error occurred trying to open /tm\\$&(*!@£^(p(^)th")
             self.assertEqual(cm.exception.code, 1)
 
+    def test_default_genesis_files(self):
+        genesis_location = Network.path_to_genesis_json(11)
+        genesis_location = Network.path_to_genesis_json(32)
+
 
 def suite():
     """ This defines all the tests of a module"""
