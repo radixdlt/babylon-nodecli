@@ -1,5 +1,6 @@
 ---
 - select_network: "34"
+- have_validator_address: "N"
 - genesis_location: "/home/runner/genesis.json"
 - first_time_config: Y
 - setup_fullnode: Y
