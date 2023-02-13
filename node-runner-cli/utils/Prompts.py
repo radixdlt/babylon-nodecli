@@ -124,7 +124,7 @@ class Prompts:
         print(f"Latest release for {gateway_or_aggregator} is {latest_gateway_release}")
         question_key = QuestionKeys.gateway_release if gateway_or_aggregator == "gateway_api" else QuestionKeys.aggregator_release
         answer = Helpers.input_guestion(
-            f"Press Enter to accept the latest or  type in {gateway_or_aggregator} release tag:",question_key)
+            f"Press Enter to accept the latest or  type in {gateway_or_aggregator} release tag:", question_key)
         return Prompts.check_default(answer, latest_gateway_release)
 
     @staticmethod
@@ -329,3 +329,13 @@ class Prompts:
                 f"Do you want to update to latest version {latest_version},"
                 f"Press ENTER to accept latest version or type in version you want to install:")
             return Helpers.check_Yes(Prompts.check_default(answer, latest_version))
+
+    @classmethod
+    def ask_validator_address(cls) -> str:
+        validator_address = ""
+        answer = Helpers.input_guestion(f"Do you have a validator address? (Y/n)")
+        if Helpers.check_Yes(Prompts.check_default(answer, "N")):
+            validator_address = Helpers.input_guestion(f"What is your validator address?")
+        else:
+            print("\nYou can find your validator address using 'radixnode api system identity'")
+        return validator_address
