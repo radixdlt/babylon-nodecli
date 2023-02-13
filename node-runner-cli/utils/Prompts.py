@@ -333,9 +333,14 @@ class Prompts:
     @classmethod
     def ask_validator_address(cls) -> str:
         validator_address = ""
-        answer = Helpers.input_guestion(f"Do you have a validator address? (Y/n)", QuestionKeys.have_validator_address)
+        answer = Helpers.input_guestion(f"Do you have a validator address? (Y/n)"
+                                        "\nIf you are running this command for the first time, you will not have one."
+                                        "\nAfter your node is up and running, you can receive the validator address by"
+                                        "sending a request to /system/identity"
+                                        "or by executing 'radixnode api system identity'."
+                                        , QuestionKeys.have_validator_address)
         if Helpers.check_Yes(Prompts.check_default(answer, "N")):
-            validator_address = Helpers.input_guestion(f"What is your validator address?",
+            validator_address = Helpers.input_guestion(f"Enter your validator address:",
                                                        QuestionKeys.validator_address)
         else:
             print("\nYou can find your validator address using 'radixnode api system identity'")
