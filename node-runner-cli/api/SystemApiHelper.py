@@ -41,3 +41,7 @@ class SystemApiHelper(API):
 
         self.api_client.prepare("GET", "/prometheus/metrics")
         Helpers.send_request(self.api_client.prepared_req, print_request=False, print_response=print_response)
+
+    def identity(self, print_response=False):
+        self.api_client.prepare("GET", "/system/identity")
+        Helpers.send_request(self.api_client.prepared_req, print_request=False, print_response=print_response)
