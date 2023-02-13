@@ -102,6 +102,10 @@ class CoreDockerSettings(BaseConfig):
     def set_validator_address(self, validator_address: str):
         self.validator_address = validator_address
 
+    def ask_validator_address(self):
+        validator_address = Prompts.ask_validator_address()
+        self.set_validator_address(validator_address)
+
 
 class DockerConfig:
     core_node_settings: CoreDockerSettings = CoreDockerSettings({})

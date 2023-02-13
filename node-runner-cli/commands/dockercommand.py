@@ -117,6 +117,7 @@ def config(args):
         f"\nLocation of the config file: {bcolors.OKBLUE}{config_file}{bcolors.ENDC}")
 
     configuration.common_settings.ask_network_id(networkid)
+    configuration.core_node_settings.ask_validator_address()
     configuration.common_settings.ask_existing_docker_compose_file()
 
     config_to_dump = {"version": "0.2"}

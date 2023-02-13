@@ -2,6 +2,8 @@ import unittest
 from io import StringIO
 from unittest import mock
 
+import yaml
+
 from config.DockerConfig import CoreDockerSettings, DockerConfig
 from config.Renderer import Renderer
 from utils.Prompts import Prompts
@@ -34,6 +36,15 @@ class ValidatorUnitTests(unittest.TestCase):
             dict(settings)).to_yaml()
         compose_yml_str = str(compose_yml)
         self.assertTrue(validator_address_fixture in compose_yml_str)
+
+    def test_validator_address_included_in_dict_from_object(self):
+        config = DockerConfig("1.0.0")
+        config.core_node_settings = CoreDockerSettings({})
+        config.core_node_settings.validator_address = "validator_mock"
+        # ToDo: This is too looesely coupled. Implement DockerConfig save and load from/to Object and remove this test
+        yaml_config = yaml.dump(config, default_flow_style=False, explicit_start=True, allow_unicode=True)
+        self.assertTrue("validator_address" in str(yaml_config))
+        self.assertTrue("validator_mock" in str(yaml_config))
 
 
 def suite():
