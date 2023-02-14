@@ -1,6 +1,7 @@
 ---
 - select_network: "34"
 - genesis_location: "/home/runner/genesis.json"
+- have_validator_address: "N"
 - first_time_config: Y
 - setup_fullnode: Y
 - input_seednode: "radix://node_tdx_22_1qvsml9pe32rzcrmw6jx204gjeng09adzkqqfz0ewhxwmjsaas99jzrje4u3@34.243.93.185"

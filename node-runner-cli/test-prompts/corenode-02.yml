@@ -1,5 +1,6 @@
 ---
 - select_network: S
+- have_validator_address: "N"
 - first_time_config: N
 - have_existing_compose: "/home/runner/docker-compose.yml"
 - setup_fullnode: Y

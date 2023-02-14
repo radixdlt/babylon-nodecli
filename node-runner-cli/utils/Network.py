@@ -1,5 +1,6 @@
 import sys
 
+from config.Genesis import GenesisConfig
 from utils.PromptFeeder import QuestionKeys
 from utils.Prompts import Prompts
 from utils.utils import Helpers, bcolors
@@ -31,13 +32,21 @@ class Network:
 
     @staticmethod
     def path_to_genesis_json(network_id: int) -> str:
-        if network_id not in [1, 2]:
+        if network_id not in [1, 2, 11,32]:
             config_dir = f"{Helpers.get_default_node_config_dir()}/genesis.json"
             genesis_json_location = Prompts.check_default(Helpers.input_guestion(
                 f"Enter absolute path to genesis json. Default location is {bcolors.OKBLUE}{config_dir}{bcolors.ENDC}:",
                 QuestionKeys.genesis_location), config_dir)
             Helpers.is_valid_file(genesis_json_location)
 
+        elif network_id == 11:
+            genesis_json_location = f"{Helpers.get_default_node_config_dir()}/nebunet-genesis.json"
+            GenesisConfig.create_nebunet_genesis_file(genesis_json_location)
+            return genesis_json_location
+        elif network_id == 32:
+            genesis_json_location = f"{Helpers.get_default_node_config_dir()}/gilganet-genesis.json"
+            GenesisConfig.create_gilganet_genesis_file(genesis_json_location)
+            return genesis_json_location
         else:
             genesis_json_location = None
 

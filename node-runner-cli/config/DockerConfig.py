@@ -29,12 +29,16 @@ class CoreDockerSettings(BaseConfig):
     data_directory: str = f"{Helpers.get_home_dir()}/data"
     enable_transaction: str = "false"
     trusted_node: str = None
+    validator_address: str = None
     java_opts: str = "--enable-preview -server -Xms8g -Xmx8g  " \
                      "-XX:MaxDirectMemorySize=2048m " \
                      "-XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops " \
                      "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts " \
                      "-Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom " \
                      "-DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
+
+    def __init__(self, settings: dict):
+        super().__init__(settings)
 
     def __iter__(self):
         class_variables = {key: value
@@ -94,6 +98,13 @@ class CoreDockerSettings(BaseConfig):
         self.ask_data_directory()
         self.ask_enable_transaction()
         return self
+
+    def set_validator_address(self, validator_address: str):
+        self.validator_address = validator_address
+
+    def ask_validator_address(self):
+        validator_address = Prompts.ask_validator_address()
+        self.set_validator_address(validator_address)
 
 
 class DockerConfig:

@@ -50,8 +50,7 @@ def check_latest_cli():
                 """)
 
 
-if __name__ == "__main__":
-
+def main():
     args = cli.parse_args(sys.argv[1:2])
 
     if args.subcommand is None:
@@ -113,3 +112,7 @@ if __name__ == "__main__":
 
     else:
         print(f"Invalid subcommand {args.subcommand}")
+
+
+if __name__ == "__main__":
+    main()
