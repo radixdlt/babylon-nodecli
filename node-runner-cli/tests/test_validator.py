@@ -5,6 +5,7 @@ from unittest import mock
 
 import yaml
 
+from config.CommonDockerSettings import CommonDockerSettings
 from config.DockerConfig import CoreDockerSettings, DockerConfig
 from config.Renderer import Renderer
 from utils.PromptFeeder import PromptFeeder
@@ -65,6 +66,12 @@ class ValidatorUnitTests(unittest.TestCase):
         PromptFeeder.prompts_feed = PromptFeeder.instance().load_prompt_feeds()
         address = Prompts.ask_validator_address()
         self.assertEqual("validator_mock", address)
+
+    def test_ask_network_id(self):
+        settings = CommonDockerSettings({})
+        settings.ask_network_id(11)
+        self.assertIn("nebunet", settings.network_name)
+        self.assertIn("nebunet", settings.genesis_json_location)
 
 
 

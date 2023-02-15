@@ -3,6 +3,7 @@ import unittest
 from unittest import mock
 from io import StringIO
 
+from config.CommonDockerSettings import CommonDockerSettings
 from utils.Network import Network
 
 
@@ -53,7 +54,15 @@ class NetworkUtilsUnitTests(unittest.TestCase):
 
     def test_default_genesis_files(self):
         genesis_location = Network.path_to_genesis_json(11)
+        self.assertIn("nebunet", genesis_location)
         genesis_location = Network.path_to_genesis_json(32)
+        self.assertIn("gilganet", genesis_location)
+
+    def test_hammunet_genesis_files(self):
+        settings = CommonDockerSettings({})
+        with mock.patch('builtins.input', side_effect=['34', '/tmp/hammunet_genesis.json']):
+            settings.ask_network_id(None)
+        self.assertIn("hammunet_genesis.json", settings.genesis_json_location)
 
 
 def suite():
