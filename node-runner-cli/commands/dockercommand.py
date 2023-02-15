@@ -64,7 +64,7 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
                                           " defined in argument configdir", action="store_true"),
     argument("-t", "--trustednode",
              help="Trusted node on radix network."
-                  "Example format: 'radix://node_tdx_21_1qfpu6e4xjnjv0anuadnf935kktd2cvycd5evavk9an56y9pzl3rtk0vzdy5@35.170.44.1'."
+                  "Example format: 'radix://node_tdx_b_1qdrcdjgzl6s2ymnsssdssxllmmj0j84eagu2m6xtttj3nxrunzesyh9fwea@3.109.242.93'."
                   "This is required only if you are creating config to run a CORE node and "
                   "if not provided you will be prompted to enter a value",
              default="",
@@ -117,7 +117,6 @@ def config(args):
         f"\nLocation of the config file: {bcolors.OKBLUE}{config_file}{bcolors.ENDC}")
 
     configuration.common_settings.ask_network_id(networkid)
-    configuration.core_node_settings.ask_validator_address()
     configuration.common_settings.ask_existing_docker_compose_file()
 
     config_to_dump = {"version": "0.2"}
@@ -227,7 +226,7 @@ def install(args):
     if len(compose_file_difference) != 0:
         print(f"""
             {Helpers.section_headline("Differences between existing compose file and new compose file")}
-            Difference between existing config file and new config that you are creating
+             Difference between existing compose file and new compose file that you are creating
             {compose_file_difference}
               """)
         to_update = ""

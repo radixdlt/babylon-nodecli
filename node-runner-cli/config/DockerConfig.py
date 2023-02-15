@@ -94,6 +94,7 @@ class CoreDockerSettings(BaseConfig):
 
         self.set_core_release(release)
         self.set_trusted_node(trustednode)
+        self.ask_validator_address()
         self.ask_keydetails(ks_password, new_keystore)
         self.ask_data_directory()
         self.ask_enable_transaction()
