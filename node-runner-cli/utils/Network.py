@@ -37,7 +37,7 @@ class Network:
             genesis_json_location = Prompts.check_default(Helpers.input_guestion(
                 f"Enter absolute path to genesis json. Default location is {bcolors.OKBLUE}{config_dir}{bcolors.ENDC}:",
                 QuestionKeys.genesis_location), config_dir)
-
+            Helpers.is_valid_file(genesis_json_location)
 
         elif network_id == 11:
             genesis_json_location = f"{Helpers.get_default_node_config_dir()}/nebunet-genesis.json"
