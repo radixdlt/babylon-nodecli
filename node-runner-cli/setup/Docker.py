@@ -179,6 +179,7 @@ class Docker(Base):
             to_update = input("\nOkay to update the config file [Y/n]?:")
         if Helpers.check_Yes(to_update) or autoapprove:
             if os.path.exists(config_file):
+                print(f"\n\n Backing up existing config file")
                 Helpers.backup_file(config_file, f"{config_file}_{backup_time}")
             print(f"\n\n Saving to file {config_file} ")
             with open(config_file, 'w') as f:

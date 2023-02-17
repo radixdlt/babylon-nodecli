@@ -69,7 +69,7 @@ done
 #  command_api_help_doc "core" "$subcommand" "$filename"
 #done
 
-declare -a systemapicommands=("health" "version" "metrics" "configuration" "peers" "addressbook" "network-sync-status" "metrics")
+declare -a systemapicommands=("health" "version" "metrics" "configuration" "peers" "addressbook" "network-sync-status" "identity")
 for subcommand in "${systemapicommands[@]}"; do
   command_api_help_doc "system" "$subcommand" "$filename"
 done
@@ -89,11 +89,11 @@ done
 #Using CLI, for a key file, you can print out the validator address. This feature is in beta and currently only below commands supported.
 #EOT
 #
-#declare -a keyCommands=("info" )
-#for subcommand in "${keyCommands[@]}"
-#do
-#  command_help_doc "key" "$subcommand" "$filename"
-#done
+declare -a keyCommands=("info" )
+for subcommand in "${keyCommands[@]}"
+do
+  command_help_doc "key" "$subcommand" "$filename"
+done
 
 cat <<EOT >>"$filename"
 === Other commands supported by CLI

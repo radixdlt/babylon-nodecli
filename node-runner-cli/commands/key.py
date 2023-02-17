@@ -27,7 +27,6 @@ def info(args):
     Using CLI, for a key file, you can print out the validator address. This feature is in beta.
     """
     key = KeyInteraction(keystore_password=str.encode(args.password), keystore_path=args.filelocation)
-    print(f"Validator Address {key.get_validator_address()}")
     print(f"Validator hex public key  {key.get_validator_hex_public_key()}")
 
 # @keycommand([
