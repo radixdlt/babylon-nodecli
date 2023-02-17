@@ -69,16 +69,9 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
                   "if not provided you will be prompted to enter a value",
              default="",
              action="store"),
-    argument("-p", "--postgrespassword",
-             help="Network Gateway uses Postgres as datastore. This is password for the user `postgres`.",
-             action="store",
-             default=""),
     argument("-xc", "--disablenginxforcore", help="Core Node API's are protected by Basic auth setting."
                                                   "Set this to disable to nginx for core",
-             action="store", default="", choices=["true", "false"]),
-    argument("-xg", "--disablenginxforgateway", help="GateWay API's end points are protected by Basic auth settings. "
-                                                     "Set this to disable to nginx for gateway",
-             action="store", default="", choices=["true", "false"]),
+             action="store", default="", choices=["true", "false"])
 
 ])
 def config(args):
@@ -93,8 +86,6 @@ def config(args):
     trustednode = args.trustednode if args.trustednode != "" else None
     networkid = args.networkid if args.networkid != "" else None
     keystore_password = args.keystorepassword if args.keystorepassword != "" else None
-    postgrespassword = args.postgrespassword if args.postgrespassword != "" else None
-    nginx_on_gateway = args.disablenginxforgateway if args.disablenginxforgateway != "" else None
     nginx_on_core = args.disablenginxforcore if args.disablenginxforcore != "" else None
     autoapprove = args.autoapprove
     new_keystore = args.newkeystore

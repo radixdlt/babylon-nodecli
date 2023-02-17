@@ -65,8 +65,8 @@ optional arguments:
                         prompts using location defined in argument configdir
   -t TRUSTEDNODE, --trustednode TRUSTEDNODE
                         Trusted node on radix network.Example format: 'radix:/
-                        /node_tdx_21_1qfpu6e4xjnjv0anuadnf935kktd2cvycd5evavk9
-                        an56y9pzl3rtk0vzdy5@35.170.44.1'.This is required only
+                        /node_tdx_b_1qdrcdjgzl6s2ymnsssdssxllmmj0j84eagu2m6xtt
+                        tj3nxrunzesyh9fwea@3.109.242.93'.This is required only
                         if you are creating config to run a CORE node and if
                         not provided you will be prompted to enter a value
   -p POSTGRESPASSWORD, --postgrespassword POSTGRESPASSWORD
@@ -268,13 +268,6 @@ optional arguments:
 ==== radixnode system metrics
 [source, bash,subs="+quotes, +attributes" ]
 ----
-usage: radixnode api system metrics [-h]
-
-This command displays prometheus metrics. The response that is printed out is
-in bytes.
-
-optional arguments:
-  -h, --help  show this help message and exit
 ----
 
 ==== radixnode system configuration
@@ -322,13 +315,13 @@ optional arguments:
   -h, --help  show this help message and exit
 ----
 
-==== radixnode system metrics
+==== radixnode system identity
 [source, bash,subs="+quotes, +attributes" ]
 ----
-usage: radixnode api system metrics [-h]
+usage: radixnode api system identity [-h]
 
-This command displays prometheus metrics. The response that is printed out is
-in bytes.
+This command displays information on the status with respect to syncing to
+network.
 
 optional arguments:
   -h, --help  show this help message and exit
