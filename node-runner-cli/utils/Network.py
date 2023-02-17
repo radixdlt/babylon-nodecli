@@ -11,6 +11,7 @@ class Network:
     @staticmethod
     def get_network_id() -> int:
         # Network id
+        Helpers.section_headline(f"Network connection")
         network_prompt = Helpers.input_guestion(
             "Select the network you want to connect [S]Stokenet or [M]Mainnet or network_id:",
             QuestionKeys.select_network)

@@ -96,13 +96,19 @@ def config(args):
               f"Hence cannot be clubbed together with options"
               f"{bcolors.ENDC}")
         sys.exit(1)
-    release = latest_release()
 
+    Helpers.section_headline("CONFIG FILE")
     Path(f"{Helpers.get_default_node_config_dir()}").mkdir(parents=True, exist_ok=True)
     config_file = f"{args.configdir}/config.yaml"
 
+    # Print old config if it exists
+    old_config = Docker.load_all_config(config_file)
+    if len(old_config) != 0:
+        print("\n----There is existing config file and contents are as below----\n")
+        print(f"\n{yaml.dump(old_config)}")
+    release = latest_release()
+
     configuration = DockerConfig(release)
-    Helpers.section_headline("CONFIG FILE")
     print(
         "\nCreating config file using the answers from the questions that would be asked in next steps."
         f"\nLocation of the config file: {bcolors.OKBLUE}{config_file}{bcolors.ENDC}")

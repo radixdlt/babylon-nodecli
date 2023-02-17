@@ -21,8 +21,7 @@ optional arguments:
 usage: radixnode docker config [-h] [-a] [-d CONFIGDIR] [-k KEYSTOREPASSWORD]
                                -m {CORE,GATEWAY,DETAILED}
                                [{CORE,GATEWAY,DETAILED} ...] [-n NETWORKID]
-                               [-nk] [-t TRUSTEDNODE] [-p POSTGRESPASSWORD]
-                               [-xc {true,false}] [-xg {true,false}]
+                               [-nk] [-t TRUSTEDNODE] [-xc {true,false}]
 
 This commands allows node-runners and gateway admins to create a config file,
 which can persist their custom settings. Thus it allows is to decouple the
@@ -69,15 +68,9 @@ optional arguments:
                         tj3nxrunzesyh9fwea@3.109.242.93'.This is required only
                         if you are creating config to run a CORE node and if
                         not provided you will be prompted to enter a value
-  -p POSTGRESPASSWORD, --postgrespassword POSTGRESPASSWORD
-                        Network Gateway uses Postgres as datastore. This is
-                        password for the user `postgres`.
   -xc {true,false}, --disablenginxforcore {true,false}
                         Core Node API's are protected by Basic auth
                         setting.Set this to disable to nginx for core
-  -xg {true,false}, --disablenginxforgateway {true,false}
-                        GateWay API's end points are protected by Basic auth
-                        settings. Set this to disable to nginx for gateway
 ----
 
 ==== radixnode docker install
@@ -423,6 +416,24 @@ optional arguments:
                         Path to config file. Default is
                         '/Users/shambu/monitoring/monitoring_config.yaml'
   -v, --removevolumes   Remove the volumes
+----
+
+==== radixnode key info
+[source, bash,subs="+quotes, +attributes" ]
+----
+usage: radixnode key info [-h] -p PASSWORD -f FILELOCATION
+
+Using CLI, for a key file, you can print out the validator address. This
+feature is in beta.
+
+optional arguments:
+  -h, --help            show this help message and exit
+
+required arguments:
+  -p PASSWORD, --password PASSWORD
+                        Password of the keystore
+  -f FILELOCATION, --filelocation FILELOCATION
+                        Location of keystore on the disk
 ----
 === Other commands supported by CLI
 List of other commands supported by cli are to check the version of CLI being used and optimise-node

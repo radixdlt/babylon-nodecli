@@ -198,7 +198,7 @@ class Prompts:
 
     @staticmethod
     def ask_trusted_node() -> str:
-
+        Helpers.section_headline("Trusted node settings")
         value = Helpers.input_guestion("Fullnode requires another node to connect to network. "
                                        "\nTo connect to MAINNET or STOKENET details on these node can be found here "
                                        "- https://docs.radixdlt.com/main/node-and-gateway/seed-nodes.html"
@@ -332,17 +332,18 @@ class Prompts:
 
     @classmethod
     def ask_validator_address(cls) -> str:
-        validator_address = ""
-        print("If you want to run this node as validator,"
+        Helpers.section_headline("Validator Address")
+        print("\n\nIf you want to run this node as validator,"
               "you would need to store validator address in the config"
               "\nAfter your node is up and running, you can get you node public key by"
               " sending a request to /system/identity"
               " or by executing 'radixnode api system identity'. "
               "Refer this link for more details"
-              "https://docs-babylon.radixdlt.com/main/node-and-gateway/register-as-validator.html#_gather_your_node_public_key"
+              "\n https://docs-babylon.radixdlt.com/main/node-and-gateway/register-as-validator.html#_gather_your_node_public_key"
               "")
-        answer = Helpers.input_guestion(f"\n\n Do you have a validator address? (Y/n)"
+        answer = Helpers.input_guestion(f"\n\n Do you have a validator address? (Y/n): "
                                         , QuestionKeys.have_validator_address)
+        validator_address = ""
         if Helpers.check_Yes(Prompts.check_default(answer, "N")):
             validator_address = Helpers.input_guestion(f"Enter your validator address:",
                                                        QuestionKeys.validator_address)
