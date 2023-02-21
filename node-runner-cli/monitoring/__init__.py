@@ -148,6 +148,7 @@ class Monitoring:
         else:
             start_monitoring_answer = input(
                 f"Do you want to start monitoring using file {composefile} [Y/n]?")
+
         if Helpers.check_Yes(start_monitoring_answer) or auto_approve:
             docker_compose_binary = os.getenv("DOCKER_COMPOSE_LOCATION", 'docker-compose')
             run_shell_command([docker_compose_binary, '-f', composefile, 'up', '-d'],
