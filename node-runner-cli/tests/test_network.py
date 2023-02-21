@@ -1,12 +1,11 @@
 import os.path
 import unittest
-
-from unittest import mock
 from io import StringIO
+from unittest import mock
 
 from config.CommonDockerSettings import CommonDockerSettings
-from utils.Network import Network
 from config.Genesis import GenesisConfig
+from utils.Network import Network
 
 
 class NetworkUtilsUnitTests(unittest.TestCase):

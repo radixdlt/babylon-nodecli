@@ -72,7 +72,8 @@ def config(args):
     gatewayapimetricspassword = args.gatewayapimetricspassword if args.gatewayapimetricspassword != "" else None
     aggregatormetricspassword = args.aggregatormetricspassword if args.aggregatormetricspassword != "" else None
 
-    if "DETAILED" in setupmode.mode and len(setupmode.mode) > 1:
+    print(f"{len(setupmode.mode)} and {setupmode.mode}")
+    if "DETAILED" in setupmode.mode and len(setupmode.mode) > 8:
         print(f"{bcolors.FAIL}You cannot have DETAILED option with other options together."
               f"\nDETAILED option goes through asking each and every question that to customize setup. "
               f"Hence cannot be clubbed together with options"
