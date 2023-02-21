@@ -131,7 +131,9 @@ class Helpers:
 
     @staticmethod
     def docker_compose_down(composefile, remove_volumes):
-        command = ['docker-compose', '-f', composefile, 'down']
+
+        docker_compose_binary = os.getenv("DOCKER_COMPOSE_LOCATION", 'docker-compose')
+        command = [docker_compose_binary, '-f', composefile, 'down']
         if remove_volumes:
             command.append('-v')
         result = run_shell_command(command, env={
