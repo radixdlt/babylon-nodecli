@@ -12,10 +12,12 @@ class Network:
     def get_network_id() -> int:
         # Network id
         Helpers.section_headline(f"Network connection")
+        # TODO change this for rcnet launch
         network_prompt = Helpers.input_guestion(
-            "Select the network you want to connect [S]Stokenet or [M]Mainnet or network_id:",
+            "Enter the network_id. For babylon betanet it is 11:",
             QuestionKeys.select_network)
         network_id = Network.validate_network_id(network_prompt)
+
         return network_id
 
     @staticmethod
