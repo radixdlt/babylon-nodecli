@@ -26,7 +26,8 @@ def monitoringcommand(args=[], parent=monitoring_parser):
 def read_monitoring_config(args):
     yaml.add_representer(type(None), Helpers.represent_none)
     if not exists(args.monitoringconfigfile):
-        print("There is no monitoring config file. It seems like monitoring was not set up. Nothing to do here")
+        print(f"The monitoring config file {args.monitoringconfigfile} does not exist. It seems like monitoring was not set up. "
+              "Please run the config command first.")
         sys.exit(1)
     with open(args.monitoringconfigfile, 'r') as file:
         all_config = yaml.safe_load(file)
