@@ -39,9 +39,11 @@ jobs:
           make local
       - name: Execute Unit Tests
         run: |
+          cd node-runner-cli
           make test
       - name: Build the binary for ubuntu
         run: |
+          cd node-runner-cli
           make output-ubuntu-focal
       - name: "Upload generated cli file"
         uses: actions/upload-artifact@v2.2.3
