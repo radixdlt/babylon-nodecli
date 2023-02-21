@@ -42,9 +42,12 @@ class NetworkUtilsUnitTests(unittest.TestCase):
         genesis_location = Network.path_to_genesis_json(2)
         self.assertEqual(genesis_location, None)
 
-        with mock.patch('builtins.input', return_value='/tmp/path'):
-            genesis_location = Network.path_to_genesis_json(3)
-        self.assertEqual(genesis_location, "/tmp/path")
+        with self.assertRaises(SystemExit) as cm:
+            with mock.patch('builtins.input', return_value='/tmp/path'):
+                genesis_location = Network.path_to_genesis_json(3)
+            self.assertEqual(genesis_location, "/tmp/path")
+            self.assertEqual(mock_stdout.getvalue(), f" `{genesis_location}` does not exist ")
+            self.assertEqual(cm.exception.code, 1)
 
         with self.assertRaises(SystemExit) as cm:
             with mock.patch('builtins.input', return_value='/tm\\$&(*!@£^(p(^)th'):
@@ -59,10 +62,14 @@ class NetworkUtilsUnitTests(unittest.TestCase):
         self.assertIn("gilganet", genesis_location)
 
     def test_hammunet_genesis_files(self):
-        settings = CommonDockerSettings({})
-        with mock.patch('builtins.input', side_effect=['34', '/tmp/hammunet_genesis.json']):
-            settings.ask_network_id(None)
-        self.assertIn("hammunet_genesis.json", settings.genesis_json_location)
+
+        with self.assertRaises(SystemExit) as cm:
+            settings = CommonDockerSettings({})
+            with mock.patch('builtins.input', side_effect=['34', '/tmp/hammunet_genesis.json']):
+                settings.ask_network_id(None)
+            self.assertIn("hammunet_genesis.json", settings.genesis_json_location)
+            self.assertEqual(mock_stdout.getvalue(), f" `{settings.genesis_json_location}` does not exist ")
+            self.assertEqual(cm.exception.code, 1)
 
 
 def suite():

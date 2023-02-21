@@ -140,8 +140,8 @@ def install(args):
     monitoring_config_dir = all_config["common_config"]["config_dir"]
     Monitoring.template_prometheus_yml(all_config, monitoring_config_dir)
     Monitoring.template_datasource(monitoring_config_dir)
-    Monitoring.template_dashboards(["dashboard.yml", "sample-node-dashboard.json", "network-gateway-dashboard.json"],
-                                   monitoring_config_dir)
+    Monitoring.template_dashboards(["dashboard.yml", "babylon-node-dashboard.json", "babylon-jvm-dashboard.json",
+                                    "network-gateway-dashboard.json"], monitoring_config_dir)
 
     Monitoring.template_monitoring_containers(monitoring_config_dir)
     Monitoring.setup_external_volumes()
