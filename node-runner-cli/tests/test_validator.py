@@ -14,12 +14,15 @@ from utils.Prompts import Prompts
 
 class ValidatorUnitTests(unittest.TestCase):
 
-    def test_can_set_validator_address(self):
+
+    @mock.patch('sys.stdout', new_callable=StringIO)
+    def test_can_set_validator_address(self, mock_stdout):
         core_settings = CoreDockerSettings({})
         core_settings.set_validator_address("validator_mock")
         self.assertEqual(core_settings.validator_address, "validator_mock")
 
-    def test_prompt_validator_address(self):
+    @mock.patch('sys.stdout', new_callable=StringIO)
+    def test_prompt_validator_address(self, mock_stdout):
         with mock.patch('builtins.input', side_effect=['Y', 'validator_address_5']):
             validator_address = Prompts.ask_validator_address()
             self.assertEqual(validator_address, "validator_address_5")
@@ -27,7 +30,8 @@ class ValidatorUnitTests(unittest.TestCase):
             validator_address = Prompts.ask_validator_address()
             self.assertEqual(validator_address, "")
 
-    def test_validator_address_get_templated_into_docker_compose(self):
+    @mock.patch('sys.stdout', new_callable=StringIO)
+    def test_validator_address_get_templated_into_docker_compose(self, mock_stdout):
         validator_address_fixture = "validator_mock"
         settings = {'core_node': {'validator_address': validator_address_fixture,
                                   'repo': 'some',
