@@ -1,3 +1,4 @@
+import os.path
 import unittest
 
 from unittest import mock
@@ -5,6 +6,7 @@ from io import StringIO
 
 from config.CommonDockerSettings import CommonDockerSettings
 from utils.Network import Network
+from config.Genesis import GenesisConfig
 
 
 class NetworkUtilsUnitTests(unittest.TestCase):
@@ -71,6 +73,15 @@ class NetworkUtilsUnitTests(unittest.TestCase):
             self.assertIn("hammunet_genesis.json", settings.genesis_json_location)
             self.assertEqual(mock_stdout.getvalue(), f" `{settings.genesis_json_location}` does not exist ")
             self.assertEqual(cm.exception.code, 1)
+
+    def test_create_if_not_exists(self):
+        genesisfile_txt = "/tmp/genesisfile.txt"
+        # permissions changed on a local test to verify it does not error out when docker has taken ownership
+        # self.assertFalse(os.path.exists(genesisfile_txt))
+        GenesisConfig.create_genesis_file(genesisfile_txt, "genesis")
+        self.assertTrue(os.path.exists(genesisfile_txt))
+        GenesisConfig.create_genesis_file(genesisfile_txt, "genesis")
+        self.assertTrue(os.path.exists(genesisfile_txt))
 
 
 def suite():
