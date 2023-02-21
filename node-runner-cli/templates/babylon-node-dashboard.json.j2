@@ -24,7 +24,6 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "id": 7,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -588,7 +587,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 2,
+        "h": 3,
         "w": 18,
         "x": 0,
         "y": 5
@@ -613,7 +612,8 @@
       "targets": [
         {
           "datasource": {
-            "uid": "${prometheus}"
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
           "exemplar": true,
@@ -729,10 +729,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 2,
+        "h": 3,
         "w": 18,
         "x": 0,
-        "y": 7
+        "y": 8
       },
       "id": 28,
       "options": {
@@ -852,83 +852,6 @@
         }
       ],
       "title": "Registered Validator",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${prometheus}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "dark-blue",
-                "value": null
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 2,
-        "w": 18,
-        "x": 0,
-        "y": 9
-      },
-      "id": 24,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "last"
-          ],
-          "fields": "/.*/",
-          "values": false
-        },
-        "text": {},
-        "textMode": "name"
-      },
-      "pluginVersion": "9.3.6",
-      "targets": [
-        {
-          "datasource": {
-            "uid": "${prometheus}"
-          },
-          "editorMode": "code",
-          "exemplar": true,
-          "expr": "nodeinfo{job=\"validator\"}",
-          "format": "time_series",
-          "instant": true,
-          "interval": "",
-          "legendFormat": "{{instance}}",
-          "refId": "A"
-        }
-      ],
-      "title": "Validator Address",
-      "transformations": [
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Time": true,
-              "vb1qv29t52l7nzunf83ykfe90qv5ffzky4eym647m43qku5dd38kya97tmktxt": false
-            },
-            "indexByName": {},
-            "renameByName": {}
-          }
-        }
-      ],
       "type": "stat"
     },
     {
@@ -1615,6 +1538,6 @@
   "timezone": "",
   "title": "Babylon Node Dashboard",
   "uid": "3467sdft47",
-  "version": 2,
+  "version": 3,
   "weekStart": ""
 }
