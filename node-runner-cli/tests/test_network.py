@@ -55,14 +55,15 @@ class NetworkUtilsUnitTests(unittest.TestCase):
             self.assertEqual(mock_stdout.getvalue(), "OS error occurred trying to open /tm\\$&(*!@£^(p(^)th")
             self.assertEqual(cm.exception.code, 1)
 
-    def test_default_genesis_files(self):
+    @mock.patch('sys.stdout', new_callable=StringIO)
+    def test_default_genesis_files(self, mock_stdout):
         genesis_location = Network.path_to_genesis_json(11)
         self.assertIn("nebunet", genesis_location)
         genesis_location = Network.path_to_genesis_json(32)
         self.assertIn("gilganet", genesis_location)
 
-    def test_hammunet_genesis_files(self):
-
+    @mock.patch('sys.stdout', new_callable=StringIO)
+    def test_hammunet_genesis_files(self, mock_stdout):
         with self.assertRaises(SystemExit) as cm:
             settings = CommonDockerSettings({})
             with mock.patch('builtins.input', side_effect=['34', '/tmp/hammunet_genesis.json']):
