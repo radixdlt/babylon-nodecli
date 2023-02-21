@@ -71,11 +71,11 @@ class ValidatorUnitTests(unittest.TestCase):
         address = Prompts.ask_validator_address()
         self.assertEqual("validator_mock", address)
 
-    # def test_ask_network_id(self):
-    #     settings = CommonDockerSettings({})
-    #     settings.ask_network_id(11)
-    #     self.assertIn("nebunet", settings.network_name)
-    #     self.assertIn("nebunet", settings.genesis_json_location)
+    def test_ask_network_id(self):
+        settings = CommonDockerSettings({})
+        settings.ask_network_id(11)
+        self.assertIn("nebunet", settings.network_name)
+        self.assertIn("nebunet", settings.genesis_json_location)
 
 
 
