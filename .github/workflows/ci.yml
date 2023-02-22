@@ -266,17 +266,32 @@ jobs:
           # ToDo: Fix Authorization error export DOCKER_COMPOSE_FOLDER_PREFIX=runner ?
           sleep 60
           ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
+          ./radixnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
+          ./radixnode auth set-superadmin-password -m DOCKER -p $NGINX_SUPERADMIN_PASSWORD
           NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system health
           NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system version
-          # ./radixnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
-          # ./radixnode auth set-superadmin-password -m DOCKER -p $NGINX_SUPERADMIN_PASSWORD
         env:
           NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
           NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
           NGINX_SUPERADMIN_PASSWORD: ${{secrets.NGINX_SUPERADMIN_PASSWORD}}
-          CORE_DOCKER_REPO_OVERRIDE: "radixdlt/radixdlt-core"
-          RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
-          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
+
+      - name: Run Monitoring setup
+        run: |
+          export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
+          ./radixnode monitoring config \
+                        -m MONITOR_CORE  \
+                        -cm $NGINX_METRICS_PASSWORD  \
+                        -gm $NGINX_METRICS_PASSWORD  \
+                        -am $NGINX_METRICS_PASSWORD
+
+          ./radixnode monitoring install -a
+
+        env:
+          NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
+          NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
+          NGINX_SUPERADMIN_PASSWORD: ${{secrets.NGINX_SUPERADMIN_PASSWORD}}
+
+
 #  These do not run on Babylon
 #  test-core-api:
 #    runs-on: [node-only]
