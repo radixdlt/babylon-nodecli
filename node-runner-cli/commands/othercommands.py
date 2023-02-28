@@ -21,12 +21,7 @@ def version(args):
     print(f"Cli - Version : {Helpers.cli_version()}")
 
 
-@othercommands([
-    argument("-p", "--use-postgres",
-             help="Flag for optimising local postgres instance aswell",
-             default=False,
-             action="store_true"),
-])
+@othercommands()
 def optimise_node(args):
     """
     Run this command to setup ulimits and swap size on the fresh ubuntu machine
@@ -34,4 +29,4 @@ def optimise_node(args):
     . Prompts asking to setup limits
     . Prompts asking to setup swap and size of swap in GB
     """
-    Base.setup_node_optimisation_config(Helpers.cli_version(), args.use-postgres)
+    Base.setup_node_optimisation_config(Helpers.cli_version(), False)
