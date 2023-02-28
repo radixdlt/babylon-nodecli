@@ -63,19 +63,21 @@ class Base:
         return keystore_password, f'{keyfile_path}/{keyfile_name}'
 
     @staticmethod
-    def setup_node_optimisation_config(version):
+    def setup_node_optimisation_config(version,postgres_local=False):
         ansibleRunner = AnsibleRunner(
             f'https://raw.githubusercontent.com/radixdlt/babylon-nodecli/{version}/node-runner-cli')
         file = 'ansible/project/provision.yml'
         ansibleRunner.check_install_ansible()
         ansibleRunner.download_ansible_file(file)
+        ansibleRunner.install_ansible_modules()
         setup_limits = Prompts.ask_ansible_setup_limits()
+
         if setup_limits:
-            ansibleRunner.run_setup_limits(setup_limits)
+            ansibleRunner.run_setup_limits(setup_limits, postgres_local)
 
         setup_swap, ask_swap_size = Prompts.ask_ansible_swap_setup()
         if setup_swap:
-            ansibleRunner.run_swap_size(setup_swap, ask_swap_size)
+            ansibleRunner.run_swap_size(setup_swap, ask_swap_size, postgres_local)
 
     @staticmethod
     def get_data_dir(create_dir=True):

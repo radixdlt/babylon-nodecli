@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 
-from commands.subcommand import get_decorator
+from commands.subcommand import get_decorator, argument
 from setup.Base import Base
 from utils.utils import Helpers
 
@@ -21,7 +21,12 @@ def version(args):
     print(f"Cli - Version : {Helpers.cli_version()}")
 
 
-@othercommands()
+@othercommands([
+    argument("-p", "--use-postgres",
+             help="Flag for optimising local postgres instance aswell",
+             default=False,
+             action="store_true"),
+])
 def optimise_node(args):
     """
     Run this command to setup ulimits and swap size on the fresh ubuntu machine
@@ -29,4 +34,4 @@ def optimise_node(args):
     . Prompts asking to setup limits
     . Prompts asking to setup swap and size of swap in GB
     """
-    Base.setup_node_optimisation_config(Helpers.cli_version())
+    Base.setup_node_optimisation_config(Helpers.cli_version(), args.use-postgres)

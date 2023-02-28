@@ -9,7 +9,7 @@ from env_vars import RADIXDLT_APP_VERSION_OVERRIDE, RADIXDLT_NGINX_VERSION_OVERR
 from utils.utils import Helpers
 
 
-def latest_release(repo_name="radixdlt/babylon-node"):
+def latest_release(repo_name="radixdlt/babylon-node") -> str:
     if repo_name == "radixdlt/babylon-node":
         if os.environ.get(RADIXDLT_APP_VERSION_OVERRIDE) is not None:
             return os.environ.get(RADIXDLT_APP_VERSION_OVERRIDE)
