@@ -53,14 +53,14 @@ class AnsibleRunner:
         run_shell_command(f"ansible-galaxy collection install community.postgresql", shell=True, fail_on_error=True)
 
     @classmethod
-    def run_setup_limits(cls, setup_limits, use_postgres=False):
+    def run_setup_limits(cls, setup_limits):
         run_shell_command(
-            f"ansible-playbook ansible/project/provision.yml -e postgres_local=false -e setup_limits={setup_limits}",
+            f"ansible-playbook ansible/project/provision.yml -e setup_limits={setup_limits}",
             shell=True)
 
-    def run_swap_size(self, setup_swap, setup_swap_size, use_postgres=False):
+    def run_swap_size(self, setup_swap, setup_swap_size):
         run_shell_command(
-            f"ansible-playbook ansible/project/provision.yml -e postgres_local={use_postgres} -e setup_swap={setup_swap} -e swap_size={setup_swap_size}",
+            f"ansible-playbook ansible/project/provision.yml -e setup_swap={setup_swap} -e swap_size={setup_swap_size}",
             shell=True)
 
     def run_setup_postgress(self, postgress_password, postgresql_user, postgresql_db_name, file):
