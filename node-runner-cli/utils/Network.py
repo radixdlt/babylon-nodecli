@@ -1,7 +1,9 @@
 import sys
 
+from config.Genesis import GenesisConfig
 from utils.PromptFeeder import QuestionKeys
-from utils.utils import Helpers
+from utils.Prompts import Prompts
+from utils.utils import Helpers, bcolors
 
 
 class Network:

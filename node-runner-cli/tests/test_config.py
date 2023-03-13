@@ -7,8 +7,8 @@ from pathlib import Path
 
 from config.DockerConfig import DockerConfig
 from config.Nginx import SystemdNginxConfig
-from config.SystemDConfig import SystemDSettings, extract_network_id_from_arg
-from setup.SystemD import SystemD, validate_network_id
+from config.SystemDConfig import SystemDSettings
+from utils.Network import Network
 
 
 class ConfigUnitTests(unittest.TestCase):
@@ -45,19 +45,21 @@ core_node_settings:
   keydetails:
     keyfile_path: {home_directory}/node-config
     keyfile_name: node-keystore.ks
-  repo: radixdlt/radixdlt-core
   data_directory: {home_directory}/data
   enable_transaction: 'false'
+  node_dir: /someDir/node-config
   node_secrets_dir: /someDir/node-config/secret
   java_opts: --enable-preview -server -Xms8g -Xmx8g  -XX:MaxDirectMemorySize=2048m
     -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts
     -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
 common_settings:
   nginx_settings:
+    mode: systemd
+    enable_transaction_api: 'false'
+    protect_core: 'true'
     dir: /etc/nginx
     secrets_dir: /etc/nginx/secrets
   service_user: radixdlt
-  node_dir: /someDir/node-config
   network_id: 1
 """
         self.assertEqual(config_as_yaml, fixture)
@@ -73,7 +75,7 @@ core_node_settings:
   keydetails:
     keyfile_path: {home_directory}/node-config
     keyfile_name: node-keystore.ks
-  repo: radixdlt/radixdlt-core
+  repo: radixdlt/babylon-node
   data_directory: {home_directory}/data
   enable_transaction: 'false'
   java_opts: --enable-preview -server -Xms8g -Xmx8g  -XX:MaxDirectMemorySize=2048m
@@ -81,6 +83,7 @@ core_node_settings:
     -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
 common_settings:
   nginx_settings:
+    mode: docker
     protect_gateway: 'true'
     gateway_behind_auth: 'true'
     enable_transaction_api: 'false'
@@ -89,7 +92,7 @@ common_settings:
   docker_compose: {home_directory}/docker-compose.yml
 gateway_settings:
   data_aggregator:
-    repo: radixdlt/ng-data-aggregator
+    repo: radixdlt/babylon-ng-data-aggregator
     restart: unless-stopped
     coreApiNode:
       Name: Core
@@ -98,7 +101,7 @@ gateway_settings:
       request_weighting: 1
       enabled: 'true'
   gateway_api:
-    repo: radixdlt/ng-gateway-api
+    repo: radixdlt/babylon-ng-gateway-api
     coreApiNode:
       Name: Core
       core_api_address: http://core:3333
@@ -117,14 +120,14 @@ gateway_settings:
         self.assertEqual(config_as_yaml, fixture)
 
     def test_network_id_can_be_parsed(self):
-        self.assertEqual(validate_network_id("1"), 1)
-        self.assertEqual(validate_network_id("m"), 1)
-        self.assertEqual(validate_network_id("M"), 1)
-        self.assertEqual(validate_network_id("mainnet"), 1)
-        self.assertEqual(validate_network_id("2"), 2)
-        self.assertEqual(validate_network_id("s"), 2)
-        self.assertEqual(validate_network_id("S"), 2)
-        self.assertEqual(validate_network_id("stokenet"), 2)
+        self.assertEqual(Network.validate_network_id("1"), 1)
+        self.assertEqual(Network.validate_network_id("m"), 1)
+        self.assertEqual(Network.validate_network_id("M"), 1)
+        self.assertEqual(Network.validate_network_id("mainnet"), 1)
+        self.assertEqual(Network.validate_network_id("2"), 2)
+        self.assertEqual(Network.validate_network_id("s"), 2)
+        self.assertEqual(Network.validate_network_id("S"), 2)
+        self.assertEqual(Network.validate_network_id("stokenet"), 2)
 
 def suite():
     """ This defines all the tests of a module"""

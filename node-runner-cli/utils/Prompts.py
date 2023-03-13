@@ -343,6 +343,7 @@ class Prompts:
             sys.exit(1)
         return answer
 
+    @classmethod
     def ask_validator_address(cls) -> str:
         Helpers.section_headline("Validator Address")
         print("\n\nIf you want to run this node as validator,"

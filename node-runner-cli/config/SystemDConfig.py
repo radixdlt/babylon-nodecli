@@ -135,7 +135,10 @@ class CommonSystemdSettings(BaseConfig):
     def ask_network_id(self, network_id):
         if not network_id:
             network_id = Network.get_network_id()
-        self.set_network_id(network_id)
+        if isinstance(network_id, str):
+            self.set_network_id(int(network_id))
+        else:
+            self.set_network_id(network_id)
         self.set_genesis_json_location(Network.path_to_genesis_json(self.network_id))
 
     def ask_enable_nginx_for_core(self, nginx_on_core):
