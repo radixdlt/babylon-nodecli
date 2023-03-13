@@ -1,5 +1,6 @@
 import os
 import unittest
+from io import StringIO
 from pathlib import Path
 from unittest.mock import patch
 
@@ -76,12 +77,45 @@ class SystemdUnitTests(unittest.TestCase):
                    ["main", "systemd", "dependencies"]):
             main()
 
-    def test_systemd_dependencies(self):
+    def test_systemd_config(self):
         with patch("sys.argv",
                    ["main", "systemd", "config", "-m", "CORE", "-i", "18.133.170.30", "-t",
                     "radix://tn1q28eygvxshszxk48jhjxdmyne06m3x6hfyvxg7a45qt8cksffx6z7uu6392@15.236.228.96",
                     "-n", "2", "-k", "radix", "-d", "/tmp", "-dd", "/tmp", "-a"]):
             main()
+
+    @patch('sys.stdout', new_callable=StringIO)
+    def test_docker_config(self, mockout):
+        # os.environ['PROMPT_FEEDS'] = "test-prompts/individual-prompts/validator_address.yml"
+        # PromptFeeder.prompts_feed = PromptFeeder.instance().load_prompt_feeds()
+        with patch('builtins.input', side_effect=['S', 'N', 'N', '/home/runner/docker-compose.yml', 'N']):
+            with patch("sys.argv",
+                       ["main", "docker", "config", "-m", "DETAILED", "-k", "radix", "-nk","-a"]):
+                main()
+
+    @patch('sys.stdout', new_callable=StringIO)
+    def test_docker_config_all_local(self, mockout):
+        # os.environ['PROMPT_FEEDS'] = "test-prompts/individual-prompts/validator_address.yml"
+        # PromptFeeder.prompts_feed = PromptFeeder.instance().load_prompt_feeds()
+        with open('/tmp/genesis.json', 'w') as fp:
+            pass
+        with patch('builtins.input', side_effect=['34',
+                                                  '/tmp/genesis.json',
+                                                  'Y',
+                                                  'Y',
+                                                  'radix://node_tdx_22_1qvsml9pe32rzcrmw6jx204gjeng09adzkqqfz0ewhxwmjsaas99jzrje4u3@34.243.93.185',
+                                                  'N',
+                                                  'Y',
+                                                  '/tmp/node-config',
+                                                  'node-keystore.ks',
+                                                  '/tmp/data',
+                                                  'true',
+                                                  'true',
+                                                  'development-latest']):
+            with patch("sys.argv",
+                       ["main", "docker", "config", "-m", "DETAILED", "-k", "radix", "-nk", "-a"]):
+                main()
+
 
     @unittest.skip("For verification only")
     def test_systemd_install_manual(self):

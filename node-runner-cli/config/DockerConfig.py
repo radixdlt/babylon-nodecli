@@ -10,7 +10,6 @@ from config.GatewayDockerConfig import GatewayDockerSettings
 from config.KeyDetails import KeyDetails
 from setup.Base import Base
 from env_vars import MOUNT_LEDGER_VOLUME, CORE_DOCKER_REPO_OVERRIDE
-from setup import Base
 from utils.Prompts import Prompts
 from utils.utils import Helpers
 
@@ -109,6 +108,9 @@ class DockerConfig(BaseConfig):
     gateway_settings: GatewayDockerSettings = GatewayDockerSettings({})
 
     def __init__(self, release: str):
+        self.core_node_settings = CoreDockerSettings({})
+        self.common_settings = CommonDockerSettings({})
+        self.gateway_settings = GatewayDockerSettings({})
         self.core_node_settings.core_release = release
 
     def loadConfig(self, file):

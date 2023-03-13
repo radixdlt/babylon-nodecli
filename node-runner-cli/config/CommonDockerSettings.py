@@ -31,6 +31,7 @@ class CommonDockerSettings(BaseConfig):
 
         if self.network_id:
             self.set_network_name()
+        self.nginx_settings = DockerNginxConfig({})
 
     def __iter__(self):
         class_variables = {key: value

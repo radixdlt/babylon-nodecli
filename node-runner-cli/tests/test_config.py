@@ -129,6 +129,8 @@ gateway_settings:
         self.assertEqual(Network.validate_network_id("S"), 2)
         self.assertEqual(Network.validate_network_id("stokenet"), 2)
 
+
+
 def suite():
     """ This defines all the tests of a module"""
     suite = unittest.TestSuite()

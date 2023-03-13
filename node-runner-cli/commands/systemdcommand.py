@@ -164,7 +164,7 @@ def install(args):
                                settings.core_node_settings.core_binary_url,
                                settings.common_settings.nginx_settings.config_url)
 
-    # SystemD.checkUser()
+    SystemD.checkUser()
 
     SystemD.download_binaries(binary_location_url=settings.core_node_settings.core_binary_url,
                               node_dir=settings.core_node_settings.node_dir,
