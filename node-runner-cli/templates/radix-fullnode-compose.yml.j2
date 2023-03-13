@@ -13,10 +13,13 @@ services:
       RADIXDLT_NETWORK_USE_PROXY_PROTOCOL: '{{core_node.use_proxy_protocol or 'false'}}'
       RADIXDLT_SIGN_ENABLE: 'true'
       RADIXDLT_TRANSACTIONS_API_ENABLE: '{{core_node.enable_transaction}}'
-      RADIXDLT_VALIDATOR_KEY_LOCATION: '{{core_node.keydetails.keyfile_path}}/{{core_node.keydetails.keyfile_name}}'
-      RADIX_NODE_KEYSTORE_PASSWORD: {{core_node.keydetails.keystore_password}}
+      RADIXDLT_VALIDATOR_KEY_LOCATION: /home/radixdlt/node-keystore.ks
+      RADIX_NODE_KEYSTORE_PASSWORD: '{{core_node.keydetails.keystore_password}}'
       {% if common_config.genesis_json_location is defined %}
-      RADIXDLT_GENESIS_FILE: "{{common_config.genesis_json_location}}"
+      RADIXDLT_GENESIS_FILE: "/home/radixdlt/genesis.json"
+      {% endif %}
+      {% if core_node.validator_address is defined %}
+      RADIXDLT_CONSENSUS_VALIDATOR_ADDRESS: '{{core_node.validator_address}}'
       {% endif %}
     image: {{core_node.repo}}:{{core_node.core_release}}
     init: true
@@ -28,10 +31,10 @@ services:
        - "30000:30000"
     {% endif %}
     ulimits:
-      memlock: '-1'
+      memlock: -1
       nofile:
-        hard: '65536'
-        soft: '65536'
+        hard: 65536
+        soft: 65536
     volumes:
     {% if core_node.data_directory is defined %}
     - core_ledger:/home/radixdlt/RADIXDB
@@ -60,8 +63,8 @@ services:
     restart: unless-stopped
     ulimits:
       nofile:
-        hard: '65536'
-        soft: '65536'
+        hard: 65536
+        soft: 65536
     volumes:
     - nginx_secrets:/etc/nginx/secrets
  {% endif %}

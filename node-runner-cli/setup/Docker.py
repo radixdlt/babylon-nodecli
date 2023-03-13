@@ -111,9 +111,11 @@ class Docker(Base):
     @staticmethod
     def get_existing_compose_file(all_config):
         compose_file = all_config['common_config']['docker_compose']
+        Helpers.section_headline("Checking if you have existing docker compose file")
         if os.path.exists(compose_file):
             return compose_file, Helpers.yaml_as_dict(compose_file)
         else:
+            Helpers.print_info("Seems you are creating docker compose file for first time")
             return compose_file, {}
 
     @staticmethod
@@ -127,12 +129,12 @@ class Docker(Base):
 
         if all_config.get('core_node'):
             current_core_release = all_config['core_node']["core_release"]
-            latest_core_release = github.latest_release("radixdlt/radixdlt")
+            latest_core_release = github.latest_release("radixdlt/babylon-node")
             updated_config['core_node']["core_release"] = Prompts.confirm_version_updates(current_core_release,
                                                                                           latest_core_release, 'CORE',
                                                                                           autoapprove)
         if all_config.get("gateway"):
-            latest_gateway_release = github.latest_release("radixdlt/radixdlt-network-gateway")
+            latest_gateway_release = github.latest_release("radixdlt/babylon-gateway")
             current_gateway_release = all_config['gateway']["data_aggregator"]["release"]
 
             if all_config.get('gateway', {}).get('data_aggregator'):
@@ -146,7 +148,7 @@ class Docker(Base):
                     latest_gateway_release, 'GATEWAY', autoapprove)
 
         if all_config.get("common_config").get("nginx_settings"):
-            latest_nginx_release = github.latest_release("radixdlt/radixdlt-nginx")
+            latest_nginx_release = github.latest_release("radixdlt/babylon-nginx")
             current_nginx_release = all_config['common_config']["nginx_settings"]["release"]
             updated_config['common_config']["nginx_settings"]["release"] = Prompts.confirm_version_updates(
                 current_nginx_release, latest_nginx_release, "RADIXDLT NGINX", autoapprove
@@ -154,4 +156,17 @@ class Docker(Base):
 
         return updated_config
 
-
+    @staticmethod
+    def backup_save_config(config_file, new_config, autoapprove, backup_time):
+        to_update = ""
+        if autoapprove:
+            print("In Auto mode - Updating the file as suggested in above changes")
+        else:
+            to_update = input("\nOkay to update the config file [Y/n]?:")
+        if Helpers.check_Yes(to_update) or autoapprove:
+            if os.path.exists(config_file):
+                print(f"\n\n Backing up existing config file")
+                Helpers.backup_file(config_file, f"{config_file}_{backup_time}")
+            print(f"\n\n Saving to file {config_file} ")
+            with open(config_file, 'w') as f:
+                yaml.dump(new_config, f, default_flow_style=False, explicit_start=True, allow_unicode=True)

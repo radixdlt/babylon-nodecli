@@ -1,3 +1,4 @@
+#TODO this needs updating when a new python client is created
 from core_client.model.big_integer import BigInteger
 from core_client.model.data import Data
 from core_client.model.entity_identifier import EntityIdentifier

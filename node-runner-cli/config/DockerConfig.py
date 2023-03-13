@@ -8,8 +8,9 @@ from config.BaseConfig import BaseConfig, SetupMode
 from config.CommonDockerSettings import CommonDockerSettings
 from config.GatewayDockerConfig import GatewayDockerSettings
 from config.KeyDetails import KeyDetails
-from env_vars import MOUNT_LEDGER_VOLUME
 from setup.Base import Base
+from env_vars import MOUNT_LEDGER_VOLUME, CORE_DOCKER_REPO_OVERRIDE
+from setup import Base
 from utils.Prompts import Prompts
 from utils.utils import Helpers
 
@@ -19,16 +20,20 @@ class CoreDockerSettings(BaseConfig):
     composefileurl: str = None
     keydetails: KeyDetails = KeyDetails({})
     core_release: str = None
-    repo: str = "radixdlt/radixdlt-core"
+    repo: str = os.getenv(CORE_DOCKER_REPO_OVERRIDE, "radixdlt/babylon-node")
     data_directory: str = f"{Helpers.get_home_dir()}/data"
     enable_transaction: str = "false"
     trusted_node: str = None
+    validator_address: str = None
     java_opts: str = "--enable-preview -server -Xms8g -Xmx8g  " \
                      "-XX:MaxDirectMemorySize=2048m " \
                      "-XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops " \
                      "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts " \
                      "-Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom " \
                      "-DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
+
+    def __init__(self, settings: dict):
+        super().__init__(settings)
 
     def __iter__(self):
         class_variables = {key: value
@@ -58,7 +63,8 @@ class CoreDockerSettings(BaseConfig):
 
     def set_core_release(self, release):
         self.core_release = release
-        self.keydetails.keygen_tag = self.core_release
+        # Using hardcoded tag value till we publish keygen image
+        self.keydetails.keygen_tag = "1.3.2"
 
     def ask_data_directory(self):
         if "DETAILED" in SetupMode.instance().mode:
@@ -83,10 +89,18 @@ class CoreDockerSettings(BaseConfig):
 
         self.set_core_release(release)
         self.set_trusted_node(trustednode)
+        self.ask_validator_address()
         self.ask_keydetails(ks_password, new_keystore)
         self.ask_data_directory()
         self.ask_enable_transaction()
         return self
+
+    def set_validator_address(self, validator_address: str):
+        self.validator_address = validator_address
+
+    def ask_validator_address(self):
+        validator_address = Prompts.ask_validator_address()
+        self.set_validator_address(validator_address)
 
 
 class DockerConfig(BaseConfig):

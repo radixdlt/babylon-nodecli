@@ -148,11 +148,13 @@ class Monitoring:
         else:
             start_monitoring_answer = input(
                 f"Do you want to start monitoring using file {composefile} [Y/n]?")
+
         if Helpers.check_Yes(start_monitoring_answer) or auto_approve:
-            run_shell_command(f'docker-compose -f {composefile} up -d',
-                              env={
-                                  COMPOSE_HTTP_TIMEOUT: os.getenv(COMPOSE_HTTP_TIMEOUT, "200")
-                              }, shell=True)
+            docker_compose_binary = os.getenv("DOCKER_COMPOSE_LOCATION", 'docker-compose')
+            run_shell_command([docker_compose_binary, '-f', composefile, 'up', '-d'],
+                                       env={
+                                           COMPOSE_HTTP_TIMEOUT: os.getenv(COMPOSE_HTTP_TIMEOUT, "200")
+                                       }, fail_on_error=False)
         else:
             print(f"""Exiting the command ..
                      Once you verified the file {composefile}, you can start the monitoring by running

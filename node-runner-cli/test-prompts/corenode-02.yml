@@ -1,13 +1,15 @@
 ---
-- select_network: S
+- select_network: "34"
+- genesis_location: "/home/runner/genesis.json"
 - first_time_config: N
-- have_existing_compose: "/Users/shambu/project/node-runner/node-runner-cli/docker-compose.yml"
+- have_existing_compose: "/home/runner/docker-compose.yml"
 - setup_fullnode: Y
 - input_seednode: "radix://node_tdx_21_1qfpu6e4xjnjv0anuadnf935kktd2cvycd5evavk9an56y9pzl3rtk0vzdy5@35.170.44.1"
+- have_validator_address: "N"
 - have_keystore_file: N
 - input_path_keystore: "/home/runner/node-config"
 - enter_keystore_name: "node-keystore.ks"
 - input_ledger_path: "/tmp/data"
 - input_transaction_api: "false"
 - core_nginx_setup: "false"
-- setup_gateway: "false"
+#- setup_gateway: "false"

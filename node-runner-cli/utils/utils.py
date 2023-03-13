@@ -103,6 +103,7 @@ class Helpers:
 
         if print_response:
             print(response_content)
+        s.close()
         return resp
 
     @staticmethod
@@ -130,7 +131,9 @@ class Helpers:
 
     @staticmethod
     def docker_compose_down(composefile, remove_volumes):
-        command = ['docker-compose', '-f', composefile, 'down']
+
+        docker_compose_binary = os.getenv("DOCKER_COMPOSE_LOCATION", 'docker-compose')
+        command = [docker_compose_binary, '-f', composefile, 'down']
         if remove_volumes:
             command.append('-v')
         result = run_shell_command(command, env={
@@ -327,6 +330,12 @@ class Helpers:
     def backup_file(source: str, dest: str):
         import shutil
         shutil.copy2(source, dest)
+
+    @staticmethod
+    def is_valid_file(file: str):
+        if not os.path.exists(file):
+            print(f" `{file}` does not exist ")
+            sys.exit(1)
 
 
 class bcolors:

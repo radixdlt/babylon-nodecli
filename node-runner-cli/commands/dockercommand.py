@@ -63,21 +63,14 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
                                           " defined in argument configdir", action="store_true"),
     argument("-t", "--trustednode",
              help="Trusted node on radix network."
-                  "Example format: 'radix://node_tdx_21_1qfpu6e4xjnjv0anuadnf935kktd2cvycd5evavk9an56y9pzl3rtk0vzdy5@35.170.44.1'."
+                  "Example format: 'radix://node_tdx_b_1qdrcdjgzl6s2ymnsssdssxllmmj0j84eagu2m6xtttj3nxrunzesyh9fwea@3.109.242.93'."
                   "This is required only if you are creating config to run a CORE node and "
                   "if not provided you will be prompted to enter a value",
              default="",
              action="store"),
-    argument("-p", "--postgrespassword",
-             help="Network Gateway uses Postgres as datastore. This is password for the user `postgres`.",
-             action="store",
-             default=""),
     argument("-xc", "--disablenginxforcore", help="Core Node API's are protected by Basic auth setting."
                                                   "Set this to disable to nginx for core",
-             action="store", default="", choices=["true", "false"]),
-    argument("-xg", "--disablenginxforgateway", help="GateWay API's end points are protected by Basic auth settings. "
-                                                     "Set this to disable to nginx for gateway",
-             action="store", default="", choices=["true", "false"]),
+             action="store", default="", choices=["true", "false"])
 
 ])
 def config(args):
@@ -91,8 +84,6 @@ def config(args):
     setupmode.mode = args.setupmode
     trustednode = args.trustednode if args.trustednode != "" else None
     keystore_password = args.keystorepassword if args.keystorepassword != "" else None
-    postgrespassword = args.postgrespassword if args.postgrespassword != "" else None
-    nginx_on_gateway = args.disablenginxforgateway if args.disablenginxforgateway != "" else None
     nginx_on_core = args.disablenginxforcore if args.disablenginxforcore != "" else None
     autoapprove = args.autoapprove
     new_keystore = args.newkeystore
@@ -103,13 +94,19 @@ def config(args):
               f"Hence cannot be clubbed together with options"
               f"{bcolors.ENDC}")
         sys.exit(1)
-    release = latest_release()
 
+    Helpers.section_headline("CONFIG FILE")
     Path(f"{Helpers.get_default_node_config_dir()}").mkdir(parents=True, exist_ok=True)
     config_file = f"{args.configdir}/config.yaml"
 
+    # Print old config if it exists
+    old_config = Docker.load_all_config(config_file)
+    if len(old_config) != 0:
+        print("\n----There is existing config file and contents are as below----\n")
+        print(f"\n{yaml.dump(old_config)}")
+    release = latest_release()
+
     configuration = DockerConfig(release)
-    Helpers.section_headline("CONFIG FILE")
     print(
         "\nCreating config file using the answers from the questions that would be asked in next steps."
         f"\nLocation of the config file: {bcolors.OKBLUE}{config_file}{bcolors.ENDC}")
@@ -117,7 +114,7 @@ def config(args):
     configuration.common_settings.ask_network_id(args.networkid)
     configuration.common_settings.ask_existing_docker_compose_file()
 
-    config_to_dump = {"version": "0.1"}
+    config_to_dump = {"version": "0.2"}
 
     if "CORE" in setupmode.mode:
         quick_node_settings: CoreDockerSettings = CoreDockerSettings({}).create_config(release, trustednode,
@@ -126,12 +123,12 @@ def config(args):
         configuration.common_settings.ask_enable_nginx_for_core(nginx_on_core)
         config_to_dump["core_node"] = dict(configuration.core_node_settings)
 
-    if "GATEWAY" in setupmode.mode:
-        quick_gateway_settings: GatewayDockerSettings = GatewayDockerSettings({}).create_config(postgrespassword)
-
-        configuration.gateway_settings = quick_gateway_settings
-        configuration.common_settings.ask_enable_nginx_for_gateway(nginx_on_gateway)
-        config_to_dump["gateway"] = dict(configuration.gateway_settings)
+    # if "GATEWAY" in setupmode.mode:
+    #     quick_gateway_settings: GatewayDockerSettings = GatewayDockerSettings({}).create_config(postgrespassword)
+    #
+    #     configuration.gateway_settings = quick_gateway_settings
+    #     configuration.common_settings.ask_enable_nginx_for_gateway(nginx_on_gateway)
+    #     config_to_dump["gateway"] = dict(configuration.gateway_settings)
 
     if "DETAILED" in setupmode.mode:
         run_fullnode = Prompts.check_for_fullnode()
@@ -144,15 +141,15 @@ def config(args):
         else:
             configuration.common_settings.nginx_settings.protect_core = "false"
 
-        run_gateway = Prompts.check_for_gateway()
-        if run_gateway:
-            detailed_gateway_settings: GatewayDockerSettings = GatewayDockerSettings({}).create_config(
-                postgrespassword)
-            configuration.gateway_settings = detailed_gateway_settings
-            configuration.common_settings.ask_enable_nginx_for_gateway(nginx_on_gateway)
-            config_to_dump["gateway"] = dict(configuration.gateway_settings)
-        else:
-            configuration.common_settings.nginx_settings.protect_gateway = "false"
+        # run_gateway = Prompts.check_for_gateway()
+        # if run_gateway:
+        #     detailed_gateway_settings: GatewayDockerSettings = GatewayDockerSettings({}).create_config(
+        #         postgrespassword)
+        #     configuration.gateway_settings = detailed_gateway_settings
+        #     configuration.common_settings.ask_enable_nginx_for_gateway(nginx_on_gateway)
+        #     config_to_dump["gateway"] = dict(configuration.gateway_settings)
+        # else:
+        #     configuration.common_settings.nginx_settings.protect_gateway = "false"
 
     if configuration.common_settings.check_nginx_required():
         configuration.common_settings.ask_nginx_release()
@@ -224,7 +221,7 @@ def install(args):
     if len(compose_file_difference) != 0:
         print(f"""
             {Helpers.section_headline("Differences between existing compose file and new compose file")}
-            Difference between existing config file and new config that you are creating
+             Difference between existing compose file and new compose file that you are creating
             {compose_file_difference}
               """)
         to_update = ""

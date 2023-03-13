@@ -126,7 +126,7 @@ class Prompts:
         print(f"Latest release for {gateway_or_aggregator} is {latest_gateway_release}")
         question_key = QuestionKeys.gateway_release if gateway_or_aggregator == "gateway_api" else QuestionKeys.aggregator_release
         answer = Helpers.input_guestion(
-            f"Press Enter to accept the latest or  type in {gateway_or_aggregator} release tag:",question_key)
+            f"Press Enter to accept the latest or  type in {gateway_or_aggregator} release tag:", question_key)
         return Prompts.check_default(answer, latest_gateway_release)
 
     @staticmethod
@@ -144,7 +144,7 @@ class Prompts:
     def check_for_fullnode() -> str:
         Helpers.section_headline("FULL NODE")
         print(
-            f"\nDo you want to setup a fullnode or a validator? For more information refer "
+            f"\nDo you want to setup a core node that is either fullnode or a validator? For more information refer "
             "https://docs.radixdlt.com/main/node-and-gateway/node-introduction.html#_what_is_a_radix_node")
         answer = Helpers.input_guestion(
             "Default is Y to setup fullnode , Press ENTER to accept default or type in [Y/N]:",
@@ -200,16 +200,16 @@ class Prompts:
 
     @staticmethod
     def ask_trusted_node() -> str:
-
+        Helpers.section_headline("Trusted node settings")
         value = Helpers.input_guestion("Fullnode requires another node to connect to network. "
                                        "\nTo connect to MAINNET or STOKENET details on these node can be found here "
                                        "- https://docs.radixdlt.com/main/node-and-gateway/seed-nodes.html"
                                        "\nType in the node you want to connect to in format radix://<node-peer-2-peer-address>@<ip>"
                                        "\n OR press Enter to accept default "
-                                       "radix://node_tdx_21_1qfpu6e4xjnjv0anuadnf935kktd2cvycd5evavk9an56y9pzl3rtk0vzdy5@35.170.44.1:",
+                                       "radix://node_tdx_b_1qdrcdjgzl6s2ymnsssdssxllmmj0j84eagu2m6xtttj3nxrunzesyh9fwea@3.109.242.93:",
                                        QuestionKeys.input_seednode)
         trustednode = Prompts.check_default(value,
-                                            "radix://node_tdx_21_1qfpu6e4xjnjv0anuadnf935kktd2cvycd5evavk9an56y9pzl3rtk0vzdy5@35.170.44.1")
+                                            "radix://node_tdx_b_1qdrcdjgzl6s2ymnsssdssxllmmj0j84eagu2m6xtttj3nxrunzesyh9fwea@3.109.242.93")
         Helpers.parse_trustednode(trustednode)
         return trustednode
 
@@ -250,7 +250,7 @@ class Prompts:
         Helpers.section_headline("NGINX CONFIG")
         print(f"Latest release of radixdlt-nginx is {bcolors.OKBLUE}{latest_nginx_release}{bcolors.ENDC}.")
         answer = Helpers.input_guestion(
-            f"\nPress Enter to accept default or Type in radixdlt/radixdlt-nginx release tag:",
+            f"\nPress Enter to accept default or Type in radixdlt/babylon-nginx release tag:",
             QuestionKeys.input_nginx_release)
         return Prompts.check_default(answer, latest_nginx_release)
 
@@ -342,3 +342,23 @@ class Prompts:
             print(f"'{ip_string}' is not a valid ip address.")
             sys.exit(1)
         return answer
+
+    def ask_validator_address(cls) -> str:
+        Helpers.section_headline("Validator Address")
+        print("\n\nIf you want to run this node as validator,"
+              "you would need to store validator address in the config"
+              "\nAfter your node is up and running, you can get you node public key by"
+              " sending a request to /system/identity"
+              " or by executing 'radixnode api system identity'. "
+              "Refer this link for more details"
+              "\n https://docs-babylon.radixdlt.com/main/node-and-gateway/register-as-validator.html#_gather_your_node_public_key"
+              "")
+        answer = Helpers.input_guestion(f"\n\n Do you have a validator address? (Y/n): "
+                                        , QuestionKeys.have_validator_address)
+        validator_address = ""
+        if Helpers.check_Yes(Prompts.check_default(answer, "N")):
+            validator_address = Helpers.input_guestion(f"Enter your validator address:",
+                                                       QuestionKeys.validator_address)
+        else:
+            print("\nYou can find your validator address using 'radixnode api system identity'")
+        return validator_address

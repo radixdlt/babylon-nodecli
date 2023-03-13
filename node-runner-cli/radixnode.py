@@ -6,9 +6,8 @@ from argparse import ArgumentParser
 
 import urllib3
 
-from api.DefaultApiHelper import DefaultApiHelper
+from api.SystemApiHelper import SystemApiHelper
 from commands.authcommand import authcli
-from commands.coreapi import handle_core
 from commands.dockercommand import dockercli
 from commands.key import keycli
 from commands.monitoring import monitoringcli
@@ -79,12 +78,10 @@ def main():
             apicli.print_help()
         else:
             if apicli_args.apicommand == "metrics":
-                defaultApi = DefaultApiHelper(verify_ssl=False)
-                defaultApi.prometheus_metrics()
+                systemApiHelper = SystemApiHelper(user_type="metrics", default_username="metrics")
+                systemApiHelper.prometheus_metrics(print_response=True)
             elif apicli_args.apicommand == "system":
                 handle_systemapi()
-            elif apicli_args.apicommand == "core":
-                handle_core()
             else:
                 print(f"Invalid api command {apicli_args.apicommand}")
 

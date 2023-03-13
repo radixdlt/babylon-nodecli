@@ -7,6 +7,16 @@ from utils.Network import Network
 from utils.Prompts import Prompts, Helpers
 
 
+class NginxConfig(BaseConfig):
+    # uncomment below when support to gateway is added
+    # protect_gateway: str = "true"
+    # gateway_behind_auth: str = "true"
+    enable_transaction_api = "false"
+    protect_core: str = "true"
+    release = None
+    repo = "radixdlt/babylon-nginx"
+
+
 class CommonDockerSettings(BaseConfig):
     network_id: int = None
     network_name: str = None
@@ -52,7 +62,7 @@ class CommonDockerSettings(BaseConfig):
         self.set_genesis_json_location(Network.path_to_genesis_json(self.network_id))
 
     def ask_nginx_release(self):
-        latest_nginx_release = github.latest_release("radixdlt/radixdlt-nginx")
+        latest_nginx_release = github.latest_release("radixdlt/babylon-nginx")
         self.nginx_settings.release = latest_nginx_release
         if "DETAILED" in SetupMode.instance().mode:
             self.nginx_settings.release = Prompts.get_nginx_release(latest_nginx_release)
@@ -70,8 +80,8 @@ class CommonDockerSettings(BaseConfig):
             self.nginx_settings.protect_gateway = Prompts.ask_enable_nginx(service="GATEWAY").lower()
 
     def check_nginx_required(self):
-        if json.loads(self.nginx_settings.protect_gateway.lower()) or json.loads(
-                self.nginx_settings.protect_core.lower()):
+        # When gateway is supported add back the condition to check gateway
+        if json.loads(self.nginx_settings.protect_core.lower()):
             return True
         else:
             return False

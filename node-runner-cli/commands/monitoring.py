@@ -26,7 +26,8 @@ def monitoringcommand(args=[], parent=monitoring_parser):
 def read_monitoring_config(args):
     yaml.add_representer(type(None), Helpers.represent_none)
     if not exists(args.monitoringconfigfile):
-        print("There is no monitoring config file. It seems like monitoring was not set up. Nothing to do here")
+        print(f"The monitoring config file {args.monitoringconfigfile} does not exist. It seems like monitoring was not set up. "
+              "Please run the config command first.")
         sys.exit(1)
     with open(args.monitoringconfigfile, 'r') as file:
         all_config = yaml.safe_load(file)
@@ -72,7 +73,8 @@ def config(args):
     gatewayapimetricspassword = args.gatewayapimetricspassword if args.gatewayapimetricspassword != "" else None
     aggregatormetricspassword = args.aggregatormetricspassword if args.aggregatormetricspassword != "" else None
 
-    if "DETAILED" in setupmode.mode and len(setupmode.mode) > 1:
+    print(f"{len(setupmode.mode)} and {setupmode.mode}")
+    if "DETAILED" in setupmode.mode and len(setupmode.mode) > 8:
         print(f"{bcolors.FAIL}You cannot have DETAILED option with other options together."
               f"\nDETAILED option goes through asking each and every question that to customize setup. "
               f"Hence cannot be clubbed together with options"
@@ -140,8 +142,8 @@ def install(args):
     monitoring_config_dir = all_config["common_config"]["config_dir"]
     Monitoring.template_prometheus_yml(all_config, monitoring_config_dir)
     Monitoring.template_datasource(monitoring_config_dir)
-    Monitoring.template_dashboards(["dashboard.yml", "sample-node-dashboard.json", "network-gateway-dashboard.json"],
-                                   monitoring_config_dir)
+    Monitoring.template_dashboards(["dashboard.yml", "babylon-node-dashboard.json", "babylon-jvm-dashboard.json",
+                                    "network-gateway-dashboard.json"], monitoring_config_dir)
 
     Monitoring.template_monitoring_containers(monitoring_config_dir)
     Monitoring.setup_external_volumes()

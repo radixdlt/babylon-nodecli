@@ -1,0 +1,3 @@
+---
+- have_validator_address: "Y"
+- validator_address: "validator_mock"

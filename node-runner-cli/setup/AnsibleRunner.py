@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 import requests
@@ -15,7 +16,11 @@ class AnsibleRunner:
     def download_ansible_file(self, file):
         print(f"Downloading artifacts from {self.ansible_dir}\n")
         req = requests.Request('GET', f'{self.ansible_dir}/{file}')
+        token = os.getenv('GITHUB_TOKEN')
         prepared = req.prepare()
+        if token is not None:
+            prepared.headers['Authorization'] = token
+        resp = Helpers.send_request(prepared, print_response=False)
 
         resp = Helpers.send_request(prepared, print_response=False)
         if not resp.ok:
@@ -42,6 +47,9 @@ class AnsibleRunner:
             if exit_cmd:
                 sys.exit(1)
         return
+
+    def install_ansible_modules(self):
+        run_shell_command(f"ansible-galaxy collection install community.postgresql", shell=True, fail_on_error=True)
 
     @classmethod
     def run_setup_limits(cls, setup_limits):
