@@ -23,7 +23,7 @@ class Monitoring:
 
         if not resp.ok:
             print(f" Errored downloading file {default_prometheus_yaml_url}. Exitting ... ")
-            sys.exit()
+            sys.exit(1)
 
         default_prometheus_yaml = yaml.safe_load(resp.content)
         prometheus_yaml = Monitoring.merge_auth_config(default_prometheus_yaml, Monitoring.get_node_host_ip())

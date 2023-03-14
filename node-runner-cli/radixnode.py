@@ -6,7 +6,6 @@ from argparse import ArgumentParser
 
 import urllib3
 
-from api.DefaultApiHelper import DefaultApiHelper
 from api.SystemApiHelper import SystemApiHelper
 from commands.authcommand import authcli
 from commands.dockercommand import dockercli

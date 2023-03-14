@@ -9,7 +9,7 @@
 - have_keystore_file: N
 - input_path_keystore: "/home/runner/node-config"
 - enter_keystore_name: "node-keystore.ks"
-- input_ledger_path: "/home/runner/data"
+- input_ledger_path: "/tmp/data"
 - input_transaction_api: "false"
 - core_nginx_setup: "false"
 #- setup_gateway: "false"

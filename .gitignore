@@ -133,3 +133,8 @@ dmypy.json
 .idea
 /node-runner-cli/ansible/artifacts/
 /node-runner-cli/out/ubuntu/focal/
+
+node-runner-cli/src
+node-runner-cli/systemd.settings.yml
+
+.DS_Store

@@ -2,8 +2,17 @@ import os
 import sys
 from pathlib import Path
 
-from env_vars import UNZIPPED_NODE_DIST_FOLDER, APPEND_DEFAULT_CONFIG_OVERIDES
+import yaml
+from yaml import UnsafeLoader
+
+from config.SystemDConfig import SystemDSettings, extract_network_id_from_arg, from_dict
+from config.KeyDetails import KeyDetails
+from env_vars import UNZIPPED_NODE_DIST_FOLDER, APPEND_DEFAULT_CONFIG_OVERIDES, NODE_BINARY_OVERIDE, \
+    NGINX_BINARY_OVERIDE
+from github.github import latest_release
 from setup.Base import Base
+from utils.Network import Network
+from utils.PromptFeeder import QuestionKeys
 from utils.utils import run_shell_command, Helpers
 
 
@@ -62,50 +71,64 @@ class SystemD(Base):
         run_shell_command('sudo chown radixdlt:radixdlt -R /data', shell=True)
 
     @staticmethod
-    def generatekey(keyfile_path, keyfile_name="node-keystore.ks", keygen_tag="1.0.0"):
+    def generatekey(keyfile_path, keyfile_name="node-keystore.ks", keygen_tag="1.0.0", keystore_password=None,
+                    new=False):
         run_shell_command(f'mkdir -p {keyfile_path}', shell=True)
-        keystore_password, keyfile_location = Base.generatekey(keyfile_path, keyfile_name, keygen_tag)
-        return keystore_password, keyfile_location
+        keystore_password, keyfile_location = Base.generatekey(keyfile_path, keyfile_name, keygen_tag,
+                                                               keystore_password, new)
+
+        key_details = KeyDetails({})
+        key_details.keystore_password = keystore_password
+        key_details.keyfile_name = keyfile_name
+        key_details.keygen_tag = keygen_tag
+        key_details.keyfile_path = keyfile_path
+        return key_details
 
     @staticmethod
     def fetch_universe_json(trustenode, extraction_path):
         Base.fetch_universe_json(trustenode, extraction_path)
 
     @staticmethod
-    def backup_file(filepath, filename, backup_time):
+    def backup_file(filepath, filename, backup_time, auto_approve=False):
         if os.path.isfile(f"{filepath}/{filename}"):
-            # TODO AutoApprove
-            backup_yes = input(f"{filename} file exists. Do you want to back up [Y/n]:")
-            if Helpers.check_Yes(backup_yes):
+            backup_yes = "Y"
+            if auto_approve is None:
+                backup_yes = input(f"{filename} file exists. Do you want to back up [Y/n]:")
+            if Helpers.check_Yes(backup_yes) or auto_approve:
                 Path(f"{backup_time}").mkdir(parents=True, exist_ok=True)
                 run_shell_command(f"cp {filepath}/{filename} {backup_time}/{filename}", shell=True)
 
     @staticmethod
     def set_environment_variables(keystore_password, node_secrets_dir):
+        run_shell_command(f'mkdir -p {node_secrets_dir}', shell=True)
         command = f"""
-        cat > {node_secrets_dir}/environment << EOF
-        JAVA_OPTS="--enable-preview -server -Xms8g -Xmx8g  -XX:MaxDirectMemorySize=2048m -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
-        RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
+cat > {node_secrets_dir}/environment << EOF
+JAVA_OPTS="--enable-preview -server -Xms8g -Xmx8g  -XX:MaxDirectMemorySize=2048m -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
+RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
         """
         run_shell_command(command, shell=True)
 
     @staticmethod
-    def setup_default_config(trustednode, hostip, node_dir, node_type, keyfile_name="node-keystore.ks",
-                             transactions_enable="false"):
-        network_id = SystemD.get_network_id()
-        genesis_json_location = Base.path_to_genesis_json(network_id)
+    def setup_default_config(trustednode, hostip, node_dir, node_type, keyfile_location="/etc/radixdlt/node/secrets",
+                             keyfile_name="node-keystore.ks",
+                             transactions_enable="false",
+                             network_id=1,
+                             data_folder="~/data"):
+
+        genesis_json_location = Network.path_to_genesis_json(network_id)
 
         network_genesis_file_for_testnets = f"network.genesis_file={genesis_json_location}" if genesis_json_location else ""
         enable_client_api = "true" if node_type == "archivenode" else "false"
 
-        data_folder = Base.get_data_dir()
+        print(node_dir)
+        # This may need to be moved to jinja template
         command = f"""
         cat > {node_dir}/default.config << EOF
             ntp=false
             ntp.pool=pool.ntp.org
             network.id={network_id}
             {network_genesis_file_for_testnets}
-            node.key.path=/etc/radixdlt/node/secrets/{keyfile_name}
+            node.key.path={keyfile_location}/{keyfile_name}
             network.p2p.listen_port=30001
             network.p2p.broadcast_port=30000
             network.p2p.seed_nodes={trustednode}
@@ -135,10 +158,11 @@ class SystemD(Base):
 
     @staticmethod
     def setup_service_file(node_version_dir, node_dir="/etc/radixdlt/node",
-                           node_secrets_path="/etc/radixdlt/node/secrets"):
-
+                           node_secrets_path="/etc/radixdlt/node/secrets",
+                           service_file_path="/etc/systemd/system/radixdlt-node.service"):
+        # This may need to be moved to jinja template
         command = f"""
-        sudo cat > /etc/systemd/system/radixdlt-node.service << EOF
+        sudo cat > {service_file_path} << EOF
             [Unit]
             Description=Radix DLT Validator
             After=local-fs.target
@@ -166,14 +190,17 @@ class SystemD(Base):
         run_shell_command(command, shell=True)
 
     @staticmethod
-    def download_binaries(binarylocationUrl, node_dir, node_version):
+    def download_binaries(binary_location_url, node_dir, node_version, auto_approve=None):
         run_shell_command(
-            ['wget', '--no-check-certificate', '-O', 'radixdlt-dist.zip', binarylocationUrl])
+            ['wget', '--no-check-certificate', '-O', 'radixdlt-dist.zip', binary_location_url])
         run_shell_command('unzip radixdlt-dist.zip', shell=True)
         run_shell_command(f'mkdir -p {node_dir}/{node_version}', shell=True)
         if os.listdir(f'{node_dir}/{node_version}'):
-            print(f"Directory {node_dir}/{node_version} is not empty")
-            okay = input("Should the directory be removed [Y/n]?:")
+            if auto_approve is None:
+                print(f"Directory {node_dir}/{node_version} is not empty")
+                okay = input("Should the directory be removed [Y/n]?:")
+            else:
+                okay = "Y"
             if Helpers.check_Yes(okay):
                 run_shell_command(f"rm -rf {node_dir}/{node_version}/*", shell=True)
         unzipped_folder_name = os.getenv(UNZIPPED_NODE_DIST_FOLDER, f"radixdlt-{node_version}")
@@ -198,7 +225,7 @@ class SystemD(Base):
         run_shell_command('sudo mkdir -p /etc/nginx/secrets', shell=True)
 
     @staticmethod
-    def setup_nginx_config(nginx_config_location_Url, node_type, nginx_etc_dir, backup_time):
+    def setup_nginx_config(nginx_config_location_url, node_type, nginx_etc_dir, backup_time, auto_approve=None):
         SystemD.install_nginx()
         if node_type == "archivenode":
             conf_file = 'nginx-archive.conf'
@@ -206,19 +233,22 @@ class SystemD(Base):
             conf_file = 'nginx-fullnode.conf'
         else:
             print(f"Node type - {node_type} specificed should be either archivenode or fullnode")
-            sys.exit()
+            sys.exit(1)
 
-        backup_yes = input("Do you want to backup existing nginx config [Y/n]?:")
-        if Helpers.check_Yes(backup_yes):
-            Path(f"{backup_time}/nginx-config").mkdir(parents=True, exist_ok=True)
-            run_shell_command(f"sudo cp -r {nginx_etc_dir} {backup_time}/nginx-config", shell=True)
+        if auto_approve is None:
+            backup_yes = input("Do you want to backup existing nginx config [Y/n]?:")
+            if Helpers.check_Yes(backup_yes):
+                Path(f"{backup_time}/nginx-config").mkdir(parents=True, exist_ok=True)
+                run_shell_command(f"sudo cp -r {nginx_etc_dir} {backup_time}/nginx-config", shell=True)
 
-        # TODO AutoApprove
-        continue_nginx = input("Do you want to continue with nginx setup [Y/n]?:")
+        if auto_approve is None:
+            continue_nginx = input("Do you want to continue with nginx setup [Y/n]?:")
+        else:
+            continue_nginx = "Y"
         if Helpers.check_Yes(continue_nginx):
             run_shell_command(
-                ['wget', '--no-check-certificate', '-O', 'radixdlt-nginx.zip', nginx_config_location_Url])
-            run_shell_command(f'sudo unzip radixdlt-nginx.zip -d {nginx_etc_dir}', shell=True)
+                ['wget', '--no-check-certificate', '-O', 'radixdlt-nginx.zip', nginx_config_location_url])
+            run_shell_command(f'sudo unzip -o radixdlt-nginx.zip -d {nginx_etc_dir}', shell=True)
             run_shell_command(f'sudo mv {nginx_etc_dir}/{conf_file}  /etc/nginx/nginx.conf', shell=True)
             run_shell_command(f'sudo mkdir -p /var/cache/nginx/radixdlt-hot', shell=True)
             return True
@@ -226,17 +256,18 @@ class SystemD(Base):
             return False
 
     @staticmethod
-    def create_ssl_certs(secrets_dir):
+    def create_ssl_certs(secrets_dir, auto_approve=None):
         SystemD.make_nginx_secrets_directory()
         if os.path.isfile(f'{secrets_dir}/server.key') and os.path.isfile(f'{secrets_dir}/server.pem'):
-            print(f"Files  {secrets_dir}/server.key and os.path.isfile(f'{secrets_dir}/server.pem already exists")
-            answer = input("Do you want to regenerate y/n :")
-            if Helpers.check_Yes(answer):
-                run_shell_command(f"""
-                     sudo openssl req  -nodes -new -x509 -nodes -subj '/CN=localhost' \
-                      -keyout "{secrets_dir}/server.key" \
-                      -out "{secrets_dir}/server.pem"
-                     """, shell=True)
+            if auto_approve is None:
+                print(f"Files  {secrets_dir}/server.key and os.path.isfile(f'{secrets_dir}/server.pem already exists")
+                answer = input("Do you want to regenerate y/n :")
+                if Helpers.check_Yes(answer):
+                    run_shell_command(f"""
+                         sudo openssl req  -nodes -new -x509 -nodes -subj '/CN=localhost' \
+                          -keyout "{secrets_dir}/server.key" \
+                          -out "{secrets_dir}/server.pem"
+                         """, shell=True)
         else:
 
             run_shell_command(f"""
@@ -246,10 +277,11 @@ class SystemD(Base):
             """, shell=True)
 
         if os.path.isfile(f'{secrets_dir}/dhparam.pem'):
-            print(f"File {secrets_dir}/dhparam.pem already exists")
-            answer = input("Do you want to regenerate y/n :")
-            if Helpers.check_Yes(answer):
-                run_shell_command(f"sudo openssl dhparam -out {secrets_dir}/dhparam.pem  4096", shell=True)
+            if auto_approve is None:
+                print(f"File {secrets_dir}/dhparam.pem already exists")
+                answer = input("Do you want to regenerate y/n :")
+                if Helpers.check_Yes(answer):
+                    run_shell_command(f"sudo openssl dhparam -out {secrets_dir}/dhparam.pem  4096", shell=True)
         else:
             print("Generating a dhparam.pem file")
             run_shell_command(f"sudo openssl dhparam -out {secrets_dir}/dhparam.pem  4096", shell=True)
@@ -297,7 +329,7 @@ class SystemD(Base):
         result = run_shell_command(f'whoami | grep radixdlt', shell=True, fail_on_error=False)
         if result.returncode != 0:
             print(" You are not logged as radixdlt user. Logout and login as radixdlt user")
-            sys.exit()
+            sys.exit(1)
         else:
             print("User on the terminal is radixdlt")
 
@@ -315,3 +347,27 @@ class SystemD(Base):
     def stop_node_service():
         run_shell_command('sudo systemctl stop radixdlt-node.service', shell=True)
         run_shell_command('sudo systemctl disable radixdlt-node.service', shell=True)
+
+    @staticmethod
+    def confirm_config(nodetype, release, node_binary_url, nginx_config_url) -> str:
+        answer = Helpers.input_guestion(
+            f"\nGoing to setup node type {nodetype} for version {release} from location {node_binary_url} and {nginx_config_url}. \n Do you want to continue Y/n:",
+            QuestionKeys.continue_systemd_install)
+        if not Helpers.check_Yes(answer):
+            print(" Quitting ....")
+            sys.exit(1)
+        return answer
+
+    @staticmethod
+    def save_settings(settings: SystemDSettings, config_file: str):
+        print(f"Saving configuration to {config_file}")
+        settings.to_file(config_file)
+
+    @staticmethod
+    def load_settings(config_file) -> SystemDSettings:
+        if not os.path.isfile(config_file):
+            print(f"No configuration found. Execute 'radixnode systemd config' first.")
+            sys.exit(1)
+        with open(config_file, 'r') as f:
+            dictionary = yaml.load(f, Loader=UnsafeLoader)
+        return from_dict(dictionary)

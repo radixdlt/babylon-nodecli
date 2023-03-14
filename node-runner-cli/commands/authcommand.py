@@ -1,7 +1,8 @@
 from argparse import ArgumentParser
 
 from commands.subcommand import get_decorator, argument
-from setup import Docker, SystemD
+from setup.Docker import Docker
+from setup.SystemD import SystemD
 
 authcli = ArgumentParser(
     description='Subcommand to aid creation of nginx basic auth users',

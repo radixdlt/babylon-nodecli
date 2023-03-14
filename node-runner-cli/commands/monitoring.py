@@ -79,7 +79,7 @@ def config(args):
               f"\nDETAILED option goes through asking each and every question that to customize setup. "
               f"Hence cannot be clubbed together with options"
               f"{bcolors.ENDC}")
-        sys.exit()
+        sys.exit(1)
 
     config_file = f"{args.monitoringconfigdir}/monitoring_config.yaml"
     Path(args.monitoringconfigdir).mkdir(parents=True, exist_ok=True)
@@ -90,7 +90,7 @@ def config(args):
     monitoring_config: MonitoringSettings = MonitoringSettings({})
 
     config_to_dump = {
-        "common_config": dict(monitoring_config.common_settings),
+        "common_config": dict(monitoring_config.common_config),
         "version": "0.1"
     }
 

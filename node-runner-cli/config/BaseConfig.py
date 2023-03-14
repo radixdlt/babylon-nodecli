@@ -1,3 +1,6 @@
+import sys
+
+
 class BaseConfig:
     def __init__(self, settings: dict):
         for key, value in settings.items():
@@ -24,3 +27,5 @@ class SetupMode:
         if cls._instance is None:
             cls._instance = cls.__new__(cls)
         return cls._instance
+
+
