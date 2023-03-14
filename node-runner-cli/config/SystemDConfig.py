@@ -154,7 +154,7 @@ class CommonSystemdSettings(BaseConfig):
             return False
 
     def ask_nginx_release(self):
-        latest_nginx_release = github.latest_release("radixdlt/radixdlt-nginx")
+        latest_nginx_release = github.latest_release("radixdlt/babylon-nginx")
         self.nginx_settings.release = latest_nginx_release
         if "DETAILED" in SetupMode.instance().mode:
             self.nginx_settings.release = Prompts.get_nginx_release(latest_nginx_release)
@@ -207,7 +207,7 @@ class SystemDSettings(BaseConfig):
         self.core_node.network_id = args.networkid
 
         if not args.nginxrelease:
-            self.common_config.nginx_settings.release = latest_release("radixdlt/radixdlt-nginx")
+            self.common_config.nginx_settings.release = latest_release("radixdlt/babylon-nginx")
         else:
             self.common_config.nginx_settings.release = args.nginxrelease
         self.core_node.core_binary_url = os.getenv(NODE_BINARY_OVERIDE,
