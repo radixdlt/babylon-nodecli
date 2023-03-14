@@ -201,7 +201,7 @@ WantedBy=multi-user.target
                 okay = "Y"
             if Helpers.check_Yes(okay):
                 run_shell_command(f"rm -rf {node_dir}/{node_version}/*", shell=True)
-        unzipped_folder_name = os.getenv(UNZIPPED_NODE_DIST_FOLDER, f"radixdlt-{node_version}")
+        unzipped_folder_name = os.getenv(UNZIPPED_NODE_DIST_FOLDER, f"core-{node_version}")
         run_shell_command(f'mv {unzipped_folder_name}/* {node_dir}/{node_version}', shell=True)
 
     @staticmethod
