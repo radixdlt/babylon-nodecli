@@ -124,6 +124,40 @@ class SystemdUnitTests(unittest.TestCase):
                    ["main", "systemd", "install", "-a", "-m", "-f", "/tmp/node-config/test-config.yaml"]):
             main()
 
+    @patch('sys.stdout', new_callable=StringIO)
+    def test_systemd_setup_default_config(self, mockout):
+        with patch('builtins.input', side_effect=['/tmp/genesis.json']):
+            SystemD.setup_default_config("someNode",
+                                         "1.1.1.1",
+                                         "/tmp",
+                                         "fullnode",
+                                         "false",
+                                         "/tmp/keyfile",
+                                         "34",
+                                         "/tmp/data")
+        self.assertTrue(os.path.isfile("/tmp/default.config"))
+
+        f = open("/tmp/default.config", "r")
+        default_config = f.read()
+        fixture = """ntp=false
+ntp.pool=pool.ntp.org
+network.id=/tmp/data
+network.genesis_file=/tmp/genesis.json
+node.key.path=false//tmp/keyfile
+network.p2p.listen_port=30001
+network.p2p.broadcast_port=30000
+network.p2p.seed_nodes=someNode
+network.host_ip=1.1.1.1
+db.location=~/data
+api.port=3334
+log.level=debug
+api.transactions.enable=true
+api.sign.enable=true 
+api.bind.address=0.0.0.0 
+network.p2p.use_proxy_protocol=false
+"""
+        self.maxDiff = None
+        self.assertEqual(default_config, fixture)
 
 def suite():
     """ This defines all the tests of a module"""

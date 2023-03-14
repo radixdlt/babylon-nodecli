@@ -120,28 +120,26 @@ RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
         network_genesis_file_for_testnets = f"network.genesis_file={genesis_json_location}" if genesis_json_location else ""
         enable_client_api = "true" if node_type == "archivenode" else "false"
 
-        print(node_dir)
         # This may need to be moved to jinja template
         command = f"""
         cat > {node_dir}/default.config << EOF
-            ntp=false
-            ntp.pool=pool.ntp.org
-            network.id={network_id}
-            {network_genesis_file_for_testnets}
-            node.key.path={keyfile_location}/{keyfile_name}
-            network.p2p.listen_port=30001
-            network.p2p.broadcast_port=30000
-            network.p2p.seed_nodes={trustednode}
-            network.host_ip={hostip}
-            db.location={data_folder}
-            api.port=3334
-            log.level=debug
-            api.transactions.enable={"true" if transactions_enable else "false"}
-            api.sign.enable=true 
-            api.bind.address=0.0.0.0 
-            network.p2p.use_proxy_protocol=false
-
-        """
+ntp=false
+ntp.pool=pool.ntp.org
+network.id={network_id}
+{network_genesis_file_for_testnets}
+node.key.path={keyfile_location}/{keyfile_name}
+network.p2p.listen_port=30001
+network.p2p.broadcast_port=30000
+network.p2p.seed_nodes={trustednode}
+network.host_ip={hostip}
+db.location={data_folder}
+api.port=3334
+log.level=debug
+api.transactions.enable={"true" if transactions_enable else "false"}
+api.sign.enable=true 
+api.bind.address=0.0.0.0 
+network.p2p.use_proxy_protocol=false
+"""
         run_shell_command(command, shell=True)
 
         if (os.getenv(APPEND_DEFAULT_CONFIG_OVERIDES)) is not None:
@@ -163,29 +161,29 @@ RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
         # This may need to be moved to jinja template
         command = f"""
         sudo cat > {service_file_path} << EOF
-            [Unit]
-            Description=Radix DLT Validator
-            After=local-fs.target
-            After=network-online.target
-            After=nss-lookup.target
-            After=time-sync.target
-            After=systemd-journald-dev-log.socket
-            Wants=network-online.target
+[Unit]
+Description=Radix DLT Validator
+After=local-fs.target
+After=network-online.target
+After=nss-lookup.target
+After=time-sync.target
+After=systemd-journald-dev-log.socket
+Wants=network-online.target
 
-            [Service]
-            EnvironmentFile={node_secrets_path}/environment
-            User=radixdlt
-            LimitNOFILE=65536
-            LimitNPROC=65536
-            LimitMEMLOCK=infinity
-            WorkingDirectory={node_dir}
-            ExecStart={node_dir}/{node_version_dir}/bin/core
-            SuccessExitStatus=143
-            TimeoutStopSec=10
-            Restart=on-failure
+[Service]
+EnvironmentFile={node_secrets_path}/environment
+User=radixdlt
+LimitNOFILE=65536
+LimitNPROC=65536
+LimitMEMLOCK=infinity
+WorkingDirectory={node_dir}
+ExecStart={node_dir}/{node_version_dir}/bin/core
+SuccessExitStatus=143
+TimeoutStopSec=10
+Restart=on-failure
 
-            [Install]
-            WantedBy=multi-user.target
+[Install]
+WantedBy=multi-user.target
         """
         run_shell_command(command, shell=True)
 
