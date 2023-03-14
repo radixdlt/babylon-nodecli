@@ -86,13 +86,11 @@ def config(args):
     setupmode = SetupMode.instance()
     setupmode.mode = args.setupmode
 
-    auto_approve = args.autoapprove
     trustednode = args.trustednode if args.trustednode != "" else None
     keystore_password = args.keystorepassword if args.keystorepassword != "" else None
     nginx_on_core = args.disablenginxforcore if args.disablenginxforcore != "" else None
     data_directory = args.data_directory
     new_keystore = args.newkeystore
-    backup_time = Helpers.get_current_date_time()
 
     Helpers.section_headline("CONFIG FILE")
     config_file = f"{args.configdir}/config.yaml"
@@ -106,12 +104,13 @@ def config(args):
         release = args.release
 
     configuration = SystemDSettings({})
+    configuration.common_config = CommonSystemdSettings({})
     configuration.common_config.ask_network_id(args.networkid)
+    configuration.common_config.ask_host_ip(args.hostip)
 
     configuration.core_node = CoreSystemdSettings({}).create_config(release, data_directory,
                                                                              trustednode,
                                                                              keystore_password, new_keystore)
-    configuration.common_config = CommonSystemdSettings({})
     configuration.common_config.ask_enable_nginx_for_core(nginx_on_core)
     config_to_dump["core_node"] = dict(configuration.core_node)
 
@@ -134,7 +133,7 @@ def config(args):
                 {dict(DeepDiff(old_config, config_to_dump))}
                   """)
 
-    SystemD.backup_save_config(config_file, config_to_dump, auto_approve, backup_time)
+    SystemD.save_settings(configuration, config_file)
 
 @systemdcommand([
     argument("-a", "--auto", help="Automatically approve all Yes/No prompts", action="store_true"),
