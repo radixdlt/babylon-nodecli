@@ -103,15 +103,15 @@ class CoreDockerSettings(BaseConfig):
 
 
 class DockerConfig(BaseConfig):
-    core_node_settings: CoreDockerSettings = CoreDockerSettings({})
-    common_settings: CommonDockerSettings = CommonDockerSettings({})
+    core_node: CoreDockerSettings = CoreDockerSettings({})
+    common_config: CommonDockerSettings = CommonDockerSettings({})
     gateway_settings: GatewayDockerSettings = GatewayDockerSettings({})
 
     def __init__(self, release: str):
-        self.core_node_settings = CoreDockerSettings({})
-        self.common_settings = CommonDockerSettings({})
+        self.core_node = CoreDockerSettings({})
+        self.common_config = CommonDockerSettings({})
         self.gateway_settings = GatewayDockerSettings({})
-        self.core_node_settings.core_release = release
+        self.core_node.core_release = release
 
     def loadConfig(self, file):
         my_file = Path(file)
@@ -121,21 +121,21 @@ class DockerConfig(BaseConfig):
         with open(file, 'r') as file:
             config_yaml = yaml.safe_load(file)
             core_node = config_yaml["core_node"]
-            common_settings = config_yaml["common_config"]
-            self.core_node_settings.core_release = core_node.get("core_release", None)
-            self.core_node_settings.data_directory = core_node.get("data_directory", None)
-            self.core_node_settings.genesis_json_location = core_node.get("genesis_json_location", None)
-            self.core_node_settings.enable_transaction = core_node.get("enable_transaction", False)
-            self.common_settings = CommonDockerSettings(
-                {"network_id": common_settings.get("network_id", "1")})
-            self.core_node_settings.keydetails = KeyDetails(core_node.get("keydetails", None))
-            self.core_node_settings.trusted_node = core_node.get("trusted_node", None)
-            self.core_node_settings.existing_docker_compose = core_node.get("docker_compose", None)
+            common_config = config_yaml["common_config"]
+            self.core_node.core_release = core_node.get("core_release", None)
+            self.core_node.data_directory = core_node.get("data_directory", None)
+            self.core_node.genesis_json_location = core_node.get("genesis_json_location", None)
+            self.core_node.enable_transaction = core_node.get("enable_transaction", False)
+            self.common_config = CommonDockerSettings(
+                {"network_id": common_config.get("network_id", "1")})
+            self.core_node.keydetails = KeyDetails(core_node.get("keydetails", None))
+            self.core_node.trusted_node = core_node.get("trusted_node", None)
+            self.core_node.existing_docker_compose = core_node.get("docker_compose", None)
 
     def to_yaml(self):
         config_to_dump = dict(self)
-        config_to_dump["common_settings"] = dict(self.common_settings)
-        config_to_dump["core_node_settings"] = dict(self.core_node_settings)
+        config_to_dump["common_config"] = dict(self.common_config)
+        config_to_dump["core_node"] = dict(self.core_node)
         config_to_dump["gateway_settings"] = dict(self.gateway_settings)
         return yaml.dump(config_to_dump, sort_keys=False, default_flow_style=False, explicit_start=True,
                          allow_unicode=True)

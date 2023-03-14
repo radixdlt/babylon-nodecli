@@ -106,21 +106,21 @@ def config(args):
         release = args.release
 
     configuration = SystemDSettings({})
-    configuration.common_settings.ask_network_id(args.networkid)
+    configuration.common_config.ask_network_id(args.networkid)
 
-    configuration.core_node_settings = CoreSystemdSettings({}).create_config(release, data_directory,
+    configuration.core_node = CoreSystemdSettings({}).create_config(release, data_directory,
                                                                              trustednode,
                                                                              keystore_password, new_keystore)
-    configuration.common_settings = CommonSystemdSettings({})
-    configuration.common_settings.ask_enable_nginx_for_core(nginx_on_core)
-    config_to_dump["core_node"] = dict(configuration.core_node_settings)
+    configuration.common_config = CommonSystemdSettings({})
+    configuration.common_config.ask_enable_nginx_for_core(nginx_on_core)
+    config_to_dump["core_node"] = dict(configuration.core_node)
 
-    if configuration.common_settings.check_nginx_required():
-        configuration.common_settings.ask_nginx_release()
+    if configuration.common_config.check_nginx_required():
+        configuration.common_config.ask_nginx_release()
     else:
-        configuration.common_settings.nginx_settings = None
+        configuration.common_config.nginx_settings = None
 
-    config_to_dump["common_config"] = dict(configuration.common_settings)
+    config_to_dump["common_config"] = dict(configuration.common_config)
 
     yaml.add_representer(type(None), Helpers.represent_none)
     Helpers.section_headline("CONFIG is Generated as below")
@@ -159,51 +159,51 @@ def install(args):
     print(settings.to_yaml())
 
     if auto_approve is None:
-        SystemD.confirm_config(settings.core_node_settings.nodetype,
-                               settings.core_node_settings.core_release,
-                               settings.core_node_settings.core_binary_url,
-                               settings.common_settings.nginx_settings.config_url)
+        SystemD.confirm_config(settings.core_node.nodetype,
+                               settings.core_node.core_release,
+                               settings.core_node.core_binary_url,
+                               settings.common_config.nginx_settings.config_url)
 
     SystemD.checkUser()
 
-    SystemD.download_binaries(binary_location_url=settings.core_node_settings.core_binary_url,
-                              node_dir=settings.core_node_settings.node_dir,
-                              node_version=settings.core_node_settings.core_release,
+    SystemD.download_binaries(binary_location_url=settings.core_node.core_binary_url,
+                              node_dir=settings.core_node.node_dir,
+                              node_version=settings.core_node.core_release,
                               auto_approve=auto_approve)
 
     backup_time = Helpers.get_current_date_time()
 
-    SystemD.setup_default_config(trustednode=settings.core_node_settings.trusted_node,
-                                 hostip=settings.common_settings.host_ip,
-                                 node_dir=settings.core_node_settings.node_dir,
-                                 node_type=settings.core_node_settings.nodetype,
-                                 transactions_enable=settings.core_node_settings.enable_transaction,
-                                 keyfile_location=settings.core_node_settings.keydetails.keyfile_path,
-                                 network_id=settings.common_settings.network_id,
-                                 data_folder=settings.core_node_settings.data_directory)
-    SystemD.backup_file(settings.core_node_settings.node_dir, f"default.config", backup_time, auto_approve)
+    SystemD.setup_default_config(trustednode=settings.core_node.trusted_node,
+                                 hostip=settings.common_config.host_ip,
+                                 node_dir=settings.core_node.node_dir,
+                                 node_type=settings.core_node.nodetype,
+                                 transactions_enable=settings.core_node.enable_transaction,
+                                 keyfile_location=settings.core_node.keydetails.keyfile_path,
+                                 network_id=settings.common_config.network_id,
+                                 data_folder=settings.core_node.data_directory)
+    SystemD.backup_file(settings.core_node.node_dir, f"default.config", backup_time, auto_approve)
 
     # Below steps only required if user want's setup nginx in same node
     SystemD.backup_file("/lib/systemd/system", "nginx.service", backup_time, auto_approve)
-    SystemD.create_ssl_certs(settings.common_settings.nginx_settings.secrets_dir, auto_approve)
+    SystemD.create_ssl_certs(settings.common_config.nginx_settings.secrets_dir, auto_approve)
     nginx_configured = SystemD.setup_nginx_config(
-        nginx_config_location_url=settings.common_settings.nginx_settings.config_url,
-        node_type=settings.core_node_settings.nodetype,
-        nginx_etc_dir=settings.common_settings.nginx_settings.dir, backup_time=backup_time,
+        nginx_config_location_url=settings.common_config.nginx_settings.config_url,
+        node_type=settings.core_node.nodetype,
+        nginx_etc_dir=settings.common_config.nginx_settings.dir, backup_time=backup_time,
         auto_approve=auto_approve)
 
     # Core node environment files
-    SystemD.backup_file(settings.core_node_settings.node_secrets_dir, "environment", backup_time, auto_approve)
-    SystemD.set_environment_variables(keystore_password=settings.core_node_settings.keydetails.keystore_password,
-                                      node_secrets_dir=settings.core_node_settings.node_secrets_dir)
+    SystemD.backup_file(settings.core_node.node_secrets_dir, "environment", backup_time, auto_approve)
+    SystemD.set_environment_variables(keystore_password=settings.core_node.keydetails.keystore_password,
+                                      node_secrets_dir=settings.core_node.node_secrets_dir)
     # Core node systemd service file
     SystemD.backup_file("/etc/systemd/system", "radixdlt-node.service", backup_time, auto_approve)
     service_file_path = "/etc/systemd/system/radixdlt-node.service"
     if args.manual:
-        service_file_path = f"{settings.core_node_settings.node_dir}/radixdlt-node.service"
-    SystemD.setup_service_file(node_version_dir=settings.core_node_settings.core_release,
-                               node_dir=settings.core_node_settings.node_dir,
-                               node_secrets_path=settings.core_node_settings.node_secrets_dir,
+        service_file_path = f"{settings.core_node.node_dir}/radixdlt-node.service"
+    SystemD.setup_service_file(node_version_dir=settings.core_node.core_release,
+                               node_dir=settings.core_node.node_dir,
+                               node_secrets_path=settings.core_node.node_secrets_dir,
                                service_file_path=service_file_path)
 
     if not args.manual:

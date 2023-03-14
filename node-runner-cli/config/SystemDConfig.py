@@ -91,8 +91,7 @@ class CoreSystemdSettings(BaseConfig):
         self.ask_keydetails(ks_password, new_keystore)
         self.ask_data_directory(data_directory)
         self.core_binary_url = os.getenv(NODE_BINARY_OVERIDE,
-                                         f"https://github.com/radixdlt/radixdlt/releases/download/{self.core_release}/radixdlt-dist-{self.core_release}.zip")
-        self.node_version = self.core_binary_url.rsplit('/', 2)[-2]
+                                         f"https://github.com/radixdlt/babylon-node/releases/download/{self.core_release}/radixdlt-dist-{self.core_release}.zip")
         return self
 
 
@@ -160,13 +159,13 @@ class CommonSystemdSettings(BaseConfig):
         if "DETAILED" in SetupMode.instance().mode:
             self.nginx_settings.release = Prompts.get_nginx_release(latest_nginx_release)
         self.nginx_settings.config_url = os.getenv(NGINX_BINARY_OVERIDE,
-                                                   f"https://github.com/radixdlt/radixdlt-nginx/releases/download/"
+                                                   f"https://github.com/radixdlt/babylon-nginx/releases/download/"
                                                    f"{self.nginx_settings.release}/radixdlt-nginx-fullnode-conf.zip")
 
 
 class SystemDSettings(BaseConfig):
-    core_node_settings: CoreSystemdSettings = CoreSystemdSettings({})
-    common_settings: CommonSystemdSettings = CommonSystemdSettings({})
+    core_node: CoreSystemdSettings = CoreSystemdSettings({})
+    common_config: CommonSystemdSettings = CommonSystemdSettings({})
     gateway_settings: None
 
     def __iter__(self):
@@ -181,50 +180,51 @@ class SystemDSettings(BaseConfig):
 
     def to_yaml(self):
         config_to_dump = dict(self)
-        config_to_dump["core_node_settings"] = dict(self.core_node_settings)
-        config_to_dump["core_node_settings"]["keydetails"] = dict(self.core_node_settings.keydetails)
-        config_to_dump["common_settings"] = dict(self.common_settings)
-        config_to_dump["common_settings"]["nginx_settings"] = dict(self.common_settings.nginx_settings)
-        return yaml.dump(config_to_dump, sort_keys=False, default_flow_style=False, explicit_start=True,
+        config_to_dump["core_node"] = dict(self.core_node)
+        config_to_dump["core_node"]["keydetails"] = dict(self.core_node.keydetails)
+        config_to_dump["common_config"] = dict(self.common_config)
+        config_to_dump["common_config"]["nginx_settings"] = dict(self.common_config.nginx_settings)
+        return yaml.dump(config_to_dump, sort_keys=True, default_flow_style=False, explicit_start=True,
                          allow_unicode=True)
 
     def to_file(self, config_file):
         config_to_dump = dict(self)
-        config_to_dump["core_node_settings"] = dict(self.core_node_settings)
-        config_to_dump["core_node_settings"]["keydetails"] = dict(self.core_node_settings.keydetails)
-        config_to_dump["common_settings"] = dict(self.common_settings)
-        config_to_dump["common_settings"]["nginx_settings"] = dict(self.common_settings.nginx_settings)
+        config_to_dump["core_node"] = dict(self.core_node)
+        config_to_dump["core_node"]["keydetails"] = dict(self.core_node.keydetails)
+        config_to_dump["common_config"] = dict(self.common_config)
+        config_to_dump["common_config"]["nginx_settings"] = dict(self.common_config.nginx_settings)
         with open(config_file, 'w') as f:
             yaml.dump(config_to_dump, f, sort_keys=True, default_flow_style=False)
 
     def parse_config_from_args(self, args):
-        self.core_node_settings.trusted_node = args.trustednode
+        self.core_node.trusted_node = args.trustednode
         self.host_ip = args.hostip
-        self.core_node_settings.enable_transaction = args.enabletransactions
-        self.core_node_settings.data_directory = args.data_directory
-        self.common_settings.node_dir = args.configdir
+        self.core_node.enable_transaction = args.enabletransactions
+        self.core_node.data_directory = args.data_directory
+        self.common_config.node_dir = args.configdir
         if args.configdir is not None:
-            self.core_node_settings.node_secrets_dir = f"{self.core_node_settings.node_dir}/secrets"
-        self.core_node_settings.network_id = args.networkid
+            self.core_node.node_secrets_dir = f"{self.core_node.node_dir}/secrets"
+        self.core_node.network_id = args.networkid
 
         if not args.nginxrelease:
-            self.common_settings.nginx_settings.release = latest_release("radixdlt/radixdlt-nginx")
+            self.common_config.nginx_settings.release = latest_release("radixdlt/radixdlt-nginx")
         else:
-            self.common_settings.nginx_settings.release = args.nginxrelease
-        self.core_node_settings.core_binary_url = os.getenv(NODE_BINARY_OVERIDE,
-                                                            f"https://github.com/radixdlt/radixdlt/releases/download/{self.core_node_settings.core_release}/radixdlt-dist-{self.core_node_settings.core_release}.zip")
-        self.common_settings.nginx_settings.config_url = os.getenv(NGINX_BINARY_OVERIDE,
-                                                                   f"https://github.com/radixdlt/radixdlt-nginx/releases/download/{self.common_settings.nginx_settings.release}/radixdlt-nginx-{self.core_node_settings.nodetype}-conf.zip")
-        self.node_version = self.core_node_settings.core_binary_url.rsplit('/', 2)[-2]
+            self.common_config.nginx_settings.release = args.nginxrelease
+        self.core_node.core_binary_url = os.getenv(NODE_BINARY_OVERIDE,
+                                                            f"https://github.com/radixdlt/babylon-node/releases/download/{self.core_node.core_release}/radixdlt-dist-{self.core_node.core_release}.zip")
+        self.common_config.nginx_settings.config_url = os.getenv(NGINX_BINARY_OVERIDE,
+                                                                   f"https://github.com/radixdlt/babylon-nginx/releases/download/{self.common_config.nginx_settings.release}/radixdlt-nginx-{self.core_node.nodetype}-conf.zip")
         return self
 
 
 def from_dict(dictionary: dict) -> SystemDSettings:
     settings = SystemDSettings({})
-    settings.core_node_settings = CoreSystemdSettings(dictionary["core_node_settings"])
-    settings.core_node_settings.keydetails = KeyDetails(dictionary["core_node_settings"]["keydetails"])
-    settings.common_settings = CommonSystemdSettings(dictionary["common_settings"])
-    settings.common_settings.nginx_settings = SystemdNginxConfig(dictionary["common_settings"]["nginx_settings"])
+    settings.core_node = CoreSystemdSettings({})
+    settings.common_config = CommonSystemdSettings({})
+    settings.core_node = CoreSystemdSettings(dictionary["core_node"])
+    settings.core_node.keydetails = KeyDetails(dictionary["core_node"]["keydetails"])
+    settings.common_config = CommonSystemdSettings(dictionary["common_config"])
+    settings.common_config.nginx_settings = SystemdNginxConfig(dictionary["common_config"]["nginx_settings"])
     return settings
 
 

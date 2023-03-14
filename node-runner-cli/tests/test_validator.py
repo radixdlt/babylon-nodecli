@@ -57,8 +57,8 @@ class ValidatorUnitTests(unittest.TestCase):
 
     def test_validator_address_included_in_dict_from_object(self):
         config = DockerConfig("1.0.0")
-        config.core_node_settings = CoreDockerSettings({})
-        config.core_node_settings.validator_address = "validator_mock"
+        config.core_node = CoreDockerSettings({})
+        config.core_node.validator_address = "validator_mock"
         # ToDo: This is too looesely coupled. Implement DockerConfig save and load from/to Object and remove this test
         yaml_config = yaml.dump(config, default_flow_style=False, explicit_start=True, allow_unicode=True)
         self.assertTrue("validator_address" in str(yaml_config))

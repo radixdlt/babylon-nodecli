@@ -58,18 +58,19 @@ class SystemdUnitTests(unittest.TestCase):
         # Make Python Class YAML Serializable
         settings = SystemDSettings({})
         home_directory = Path.home()
-        settings.core_node_settings.node_dir = "/somedir/node-config"
-        settings.core_node_settings.node_secrets_dir = "/somedir/node-config/secret"
+        settings.core_node.node_dir = "/somedir/node-config"
+        settings.core_node.node_secrets_dir = "/somedir/node-config/secret"
         key_details = KeyDetails({})
-        settings.core_node_settings.keydetails = key_details
-        settings.common_settings.host_ip = "6.6.6.6"
+        settings.core_node.keydetails = key_details
+        settings.common_config.host_ip = "6.6.6.6"
 
         config_file = f"/tmp/config.yaml"
         SystemD.save_settings(settings, config_file)
 
+        self.maxDiff = None
         new_settings = SystemD.load_settings(config_file)
         self.assertEqual(new_settings.to_yaml(), settings.to_yaml())
-        self.assertEqual(new_settings.core_node_settings.node_dir, "/somedir/node-config")
+        self.assertEqual(new_settings.core_node.node_dir, "/somedir/node-config")
 
     @unittest.skip("Can only be executed on Ubuntu")
     def test_systemd_dependencies(self):
@@ -114,6 +115,29 @@ class SystemdUnitTests(unittest.TestCase):
                                                   'development-latest']):
             with patch("sys.argv",
                        ["main", "docker", "config", "-m", "DETAILED", "-k", "radix", "-nk", "-a"]):
+                main()
+
+    # @patch('sys.stdout', new_callable=StringIO)
+    def test_docker_config_all_local(self):
+        # os.environ['PROMPT_FEEDS'] = "test-prompts/individual-prompts/validator_address.yml"
+        # PromptFeeder.prompts_feed = PromptFeeder.instance().load_prompt_feeds()
+        with open('/tmp/genesis.json', 'w') as fp:
+            pass
+        with patch('builtins.input', side_effect=['34',
+                                                  '/tmp/genesis.json',
+                                                  'Y',
+                                                  'Y',
+                                                  'radix://node_tdx_22_1qvsml9pe32rzcrmw6jx204gjeng09adzkqqfz0ewhxwmjsaas99jzrje4u3@34.243.93.185',
+                                                  'N',
+                                                  'Y',
+                                                  '/tmp/node-config',
+                                                  'node-keystore.ks',
+                                                  '/tmp/data',
+                                                  'true',
+                                                  'true',
+                                                  'development-latest']):
+            with patch("sys.argv",
+                       ["main", "systemd", "install", "-f", "/tmp/systemdconfig.yaml"]):
                 main()
 
 

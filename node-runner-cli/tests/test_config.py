@@ -16,7 +16,7 @@ class ConfigUnitTests(unittest.TestCase):
     # @unittest.skip("Tests with PROMPT_FEEDS can only be run individually")
     def test_config_systemd_can_be_instantiated_with_defaults(self):
         config = SystemDSettings({})
-        self.assertEqual(config.core_node_settings.node_dir, "/etc/radixdlt/node")
+        self.assertEqual(config.core_node.node_dir, "/etc/radixdlt/node")
 
     def test_config_systemd_nginx_can_be_serialized(self):
         config = SystemdNginxConfig({})
@@ -35,32 +35,32 @@ class ConfigUnitTests(unittest.TestCase):
     def test_config_systemd_defaut_config_matches_fixture(self):
         config=SystemDSettings({})
         home_directory = Path.home()
-        config.core_node_settings.node_dir = f"/someDir/node-config"
-        config.core_node_settings.node_secrets_dir = f"/someDir/node-config/secret"
+        config.core_node.node_dir = f"/someDir/node-config"
+        config.core_node.node_secrets_dir = f"/someDir/node-config/secret"
         config_as_yaml = config.to_yaml()
         self.maxDiff = None
         fixture = f"""---
-core_node_settings:
-  nodetype: fullnode
-  keydetails:
-    keyfile_path: {home_directory}/node-config
-    keyfile_name: node-keystore.ks
+common_config:
+  network_id: 1
+  nginx_settings:
+    dir: /etc/nginx
+    enable_transaction_api: 'false'
+    mode: systemd
+    protect_core: 'true'
+    secrets_dir: /etc/nginx/secrets
+  service_user: radixdlt
+core_node:
   data_directory: {home_directory}/data
   enable_transaction: 'false'
-  node_dir: /someDir/node-config
-  node_secrets_dir: /someDir/node-config/secret
   java_opts: --enable-preview -server -Xms8g -Xmx8g  -XX:MaxDirectMemorySize=2048m
     -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts
     -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
-common_settings:
-  nginx_settings:
-    mode: systemd
-    enable_transaction_api: 'false'
-    protect_core: 'true'
-    dir: /etc/nginx
-    secrets_dir: /etc/nginx/secrets
-  service_user: radixdlt
-  network_id: 1
+  keydetails:
+    keyfile_name: node-keystore.ks
+    keyfile_path: {home_directory}/node-config
+  node_dir: /someDir/node-config
+  node_secrets_dir: /someDir/node-config/secret
+  nodetype: fullnode
 """
         self.assertEqual(config_as_yaml, fixture)
 
@@ -70,7 +70,7 @@ common_settings:
         home_directory = Path.home()
         self.maxDiff = None
         fixture = f"""---
-core_node_settings:
+core_node:
   nodetype: fullnode
   keydetails:
     keyfile_path: {home_directory}/node-config
@@ -81,7 +81,7 @@ core_node_settings:
   java_opts: --enable-preview -server -Xms8g -Xmx8g  -XX:MaxDirectMemorySize=2048m
     -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts
     -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
-common_settings:
+common_config:
   nginx_settings:
     mode: docker
     protect_gateway: 'true'

@@ -44,7 +44,7 @@ class MonitoringSettings(BaseConfig):
     core_prometheus_settings: PrometheusSettings = PrometheusSettings({})
     gateway_api_prometheus_settings: PrometheusSettings = PrometheusSettings({})
     aggregator_prometheus_settings: PrometheusSettings = PrometheusSettings({})
-    common_settings: CommonMonitoringSettings = CommonMonitoringSettings({})
+    common_config: CommonMonitoringSettings = CommonMonitoringSettings({})
 
     def configure_core_target(self, basic_auth_password):
         self.core_prometheus_settings.ask_prometheus_target(basic_auth_password, target_name="CORE_NODE")

@@ -90,7 +90,7 @@ def config(args):
     monitoring_config: MonitoringSettings = MonitoringSettings({})
 
     config_to_dump = {
-        "common_config": dict(monitoring_config.common_settings),
+        "common_config": dict(monitoring_config.common_config),
         "version": "0.1"
     }
 
