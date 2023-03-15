@@ -1,6 +1,8 @@
 import ipaddress
 import sys
 from argparse import ArgumentParser
+from pathlib import Path
+
 from deepdiff import DeepDiff
 import yaml
 
@@ -94,6 +96,7 @@ def config(args):
 
     Helpers.section_headline("CONFIG FILE")
     config_file = f"{args.configdir}/config.yaml"
+    Path(f"{args.configdir}").mkdir(parents=True, exist_ok=True)
     print(
         "\nCreating config file using the answers from the questions that would be asked in next steps."
         f"\nLocation of the config file: {bcolors.OKBLUE}{config_file}{bcolors.ENDC}")

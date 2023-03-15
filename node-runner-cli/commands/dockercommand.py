@@ -10,8 +10,6 @@ from deepdiff import DeepDiff
 from commands.subcommand import get_decorator, argument
 from config.BaseConfig import SetupMode
 from config.DockerConfig import DockerConfig, CoreDockerSettings
-from config.GatewayDockerConfig import GatewayDockerSettings
-from config.Nginx import DockerNginxConfig
 from config.Renderer import Renderer
 from github.github import latest_release
 from setup.AnsibleRunner import AnsibleRunner
