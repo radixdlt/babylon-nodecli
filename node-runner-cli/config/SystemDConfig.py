@@ -213,7 +213,7 @@ class SystemDSettings(BaseConfig):
         self.core_node.core_binary_url = os.getenv(NODE_BINARY_OVERIDE,
                                                             f"https://github.com/radixdlt/babylon-node/releases/download/{self.core_node.core_release}/radixdlt-dist-{self.core_node.core_release}.zip")
         self.common_config.nginx_settings.config_url = os.getenv(NGINX_BINARY_OVERIDE,
-                                                                   f"https://github.com/radixdlt/babylon-nginx/releases/download/{self.common_config.nginx_settings.release}/radixdlt-nginx-{self.core_node.nodetype}-conf.zip")
+                                                                   f"https://github.com/radixdlt/babylon-nginx/releases/download/{self.common_config.nginx_settings.release}/babylon-nginx-{self.core_node.nodetype}-conf.zip")
         return self
 
 

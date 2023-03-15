@@ -8,7 +8,7 @@ class DockerNginxConfig(BaseConfig):
     enable_transaction_api = "false"
     protect_core: str = "true"
     release = None
-    repo = "radixdlt/radixdlt-nginx"
+    repo = "radixdlt/babylon-nginx"
 
 
 class SystemdNginxConfig(BaseConfig):

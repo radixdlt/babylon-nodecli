@@ -248,7 +248,7 @@ class Prompts:
     def get_nginx_release(latest_nginx_release) -> str:
 
         Helpers.section_headline("NGINX CONFIG")
-        print(f"Latest release of radixdlt-nginx is {bcolors.OKBLUE}{latest_nginx_release}{bcolors.ENDC}.")
+        print(f"Latest release of babylon-nginx is {bcolors.OKBLUE}{latest_nginx_release}{bcolors.ENDC}.")
         answer = Helpers.input_guestion(
             f"\nPress Enter to accept default or Type in radixdlt/babylon-nginx release tag:",
             QuestionKeys.input_nginx_release)

@@ -88,7 +88,7 @@ common_config:
     gateway_behind_auth: 'true'
     enable_transaction_api: 'false'
     protect_core: 'true'
-    repo: radixdlt/radixdlt-nginx
+    repo: radixdlt/babylon-nginx
   docker_compose: {home_directory}/docker-compose.yml
 gateway_settings:
   data_aggregator:
