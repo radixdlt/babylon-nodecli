@@ -358,8 +358,10 @@ WantedBy=multi-user.target
 
     @staticmethod
     def save_settings(settings: SystemDSettings, config_file: str):
-        print(f"Saving configuration to {config_file}")
-        settings.to_file(config_file)
+        to_update = input("\nOkay to update the config file [Y/n]?:")
+        if Helpers.check_Yes(to_update):
+            print(f"Saving configuration to {config_file}")
+            settings.to_file(config_file)
 
     @staticmethod
     def load_settings(config_file) -> SystemDSettings:
