@@ -83,7 +83,7 @@ class CoreSystemdSettings(BaseConfig):
 
     def set_core_release(self, release):
         self.core_release = release
-        self.keydetails.keygen_tag = self.core_release
+        self.keydetails.keygen_tag = "1.3.2"
 
     def create_config(self, release, data_directory, trustednode, ks_password, new_keystore):
         self.set_core_release(release)
