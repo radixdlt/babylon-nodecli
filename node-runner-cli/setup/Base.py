@@ -1,9 +1,12 @@
 import getpass
 import os
 import sys
+from pathlib import Path
 
 import yaml
 
+from config.BaseConfig import SetupMode
+from config.KeyDetails import KeyDetails
 from setup.AnsibleRunner import AnsibleRunner
 from utils.PromptFeeder import QuestionKeys
 from utils.Prompts import Prompts
@@ -33,33 +36,52 @@ class Base:
             shell=True)
 
     @staticmethod
-    def generatekey(keyfile_path, keyfile_name, keygen_tag, ks_password=None, new=False):
-        if os.path.isfile(f'{keyfile_path}/{keyfile_name}'):
-            print(f"Node Keystore file already exist at location {keyfile_path}")
-            keystore_password = ks_password if ks_password else getpass.getpass(
-                f"Enter the password of the existing keystore file '{keyfile_name}':")
+    def generatekey(keyfile_path, keyfile_name, keygen_tag, keystore_password=None, new=False):
+        key_details = KeyDetails({})
+        key_details.keystore_password = keystore_password
+        key_details.keyfile_name = keyfile_name
+        key_details.keygen_tag = keygen_tag
+        key_details.keyfile_path = keyfile_path
+        Path(f"{key_details.keyfile_path}").mkdir(parents=True, exist_ok=True)
+        if os.path.isfile(f'{key_details.keyfile_path}/{key_details.keyfile_name}'):
+            print(f"Node Keystore file already exist at location {key_details.keyfile_path}")
+            keystore_password = key_details.keystore_password if key_details.keystore_password else getpass.getpass(
+                f"Enter the password of the existing keystore file '{key_details.keyfile_name}':")
         else:
             if not new:
                 ask_keystore_exists = input \
-                    (f"Do you have keystore file named '{keyfile_name}' already from previous node Y/n?:")
+                    (f"Do you have keystore file named '{key_details.keyfile_name}' already from previous node Y/n?:")
                 if Helpers.check_Yes(ask_keystore_exists):
                     print(
-                        f"\nCopy the keystore file '{keyfile_name}' to the location {keyfile_path} and then rerun the command")
+                        f"\nCopy the keystore file '{key_details.keyfile_name}' to the location {key_details.keyfile_path} and then rerun the command")
                     sys.exit(1)
 
             print(f"""
-            \nGenerating new keystore file. Don't forget to backup the key from location {keyfile_path}/{keyfile_name}
+            \nGenerating new keystore file. Don't forget to backup the key from location {key_details.keyfile_path}/{key_details.keyfile_name}
             """)
-            keystore_password = ks_password if ks_password else getpass.getpass(
-                f"Enter the password of the new file '{keyfile_name}':")
-            run_shell_command(['docker', 'run', '--rm', '-v', keyfile_path + ':/keygen/key',
-                               f'radixdlt/keygen:{keygen_tag}',
-                               f'--keystore=/keygen/key/{keyfile_name}',
-                               '--password=' + keystore_password], quite=True
+            key_details.keystore_password = key_details.keystore_password if key_details.keystore_password else getpass.getpass(
+                f"Enter the password of the new file '{key_details.keyfile_name}':")
+            run_shell_command(['docker', 'run', '--rm', '-v', key_details.keyfile_path + ':/keygen/key',
+                               f'radixdlt/keygen:{key_details.keygen_tag}',
+                               f'--keystore=/keygen/key/{key_details.keyfile_name}',
+                               '--password=' + key_details.keystore_password], quite=True
                               )
-            run_shell_command(['sudo', 'chmod', '644', f'{keyfile_path}/{keyfile_name}'])
+            run_shell_command(['sudo', 'chmod', '644', f'{key_details.keyfile_path}/{key_details.keyfile_name}'])
 
-        return keystore_password, f'{keyfile_path}/{keyfile_name}'
+        return key_details
+
+    @staticmethod
+    def ask_keydetails(ks_password=None, new_keystore=False):
+        keydetails = KeyDetails({})
+        if "DETAILED" in SetupMode.instance().mode:
+            keydetails.keyfile_path = Prompts.ask_keyfile_path()
+            keydetails.keyfile_name = Prompts.ask_keyfile_name()
+
+        keydetails = Base.generatekey(
+            keyfile_path=keydetails.keyfile_path,
+            keyfile_name=keydetails.keyfile_name,
+            keygen_tag=keydetails.keygen_tag, keystore_password=ks_password, new=new_keystore)
+        return keydetails
 
     @staticmethod
     def setup_node_optimisation_config(version):
@@ -106,16 +128,3 @@ class Base:
             return {}
 
 
-    @staticmethod
-    def backup_save_config(config_file, new_config, autoapprove, backup_time):
-        to_update = ""
-        if autoapprove:
-            print("In Auto mode - Updating the file as suggested in above changes")
-        else:
-            to_update = input("\nOkay to update the config file [Y/n]?:")
-        if Helpers.check_Yes(to_update) or autoapprove:
-            if os.path.exists(config_file):
-                Helpers.backup_file(config_file, f"{config_file}_{backup_time}")
-            print(f"\n\n Saving to file {config_file} ")
-            with open(config_file, 'w') as f:
-                yaml.dump(new_config, f, default_flow_style=False, explicit_start=True, allow_unicode=True)

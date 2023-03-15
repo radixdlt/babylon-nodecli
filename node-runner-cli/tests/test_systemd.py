@@ -65,7 +65,8 @@ class SystemdUnitTests(unittest.TestCase):
         settings.common_config.host_ip = "6.6.6.6"
 
         config_file = f"/tmp/config.yaml"
-        SystemD.save_settings(settings, config_file)
+        with patch('builtins.input', side_effect=['Y']):
+            SystemD.save_settings(settings, config_file)
 
         self.maxDiff = None
         new_settings = SystemD.load_settings(config_file)
@@ -80,11 +81,12 @@ class SystemdUnitTests(unittest.TestCase):
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_systemd_config(self, mockout):
-        with patch("sys.argv",
-                   ["main", "systemd", "config", "-m", "CORE", "-i", "18.133.170.30", "-t",
-                    "radix://tn1q28eygvxshszxk48jhjxdmyne06m3x6hfyvxg7a45qt8cksffx6z7uu6392@15.236.228.96",
-                    "-n", "2", "-k", "radix", "-d", "/tmp", "-dd", "/tmp", "-a"]):
-            main()
+        with patch('builtins.input', side_effect=['Y']):
+            with patch("sys.argv",
+                       ["main", "systemd", "config", "-m", "CORE", "-i", "18.133.170.30", "-t",
+                        "radix://tn1q28eygvxshszxk48jhjxdmyne06m3x6hfyvxg7a45qt8cksffx6z7uu6392@15.236.228.96",
+                        "-n", "2", "-k", "radix", "-d", "/tmp", "-dd", "/tmp", "-a"]):
+                main()
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_docker_config(self, mockout):

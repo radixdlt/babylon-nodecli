@@ -71,20 +71,6 @@ class SystemD(Base):
         run_shell_command('sudo chown radixdlt:radixdlt -R /data', shell=True)
 
     @staticmethod
-    def generatekey(keyfile_path, keyfile_name="node-keystore.ks", keygen_tag="1.3.2", keystore_password=None,
-                    new=False):
-        run_shell_command(f'mkdir -p {keyfile_path}', shell=True)
-        keystore_password, keyfile_location = Base.generatekey(keyfile_path, keyfile_name, keygen_tag,
-                                                               keystore_password, new)
-
-        key_details = KeyDetails({})
-        key_details.keystore_password = keystore_password
-        key_details.keyfile_name = keyfile_name
-        key_details.keygen_tag = keygen_tag
-        key_details.keyfile_path = keyfile_path
-        return key_details
-
-    @staticmethod
     def fetch_universe_json(trustenode, extraction_path):
         Base.fetch_universe_json(trustenode, extraction_path)
 

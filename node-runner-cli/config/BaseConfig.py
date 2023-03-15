@@ -14,7 +14,6 @@ class BaseConfig:
             if self.__getattribute__(attr):
                 yield attr, self.__getattribute__(attr)
 
-
 class SetupMode:
     _instance = None
     mode = None

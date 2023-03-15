@@ -47,19 +47,6 @@ class CoreDockerSettings(BaseConfig):
     def set_node_type(self, nodetype="fullnode"):
         self.nodetype = nodetype
 
-    def ask_keydetails(self, ks_password=None, new_keystore=False):
-        keydetails = self.keydetails
-        if "DETAILED" in SetupMode.instance().mode:
-            keydetails.keyfile_path = Prompts.ask_keyfile_path()
-            keydetails.keyfile_name = Prompts.ask_keyfile_name()
-
-        keystore_password, file_location = Base.generatekey(
-            keyfile_path=keydetails.keyfile_path,
-            keyfile_name=keydetails.keyfile_name,
-            keygen_tag=keydetails.keygen_tag, ks_password=ks_password, new=new_keystore)
-        keydetails.keystore_password = keystore_password
-        self.keydetails = keydetails
-
     def set_core_release(self, release):
         self.core_release = release
         # Using hardcoded tag value till we publish keygen image
@@ -89,7 +76,7 @@ class CoreDockerSettings(BaseConfig):
         self.set_core_release(release)
         self.set_trusted_node(trustednode)
         self.ask_validator_address()
-        self.ask_keydetails(ks_password, new_keystore)
+        self.keydetails = Base.ask_keydetails(ks_password, new_keystore)
         self.ask_data_directory()
         self.ask_enable_transaction()
         return self

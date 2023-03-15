@@ -63,18 +63,7 @@ class CoreSystemdSettings(BaseConfig):
         if self.data_directory:
             Path(self.data_directory).mkdir(parents=True, exist_ok=True)
 
-    def ask_keydetails(self, ks_password=None, new_keystore=False):
-        keydetails = self.keydetails
-        if "DETAILED" in SetupMode.instance().mode:
-            keydetails.keyfile_path = Prompts.ask_keyfile_path()
-            keydetails.keyfile_name = Prompts.ask_keyfile_name()
 
-        keystore_password, file_location = Base.generatekey(
-            keyfile_path=keydetails.keyfile_path,
-            keyfile_name=keydetails.keyfile_name,
-            keygen_tag=keydetails.keygen_tag, ks_password=ks_password, new=new_keystore)
-        keydetails.keystore_password = keystore_password
-        self.keydetails = keydetails
 
     def set_trusted_node(self, trusted_node):
         if not trusted_node:
@@ -88,7 +77,7 @@ class CoreSystemdSettings(BaseConfig):
     def create_config(self, release, data_directory, trustednode, ks_password, new_keystore):
         self.set_core_release(release)
         self.set_trusted_node(trustednode)
-        self.ask_keydetails(ks_password, new_keystore)
+        self.keydetails = Base.ask_keydetails(ks_password, new_keystore)
         self.ask_data_directory(data_directory)
         self.core_binary_url = os.getenv(NODE_BINARY_OVERIDE,
                                          f"https://github.com/radixdlt/babylon-node/releases/download/{self.core_release}/radixdlt-dist-{self.core_release}.zip")
