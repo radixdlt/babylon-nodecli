@@ -114,7 +114,7 @@ jobs:
         if: ${{ github.event_name == 'release' }}
 
   test-systemd:
-    runs-on: ubuntu-22.04
+    runs-on: [node-only]
     needs:
       - package_ubuntu_cli
     steps:
@@ -135,7 +135,8 @@ jobs:
         run: |
           ls -a
           chmod +x ./radixnode
-          ./radixnode systemd dependencies
+          # ./radixnode systemd dependencies
+          echo "expecting the dependencies to be already installed"
       - name: Run systemd config
         run: |
           ls -a
@@ -177,6 +178,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install containerd runc
           ./radixnode docker dependencies
+          touch /home/runner/genesis.json
       - name: core-gateway-all-local
         run: |
           ls -a
