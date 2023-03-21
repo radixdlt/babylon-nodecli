@@ -174,10 +174,10 @@ WantedBy=multi-user.target
         run_shell_command(command, shell=True)
 
     @staticmethod
-    def download_binaries(binary_location_url, node_dir, node_version, auto_approve=None):
+    def download_binaries(binary_location_url, library_location_url, node_dir, node_version, auto_approve=None):
         run_shell_command(
-            ['wget', '--no-check-certificate', '-O', 'radixdlt-dist.zip', binary_location_url])
-        run_shell_command('unzip radixdlt-dist.zip', shell=True)
+            ['wget', '--no-check-certificate', '-O', 'babylon-node-dist.zip', binary_location_url])
+        run_shell_command('unzip babylon-node-dist.zip', shell=True)
         run_shell_command(f'mkdir -p {node_dir}/{node_version}', shell=True)
         if os.listdir(f'{node_dir}/{node_version}'):
             if auto_approve is None:
@@ -189,6 +189,13 @@ WantedBy=multi-user.target
                 run_shell_command(f"rm -rf {node_dir}/{node_version}/*", shell=True)
         unzipped_folder_name = os.getenv(UNZIPPED_NODE_DIST_FOLDER, f"core-{node_version}")
         run_shell_command(f'mv {unzipped_folder_name}/* {node_dir}/{node_version}', shell=True)
+
+        # Download and unzip library
+        run_shell_command(
+            ['wget', '-', '-O', 'babylon-node-lib.zip', library_location_url])
+        run_shell_command('unzip babylon-node-lib.zip', shell=True)
+        run_shell_command(f'mkdir -p /usr/lib/jni', shell=True)
+        run_shell_command(f'sudo mv libcorerust.so /usr/lib/jni/libcorerust.so', shell=True)
 
     @staticmethod
     def start_node_service():

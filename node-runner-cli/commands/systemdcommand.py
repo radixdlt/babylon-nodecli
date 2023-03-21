@@ -169,6 +169,7 @@ def install(args):
     SystemD.checkUser()
 
     SystemD.download_binaries(binary_location_url=settings.core_node.core_binary_url,
+                              library_location_url=settings.core_node.core_library_url,
                               node_dir=settings.core_node.node_dir,
                               node_version=settings.core_node.core_release,
                               auto_approve=auto_approve)

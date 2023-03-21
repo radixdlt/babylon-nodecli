@@ -22,6 +22,7 @@ class CoreSystemdSettings(BaseConfig):
     keydetails: KeyDetails = KeyDetails({})
     core_release: str = None
     core_binary_url: str = None
+    core_library_url: str = None
     data_directory: str = f"{Helpers.get_home_dir()}/data"
     enable_transaction: str = "false"
     trusted_node: str = None
@@ -63,8 +64,6 @@ class CoreSystemdSettings(BaseConfig):
         if self.data_directory:
             Path(self.data_directory).mkdir(parents=True, exist_ok=True)
 
-
-
     def set_trusted_node(self, trusted_node):
         if not trusted_node:
             trusted_node = Prompts.ask_trusted_node()
@@ -80,7 +79,8 @@ class CoreSystemdSettings(BaseConfig):
         self.keydetails = Base.ask_keydetails(ks_password, new_keystore)
         self.ask_data_directory(data_directory)
         self.core_binary_url = os.getenv(NODE_BINARY_OVERIDE,
-                                         f"https://github.com/radixdlt/babylon-node/releases/download/{self.core_release}/radixdlt-dist-{self.core_release}.zip")
+                                         f"https://github.com/radixdlt/babylon-node/releases/download/{self.core_release}/babylon-node-{self.core_release}.zip")
+        self.core_library_url = f"https://github.com/radixdlt/babylon-node/releases/download/{self.core_release}/babylon-node-rust-arch-linux-x86_64-release-{self.core_release}.zip"
         return self
 
 
@@ -200,11 +200,11 @@ class SystemDSettings(BaseConfig):
         else:
             self.common_config.nginx_settings.release = args.nginxrelease
         self.core_node.core_binary_url = os.getenv(NODE_BINARY_OVERIDE,
-                                                            f"https://github.com/radixdlt/babylon-node/releases/download/{self.core_node.core_release}/radixdlt-dist-{self.core_node.core_release}.zip")
+                                                   f"https://github.com/radixdlt/babylon-node/releases/download/{self.core_node.core_release}/babylon-node-{self.core_node.core_release}.zip")
+        self.core_node.core_library_url = f"https://github.com/radixdlt/babylon-node/releases/download/{self.core_release}/babylon-node-rust-arch-linux-x86_64-release-{self.core_release}.zip"
         self.common_config.nginx_settings.config_url = os.getenv(NGINX_BINARY_OVERIDE,
-                                                                   f"https://github.com/radixdlt/babylon-nginx/releases/download/{self.common_config.nginx_settings.release}/babylon-nginx-{self.core_node.nodetype}-conf.zip")
+                                                                 f"https://github.com/radixdlt/babylon-nginx/releases/download/{self.common_config.nginx_settings.release}/babylon-nginx-{self.core_node.nodetype}-conf.zip")
         return self
-
 
 def from_dict(dictionary: dict) -> SystemDSettings:
     settings = SystemDSettings({})
