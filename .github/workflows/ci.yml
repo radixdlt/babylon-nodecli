@@ -162,13 +162,22 @@ jobs:
           echo "HOME=$HOME"
           echo "PATH=$PWD"
           ./radixnode systemd install
+      - name: Get Logs and Status
+        run: |
           sudo tail /var/log/syslog  -n 100
-          ./radixnode api system health
+          ./radixnode auth set-admin-password --setupmode SYSTEMD -p $NGINX_ADMIN_PASSWORD
+          ./radixnode auth set-superadmin-password --setupmode SYSTEMD -p $NGINX_SUPERADMIN_PASSWORD
+          ./radixnode auth set-metrics-password --setupmode SYSTEMD -p $NGINX_METRICS_PASSWORD
+          NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system health
+          NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system version
+        env:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
+          NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
+          NGINX_SUPERADMIN_PASSWORD: ${{secrets.NGINX_SUPERADMIN_PASSWORD}}
       - name: Stop systemd 
         run: |
-          ls -a
           chmod +x ./radixnode
           echo "HOME=$HOME"
           echo "PATH=$PWD"
