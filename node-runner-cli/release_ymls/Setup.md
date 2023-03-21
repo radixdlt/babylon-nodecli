@@ -1,4 +1,4 @@
-Below are steps on a Ubuntu 20.04 machine with a user having sudo access
+Below are steps on a Ubuntu 22.04 machine with a user having sudo access
 
 
 ```bash
