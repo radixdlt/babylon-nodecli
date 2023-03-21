@@ -151,6 +151,7 @@ jobs:
             -n 11 \
             -t radix://node_tdx_b_1qdrcdjgzl6s2ymnsssdssxllmmj0j84eagu2m6xtttj3nxrunzesyh9fwea@3.109.242.93 \
             -i 35.178.142.54 \
+            -v "not_a_real_validator_address" \
             -k $KEYSTORE_PASSWORD -nk -a
         env:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}

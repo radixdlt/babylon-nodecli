@@ -67,6 +67,7 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
                   "if not provided you will be prompted to enter a value",
              default="",
              action="store"),
+    argument("-v", "--validator", help="Address of the validator ", action="store"),
     argument("-xc", "--disablenginxforcore", help="Core Node API's are protected by Basic auth setting."
                                                   "Set this to disable to nginx for core",
              action="store", default="", choices=["true", "false"])
@@ -86,6 +87,7 @@ def config(args):
     nginx_on_core = args.disablenginxforcore if args.disablenginxforcore != "" else None
     autoapprove = args.autoapprove
     new_keystore = args.newkeystore
+    validator = args.validator
 
     if "DETAILED" in setupmode.mode and len(setupmode.mode) > 1:
         print(f"{bcolors.FAIL}You cannot have DETAILED option with other options together."
@@ -117,7 +119,8 @@ def config(args):
 
     if "CORE" in setupmode.mode:
         quick_node_settings: CoreDockerSettings = CoreDockerSettings({}).create_config(release, trustednode,
-                                                                                       keystore_password, new_keystore)
+                                                                                       keystore_password, new_keystore,
+                                                                                       validator)
         configuration.core_node = quick_node_settings
         configuration.common_config.ask_enable_nginx_for_core(nginx_on_core)
         config_to_dump["core_node"] = dict(configuration.core_node)
@@ -132,8 +135,9 @@ def config(args):
     if "DETAILED" in setupmode.mode:
         run_fullnode = Prompts.check_for_fullnode()
         if run_fullnode:
-            detailed_node_settings = CoreDockerSettings({}).create_config(release, trustednode, keystore_password,
-                                                                          new_keystore)
+            detailed_node_settings: CoreDockerSettings = CoreDockerSettings({}).create_config(release, trustednode,
+                                                                                              keystore_password,
+                                                                                              new_keystore, validator)
             configuration.core_node = detailed_node_settings
             configuration.common_config.ask_enable_nginx_for_core(nginx_on_core)
             config_to_dump["core_node"] = dict(configuration.core_node)

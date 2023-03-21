@@ -5,6 +5,7 @@ from pathlib import Path
 import yaml
 from yaml import UnsafeLoader
 
+from config.Renderer import Renderer
 from config.SystemDConfig import SystemDSettings, extract_network_id_from_arg, from_dict
 from config.KeyDetails import KeyDetails
 from env_vars import UNZIPPED_NODE_DIST_FOLDER, APPEND_DEFAULT_CONFIG_OVERIDES, NODE_BINARY_OVERIDE, \
@@ -95,38 +96,11 @@ RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
         run_shell_command(command, shell=True)
 
     @staticmethod
-    def setup_default_config(trustednode, hostip, node_dir, node_type, keyfile_location="/etc/radixdlt/node/secrets",
-                             keyfile_name="node-keystore.ks",
-                             transactions_enable="false",
-                             network_id=1,
-                             data_folder="~/data"):
+    def setup_default_config(settings: SystemDSettings):
 
-        genesis_json_location = Network.path_to_genesis_json(network_id)
-
-        network_genesis_file_for_testnets = f"network.genesis_file={genesis_json_location}" if genesis_json_location else ""
-        enable_client_api = "true" if node_type == "archivenode" else "false"
-
-        # This may need to be moved to jinja template
-        command = f"""
-        cat > {node_dir}/default.config << EOF
-ntp=false
-ntp.pool=pool.ntp.org
-network.id={network_id}
-{network_genesis_file_for_testnets}
-node.key.path={keyfile_location}/{keyfile_name}
-network.p2p.listen_port=30001
-network.p2p.broadcast_port=30000
-network.p2p.seed_nodes={trustednode}
-network.host_ip={hostip}
-db.location={data_folder}
-api.port=3334
-log.level=debug
-api.transactions.enable={"true" if transactions_enable else "false"}
-api.sign.enable=true 
-api.bind.address=0.0.0.0 
-network.p2p.use_proxy_protocol=false
-"""
-        run_shell_command(command, shell=True)
+        settings.common_config.genesis_json_location = Network.path_to_genesis_json(settings.common_config.network_id)
+        Renderer().load_file_based_template("systemd-default.config.j2").render(
+            dict(settings)).to_file(f"{settings.core_node.node_dir}/default.config")
 
         if (os.getenv(APPEND_DEFAULT_CONFIG_OVERIDES)) is not None:
             print("Add overides")

@@ -28,6 +28,7 @@ class CoreSystemdSettings(BaseConfig):
     trusted_node: str = None
     node_dir: str = '/etc/radixdlt/node'
     node_secrets_dir: str = '/etc/radixdlt/node/secrets'
+    validator_address: str = None
     java_opts: str = "--enable-preview -server -Xms8g -Xmx8g  " \
                      "-XX:MaxDirectMemorySize=2048m " \
                      "-XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops " \
@@ -83,12 +84,21 @@ class CoreSystemdSettings(BaseConfig):
         self.core_library_url = f"https://github.com/radixdlt/babylon-node/releases/download/{self.core_release}/babylon-node-rust-arch-linux-x86_64-release-{self.core_release}.zip"
         return self
 
+    def set_validator_address(self, validator_address: str):
+        self.validator_address = validator_address
+
+    def ask_validator_address(self, validator_address=None):
+        if validator_address is None:
+            validator_address = Prompts.ask_validator_address()
+        self.set_validator_address(validator_address)
+
 
 class CommonSystemdSettings(BaseConfig):
     nginx_settings: SystemdNginxConfig = SystemdNginxConfig({})
     host_ip: str = None
     service_user: str = "radixdlt"
     network_id: int = 1
+    genesis_json_location: str
 
     def __iter__(self):
         class_variables = {key: value

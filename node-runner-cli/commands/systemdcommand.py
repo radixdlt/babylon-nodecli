@@ -62,6 +62,7 @@ def systemdcommand(systemdcommand_args=None, parent=systemd_parser):
              help="Version of node software to install",
              action="store"),
     argument("-t", "--trustednode", help="Trusted node on radix network", action="store"),
+    argument("-v", "--validator", help="Address of the validator ", action="store"),
     argument("-x", "--nginxrelease", help="Version of radixdlt nginx release ", action="store"),
     argument("-xc", "--disablenginxforcore", help="Core Node API's are protected by Basic auth setting."
                                                   "Set this to disable to nginx for core",
@@ -110,6 +111,7 @@ def config(args):
     configuration.common_config = CommonSystemdSettings({})
     configuration.common_config.ask_network_id(args.networkid)
     configuration.common_config.ask_host_ip(args.hostip)
+    configuration.core_node.ask_validator_address(args.validator)
 
     configuration.core_node = CoreSystemdSettings({}).create_config(release, data_directory,
                                                                              trustednode,
@@ -176,14 +178,7 @@ def install(args):
 
     backup_time = Helpers.get_current_date_time()
 
-    SystemD.setup_default_config(trustednode=settings.core_node.trusted_node,
-                                 hostip=settings.common_config.host_ip,
-                                 node_dir=settings.core_node.node_dir,
-                                 node_type=settings.core_node.nodetype,
-                                 transactions_enable=settings.core_node.enable_transaction,
-                                 keyfile_location=settings.core_node.keydetails.keyfile_path,
-                                 network_id=settings.common_config.network_id,
-                                 data_folder=settings.core_node.data_directory)
+    SystemD.setup_default_config(settings)
     SystemD.backup_file(settings.core_node.node_dir, f"default.config", backup_time, auto_approve)
 
     # Below steps only required if user want's setup nginx in same node
