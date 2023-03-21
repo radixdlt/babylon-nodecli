@@ -351,6 +351,7 @@ WantedBy=multi-user.target
 
     @staticmethod
     def save_settings(settings: SystemDSettings, config_file: str, autoapprove=False):
+        to_update = ""
         if autoapprove:
             print("In Auto mode - Updating the file as suggested in above changes")
         else:
