@@ -45,7 +45,7 @@ class Base:
         Path(f"{key_details.keyfile_path}").mkdir(parents=True, exist_ok=True)
         if os.path.isfile(f'{key_details.keyfile_path}/{key_details.keyfile_name}'):
             print(f"Node Keystore file already exist at location {key_details.keyfile_path}")
-            keystore_password = key_details.keystore_password if key_details.keystore_password else getpass.getpass(
+            key_details.keystore_passwordma = key_details.keystore_password if key_details.keystore_password else getpass.getpass(
                 f"Enter the password of the existing keystore file '{key_details.keyfile_name}':")
         else:
             if not new:

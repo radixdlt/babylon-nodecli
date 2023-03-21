@@ -155,16 +155,31 @@ jobs:
         env:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Run systemd config
+      - name: Run systemd install
         run: |
           ls -a
           chmod +x ./radixnode
           echo "HOME=$HOME"
           echo "PATH=$PWD"
           ./radixnode systemd install
-          journalctl -f -n 100
+          sudo tail /var/log/syslog  -n 100
+          ./radixnode api system health
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Stop systemd 
+        run: |
+          ls -a
+          chmod +x ./radixnode
+          echo "HOME=$HOME"
+          echo "PATH=$PWD"
+          ./radixnode systemd stop   
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Clean Up
+        run: |
+          sudo rm -rf /etc/radixdlt/node
+          rm -rf node-config/
+          rm -rf monitoring
 
   test-config-command:
     runs-on: ubuntu-22.04
