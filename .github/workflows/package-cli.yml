@@ -14,7 +14,7 @@ on:
 jobs:
   run_unit_tests:
     name: "Unit tests"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: cancel running workflows
         uses: styfle/cancel-workflow-action@0.8.0
@@ -41,7 +41,7 @@ jobs:
 
   package_ubuntu_cli:
     name: "Package cli for Ubuntu"
-    #runs-on: ubuntu-20.04
+    #runs-on: ubuntu-22.04
     runs-on: [node-only]
     steps:
       - name: cancel running workflows
@@ -67,7 +67,7 @@ jobs:
       - name: "Upload generated cli file"
         uses: actions/upload-artifact@v2.2.3
         with:
-          name: ubuntu 20.04
+          name: ubuntu 22.04
           path: "${{ github.workspace }}/node-runner-cli/out/ubuntu/focal/radixnode"
 
   upload-asset-store:
@@ -96,11 +96,11 @@ jobs:
       - name: Download packaged cli
         uses: actions/download-artifact@v3
         with:
-          name: ubuntu 20.04
+          name: ubuntu 22.04
       - name: Upload cli to asset store
         run: |
           ls */**
-          aws s3 cp radixnode s3://${{secrets.ARTIFACT_AWS_BUCKET }}/radixnode/${{env.BRANCH_WITH_COMMIT}}/radixnode-ubuntu-20.04
+          aws s3 cp radixnode s3://${{secrets.ARTIFACT_AWS_BUCKET }}/radixnode/${{env.BRANCH_WITH_COMMIT}}/radixnode-ubuntu-22.04
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACT_AWS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACT_AWS_SECRET_ACCESS_KEY}}
@@ -114,7 +114,7 @@ jobs:
       - name: Download packaged cli
         uses: actions/download-artifact@v3
         with:
-          name: ubuntu 20.04
+          name: ubuntu 22.04
       - name: Get release
         id: get_release
         uses: bruceadams/get-release@v1.2.2
@@ -128,12 +128,12 @@ jobs:
         with:
           upload_url: ${{ steps.get_release.outputs.upload_url }}
           asset_path: ./radixnode
-          asset_name: radixnode-ubuntu-20.04
+          asset_name: radixnode-ubuntu-22.04
           asset_content_type: application/octet-stream
         if: ${{ github.event_name == 'release' }}
 
   test-config-command:
-   runs-on: ubuntu-20.04
+   runs-on: ubuntu-22.04
    needs:
      - package_ubuntu_cli
    steps:
@@ -144,7 +144,7 @@ jobs:
      - name: Download packaged cli
        uses: actions/download-artifact@v3
        with:
-         name: ubuntu 20.04
+         name: ubuntu 22.04
      - name: core-gateway-all-local
        run: |
          ls -a
@@ -212,14 +212,14 @@ jobs:
          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "1.1.8"
 
   test-core-only-node:
-   runs-on: ubuntu-20.04
+   runs-on: ubuntu-22.04
    needs:
      - package_ubuntu_cli
    steps:
      - name: Download packaged cli
        uses: actions/download-artifact@v3
        with:
-         name: ubuntu 20.04
+         name: ubuntu 22.04
      - name: Run configure command
        run: |
          chmod +x ./radixnode
@@ -307,7 +307,7 @@ jobs:
   #    - name: Download packaged cli
   #      uses: actions/download-artifact@v3
   #      with:
-  #        name: ubuntu 20.04
+  #        name: ubuntu 22.04
   #    - name: Setup config
   #      run: |
   #        chmod +x ./radixnode
@@ -378,7 +378,7 @@ jobs:
   #    - name: Download packaged cli
   #      uses: actions/download-artifact@v3
   #      with:
-  #        name: ubuntu 20.04
+  #        name: ubuntu 22.04
   #    - name: Setup config
   #      run: |
   #        chmod +x ./radixnode
@@ -414,14 +414,14 @@ jobs:
   #        RADIXDLT_GATEWAY_VERSION_OVERRIDE: "1.1.8"
   #
   test-systemd:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs:
       - package_ubuntu_cli
     steps:
       - name: Download packaged cli
         uses: actions/download-artifact@v3
         with:
-          name: ubuntu 20.04
+          name: ubuntu 22.04
       - name: Setup config
         run: |
           chmod +x ./radixnode
