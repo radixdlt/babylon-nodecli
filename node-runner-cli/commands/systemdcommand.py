@@ -136,7 +136,7 @@ def config(args):
                 {dict(DeepDiff(old_config, config_to_dump))}
                   """)
 
-    SystemD.save_settings(configuration, config_file)
+    SystemD.save_settings(configuration, config_file, autoapprove=args.autoapprove)
 
 @systemdcommand([
     argument("-a", "--auto", help="Automatically approve all Yes/No prompts", action="store_true"),

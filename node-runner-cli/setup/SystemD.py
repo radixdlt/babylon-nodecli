@@ -350,9 +350,12 @@ WantedBy=multi-user.target
         return answer
 
     @staticmethod
-    def save_settings(settings: SystemDSettings, config_file: str):
-        to_update = input("\nOkay to update the config file [Y/n]?:")
-        if Helpers.check_Yes(to_update):
+    def save_settings(settings: SystemDSettings, config_file: str, autoapprove=False):
+        if autoapprove:
+            print("In Auto mode - Updating the file as suggested in above changes")
+        else:
+            to_update = input("\nOkay to update the config file [Y/n]?:")
+        if Helpers.check_Yes(to_update) or autoapprove:
             print(f"Saving configuration to {config_file}")
             settings.to_file(config_file)
 
