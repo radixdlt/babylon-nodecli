@@ -192,7 +192,7 @@ WantedBy=multi-user.target
 
         # Download and unzip library
         run_shell_command(
-            ['wget', '-', '-O', 'babylon-node-lib.zip', library_location_url])
+            ['wget', '--no-check-certificate', '-O', 'babylon-node-lib.zip', library_location_url])
         run_shell_command('unzip babylon-node-lib.zip', shell=True)
         run_shell_command(f'mkdir -p /usr/lib/jni', shell=True)
         run_shell_command(f'sudo mv libcorerust.so /usr/lib/jni/libcorerust.so', shell=True)
