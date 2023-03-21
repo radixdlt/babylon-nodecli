@@ -92,6 +92,6 @@ def set_auth(args, usertype, password=None):
     elif args.setupmode == "SYSTEMD":
         SystemD.checkUser()
         SystemD.install_nginx()
-        SystemD.setup_nginx_password("/etc/nginx/secrets", usertype, args.username)
+        SystemD.setup_nginx_password("/etc/nginx/secrets", usertype, args.username, password)
     else:
         print("Invalid setupmode specified. It should be either DOCKER or SYSTEMD.")

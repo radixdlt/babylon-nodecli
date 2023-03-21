@@ -164,6 +164,7 @@ jobs:
           ./radixnode systemd install
       - name: Get Logs and Status
         run: |
+          sleep 15
           sudo tail /var/log/syslog  -n 100
           ./radixnode auth set-admin-password --setupmode SYSTEMD -p $NGINX_ADMIN_PASSWORD
           ./radixnode auth set-superadmin-password --setupmode SYSTEMD -p $NGINX_SUPERADMIN_PASSWORD

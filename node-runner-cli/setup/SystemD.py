@@ -278,12 +278,15 @@ WantedBy=multi-user.target
             run_shell_command(f"sudo openssl dhparam -out {secrets_dir}/dhparam.pem  4096", shell=True)
 
     @staticmethod
-    def setup_nginx_password(secrets_dir, usertype, username):
+    def setup_nginx_password(secrets_dir, usertype, username, password=None):
         run_shell_command(f'sudo mkdir -p {secrets_dir}', shell=True)
         print('-----------------------------')
         print(f'Setting up nginx password for user of type {usertype}')
         run_shell_command(f'sudo touch {secrets_dir}/htpasswd.{usertype}', fail_on_error=True, shell=True)
-        run_shell_command(f'sudo htpasswd -c {secrets_dir}/htpasswd.{usertype} {username}', shell=True)
+        if password is None:
+            run_shell_command(f'sudo htpasswd -c {secrets_dir}/htpasswd.{usertype} {username}', shell=True)
+        else:
+            run_shell_command(f'sudo htpasswd -b -c {secrets_dir}/htpasswd.{usertype} {username} {password}', shell=True)
         print(
             f"""Setup NGINX_{usertype.upper()}_PASSWORD environment variable using below command . Replace the string 
             'nginx_password_of_your_choice' with your password 
