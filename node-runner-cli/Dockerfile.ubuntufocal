@@ -1,8 +1,8 @@
-FROM ubuntu:20.04 as BUILD
+FROM ubuntu:22.04 as BUILD
 MAINTAINER radixdlt <devops@radixdlt.com>
 
 ENV DEBIAN_FRONTEND noninteractive
-ENV PYTHON_VERSION 3.7.6
+ENV PYTHON_VERSION 3.10.6
 
 CMD /bin/bash
 
@@ -22,11 +22,11 @@ RUN set -ex \
     && pyenv update
 
 
-RUN CONFIGURE_OPTS=--enable-shared pyenv install 3.7.6
+RUN CONFIGURE_OPTS=--enable-shared pyenv install 3.10.6
 
 
 
-RUN pyenv virtualenv 3.7.6 nodecli
+RUN pyenv virtualenv 3.10.6 nodecli
 RUN pyenv local nodecli
 RUN pip install pyinstaller==4.10
 
