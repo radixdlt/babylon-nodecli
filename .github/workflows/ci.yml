@@ -113,6 +113,51 @@ jobs:
           asset_content_type: application/octet-stream
         if: ${{ github.event_name == 'release' }}
 
+  test-systemd:
+    runs-on: ubuntu-22.04
+    needs:
+      - package_ubuntu_cli
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.4.0
+        with:
+          fetch-depth: 0
+      - name: Download packaged cli
+        uses: actions/download-artifact@v3
+        with:
+          name: ubuntu 22.04
+      - name: Get dependencies
+        run: |
+          chmod +x ./radixnode
+          sudo apt-get update
+          sudo apt-get install containerd runc
+      - name: Run systemd dependencies
+        run: |
+          ls -a
+          chmod +x ./radixnode
+          ./radixnode systemd dependencies
+      - name: Run systemd config
+        run: |
+          ls -a
+          chmod +x ./radixnode
+          echo "HOME=$HOME"
+          echo "PATH=$PWD"
+          ./radixnode systemd config -m CORE \
+            -n 11 \
+            -t radix://node_tdx_b_1qdrcdjgzl6s2ymnsssdssxllmmj0j84eagu2m6xtttj3nxrunzesyh9fwea@3.109.242.93 \
+            -i 35.178.142.54 \
+            -k $KEYSTORE_PASSWORD -nk -a
+        env:
+          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
+      - name: Run systemd config
+        run: |
+          ls -a
+          chmod +x ./radixnode
+          echo "HOME=$HOME"
+          echo "PATH=$PWD"
+          ./radixnode systemd install
+          journalctl -f -n 100
+
   test-config-command:
     runs-on: ubuntu-22.04
     needs:
@@ -132,7 +177,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install containerd runc
           ./radixnode docker dependencies
-          touch /home/runner/genesis.json
       - name: core-gateway-all-local
         run: |
           ls -a
