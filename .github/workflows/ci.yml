@@ -183,11 +183,11 @@ jobs:
           ./radixnode systemd stop   
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Clean Up
-        run: |
-          sudo rm -rf /etc/radixdlt/node
-          rm -rf node-config/
-          rm -rf monitoring
+      # - name: Clean Up
+      #   run: |
+      #     sudo rm -rf /etc/radixdlt/node
+      #     rm -rf node-config/
+      #     rm -rf monitoring
 
   test-config-command:
     runs-on: ubuntu-22.04
