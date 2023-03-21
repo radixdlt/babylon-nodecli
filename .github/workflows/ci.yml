@@ -41,10 +41,14 @@ jobs:
         run: |
           cd node-runner-cli
           make test
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Build the binary for ubuntu
         run: |
           cd node-runner-cli
           make output-ubuntu-focal
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: "Upload generated cli file"
         uses: actions/upload-artifact@v3.1.2
         with:
@@ -150,6 +154,7 @@ jobs:
             -k $KEYSTORE_PASSWORD -nk -a
         env:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Run systemd config
         run: |
           ls -a
@@ -158,6 +163,8 @@ jobs:
           echo "PATH=$PWD"
           ./radixnode systemd install
           journalctl -f -n 100
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   test-config-command:
     runs-on: ubuntu-22.04
@@ -193,6 +200,7 @@ jobs:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
           RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: corenode-01
         run: |
           ls -a
@@ -204,6 +212,7 @@ jobs:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
           RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: corenode-02
         run: |
           ls -a
@@ -214,6 +223,7 @@ jobs:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
           RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 #      Enable below tests when gateway support is implemented
 #      - name: gateway-remote-core-local-postgress
 #        run: |
@@ -282,6 +292,7 @@ jobs:
           CORE_DOCKER_REPO_OVERRIDE: "radixdlt/radixdlt-core"
           RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 #      - id: auth
 #        uses: google-github-actions/auth@a61909d048e0be579b6c15b27088d19668493851
 #        with:
@@ -320,6 +331,7 @@ jobs:
           NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
           NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
           NGINX_SUPERADMIN_PASSWORD: ${{secrets.NGINX_SUPERADMIN_PASSWORD}}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Monitoring setup
         run: |
