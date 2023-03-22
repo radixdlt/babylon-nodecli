@@ -1,9 +1,9 @@
 import os
 import unittest
+from pathlib import Path
 
 import yaml
 from yaml import UnsafeLoader
-from pathlib import Path
 
 from config.DockerConfig import DockerConfig
 from config.Nginx import SystemdNginxConfig
@@ -33,7 +33,7 @@ class ConfigUnitTests(unittest.TestCase):
         self.assertEqual(new_config.release, config.release)
 
     def test_config_systemd_defaut_config_matches_fixture(self):
-        config=SystemDSettings({})
+        config = SystemDSettings({})
         home_directory = Path.home()
         config.core_node.node_dir = f"/someDir/node-config"
         config.core_node.node_secrets_dir = f"/someDir/node-config/secret"
@@ -130,7 +130,6 @@ gateway_settings:
         self.assertEqual(Network.validate_network_id("s"), 2)
         self.assertEqual(Network.validate_network_id("S"), 2)
         self.assertEqual(Network.validate_network_id("stokenet"), 2)
-
 
 
 def suite():

@@ -1,0 +1,28 @@
+ntp=false
+ntp.pool=pool.ntp.org
+
+network.id={{common_config.network_id}}
+{% if common_config.genesis_json_location is not none %}
+network.genesis_file={{common_config.genesis_json_location}}
+{% endif %}
+
+node.key.path={{core_node.keydetails.keyfile_path ~ '/' ~ core_node.keydetails.keyfile_name }}
+
+network.p2p.broadcast_port=30000
+network.p2p.listen_port=30001
+network.p2p.seed_nodes={{core_node.trusted_node}}
+network.p2p.use_proxy_protocol=false
+network.host_ip={{common_config.host_ip}}
+
+log.level=debug
+
+api.port=3334
+api.transactions.enable=true
+api.sign.enable=true
+api.bind.address=0.0.0.0
+
+db.location=/home/radixdlt/data
+
+{% if core_node.validator_address is defined %}
+consensus.validator_address={{core_node.validator_address}}
+{% endif %}

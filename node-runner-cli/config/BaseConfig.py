@@ -1,6 +1,3 @@
-import sys
-
-
 class BaseConfig:
     def __init__(self, settings: dict):
         for key, value in settings.items():
@@ -14,6 +11,7 @@ class BaseConfig:
             if self.__getattribute__(attr):
                 yield attr, self.__getattribute__(attr)
 
+
 class SetupMode:
     _instance = None
     mode = None
@@ -26,5 +24,3 @@ class SetupMode:
         if cls._instance is None:
             cls._instance = cls.__new__(cls)
         return cls._instance
-
-

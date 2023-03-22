@@ -8,8 +8,8 @@ from config.BaseConfig import BaseConfig, SetupMode
 from config.CommonDockerSettings import CommonDockerSettings
 from config.GatewayDockerConfig import GatewayDockerSettings
 from config.KeyDetails import KeyDetails
-from setup.Base import Base
 from env_vars import MOUNT_LEDGER_VOLUME, CORE_DOCKER_REPO_OVERRIDE
+from setup.Base import Base
 from utils.Prompts import Prompts
 from utils.utils import Helpers
 
@@ -71,11 +71,11 @@ class CoreDockerSettings(BaseConfig):
             trusted_node = Prompts.ask_trusted_node()
         self.trusted_node = trusted_node
 
-    def create_config(self, release, trustednode, ks_password, new_keystore):
+    def create_config(self, release, trustednode, ks_password, new_keystore, validator):
 
         self.set_core_release(release)
         self.set_trusted_node(trustednode)
-        self.ask_validator_address()
+        self.ask_validator_address(validator)
         self.keydetails = Base.ask_keydetails(ks_password, new_keystore)
         self.ask_data_directory()
         self.ask_enable_transaction()
@@ -84,8 +84,9 @@ class CoreDockerSettings(BaseConfig):
     def set_validator_address(self, validator_address: str):
         self.validator_address = validator_address
 
-    def ask_validator_address(self):
-        validator_address = Prompts.ask_validator_address()
+    def ask_validator_address(self, validator_address=None):
+        if validator_address is None:
+            validator_address = Prompts.ask_validator_address()
         self.set_validator_address(validator_address)
 
 

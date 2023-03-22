@@ -5,13 +5,10 @@ from pathlib import Path
 import yaml
 from yaml import UnsafeLoader
 
-from config.SystemDConfig import SystemDSettings, extract_network_id_from_arg, from_dict
-from config.KeyDetails import KeyDetails
-from env_vars import UNZIPPED_NODE_DIST_FOLDER, APPEND_DEFAULT_CONFIG_OVERIDES, NODE_BINARY_OVERIDE, \
-    NGINX_BINARY_OVERIDE
-from github.github import latest_release
+from config.Renderer import Renderer
+from config.SystemDConfig import SystemDSettings, from_dict
+from env_vars import UNZIPPED_NODE_DIST_FOLDER
 from setup.Base import Base
-from utils.Network import Network
 from utils.PromptFeeder import QuestionKeys
 from utils.utils import run_shell_command, Helpers
 
@@ -85,92 +82,12 @@ class SystemD(Base):
                 run_shell_command(f"cp {filepath}/{filename} {backup_time}/{filename}", shell=True)
 
     @staticmethod
-    def set_environment_variables(keystore_password, node_secrets_dir):
-        run_shell_command(f'mkdir -p {node_secrets_dir}', shell=True)
-        command = f"""
-cat > {node_secrets_dir}/environment << EOF
-JAVA_OPTS="--enable-preview -server -Xms8g -Xmx8g  -XX:MaxDirectMemorySize=2048m -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
-RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
-        """
-        run_shell_command(command, shell=True)
-
-    @staticmethod
-    def setup_default_config(trustednode, hostip, node_dir, node_type, keyfile_location="/etc/radixdlt/node/secrets",
-                             keyfile_name="node-keystore.ks",
-                             transactions_enable="false",
-                             network_id=1,
-                             data_folder="~/data"):
-
-        genesis_json_location = Network.path_to_genesis_json(network_id)
-
-        network_genesis_file_for_testnets = f"network.genesis_file={genesis_json_location}" if genesis_json_location else ""
-        enable_client_api = "true" if node_type == "archivenode" else "false"
-
-        # This may need to be moved to jinja template
-        command = f"""
-        cat > {node_dir}/default.config << EOF
-ntp=false
-ntp.pool=pool.ntp.org
-network.id={network_id}
-{network_genesis_file_for_testnets}
-node.key.path={keyfile_location}/{keyfile_name}
-network.p2p.listen_port=30001
-network.p2p.broadcast_port=30000
-network.p2p.seed_nodes={trustednode}
-network.host_ip={hostip}
-db.location={data_folder}
-api.port=3334
-log.level=debug
-api.transactions.enable={"true" if transactions_enable else "false"}
-api.sign.enable=true 
-api.bind.address=0.0.0.0 
-network.p2p.use_proxy_protocol=false
-"""
-        run_shell_command(command, shell=True)
-
-        if (os.getenv(APPEND_DEFAULT_CONFIG_OVERIDES)) is not None:
-            print("Add overides")
-            lines = []
-            while True:
-                line = input()
-                if line:
-                    lines.append(line)
-                else:
-                    break
-            for text in lines:
-                run_shell_command(f"echo {text} >> {node_dir}/default.config", shell=True)
-
-    @staticmethod
-    def setup_service_file(node_version_dir, node_dir="/etc/radixdlt/node",
-                           node_secrets_path="/etc/radixdlt/node/secrets",
+    def setup_service_file(settings: SystemDSettings,
                            service_file_path="/etc/systemd/system/radixdlt-node.service"):
         # This may need to be moved to jinja template
-        command = f"""
-        sudo cat > {service_file_path} << EOF
-[Unit]
-Description=Radix DLT Validator
-After=local-fs.target
-After=network-online.target
-After=nss-lookup.target
-After=time-sync.target
-After=systemd-journald-dev-log.socket
-Wants=network-online.target
-
-[Service]
-EnvironmentFile={node_secrets_path}/environment
-User=radixdlt
-LimitNOFILE=65536
-LimitNPROC=65536
-LimitMEMLOCK=infinity
-WorkingDirectory={node_dir}
-ExecStart={node_dir}/{node_version_dir}/bin/core
-SuccessExitStatus=143
-TimeoutStopSec=10
-Restart=on-failure
-
-[Install]
-WantedBy=multi-user.target
-        """
+        tmp_service: str = "/tmp/radixdlt-node.service"
+        Renderer().load_file_based_template("systemd.service.j2").render(dict(settings)).to_file(tmp_service)
+        command = f"sudo mv {tmp_service} {service_file_path}"
         run_shell_command(command, shell=True)
 
     @staticmethod
@@ -286,7 +203,8 @@ WantedBy=multi-user.target
         if password is None:
             run_shell_command(f'sudo htpasswd -c {secrets_dir}/htpasswd.{usertype} {username}', shell=True)
         else:
-            run_shell_command(f'sudo htpasswd -b -c {secrets_dir}/htpasswd.{usertype} {username} {password}', shell=True)
+            run_shell_command(f'sudo htpasswd -b -c {secrets_dir}/htpasswd.{usertype} {username} {password}',
+                              shell=True)
         print(
             f"""Setup NGINX_{usertype.upper()}_PASSWORD environment variable using below command . Replace the string 
             'nginx_password_of_your_choice' with your password 

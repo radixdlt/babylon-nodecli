@@ -14,7 +14,6 @@ from utils.Prompts import Prompts
 
 class ValidatorUnitTests(unittest.TestCase):
 
-
     @mock.patch('sys.stdout', new_callable=StringIO)
     def test_can_set_validator_address(self, mock_stdout):
         core_settings = CoreDockerSettings({})
@@ -76,7 +75,6 @@ class ValidatorUnitTests(unittest.TestCase):
         settings.ask_network_id(11)
         self.assertIn("nebunet", settings.network_name)
         self.assertIn("nebunet", settings.genesis_json_location)
-
 
 
 def suite():

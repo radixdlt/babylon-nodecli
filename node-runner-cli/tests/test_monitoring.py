@@ -2,9 +2,11 @@ import os.path
 import unittest
 from io import StringIO
 from unittest import mock
-from radixnode import main
+
 from jinja2.exceptions import TemplateNotFound
+
 from monitoring import Monitoring
+from radixnode import main
 
 
 class MonitoringTests(unittest.TestCase):
@@ -22,23 +24,24 @@ class MonitoringTests(unittest.TestCase):
     def test_template_failure(self, mock_stdout):
         with self.assertRaises(TemplateNotFound) as cm:
             Monitoring.template_dashboards(["this-template-does-not-exist"], "/tmp")
-            self.assertEqual(mock_stdout.getvalue(), "jinja2.exceptions.TemplateNotFound: this-template-does-not-exist.j2")
+            self.assertEqual(mock_stdout.getvalue(),
+                             "jinja2.exceptions.TemplateNotFound: this-template-does-not-exist.j2")
             self.assertEqual(cm.exception.code, 1)
 
     @mock.patch('sys.stdout', new_callable=StringIO)
     def test_monitoring_config(self, mock_out):
-        with mock.patch('builtins.input', side_effect=['Y', 'https://45.152.180.182','metrics', 'testpassword', 'n']):
+        with mock.patch('builtins.input', side_effect=['Y', 'https://45.152.180.182', 'metrics', 'testpassword', 'n']):
             with mock.patch("sys.argv",
-                       ["main", "monitoring", "config"]):
+                            ["main", "monitoring", "config"]):
                 main()
 
         with mock.patch("sys.argv",
-                   ["main", "monitoring", "config", "-m", "MONITOR_CORE", "-cm", "test"]):
+                        ["main", "monitoring", "config", "-m", "MONITOR_CORE", "-cm", "test"]):
             main()
 
-        with mock.patch('builtins.input', side_effect=['Y', 'https://45.152.180.182','metrics', 'testpassword', 'n']):
+        with mock.patch('builtins.input', side_effect=['Y', 'https://45.152.180.182', 'metrics', 'testpassword', 'n']):
             with mock.patch("sys.argv",
-                       ["main", "monitoring", "config", "-m", "DETAILED"]):
+                            ["main", "monitoring", "config", "-m", "DETAILED"]):
                 main()
 
 
