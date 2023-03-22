@@ -10,7 +10,6 @@ from config.SystemDConfig import SystemDSettings
 from radixnode import main
 from setup.SystemD import SystemD
 from utils.PromptFeeder import PromptFeeder
-from utils.utils import Helpers
 
 
 class SystemdUnitTests(unittest.TestCase):
@@ -229,11 +228,13 @@ WantedBy=multi-user.target"""
         settings = SystemDSettings({})
         settings.core_node.keydetails.keystore_password = "nowthatyouknowmysecretiwillfollowyouuntilyouforgetit"
 
-        render_template = Renderer().load_file_based_template("systemd-environment.j2").render(dict(settings.core_node.keydetails)).rendered
+        render_template = Renderer().load_file_based_template("systemd-environment.j2").render(
+            dict(settings.core_node.keydetails)).rendered
         fixture = f"""JAVA_OPTS="--enable-preview -server -Xms8g -Xmx8g  -XX:MaxDirectMemorySize=2048m -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
 RADIX_NODE_KEYSTORE_PASSWORD=nowthatyouknowmysecretiwillfollowyouuntilyouforgetit"""
         self.maxDiff = None
         self.assertEqual(render_template, fixture)
+
 
 def suite():
     """ This defines all the tests of a module"""

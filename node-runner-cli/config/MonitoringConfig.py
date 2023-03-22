@@ -2,7 +2,7 @@ from urllib.parse import urlparse
 
 from config.BaseConfig import BaseConfig, SetupMode
 from utils.Prompts import Prompts
-from utils.utils import Helpers, run_shell_command, bcolors
+from utils.utils import Helpers
 
 
 class CommonMonitoringSettings(BaseConfig):

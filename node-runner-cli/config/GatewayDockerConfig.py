@@ -1,4 +1,3 @@
-from pathlib import Path
 from urllib.parse import urlparse
 
 from config.BaseConfig import BaseConfig, SetupMode

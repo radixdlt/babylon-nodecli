@@ -126,5 +126,3 @@ class Base:
         else:
             print(f"Config file '{configfile}' doesn't exist");
             return {}
-
-

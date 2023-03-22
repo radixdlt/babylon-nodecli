@@ -38,6 +38,7 @@ class QuestionKeys:
     have_validator_address = "have_validator_address"
     validator_address = "validator_address"
 
+
 class PromptFeeder:
     _instance = None
     mode = None

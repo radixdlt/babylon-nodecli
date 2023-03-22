@@ -8,8 +8,8 @@ from config.BaseConfig import BaseConfig, SetupMode
 from config.CommonDockerSettings import CommonDockerSettings
 from config.GatewayDockerConfig import GatewayDockerSettings
 from config.KeyDetails import KeyDetails
-from setup.Base import Base
 from env_vars import MOUNT_LEDGER_VOLUME, CORE_DOCKER_REPO_OVERRIDE
+from setup.Base import Base
 from utils.Prompts import Prompts
 from utils.utils import Helpers
 

@@ -1,11 +1,11 @@
 import os
+import subprocess
+import sys
 from pathlib import Path
 
 import requests
-import sys
 
 from utils.utils import run_shell_command, Helpers, bcolors
-import subprocess
 
 
 class AnsibleRunner:

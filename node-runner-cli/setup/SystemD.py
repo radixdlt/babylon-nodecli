@@ -203,7 +203,8 @@ class SystemD(Base):
         if password is None:
             run_shell_command(f'sudo htpasswd -c {secrets_dir}/htpasswd.{usertype} {username}', shell=True)
         else:
-            run_shell_command(f'sudo htpasswd -b -c {secrets_dir}/htpasswd.{usertype} {username} {password}', shell=True)
+            run_shell_command(f'sudo htpasswd -b -c {secrets_dir}/htpasswd.{usertype} {username} {password}',
+                              shell=True)
         print(
             f"""Setup NGINX_{usertype.upper()}_PASSWORD environment variable using below command . Replace the string 
             'nginx_password_of_your_choice' with your password 
