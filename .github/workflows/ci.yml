@@ -48,7 +48,7 @@ jobs:
         if: always()
         with:
           files: |
-            node-runner-cli/junit/test-results.xml 
+            /home/runner/work/babylon-nodecli/babylon-nodecli/node-runner-cli/junit/test-results.xml 
       - name: Build the binary for ubuntu
         run: |
           cd node-runner-cli
