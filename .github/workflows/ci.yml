@@ -49,7 +49,7 @@ jobs:
         with:
           files: |
             node-runner-cli/junit/test-results.xml 
-    - name: Build the binary for ubuntu
+      - name: Build the binary for ubuntu
         run: |
           cd node-runner-cli
           make output-ubuntu-focal
