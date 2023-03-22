@@ -22,27 +22,6 @@ class SystemdUnitTests(unittest.TestCase):
         SystemD.confirm_config("dummy1", "dummy2", "dummy3", "dummy4")
 
     @unittest.skip("Can only be executed on Ubuntu")
-    def test_systemd_install_sets_environments_by_creating_file(self):
-        SystemD.set_environment_variables("dummypw", "/tmp")
-        self.assertTrue(os.path.isfile("/tmp/environment"))
-
-    @unittest.skip("Can only be executed on Ubuntu")
-    def test_systemd_creates_default_config_without_asking(self):
-        os.environ['PROMPT_FEEDS'] = "test-prompts/individual-prompts/systemd_install_default_config.yml"
-        PromptFeeder.instance().load_prompt_feeds()
-        SystemD.setup_default_config("radix:12345dummynode", "1.1.1.1", "/tmp", "???", "false")
-        self.assertTrue(os.path.isfile("/tmp/default.config"))
-        # ToDo: Test Appending of override lines
-
-    @unittest.skip("Tests with PROMPT_FEEDS can only be run individually")
-    def test_systemd_creates_service_file_without_asking(self):
-        os.environ['PROMPT_FEEDS'] = "test-prompts/individual-prompts/systemd_install_default_config.yml"
-        PromptFeeder.instance().load_prompt_feeds()
-        PromptFeeder.instance()
-        SystemD.setup_service_file("someversion", "/tmp", "/tmp/secrets", "/tmp/servicefile")
-        self.assertTrue(os.path.isfile("/tmp/servicefile"))
-
-    @unittest.skip("Can only be executed on Ubuntu")
     def test_systemd_config_can_run_without_prompt(self):
         with patch("sys.argv",
                    ["main", "systemd", "config",
@@ -95,7 +74,7 @@ class SystemdUnitTests(unittest.TestCase):
         # PromptFeeder.prompts_feed = PromptFeeder.instance().load_prompt_feeds()
         with patch('builtins.input', side_effect=['S', 'N', 'N', '/home/runner/docker-compose.yml', 'N']):
             with patch("sys.argv",
-                       ["main", "docker", "config", "-m", "DETAILED", "-k", "radix", "-nk","-a"]):
+                       ["main", "docker", "config", "-m", "DETAILED", "-k", "radix", "-nk", "-a"]):
                 main()
 
     @patch('sys.stdout', new_callable=StringIO)
@@ -138,7 +117,7 @@ class SystemdUnitTests(unittest.TestCase):
             settings.core_node.trusted_node = "someNode"
             settings.core_node.validator_address = "validatorAddress"
             settings.core_node.node_dir = "/tmp"
-            SystemD.setup_default_config(settings)
+            settings.create_default_config()
         self.assertTrue(os.path.isfile("/tmp/default.config"))
 
         f = open("/tmp/default.config", "r")
@@ -173,7 +152,6 @@ consensus.validator_address=validatorAddress
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_systemd_setup_default_config_jinja(self, mockout):
-
         with patch('builtins.input', side_effect=['/tmp/genesis.json']):
             settings = SystemDSettings({})
             settings.common_config.genesis_json_location = None
@@ -183,7 +161,8 @@ consensus.validator_address=validatorAddress
             settings.common_config.host_ip = "1.1.1.1"
             settings.common_config.network_id = 1
             settings.core_node.validator_address = "validatorAddress"
-            render_template = Renderer().load_file_based_template("systemd-default.config.j2").render(dict(settings)).rendered
+            render_template = Renderer().load_file_based_template("systemd-default.config.j2").render(
+                dict(settings)).rendered
         fixture = """ntp=false
 ntp.pool=pool.ntp.org
 
@@ -211,6 +190,50 @@ consensus.validator_address=validatorAddress
         self.maxDiff = None
         self.assertEqual(render_template, fixture)
 
+    @patch('sys.stdout', new_callable=StringIO)
+    def test_systemd_service_file_jinja(self, mockout):
+        settings = SystemDSettings({})
+        settings.core_node.node_dir = "/nodedir"
+        settings.core_node.node_secrets_dir = "/nodedir/secrets"
+        settings.core_node.core_release = "1.1.0"
+
+        render_template = Renderer().load_file_based_template("systemd.service.j2").render(dict(settings)).rendered
+        fixture = f"""[Unit]
+Description=Radix DLT Validator
+After=local-fs.target
+After=network-online.target
+After=nss-lookup.target
+After=time-sync.target
+After=systemd-journald-dev-log.socket
+Wants=network-online.target
+
+[Service]
+EnvironmentFile=/nodedir/secrets/environment
+User=radixdlt
+LimitNOFILE=65536
+LimitNPROC=65536
+LimitMEMLOCK=infinity
+WorkingDirectory=/nodedir
+ExecStart=/nodedir/1.1.0/bin/core
+SuccessExitStatus=143
+TimeoutStopSec=10
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target"""
+        self.maxDiff = None
+        self.assertEqual(render_template, fixture)
+
+    @patch('sys.stdout', new_callable=StringIO)
+    def test_systemd_service_file_jinja(self, mockout):
+        settings = SystemDSettings({})
+        settings.core_node.keydetails.keystore_password = "nowthatyouknowmysecretiwillfollowyouuntilyouforgetit"
+
+        render_template = Renderer().load_file_based_template("systemd-environment.j2").render(dict(settings.core_node.keydetails)).rendered
+        fixture = f"""JAVA_OPTS="--enable-preview -server -Xms8g -Xmx8g  -XX:MaxDirectMemorySize=2048m -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
+RADIX_NODE_KEYSTORE_PASSWORD=nowthatyouknowmysecretiwillfollowyouuntilyouforgetit"""
+        self.maxDiff = None
+        self.assertEqual(render_template, fixture)
 
 def suite():
     """ This defines all the tests of a module"""

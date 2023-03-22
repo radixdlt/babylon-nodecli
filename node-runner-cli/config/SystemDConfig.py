@@ -8,13 +8,14 @@ import yaml
 from config.BaseConfig import BaseConfig, SetupMode
 from config.KeyDetails import KeyDetails
 from config.Nginx import SystemdNginxConfig
-from env_vars import MOUNT_LEDGER_VOLUME, NODE_BINARY_OVERIDE, NGINX_BINARY_OVERIDE
+from config.Renderer import Renderer
+from env_vars import MOUNT_LEDGER_VOLUME, NODE_BINARY_OVERIDE, NGINX_BINARY_OVERIDE, APPEND_DEFAULT_CONFIG_OVERIDES
 from github import github
 from github.github import latest_release
 from setup.Base import Base
 from utils.Network import Network
 from utils.Prompts import Prompts
-from utils.utils import Helpers
+from utils.utils import Helpers, run_shell_command
 
 
 class CoreSystemdSettings(BaseConfig):
@@ -197,7 +198,7 @@ class SystemDSettings(BaseConfig):
 
     def parse_config_from_args(self, args):
         self.core_node.trusted_node = args.trustednode
-        self.host_ip = args.hostip
+        self.common_config.host_ip = args.hostip
         self.core_node.enable_transaction = args.enabletransactions
         self.core_node.data_directory = args.data_directory
         self.common_config.node_dir = args.configdir
@@ -216,6 +217,38 @@ class SystemDSettings(BaseConfig):
                                                                  f"https://github.com/radixdlt/babylon-nginx/releases/download/{self.common_config.nginx_settings.release}/babylon-nginx-{self.core_node.nodetype}-conf.zip")
         return self
 
+    def create_environment_file(self):
+        run_shell_command(f'mkdir -p {self.core_node.node_secrets_dir}', shell=True)
+        Renderer().load_file_based_template("systemd-environment.j2") \
+            .render(dict(self.core_node.keydetails)) \
+            .to_file(f"{self.core_node.node_secrets_dir}/environment")
+
+    def create_default_config(self):
+        self.common_config.genesis_json_location = Network.path_to_genesis_json(self.common_config.network_id)
+        Renderer().load_file_based_template("systemd-default.config.j2").render(
+            dict(self)).to_file(f"{self.core_node.node_dir}/default.config")
+
+        if (os.getenv(APPEND_DEFAULT_CONFIG_OVERIDES)) is not None:
+            print("Add overides")
+            lines = []
+            while True:
+                line = input()
+                if line:
+                    lines.append(line)
+                else:
+                    break
+            for text in lines:
+                run_shell_command(f"echo {text} >> {self.core_node.node_dir}/default.config", shell=True)
+
+    def create_service_file(self,
+                            service_file_path="/etc/systemd/system/radixdlt-node.service"):
+        # This may need to be moved to jinja template
+        tmp_service: str = "/tmp/radixdlt-node.service"
+        Renderer().load_file_based_template("systemd.service.j2").render(dict(self)).to_file(tmp_service)
+        command = f"sudo mv {tmp_service} {service_file_path}"
+        run_shell_command(command, shell=True)
+
+
 def from_dict(dictionary: dict) -> SystemDSettings:
     settings = SystemDSettings({})
     settings.core_node = CoreSystemdSettings({})
@@ -225,18 +258,3 @@ def from_dict(dictionary: dict) -> SystemDSettings:
     settings.common_config = CommonSystemdSettings(dictionary["common_config"])
     settings.common_config.nginx_settings = SystemdNginxConfig(dictionary["common_config"]["nginx_settings"])
     return settings
-
-
-def extract_network_id_from_arg(network_id_arg) -> int:
-    if network_id_arg == 1 or network_id_arg == 2:
-        return network_id_arg
-    elif network_id_arg in ["2", "s", "S", "stokenet"]:
-        return 2
-    elif network_id_arg in ["1", "m", "M", "mainnet"]:
-        return 1
-    elif network_id_arg is None or network_id_arg == "":
-        return None
-    else:
-        print(
-            "Not a valid argument for network id. Please enter either '1' 'm' 'M' 'mainnet' or '2' 's' 'S' 'stokenet'")
-        sys.exit(1)

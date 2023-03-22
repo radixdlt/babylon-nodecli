@@ -79,6 +79,7 @@ def network_sync_status(args):
     systemApiHelper = SystemApiHelper()
     systemApiHelper.network_sync_status(print_response=True)
 
+
 @systemapicommand()
 def identity(args):
     """
@@ -86,4 +87,3 @@ def identity(args):
     """
     systemApiHelper = SystemApiHelper()
     systemApiHelper.identity(print_response=True)
-

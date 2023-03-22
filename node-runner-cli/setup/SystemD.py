@@ -6,13 +6,9 @@ import yaml
 from yaml import UnsafeLoader
 
 from config.Renderer import Renderer
-from config.SystemDConfig import SystemDSettings, extract_network_id_from_arg, from_dict
-from config.KeyDetails import KeyDetails
-from env_vars import UNZIPPED_NODE_DIST_FOLDER, APPEND_DEFAULT_CONFIG_OVERIDES, NODE_BINARY_OVERIDE, \
-    NGINX_BINARY_OVERIDE
-from github.github import latest_release
+from config.SystemDConfig import SystemDSettings, from_dict
+from env_vars import UNZIPPED_NODE_DIST_FOLDER
 from setup.Base import Base
-from utils.Network import Network
 from utils.PromptFeeder import QuestionKeys
 from utils.utils import run_shell_command, Helpers
 
@@ -86,65 +82,12 @@ class SystemD(Base):
                 run_shell_command(f"cp {filepath}/{filename} {backup_time}/{filename}", shell=True)
 
     @staticmethod
-    def set_environment_variables(keystore_password, node_secrets_dir):
-        run_shell_command(f'mkdir -p {node_secrets_dir}', shell=True)
-        command = f"""
-cat > {node_secrets_dir}/environment << EOF
-JAVA_OPTS="--enable-preview -server -Xms8g -Xmx8g  -XX:MaxDirectMemorySize=2048m -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
-RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
-        """
-        run_shell_command(command, shell=True)
-
-    @staticmethod
-    def setup_default_config(settings: SystemDSettings):
-
-        settings.common_config.genesis_json_location = Network.path_to_genesis_json(settings.common_config.network_id)
-        Renderer().load_file_based_template("systemd-default.config.j2").render(
-            dict(settings)).to_file(f"{settings.core_node.node_dir}/default.config")
-
-        if (os.getenv(APPEND_DEFAULT_CONFIG_OVERIDES)) is not None:
-            print("Add overides")
-            lines = []
-            while True:
-                line = input()
-                if line:
-                    lines.append(line)
-                else:
-                    break
-            for text in lines:
-                run_shell_command(f"echo {text} >> {node_dir}/default.config", shell=True)
-
-    @staticmethod
-    def setup_service_file(node_version_dir, node_dir="/etc/radixdlt/node",
-                           node_secrets_path="/etc/radixdlt/node/secrets",
+    def setup_service_file(settings: SystemDSettings,
                            service_file_path="/etc/systemd/system/radixdlt-node.service"):
         # This may need to be moved to jinja template
-        command = f"""
-        sudo cat > {service_file_path} << EOF
-[Unit]
-Description=Radix DLT Validator
-After=local-fs.target
-After=network-online.target
-After=nss-lookup.target
-After=time-sync.target
-After=systemd-journald-dev-log.socket
-Wants=network-online.target
-
-[Service]
-EnvironmentFile={node_secrets_path}/environment
-User=radixdlt
-LimitNOFILE=65536
-LimitNPROC=65536
-LimitMEMLOCK=infinity
-WorkingDirectory={node_dir}
-ExecStart={node_dir}/{node_version_dir}/bin/core
-SuccessExitStatus=143
-TimeoutStopSec=10
-Restart=on-failure
-
-[Install]
-WantedBy=multi-user.target
-        """
+        tmp_service: str = "/tmp/radixdlt-node.service"
+        Renderer().load_file_based_template("systemd.service.j2").render(dict(settings)).to_file(tmp_service)
+        command = f"sudo mv {tmp_service} {service_file_path}"
         run_shell_command(command, shell=True)
 
     @staticmethod
