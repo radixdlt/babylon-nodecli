@@ -40,8 +40,16 @@ jobs:
       - name: Execute Unit Tests
         run: |
           cd node-runner-cli
+          pip install pytest
+          pip install pytest-cov
           make test
-      - name: Build the binary for ubuntu
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2.6.1
+        if: always()
+        with:
+          files: |
+            node-runner-cli/junit/test-results.xml 
+    - name: Build the binary for ubuntu
         run: |
           cd node-runner-cli
           make output-ubuntu-focal

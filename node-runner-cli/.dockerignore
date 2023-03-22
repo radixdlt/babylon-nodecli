@@ -1,1 +1,4 @@
 .python-version
+junit
+htmlcov
+coverage.xml
