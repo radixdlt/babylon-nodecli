@@ -1,4 +1,5 @@
 import os.path
+from pathlib import Path
 
 
 class GenesisConfig:
@@ -16,6 +17,7 @@ class GenesisConfig:
     @staticmethod
     def create_genesis_file(genesis_json_location: str, genesis: str):
         if not os.path.exists(genesis_json_location):
+            Path(genesis_json_location).mkdir(parents=True, exist_ok=True)
             f = open(genesis_json_location, "w")
             filecontent = f"{{\"genesis\": \"{genesis}\"}}"
             f.write(filecontent)
