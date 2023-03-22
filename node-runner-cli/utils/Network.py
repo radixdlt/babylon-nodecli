@@ -1,4 +1,5 @@
 import sys
+from pathlib import Path
 
 from config.Genesis import GenesisConfig
 from utils.PromptFeeder import QuestionKeys
@@ -44,10 +45,12 @@ class Network:
 
         elif network_id == 11:
             genesis_json_location = f"{Helpers.get_default_node_config_dir()}/nebunet-genesis.json"
+            Path(Helpers.get_default_node_config_dir()).mkdir(parents=True, exist_ok=True)
             GenesisConfig.create_nebunet_genesis_file(genesis_json_location)
             return genesis_json_location
         elif network_id == 32:
             genesis_json_location = f"{Helpers.get_default_node_config_dir()}/gilganet-genesis.json"
+            Path(Helpers.get_default_node_config_dir()).mkdir(parents=True, exist_ok=True)
             GenesisConfig.create_gilganet_genesis_file(genesis_json_location)
             return genesis_json_location
         else:
