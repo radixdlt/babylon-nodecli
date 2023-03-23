@@ -17,7 +17,6 @@ class Network:
             "Enter the network_id. For babylon betanet it is 11:",
             QuestionKeys.select_network)
         network_id = Network.validate_network_id(network_prompt)
-
         return network_id
 
     @staticmethod

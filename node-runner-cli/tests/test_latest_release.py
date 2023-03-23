@@ -1,12 +1,8 @@
 import unittest
 
-from unittest import mock
-from io import StringIO
-
 import urllib3
 
 import github.github
-from utils.Network import Network
 
 
 class LatestReleaseUnitTests(unittest.TestCase):

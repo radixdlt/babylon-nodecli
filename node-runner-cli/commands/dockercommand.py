@@ -10,10 +10,8 @@ from deepdiff import DeepDiff
 from commands.subcommand import get_decorator, argument
 from config.BaseConfig import SetupMode
 from config.DockerConfig import DockerConfig, CoreDockerSettings
-from config.GatewayDockerConfig import GatewayDockerSettings
 from config.Renderer import Renderer
 from github.github import latest_release
-from setup import Docker, Base
 from setup.AnsibleRunner import AnsibleRunner
 from setup.Base import Base
 from setup.Docker import Docker
@@ -69,6 +67,7 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
                   "if not provided you will be prompted to enter a value",
              default="",
              action="store"),
+    argument("-v", "--validator", help="Address of the validator ", action="store"),
     argument("-xc", "--disablenginxforcore", help="Core Node API's are protected by Basic auth setting."
                                                   "Set this to disable to nginx for core",
              action="store", default="", choices=["true", "false"])
@@ -84,11 +83,11 @@ def config(args):
     setupmode = SetupMode.instance()
     setupmode.mode = args.setupmode
     trustednode = args.trustednode if args.trustednode != "" else None
-    networkid = args.networkid if args.networkid != "" else None
     keystore_password = args.keystorepassword if args.keystorepassword != "" else None
     nginx_on_core = args.disablenginxforcore if args.disablenginxforcore != "" else None
     autoapprove = args.autoapprove
     new_keystore = args.newkeystore
+    validator = args.validator
 
     if "DETAILED" in setupmode.mode and len(setupmode.mode) > 1:
         print(f"{bcolors.FAIL}You cannot have DETAILED option with other options together."
@@ -113,57 +112,59 @@ def config(args):
         "\nCreating config file using the answers from the questions that would be asked in next steps."
         f"\nLocation of the config file: {bcolors.OKBLUE}{config_file}{bcolors.ENDC}")
 
-    configuration.common_settings.ask_network_id(networkid)
-    configuration.common_settings.ask_existing_docker_compose_file()
+    configuration.common_config.ask_network_id(args.networkid)
+    configuration.common_config.ask_existing_docker_compose_file()
 
     config_to_dump = {"version": "0.2"}
 
     if "CORE" in setupmode.mode:
         quick_node_settings: CoreDockerSettings = CoreDockerSettings({}).create_config(release, trustednode,
-                                                                                       keystore_password, new_keystore)
-        configuration.core_node_settings = quick_node_settings
-        configuration.common_settings.ask_enable_nginx_for_core(nginx_on_core)
-        config_to_dump["core_node"] = dict(configuration.core_node_settings)
+                                                                                       keystore_password, new_keystore,
+                                                                                       validator)
+        configuration.core_node = quick_node_settings
+        configuration.common_config.ask_enable_nginx_for_core(nginx_on_core)
+        config_to_dump["core_node"] = dict(configuration.core_node)
 
     # if "GATEWAY" in setupmode.mode:
     #     quick_gateway_settings: GatewayDockerSettings = GatewayDockerSettings({}).create_config(postgrespassword)
     #
     #     configuration.gateway_settings = quick_gateway_settings
-    #     configuration.common_settings.ask_enable_nginx_for_gateway(nginx_on_gateway)
+    #     configuration.common_config.ask_enable_nginx_for_gateway(nginx_on_gateway)
     #     config_to_dump["gateway"] = dict(configuration.gateway_settings)
 
     if "DETAILED" in setupmode.mode:
         run_fullnode = Prompts.check_for_fullnode()
         if run_fullnode:
-            detailed_node_settings = CoreDockerSettings({}).create_config(release, trustednode, keystore_password,
-                                                                          new_keystore)
-            configuration.core_node_settings = detailed_node_settings
-            configuration.common_settings.ask_enable_nginx_for_core(nginx_on_core)
-            config_to_dump["core_node"] = dict(configuration.core_node_settings)
+            detailed_node_settings: CoreDockerSettings = CoreDockerSettings({}).create_config(release, trustednode,
+                                                                                              keystore_password,
+                                                                                              new_keystore, validator)
+            configuration.core_node = detailed_node_settings
+            configuration.common_config.ask_enable_nginx_for_core(nginx_on_core)
+            config_to_dump["core_node"] = dict(configuration.core_node)
         else:
-            configuration.common_settings.nginx_settings.protect_core = "false"
+            configuration.common_config.nginx_settings.protect_core = "false"
 
         # run_gateway = Prompts.check_for_gateway()
         # if run_gateway:
         #     detailed_gateway_settings: GatewayDockerSettings = GatewayDockerSettings({}).create_config(
         #         postgrespassword)
         #     configuration.gateway_settings = detailed_gateway_settings
-        #     configuration.common_settings.ask_enable_nginx_for_gateway(nginx_on_gateway)
+        #     configuration.common_config.ask_enable_nginx_for_gateway(nginx_on_gateway)
         #     config_to_dump["gateway"] = dict(configuration.gateway_settings)
         # else:
-        #     configuration.common_settings.nginx_settings.protect_gateway = "false"
+        #     configuration.common_config.nginx_settings.protect_gateway = "false"
 
-    if configuration.common_settings.check_nginx_required():
-        configuration.common_settings.ask_nginx_release()
-        if configuration.core_node_settings.enable_transaction == "true":
-            configuration.common_settings.nginx_settings.enable_transaction_api = "true"
+    if configuration.common_config.check_nginx_required():
+        configuration.common_config.ask_nginx_release()
+        if configuration.core_node.enable_transaction == "true":
+            configuration.common_config.nginx_settings.enable_transaction_api = "true"
         else:
-            configuration.common_settings.nginx_settings.enable_transaction_api = "false"
+            configuration.common_config.nginx_settings.enable_transaction_api = "false"
 
     else:
-        configuration.common_settings.nginx_settings = None
+        configuration.common_config.nginx_settings = None
 
-    config_to_dump["common_config"] = dict(configuration.common_settings)
+    config_to_dump["common_config"] = dict(configuration.common_config)
 
     yaml.add_representer(type(None), Helpers.represent_none)
     Helpers.section_headline("CONFIG is Generated as below")

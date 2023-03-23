@@ -14,6 +14,7 @@ key_parser = keycli.add_subparsers(dest="keycommand")
 def keycommand(args=[], parent=key_parser):
     return get_decorator(args, parent)
 
+
 @keycommand([
     argument("-p", "--password", required=True,
              help="Password of the keystore",

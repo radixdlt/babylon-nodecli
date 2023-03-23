@@ -14,7 +14,6 @@ from utils.Prompts import Prompts
 
 class ValidatorUnitTests(unittest.TestCase):
 
-
     @mock.patch('sys.stdout', new_callable=StringIO)
     def test_can_set_validator_address(self, mock_stdout):
         core_settings = CoreDockerSettings({})
@@ -57,8 +56,8 @@ class ValidatorUnitTests(unittest.TestCase):
 
     def test_validator_address_included_in_dict_from_object(self):
         config = DockerConfig("1.0.0")
-        config.core_node_settings = CoreDockerSettings({})
-        config.core_node_settings.validator_address = "validator_mock"
+        config.core_node = CoreDockerSettings({})
+        config.core_node.validator_address = "validator_mock"
         # ToDo: This is too looesely coupled. Implement DockerConfig save and load from/to Object and remove this test
         yaml_config = yaml.dump(config, default_flow_style=False, explicit_start=True, allow_unicode=True)
         self.assertTrue("validator_address" in str(yaml_config))
@@ -76,7 +75,6 @@ class ValidatorUnitTests(unittest.TestCase):
         settings.ask_network_id(11)
         self.assertIn("nebunet", settings.network_name)
         self.assertIn("nebunet", settings.genesis_json_location)
-
 
 
 def suite():

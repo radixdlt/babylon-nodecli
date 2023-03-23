@@ -4,8 +4,6 @@ import sys
 
 import yaml
 
-from config.BaseConfig import SetupMode
-from config.GatewayDockerConfig import PostGresSettings
 from env_vars import DOCKER_COMPOSE_FOLDER_PREFIX, COMPOSE_HTTP_TIMEOUT, RADIXDLT_NODE_KEY_PASSWORD, POSTGRES_PASSWORD
 from github import github
 from setup.AnsibleRunner import AnsibleRunner
@@ -109,18 +107,6 @@ class Docker(Base):
         if postgres_db and postgres_db.get("setup", None) == "local":
             return True
         return False
-
-    @staticmethod
-    def load_all_config(configfile):
-        yaml.add_representer(type(None), Helpers.represent_none)
-
-        if os.path.exists(configfile):
-            with open(configfile, 'r') as file:
-                all_config = yaml.safe_load(file)
-                return all_config
-        else:
-            print(f"Config file '{configfile}' doesn't exist");
-            return {}
 
     @staticmethod
     def get_existing_compose_file(all_config):

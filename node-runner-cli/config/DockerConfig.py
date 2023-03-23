@@ -7,17 +7,11 @@ import yaml
 from config.BaseConfig import BaseConfig, SetupMode
 from config.CommonDockerSettings import CommonDockerSettings
 from config.GatewayDockerConfig import GatewayDockerSettings
+from config.KeyDetails import KeyDetails
 from env_vars import MOUNT_LEDGER_VOLUME, CORE_DOCKER_REPO_OVERRIDE
-from setup import Base
+from setup.Base import Base
 from utils.Prompts import Prompts
 from utils.utils import Helpers
-
-
-class KeyDetails(BaseConfig):
-    keyfile_path: str = Helpers.get_default_node_config_dir()
-    keyfile_name: str = "node-keystore.ks"
-    keygen_tag: str = None
-    keystore_password: str = None
 
 
 class CoreDockerSettings(BaseConfig):
@@ -53,19 +47,6 @@ class CoreDockerSettings(BaseConfig):
     def set_node_type(self, nodetype="fullnode"):
         self.nodetype = nodetype
 
-    def ask_keydetails(self, ks_password=None, new_keystore=False):
-        keydetails = self.keydetails
-        if "DETAILED" in SetupMode.instance().mode:
-            keydetails.keyfile_path = Prompts.ask_keyfile_path()
-            keydetails.keyfile_name = Prompts.ask_keyfile_name()
-
-        keystore_password, file_location = Base.generatekey(
-            keyfile_path=keydetails.keyfile_path,
-            keyfile_name=keydetails.keyfile_name,
-            keygen_tag=keydetails.keygen_tag, ks_password=ks_password, new=new_keystore)
-        keydetails.keystore_password = keystore_password
-        self.keydetails = keydetails
-
     def set_core_release(self, release):
         self.core_release = release
         # Using hardcoded tag value till we publish keygen image
@@ -90,12 +71,12 @@ class CoreDockerSettings(BaseConfig):
             trusted_node = Prompts.ask_trusted_node()
         self.trusted_node = trusted_node
 
-    def create_config(self, release, trustednode, ks_password, new_keystore):
+    def create_config(self, release, trustednode, ks_password, new_keystore, validator):
 
         self.set_core_release(release)
         self.set_trusted_node(trustednode)
-        self.ask_validator_address()
-        self.ask_keydetails(ks_password, new_keystore)
+        self.ask_validator_address(validator)
+        self.keydetails = Base.ask_keydetails(ks_password, new_keystore)
         self.ask_data_directory()
         self.ask_enable_transaction()
         return self
@@ -103,18 +84,22 @@ class CoreDockerSettings(BaseConfig):
     def set_validator_address(self, validator_address: str):
         self.validator_address = validator_address
 
-    def ask_validator_address(self):
-        validator_address = Prompts.ask_validator_address()
+    def ask_validator_address(self, validator_address=None):
+        if validator_address is None:
+            validator_address = Prompts.ask_validator_address()
         self.set_validator_address(validator_address)
 
 
-class DockerConfig:
-    core_node_settings: CoreDockerSettings = CoreDockerSettings({})
-    common_settings: CommonDockerSettings = CommonDockerSettings({})
+class DockerConfig(BaseConfig):
+    core_node: CoreDockerSettings = CoreDockerSettings({})
+    common_config: CommonDockerSettings = CommonDockerSettings({})
     gateway_settings: GatewayDockerSettings = GatewayDockerSettings({})
 
     def __init__(self, release: str):
-        self.core_node_settings.core_release = release
+        self.core_node = CoreDockerSettings({})
+        self.common_config = CommonDockerSettings({})
+        self.gateway_settings = GatewayDockerSettings({})
+        self.core_node.core_release = release
 
     def loadConfig(self, file):
         my_file = Path(file)
@@ -124,13 +109,21 @@ class DockerConfig:
         with open(file, 'r') as file:
             config_yaml = yaml.safe_load(file)
             core_node = config_yaml["core_node"]
-            common_settings = config_yaml["common_config"]
-            self.core_node_settings.core_release = core_node.get("core_release", None)
-            self.core_node_settings.data_directory = core_node.get("data_directory", None)
-            self.core_node_settings.genesis_json_location = core_node.get("genesis_json_location", None)
-            self.core_node_settings.enable_transaction = core_node.get("enable_transaction", False)
-            self.common_settings = CommonDockerSettings(
-                {"network_id": common_settings.get("network_id", "1")})
-            self.core_node_settings.keydetails = KeyDetails(core_node.get("keydetails", None))
-            self.core_node_settings.trusted_node = core_node.get("trusted_node", None)
-            self.core_node_settings.existing_docker_compose = core_node.get("docker_compose", None)
+            common_config = config_yaml["common_config"]
+            self.core_node.core_release = core_node.get("core_release", None)
+            self.core_node.data_directory = core_node.get("data_directory", None)
+            self.core_node.genesis_json_location = core_node.get("genesis_json_location", None)
+            self.core_node.enable_transaction = core_node.get("enable_transaction", False)
+            self.common_config = CommonDockerSettings(
+                {"network_id": common_config.get("network_id", "1")})
+            self.core_node.keydetails = KeyDetails(core_node.get("keydetails", None))
+            self.core_node.trusted_node = core_node.get("trusted_node", None)
+            self.core_node.existing_docker_compose = core_node.get("docker_compose", None)
+
+    def to_yaml(self):
+        config_to_dump = dict(self)
+        config_to_dump["common_config"] = dict(self.common_config)
+        config_to_dump["core_node"] = dict(self.core_node)
+        config_to_dump["gateway_settings"] = dict(self.gateway_settings)
+        return yaml.dump(config_to_dump, sort_keys=False, default_flow_style=False, explicit_start=True,
+                         allow_unicode=True)
