@@ -131,6 +131,10 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ubuntu 22.04
+      - name: setup python
+          uses: actions/setup-python@v4.5.0
+          with:
+            python-version: 3.10.6
       - name: Get dependencies
         run: |
           chmod +x ./radixnode
@@ -140,7 +144,7 @@ jobs:
         run: |
           ls -a
           chmod +x ./radixnode
-          # ./radixnode systemd dependencies
+          ./radixnode systemd dependencies
           echo "expecting the dependencies to be already installed"
       - name: Run systemd config
         run: |
