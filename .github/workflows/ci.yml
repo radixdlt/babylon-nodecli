@@ -40,6 +40,7 @@ jobs:
       - name: Execute Unit Tests
         run: |
           cd node-runner-cli
+          mkdir -p /home/runner/node-config
           make test
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
