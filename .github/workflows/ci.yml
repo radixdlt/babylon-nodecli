@@ -14,7 +14,7 @@ on:
 jobs:
   package_ubuntu_cli:
     name: "Package cli for Ubuntu"
-    runs-on: [node-only]
+    runs-on: ubuntu-22.04
     steps:
       - name: cancel running workflows
         uses: styfle/cancel-workflow-action@0.11.0
@@ -118,7 +118,7 @@ jobs:
         if: ${{ github.event_name == 'release' }}
 
   test-systemd:
-    runs-on: [node-only]
+    runs-on: [systemd]
     needs:
       - package_ubuntu_cli
     steps:
