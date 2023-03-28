@@ -24,7 +24,7 @@ class SystemD(Base):
         print("Checking if user radixdlt already exists")
         user_exists = run_shell_command("cat /etc/passwd | grep radixdlt", shell=True, fail_on_error=False)
         if user_exists.returncode != 0:
-            run_shell_command('sudo useradd -m -s /bin/bash radixdlt ', shell=True)
+            run_shell_command('sudo useradd -m -s /bin/bash radixdlt', shell=True)
         run_shell_command(['sudo', 'usermod', '-aG', 'docker', 'radixdlt'])
 
     @staticmethod
