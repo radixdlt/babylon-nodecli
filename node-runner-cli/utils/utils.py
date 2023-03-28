@@ -97,9 +97,9 @@ class Helpers:
         s = requests.Session()
         resp = s.send(prepared, verify=False)
         if Helpers.is_json(resp.content):
-            response_content = json.dumps(resp.json())
+            response_content = json.dumps(resp.json(), indent=2)
         else:
-            response_content = resp.content
+            response_content = resp.content.decode("utf-8")
 
         if print_response:
             print(response_content)
