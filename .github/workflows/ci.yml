@@ -14,7 +14,7 @@ on:
 jobs:
   package_ubuntu_cli:
     name: "Package cli for Ubuntu"
-    runs-on: [node-only]
+    runs-on: ubuntu-22.04
     steps:
       - name: cancel running workflows
         uses: styfle/cancel-workflow-action@0.11.0
@@ -40,7 +40,30 @@ jobs:
       - name: Execute Unit Tests
         run: |
           cd node-runner-cli
+          pip install pytest
+          pip install pytest-cov
           make test
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2.6.1
+        if: always()
+        with:
+          files: |
+            /home/runner/work/babylon-nodecli/babylon-nodecli/node-runner-cli/junit/test-results.xml 
+            test-results/**/*.xml
+            test-results/**/*.trx
+            test-results/**/*.json
+            junit/**/*.xml
+            junit/*.xml
+            node-runner-cli/junit/**/*.xml
+            junit/*.xml
+            **/junit/test-results.xml
+      - name: Get Cover 
+        uses: orgoro/coverage@v3
+        with:
+          coverageFile: node-runner-cli/coverage.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Build the binary for ubuntu

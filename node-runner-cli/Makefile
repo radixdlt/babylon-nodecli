@@ -18,4 +18,5 @@ cmds-reference: local
 
 .PHONEY: test
 test: test
-	python -m unittest
+	#python -m unittest
+	pytest tests/ --doctest-modules --junitxml=junit/test-results.xml --cov=. --cov-report=xml --cov-report=html
