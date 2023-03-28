@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 
-from commands.subcommand import get_decorator, argument
+from commands.subcommand import get_decorator
 from setup.Base import Base
 from utils.utils import Helpers
 

@@ -33,6 +33,7 @@ class QuestionKeys:
     postgres_db_password = "postgres_db_password"
     gateway_release = "gateway_release"
     aggregator_release = "aggregator_release"
+    continue_systemd_install = "continue_systemd_install"
     genesis_location = "genesis_location"
     have_validator_address = "have_validator_address"
     validator_address = "validator_address"

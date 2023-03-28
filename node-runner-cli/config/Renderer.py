@@ -25,3 +25,7 @@ class Renderer:
 
         yaml.add_representer(type(None), represent_none)
         return yaml.safe_load(self.rendered)
+
+    def to_file(self, filepath: str):
+        with open(filepath, 'w') as f:
+            f.write(self.rendered)

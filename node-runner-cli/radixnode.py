@@ -6,7 +6,6 @@ from argparse import ArgumentParser
 
 import urllib3
 
-from api.DefaultApiHelper import DefaultApiHelper
 from api.SystemApiHelper import SystemApiHelper
 from commands.authcommand import authcli
 from commands.dockercommand import dockercli
@@ -38,7 +37,7 @@ def check_latest_cli():
 
     if os.getenv(DISABLE_VERSION_CHECK, "False").lower() not in ("true", "yes"):
         if Helpers.cli_version() != cli_latest_version:
-            os_name = "ubuntu-20.04"
+            os_name = "ubuntu-22.04"
             print(
                 f"Radixnode CLI latest version is {cli_latest_version} and current version of the binary is {Helpers.cli_version()}.\n.")
             print(f"""

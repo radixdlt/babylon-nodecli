@@ -14,14 +14,14 @@ on:
 jobs:
   package_ubuntu_cli:
     name: "Package cli for Ubuntu"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: cancel running workflows
-        uses: styfle/cancel-workflow-action@0.8.0
+        uses: styfle/cancel-workflow-action@0.11.0
         with:
           access_token: ${{ github.token }}
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3.4.0
         with:
           fetch-depth: 0
       - name: Dump context
@@ -29,9 +29,9 @@ jobs:
       - name: Install build essentials
         run: sudo apt-get -y install build-essential
       - name: setup python
-        uses: actions/setup-python@v2.2.1
+        uses: actions/setup-python@v4.5.0
         with:
-          python-version: 3.7.6
+          python-version: 3.10.6
       - name: Build application local
         run: |
           cd node-runner-cli
@@ -43,6 +43,8 @@ jobs:
           pip install pytest
           pip install pytest-cov
           make test
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2.6.1
         if: always()
@@ -62,26 +64,30 @@ jobs:
         with:
           coverageFile: node-runner-cli/coverage.xml
           token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Build the binary for ubuntu
         run: |
           cd node-runner-cli
           make output-ubuntu-focal
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: "Upload generated cli file"
-        uses: actions/upload-artifact@v2.2.3
+        uses: actions/upload-artifact@v3.1.2
         with:
-          name: ubuntu 20.04
+          name: ubuntu 22.04
           path: "${{ github.workspace }}/node-runner-cli/out/ubuntu/focal/radixnode"
 
   upload-asset-store:
     environment: AWS_ARTIFACT
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     if: ${{ github.event_name == 'push' }}
     needs:
       - package_ubuntu_cli
     steps:
 
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3.4.0
       - name: set branchname with commit
         run: |
           ls -l
@@ -98,17 +104,17 @@ jobs:
       - name: Download packaged cli
         uses: actions/download-artifact@v3
         with:
-          name: ubuntu 20.04
+          name: ubuntu 22.04
       - name: Upload cli to asset store
         run: |
           ls */**
-          aws s3 cp radixnode s3://${{secrets.ARTIFACT_AWS_BUCKET }}/radixnode/${{env.BRANCH_WITH_COMMIT}}/radixnode-ubuntu-20.04
+          aws s3 cp radixnode s3://${{secrets.ARTIFACT_AWS_BUCKET }}/radixnode/${{env.BRANCH_WITH_COMMIT}}/radixnode-ubuntu-22.04
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACT_AWS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACT_AWS_SECRET_ACCESS_KEY}}
 
   upload-release:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     if: ${{ github.event_name == 'release' }}
     needs:
       - package_ubuntu_cli
@@ -116,7 +122,7 @@ jobs:
       - name: Download packaged cli
         uses: actions/download-artifact@v3
         with:
-          name: ubuntu 20.04
+          name: ubuntu 22.04
       - name: Get release
         id: get_release
         uses: bruceadams/get-release@v1.2.2
@@ -130,23 +136,97 @@ jobs:
         with:
           upload_url: ${{ steps.get_release.outputs.upload_url }}
           asset_path: ./radixnode
-          asset_name: radixnode-ubuntu-20.04
+          asset_name: radixnode-ubuntu-22.04
           asset_content_type: application/octet-stream
         if: ${{ github.event_name == 'release' }}
 
-  test-config-command:
-    runs-on: ubuntu-20.04
+  test-systemd:
+    runs-on: [node-only]
     needs:
       - package_ubuntu_cli
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3.4.0
         with:
           fetch-depth: 0
       - name: Download packaged cli
         uses: actions/download-artifact@v3
         with:
-          name: ubuntu 20.04
+          name: ubuntu 22.04
+      - name: Get dependencies
+        run: |
+          chmod +x ./radixnode
+          sudo apt-get update
+          sudo apt-get install containerd runc
+      - name: Run systemd dependencies
+        run: |
+          ls -a
+          chmod +x ./radixnode
+          # ./radixnode systemd dependencies
+          echo "expecting the dependencies to be already installed"
+      - name: Run systemd config
+        run: |
+          ls -a
+          chmod +x ./radixnode
+          echo "HOME=$HOME"
+          echo "PATH=$PWD"
+          ./radixnode systemd config -m CORE \
+            -n 11 \
+            -t radix://node_tdx_b_1qdrcdjgzl6s2ymnsssdssxllmmj0j84eagu2m6xtttj3nxrunzesyh9fwea@3.109.242.93 \
+            -i 35.178.142.54 \
+            -v "not_a_real_validator_address" \
+            -k $KEYSTORE_PASSWORD -nk -a
+        env:
+          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run systemd install
+        run: |
+          ls -a
+          chmod +x ./radixnode
+          echo "HOME=$HOME"
+          echo "PATH=$PWD"
+          ./radixnode systemd install
+      - name: Get Logs and Status
+        run: |
+          sleep 15
+          sudo tail /var/log/syslog  -n 100
+          ./radixnode auth set-admin-password --setupmode SYSTEMD -p $NGINX_ADMIN_PASSWORD
+          ./radixnode auth set-superadmin-password --setupmode SYSTEMD -p $NGINX_SUPERADMIN_PASSWORD
+          ./radixnode auth set-metrics-password --setupmode SYSTEMD -p $NGINX_METRICS_PASSWORD
+          NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system health
+          NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
+          NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
+          NGINX_SUPERADMIN_PASSWORD: ${{secrets.NGINX_SUPERADMIN_PASSWORD}}
+      - name: Stop systemd 
+        run: |
+          chmod +x ./radixnode
+          echo "HOME=$HOME"
+          echo "PATH=$PWD"
+          ./radixnode systemd stop   
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Clean Up
+      #   run: |
+      #     sudo rm -rf /etc/radixdlt/node
+      #     rm -rf node-config/
+      #     rm -rf monitoring
+
+  test-config-command:
+    runs-on: ubuntu-22.04
+    needs:
+      - package_ubuntu_cli
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.4.0
+        with:
+          fetch-depth: 0
+      - name: Download packaged cli
+        uses: actions/download-artifact@v3
+        with:
+          name: ubuntu 22.04
       - name: Get dependencies
         run: |
           chmod +x ./radixnode
@@ -168,6 +248,7 @@ jobs:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
           RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: corenode-01
         run: |
           ls -a
@@ -179,6 +260,7 @@ jobs:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
           RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: corenode-02
         run: |
           ls -a
@@ -189,6 +271,7 @@ jobs:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
           RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 #      Enable below tests when gateway support is implemented
 #      - name: gateway-remote-core-local-postgress
 #        run: |
@@ -212,7 +295,7 @@ jobs:
 #          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
 
   test-core-only-node:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     permissions:
       id-token: write
       pull-requests: read
@@ -221,13 +304,13 @@ jobs:
       - package_ubuntu_cli
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3.4.0
         with:
           fetch-depth: 0
       - name: Download packaged cli
         uses: actions/download-artifact@v3
         with:
-          name: ubuntu 20.04
+          name: ubuntu 22.04
       - name: Run configure command
         run: |
           chmod +x ./radixnode
@@ -257,6 +340,7 @@ jobs:
           CORE_DOCKER_REPO_OVERRIDE: "radixdlt/radixdlt-core"
           RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
           RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 #      - id: auth
 #        uses: google-github-actions/auth@a61909d048e0be579b6c15b27088d19668493851
 #        with:
@@ -295,6 +379,7 @@ jobs:
           NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
           NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
           NGINX_SUPERADMIN_PASSWORD: ${{secrets.NGINX_SUPERADMIN_PASSWORD}}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Monitoring setup
         run: |
@@ -324,7 +409,7 @@ jobs:
 #          python-version: '3.x'
 #          architecture: 'x64'
 #      - name: Checkout
-#        uses: actions/checkout@v2
+#        uses: actions/checkout@v3.4.0
 #      - name: setup python modules
 #        run: |
 #          cd node-runner-cli
@@ -342,14 +427,14 @@ jobs:
 #          NGINX_SUPERADMIN_PASSWORD: ${{secrets.NGINX_SUPERADMIN_PASSWORD}}
 
 #  test-full-stack:
-#    runs-on: ubuntu-20.04
+#    runs-on: ubuntu-22.04
 #    needs:
 #      - package_ubuntu_cli
 #    steps:
 #      - name: Download packaged cli
 #        uses: actions/download-artifact@v3
 #        with:
-#          name: ubuntu 20.04
+#          name: ubuntu 22.04
 #      - name: Get dependencies
 #        run: |
 #          chmod +x ./radixnode
@@ -417,14 +502,14 @@ jobs:
 
 #
 #  test-full-stack-no-nginx:
-#    runs-on: ubuntu-20.04
+#    runs-on: ubuntu-22.04
 #    needs:
 #      - package_ubuntu_cli
 #    steps:
 #      - name: Download packaged cli
 #        uses: actions/download-artifact@v3
 #        with:
-#          name: ubuntu 20.04
+#          name: ubuntu 22.04
 #      - name: Get dependencies
 #        run: |
 #          chmod +x ./radixnode

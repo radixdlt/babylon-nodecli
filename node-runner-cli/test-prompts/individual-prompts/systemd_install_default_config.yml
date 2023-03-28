@@ -1,0 +1,4 @@
+---
+- select_network: S
+- input_ledger_path: "/tmp/data"
+- continue_systemd_install: Y

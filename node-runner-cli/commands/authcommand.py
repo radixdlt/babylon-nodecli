@@ -1,7 +1,8 @@
 from argparse import ArgumentParser
 
 from commands.subcommand import get_decorator, argument
-from setup import Docker, SystemD
+from setup.Docker import Docker
+from setup.SystemD import SystemD
 
 authcli = ArgumentParser(
     description='Subcommand to aid creation of nginx basic auth users',
@@ -91,6 +92,6 @@ def set_auth(args, usertype, password=None):
     elif args.setupmode == "SYSTEMD":
         SystemD.checkUser()
         SystemD.install_nginx()
-        SystemD.setup_nginx_password("/etc/nginx/secrets", usertype, args.username)
+        SystemD.setup_nginx_password("/etc/nginx/secrets", usertype, args.username, password)
     else:
         print("Invalid setupmode specified. It should be either DOCKER or SYSTEMD.")

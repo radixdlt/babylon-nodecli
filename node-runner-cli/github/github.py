@@ -34,7 +34,7 @@ def latest_release(repo_name="radixdlt/babylon-node") -> str:
     prepared.headers['Content-Type'] = 'application/json'
     prepared.headers['user-agent'] = 'radixnode-cli'
     if token is not None:
-        prepared.headers['Authorization'] = token
+        prepared.headers['Authorization'] = f'token {token}'
     resp = Helpers.send_request(prepared, print_response=False)
     if not resp.ok:
         print("Failed to get latest release from github. The response was:")

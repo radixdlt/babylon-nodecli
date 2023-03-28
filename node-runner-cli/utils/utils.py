@@ -97,9 +97,9 @@ class Helpers:
         s = requests.Session()
         resp = s.send(prepared, verify=False)
         if Helpers.is_json(resp.content):
-            response_content = json.dumps(resp.json())
+            response_content = json.dumps(resp.json(), indent=2)
         else:
-            response_content = resp.content
+            response_content = resp.content.decode("utf-8")
 
         if print_response:
             print(response_content)
@@ -120,7 +120,7 @@ class Helpers:
             If you not running nginx, then export below environment variable
                 export NGINX=false
             """)
-            sys.exit()
+            sys.exit(1)
         else:
             # if os.getenv(nginx_username) is None:
             #     print (f"Using default name of usertype {usertype} as {default_username}")
@@ -191,7 +191,7 @@ class Helpers:
         import re
         if not bool(re.match(r"radix://(.*)@\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", trustednode)):
             print(f"Trusted node {trustednode} does match pattern radix://public_key@ip. Please enter right value")
-            sys.exit()
+            sys.exit(1)
         return trustednode.rsplit('@', 1)[-1]
 
     @staticmethod
@@ -245,7 +245,7 @@ class Helpers:
     def archivenode_deprecate_message():
         print(
             "Archive node is no more supported for core releases from 1.1.0 onwards. Use cli versions older than 1.0.11 to run or maintain archive nodes")
-        sys.exit()
+        sys.exit(1)
 
     @staticmethod
     def print_request_body(item, name):
@@ -285,6 +285,7 @@ class Helpers:
 
     @staticmethod
     def input_guestion(question, question_key=None):
+        PromptFeeder.instance()
         prompt_feed = None
         if question_key:
             prompt_feed = PromptFeeder.instance().get_answer(question_key)

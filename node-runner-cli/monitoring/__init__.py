@@ -1,14 +1,13 @@
-import sys
-
-import requests
 import os
 import os.path
+import sys
 from pathlib import Path
 
+import requests
 import yaml
 
 from config.Renderer import Renderer
-from env_vars import NODE_END_POINT, NODE_HOST_IP_OR_NAME, COMPOSE_HTTP_TIMEOUT
+from env_vars import COMPOSE_HTTP_TIMEOUT
 from utils.utils import Helpers, run_shell_command
 
 
@@ -23,7 +22,7 @@ class Monitoring:
 
         if not resp.ok:
             print(f" Errored downloading file {default_prometheus_yaml_url}. Exitting ... ")
-            sys.exit()
+            sys.exit(1)
 
         default_prometheus_yaml = yaml.safe_load(resp.content)
         prometheus_yaml = Monitoring.merge_auth_config(default_prometheus_yaml, Monitoring.get_node_host_ip())
@@ -152,9 +151,9 @@ class Monitoring:
         if Helpers.check_Yes(start_monitoring_answer) or auto_approve:
             docker_compose_binary = os.getenv("DOCKER_COMPOSE_LOCATION", 'docker-compose')
             run_shell_command([docker_compose_binary, '-f', composefile, 'up', '-d'],
-                                       env={
-                                           COMPOSE_HTTP_TIMEOUT: os.getenv(COMPOSE_HTTP_TIMEOUT, "200")
-                                       }, fail_on_error=False)
+                              env={
+                                  COMPOSE_HTTP_TIMEOUT: os.getenv(COMPOSE_HTTP_TIMEOUT, "200")
+                              }, fail_on_error=False)
         else:
             print(f"""Exiting the command ..
                      Once you verified the file {composefile}, you can start the monitoring by running

@@ -1,4 +1,6 @@
+import ipaddress
 import os
+import sys
 
 from env_vars import SUPPRESS_API_COMMAND_WARN
 from utils.PromptFeeder import QuestionKeys
@@ -246,7 +248,7 @@ class Prompts:
     def get_nginx_release(latest_nginx_release) -> str:
 
         Helpers.section_headline("NGINX CONFIG")
-        print(f"Latest release of radixdlt-nginx is {bcolors.OKBLUE}{latest_nginx_release}{bcolors.ENDC}.")
+        print(f"Latest release of babylon-nginx is {bcolors.OKBLUE}{latest_nginx_release}{bcolors.ENDC}.")
         answer = Helpers.input_guestion(
             f"\nPress Enter to accept default or Type in radixdlt/babylon-nginx release tag:",
             QuestionKeys.input_nginx_release)
@@ -329,6 +331,17 @@ class Prompts:
                 f"Do you want to update to latest version {latest_version},"
                 f"Press ENTER to accept latest version or type in version you want to install:")
             return Helpers.check_Yes(Prompts.check_default(answer, latest_version))
+
+    @classmethod
+    def ask_host_ip(cls) -> str:
+        answer = input(
+            f"\n{bcolors.WARNING}Enter the host ip of this node:{bcolors.ENDC}")
+        try:
+            ipaddress.ip_address(answer)
+        except ValueError:
+            print(f"'{ip_string}' is not a valid ip address.")
+            sys.exit(1)
+        return answer
 
     @classmethod
     def ask_validator_address(cls) -> str:
