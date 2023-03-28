@@ -59,7 +59,8 @@ jobs:
             node-runner-cli/junit/**/*.xml
             junit/*.xml
             **/junit/test-results.xml
-      - name: Get Cover 
+      - if: ${{ github.event_name == 'pull_request' }}
+        name: Get Cover 
         uses: orgoro/coverage@v3
         with:
           coverageFile: node-runner-cli/coverage.xml
