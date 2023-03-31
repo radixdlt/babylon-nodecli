@@ -15,7 +15,7 @@ class Network:
         Helpers.section_headline(f"Network connection")
         # TODO change this for rcnet launch
         network_prompt = Helpers.input_guestion(
-            "Enter the network_id. For babylon betanet it is 11:",
+            "Enter the network_id. For babylon betanet it is 11. For babylon rcnet it is 12:",
             QuestionKeys.select_network)
         network_id = Network.validate_network_id(network_prompt)
         return network_id
@@ -46,6 +46,11 @@ class Network:
             genesis_json_location = f"{Helpers.get_default_node_config_dir()}/nebunet-genesis.json"
             Path(Helpers.get_default_node_config_dir()).mkdir(parents=True, exist_ok=True)
             GenesisConfig.create_nebunet_genesis_file(genesis_json_location)
+            return genesis_json_location
+        elif network_id == 12:
+            genesis_json_location = f"{Helpers.get_default_node_config_dir()}/kisharnet-genesis.json"
+            Path(Helpers.get_default_node_config_dir()).mkdir(parents=True, exist_ok=True)
+            GenesisConfig.create_kisharnet_genesis_file(genesis_json_location)
             return genesis_json_location
         elif network_id == 32:
             genesis_json_location = f"{Helpers.get_default_node_config_dir()}/gilganet-genesis.json"
