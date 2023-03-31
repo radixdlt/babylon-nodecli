@@ -9,9 +9,9 @@ class LatestReleaseUnitTests(unittest.TestCase):
 
     def test_latest_releases(self):
         urllib3.disable_warnings()
-        self.assertEqual(github.github.latest_release("radixdlt/babylon-node"), "betanet-v2-2e0f369d5")
+        self.assertEqual(github.github.latest_release("radixdlt/babylon-node"), "rcnet-v1-c6360105d")
         self.assertEqual(github.github.latest_release("radixdlt/babylon-nginx"), "1.0.0-rc2")
-        self.assertEqual(github.github.latest_release("radixdlt/babylon-gateway"), "betanet-v2-87f7371c5")
+        self.assertEqual(github.github.latest_release("radixdlt/babylon-gateway"), "rcnet-v1-a8da752")
 
 
 def suite():

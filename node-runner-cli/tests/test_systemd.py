@@ -4,6 +4,8 @@ from io import StringIO
 from pathlib import Path
 from unittest.mock import patch
 
+import urllib3
+
 from config.KeyDetails import KeyDetails
 from config.Renderer import Renderer
 from config.SystemDConfig import SystemDSettings
@@ -60,6 +62,7 @@ class SystemdUnitTests(unittest.TestCase):
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_systemd_config(self, mockout):
+        urllib3.disable_warnings()
         with patch('builtins.input', side_effect=['Y']):
             with patch("sys.argv",
                        ["main", "systemd", "config", "-m", "CORE", "-i", "18.133.170.30", "-t",
@@ -69,6 +72,7 @@ class SystemdUnitTests(unittest.TestCase):
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_docker_config(self, mockout):
+        urllib3.disable_warnings()
         # os.environ['PROMPT_FEEDS'] = "test-prompts/individual-prompts/validator_address.yml"
         # PromptFeeder.prompts_feed = PromptFeeder.instance().load_prompt_feeds()
         with patch('builtins.input', side_effect=['S', 'N', 'N', '/home/runner/docker-compose.yml', 'N']):
@@ -78,6 +82,7 @@ class SystemdUnitTests(unittest.TestCase):
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_docker_config_all_local(self, mockout):
+        urllib3.disable_warnings()
         # os.environ['PROMPT_FEEDS'] = "test-prompts/individual-prompts/validator_address.yml"
         # PromptFeeder.prompts_feed = PromptFeeder.instance().load_prompt_feeds()
         with open('/tmp/genesis.json', 'w') as fp:
