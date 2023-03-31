@@ -201,15 +201,16 @@ class Prompts:
     @staticmethod
     def ask_trusted_node() -> str:
         Helpers.section_headline("Trusted node settings")
-        value = Helpers.input_guestion("Fullnode requires another node to connect to network. "
-                                       "\nTo connect to MAINNET or STOKENET details on these node can be found here "
-                                       "- https://docs.radixdlt.com/main/node-and-gateway/seed-nodes.html"
+        default_trusted_nodes = "radix://node_tdx_c_1qvmhdlpvu3ym369ehjcmnmuam79vhs03gv0nqwhusewmvnjlfth3jpgr5ga@54.229.1.127,radix://node_tdx_c_1qfz58amtc2x8jz33uzfj9ymn8t2thhuatrt9w67he2w9x2f6eve4g20qctn@15.206.142.82,radix://node_tdx_c_1qtvxv7259j0l48gycv0zdze6he56c5sx4vjhljc7jsgkxaamnf3kccv4k4w@3.234.147.175,radix://node_tdx_c_1q2axr7xr4utg3a7hxstxdfjd7udqxzp5dqf6vgg0d0krmyrvzw775xa6nu4@3.24.207.200"
+        value = Helpers.input_guestion(f"Fullnode requires another node to connect to network. "
+                                       # ToDo: Add after main release of babylon
+                                       # "\nTo connect to MAINNET or STOKENET details on these node can be found here "
+                                       # "- https://docs.radixdlt.com/main/node-and-gateway/seed-nodes.html"
                                        "\nType in the node you want to connect to in format radix://<node-peer-2-peer-address>@<ip>"
-                                       "\n OR press Enter to accept default "
-                                       "radix://node_tdx_b_1qdrcdjgzl6s2ymnsssdssxllmmj0j84eagu2m6xtttj3nxrunzesyh9fwea@3.109.242.93:",
+                                       "\n OR press Enter to accept default for kisharnet/rcnet"
+                                       f"{default_trusted_nodes}",
                                        QuestionKeys.input_seednode)
-        trustednode = Prompts.check_default(value,
-                                            "radix://node_tdx_b_1qdrcdjgzl6s2ymnsssdssxllmmj0j84eagu2m6xtttj3nxrunzesyh9fwea@3.109.242.93")
+        trustednode = Prompts.check_default(value, default_trusted_nodes)
         Helpers.parse_trustednode(trustednode)
         return trustednode
 
