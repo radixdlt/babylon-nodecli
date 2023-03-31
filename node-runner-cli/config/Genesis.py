@@ -19,7 +19,7 @@ class GenesisConfig:
         GenesisConfig.create_genesis_file(genesis_json_location, kisharnet_genesis)
 
 
-@staticmethod
+    @staticmethod
     def create_genesis_file(genesis_json_location: str, genesis: str):
         if not os.path.exists(genesis_json_location):
             f = open(genesis_json_location, "w")
