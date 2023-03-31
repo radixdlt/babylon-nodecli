@@ -207,7 +207,7 @@ class Prompts:
                                        # "\nTo connect to MAINNET or STOKENET details on these node can be found here "
                                        # "- https://docs.radixdlt.com/main/node-and-gateway/seed-nodes.html"
                                        "\nType in the node you want to connect to in format radix://<node-peer-2-peer-address>@<ip>"
-                                       "\n OR press Enter to accept default for kisharnet/rcnet"
+                                       "\n OR press Enter to accept default for kisharnet/rcnet :"
                                        f"{default_trusted_nodes}",
                                        QuestionKeys.input_seednode)
         trustednode = Prompts.check_default(value, default_trusted_nodes)
