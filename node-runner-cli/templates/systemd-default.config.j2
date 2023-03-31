@@ -23,6 +23,6 @@ api.bind.address=0.0.0.0
 
 db.location=/home/radixdlt/data
 
-{% if core_node.validator_address is defined %}
+{% if core_node.validator_address is defined and core_node.validator_address is not none %}
 consensus.validator_address={{core_node.validator_address}}
 {% endif %}

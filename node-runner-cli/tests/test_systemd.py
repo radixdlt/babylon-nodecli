@@ -150,6 +150,48 @@ consensus.validator_address=validatorAddress
         self.assertEqual(default_config, fixture)
 
     @patch('sys.stdout', new_callable=StringIO)
+    def test_systemd_setup_default_config_without_validator(self, mockout):
+        with patch('builtins.input', side_effect=['/tmp/genesis.json']):
+            settings = SystemDSettings({})
+            settings.common_config.host_ip = "1.1.1.1"
+            settings.common_config.network_id = 34
+            settings.core_node.keydetails.keyfile_path = "/tmp/node-config"
+            settings.core_node.keydetails.keyfile_name = "node-keystore.ks"
+            settings.core_node.trusted_node = "someNode"
+            settings.core_node.validator_address = None
+            settings.core_node.node_dir = "/tmp"
+            settings.create_default_config()
+        self.assertTrue(os.path.isfile("/tmp/default.config"))
+
+        f = open("/tmp/default.config", "r")
+        default_config = f.read()
+        fixture = """ntp=false
+ntp.pool=pool.ntp.org
+
+network.id=34
+network.genesis_file=/tmp/genesis.json
+
+node.key.path=/tmp/node-config/node-keystore.ks
+
+network.p2p.broadcast_port=30000
+network.p2p.listen_port=30001
+network.p2p.seed_nodes=someNode
+network.p2p.use_proxy_protocol=false
+network.host_ip=1.1.1.1
+
+log.level=debug
+
+api.port=3334
+api.transactions.enable=true
+api.sign.enable=true
+api.bind.address=0.0.0.0
+
+db.location=/home/radixdlt/data
+"""
+        self.maxDiff = None
+        self.assertEqual(default_config.strip(), fixture.strip())
+
+    @patch('sys.stdout', new_callable=StringIO)
     def test_systemd_setup_default_config_jinja(self, mockout):
         with patch('builtins.input', side_effect=['/tmp/genesis.json']):
             settings = SystemDSettings({})
