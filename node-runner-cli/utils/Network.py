@@ -35,7 +35,7 @@ class Network:
 
     @staticmethod
     def path_to_genesis_json(network_id: int) -> str:
-        if network_id not in [1, 2, 11, 32]:
+        if network_id not in [1, 2, 11, 12, 32]:
             config_dir = f"{Helpers.get_default_node_config_dir()}/genesis.json"
             genesis_json_location = Prompts.check_default(Helpers.input_guestion(
                 f"Enter absolute path to genesis json. Default location is {bcolors.OKBLUE}{config_dir}{bcolors.ENDC}:",
@@ -69,6 +69,7 @@ class Network:
             2: "stokenet",
             10: "adapanet",
             11: "nebunet",
+            12: "kisharnet",
             32: "gilganet",
             33: "enkinet",
             34: "hammunet",

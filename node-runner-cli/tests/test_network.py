@@ -60,6 +60,8 @@ class NetworkUtilsUnitTests(unittest.TestCase):
     def test_default_genesis_files(self, mock_stdout):
         genesis_location = Network.path_to_genesis_json(11)
         self.assertIn("nebunet", genesis_location)
+        genesis_location = Network.path_to_genesis_json(12)
+        self.assertIn("kisharnet", genesis_location)
         genesis_location = Network.path_to_genesis_json(32)
         self.assertIn("gilganet", genesis_location)
 
