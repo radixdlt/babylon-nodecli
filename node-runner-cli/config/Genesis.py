@@ -15,7 +15,7 @@ class GenesisConfig:
 
     @staticmethod
     def create_kisharnet_genesis_file(genesis_json_location: str):
-        kisharnet_genesis: str = "2d86679542c9ffa9d04c31e268b3abe69ac5206ab257fcb1e94116377bb9a636c033776fc2ce449b8e8b9bcb1b9ef9ddf8acbc1f1431f303afc865db64e5f4aef19024543f76bc28c790a31e0932293733ad4bbdf9d58d6576bd7ca9c53293acb335402ba61f8c3af1688f7d7341666a64df71a0308346813a6210f6bec3d906c13bdea"
+        kisharnet_genesis: str = "02d86679542c9ffa9d04c31e268b3abe69ac5206ab257fcb1e94116377bb9a636c033776fc2ce449b8e8b9bcb1b9ef9ddf8acbc1f1431f303afc865db64e5f4aef19024543f76bc28c790a31e0932293733ad4bbdf9d58d6576bd7ca9c53293acb335402ba61f8c3af1688f7d7341666a64df71a0308346813a6210f6bec3d906c13bdea"
         GenesisConfig.create_genesis_file(genesis_json_location, kisharnet_genesis)
 
 
