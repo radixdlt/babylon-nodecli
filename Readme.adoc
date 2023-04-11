@@ -6,7 +6,7 @@
 
 Executable name - radixnode
 
-All the below commands can be executed on Ubuntu 20.04 ( supported OS) as below
+All the below commands can be executed on Ubuntu 22.04 ( supported OS) as below
 [source, bash]
 ----
 radixnode <sub command>
