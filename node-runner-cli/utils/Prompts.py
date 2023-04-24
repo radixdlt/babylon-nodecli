@@ -331,7 +331,7 @@ class Prompts:
             answer = Helpers.input_guestion(
                 f"Do you want to update to latest version {latest_version},"
                 f"Press ENTER to accept latest version or type in version you want to install:")
-            return Helpers.check_Yes(Prompts.check_default(answer, latest_version))
+            return Prompts.check_default(answer, latest_version)
 
     @classmethod
     def ask_host_ip(cls) -> str:
