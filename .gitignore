@@ -136,8 +136,7 @@ dmypy.json
 
 node-runner-cli/src
 node-runner-cli/systemd.settings.yml
-node-runner-cli/junit
+**/junit
 
 .DS_Store
 node-runner-cli/out/
-node-runner-cli/src/
