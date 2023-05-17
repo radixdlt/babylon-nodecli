@@ -1,5 +1,8 @@
 from argparse import ArgumentParser
 from argparse import RawTextHelpFormatter
+
+import botocore
+
 from commands.subcommand import get_decorator, argument
 
 import boto3

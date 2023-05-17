@@ -9,6 +9,7 @@ import urllib3
 from api.SystemApiHelper import SystemApiHelper
 from commands.authcommand import authcli
 from commands.dockercommand import dockercli
+from commands.ledgercommand import ledgercli
 from commands.key import keycli
 from commands.monitoring import monitoringcli
 from commands.othercommands import other_command_cli
@@ -29,10 +30,10 @@ apicli = ArgumentParser(
 api_parser = apicli.add_argument(dest="apicommand",
                                  choices=["system", "core", "metrics"])
 
-ledgercli = ArgumentParser(
-    description='Ledger commands')
-ledger_parser = ledgercli.add_argument(dest="ledgercommand",
-                                 choices=["sync"])
+# ledgercli = ArgumentParser(
+#     description='Ledger commands')
+# ledger_parser = ledgercli.add_argument(dest="ledgercommand",
+#                                  choices=["sync"])
 
 cwd = os.getcwd()
 
@@ -91,13 +92,14 @@ def main():
                 print(f"Invalid api command {apicli_args.apicommand}")
 
     elif args.subcommand == "ledger":
-        ledgercli_args = ledgercli.parse_args(sys.argv[2:3])
+        ledgercli_args = ledgercli.parse_args(sys.argv[2:])
+        # ledgercli_args = sync --type .... --fullnode
         if ledgercli_args.ledgercommand is None:
             ledgercli.print_help()
         else:
             if ledgercli_args.ledgercommand == "sync":
                 print(f"Syncing fullnode ledger {sys.argv[3:]}")
-                ledgercli_args.func(sys.argv[3:])
+                ledgercli_args.func(ledgercli_args)
             else:
                 print(f"Invalid ledger command {ledgercli_args.ledgercommand}")
 
