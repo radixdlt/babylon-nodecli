@@ -7,7 +7,7 @@ class LedgerUnitTests(unittest.TestCase):
     def test_ledger_config_can_run_without_prompt(self):
         with patch("sys.argv",
                    ["main", "ledger", "sync",
-                    "-d", "/etc/testledger/",
+                    "-d", "./",
                     "-t", "fullnode"]):
             main()
 

@@ -10,7 +10,7 @@ from botocore import UNSIGNED
 from botocore.client import Config
 
 
-BUCKET_NAME = 'backup-mainnet-ledger'
+BUCKET_NAME = 'olympia-mainnet-ledger-backups'
 BUCKET_FULLNODE_FOLDER = 'mainnet/mainnet_eu_west_1_fullnode3'
 BUCKET_VALIDATOR_FOLDER = 'mainnet/mainnet_eu_west_1_fullnode2'
 
@@ -45,7 +45,6 @@ def sync(args):
     Config is created only once as such and if there is a version change in the config file,
     then it updated by doing a migration to newer version
     """
-    print("SYNC function")
     type = args.type
     dest = args.dest
     if len(type) == 0:
