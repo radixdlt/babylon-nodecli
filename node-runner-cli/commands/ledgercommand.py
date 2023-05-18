@@ -10,7 +10,7 @@ from botocore import UNSIGNED
 from botocore.client import Config
 
 
-BUCKET_NAME = 'olympia-mainnet-ledger-backups'
+BUCKET_NAME = "olympia-mainnet-ledger-backups"
 BUCKET_FULLNODE_FOLDER = 'mainnet/mainnet_eu_west_1_fullnode3'
 BUCKET_VALIDATOR_FOLDER = 'mainnet/mainnet_eu_west_1_fullnode2'
 
@@ -74,7 +74,7 @@ def download_mainnet_backup_ledger(fullnode: bool, destinationPath: str):
         s3_client = boto3.client("s3", config=Config(signature_version=UNSIGNED))
         response = s3_client.list_objects_v2(Bucket=BUCKET_NAME,Prefix=BUCKET_FOLDER)
     except Exception as err:
-        logging.error('Exception was thrown in connection %s' % err)
+       ## logging.error('Exception was thrown in connection %s' % err)
         print("Error is {}".format(err))
         return err
     
