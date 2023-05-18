@@ -30,11 +30,6 @@ apicli = ArgumentParser(
 api_parser = apicli.add_argument(dest="apicommand",
                                  choices=["system", "core", "metrics"])
 
-# ledgercli = ArgumentParser(
-#     description='Ledger commands')
-# ledger_parser = ledgercli.add_argument(dest="ledgercommand",
-#                                  choices=["sync"])
-
 cwd = os.getcwd()
 
 
