@@ -88,7 +88,7 @@ def main():
 
     elif args.subcommand == "ledger":
         ledgercli_args = ledgercli.parse_args(sys.argv[2:])
-        # ledgercli_args = sync --type .... --fullnode
+        # ledgercli_args = sync --url --dest
         if ledgercli_args.ledgercommand is None:
             ledgercli.print_help()
         else:
