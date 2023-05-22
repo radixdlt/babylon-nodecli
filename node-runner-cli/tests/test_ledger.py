@@ -8,7 +8,8 @@ class LedgerUnitTests(unittest.TestCase):
         with patch("sys.argv",
                    ["main", "ledger", "sync",
                     "-d", "./",
-                    "-t", "fullnode"]):
+                    "--bucketname", "olympia-mainnet-ledger-backups",
+                    "--bucketfolder", "mainnet/mainnet_eu_west_1_fullnode2"]):
             main()
 
     def suite():
