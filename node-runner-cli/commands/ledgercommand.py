@@ -8,7 +8,7 @@ from commands.subcommand import get_decorator, argument
 import boto3
 
 ledgercli = ArgumentParser(
-    description='Subcommand to help to sync up the ledger of a fullnode or validator from a copy',
+    description='Subcommand to help to sync up the ledger from a S3 bucket',
     usage="radixnode ledger ",
     formatter_class=RawTextHelpFormatter)
 ledger_parser = ledgercli.add_subparsers(dest="ledgercommand")
@@ -63,7 +63,6 @@ def download_mainnet_backup_ledger(bucketName: str, bucketFolder: str, destinati
         response = s3_client.list_objects_v2(Bucket=bucketName,Prefix=bucketFolder)
         print(response)
     except Exception as err:
-       ## logging.error('Exception was thrown in connection %s' % err)
         print("Error is {}".format(err))
         return err
     
