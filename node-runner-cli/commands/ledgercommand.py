@@ -61,7 +61,6 @@ def download_mainnet_backup_ledger(bucketName: str, bucketFolder: str, destinati
     try:
         s3_client = boto3.client("s3")
         response = s3_client.list_objects_v2(Bucket=bucketName,Prefix=bucketFolder)
-        print(response)
     except Exception as err:
         print("Error is {}".format(err))
         return err
@@ -70,13 +69,15 @@ def download_mainnet_backup_ledger(bucketName: str, bucketFolder: str, destinati
     if not files:
          raise Exception("Error downloading a copy of the ledger, Bucket/Folder not found or empty")
     else:
+        if len(bucketFolder) > 0:
+            bucketFolder = bucketFolder + "/"
         for file in files:
             print(f"file_name: {file['Key']}, size: {file['Size']}")
             if file['Size'] > 0:
                 try:
                     filename = file['Key'].split('/')[-1]  # get filename from key
                     print(f"Downloading file: {file['Key']}, size: {file['Size']}")
-                    s3_client.download_file(bucketName, bucketFolder+"/"+filename, destinationPath + filename)
+                    s3_client.download_file(bucketName, bucketFolder + filename, destinationPath + filename)
                 except botocore.exceptions.ClientError as error:
                     print(error.response['Error']['Code']) #a summary of what went wrong
                     print(error.response['Error']['Message']) #explanation of what went wrong
