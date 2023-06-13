@@ -68,7 +68,7 @@ EOT
 #  command_api_help_doc "core" "$subcommand" "$filename"
 #done
 
-declare -a systemapicommands=("health" "version" "metrics" "configuration" "peers" "addressbook" "network-sync-status" "identity")
+declare -a systemapicommands=("health" "version" "configuration" "peers" "addressbook" "network-sync-status" "identity")
 for subcommand in "${systemapicommands[@]}"; do
   command_api_help_doc "system" "$subcommand" "$filename"
 done

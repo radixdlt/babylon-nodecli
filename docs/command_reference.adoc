@@ -333,11 +333,6 @@ options:
   -h, --help  show this help message and exit
 ----
 
-==== radixnode system metrics
-[source, bash,subs="+quotes, +attributes" ]
-----
-----
-
 ==== radixnode system configuration
 [source, bash,subs="+quotes, +attributes" ]
 ----
