@@ -38,16 +38,15 @@ for subcommand in "${dockersubcommands[@]}"; do
   command_help_doc "docker" "$subcommand" "$filename"
 done
 
-#Systemd not supported yet
-#cat <<EOT >> "$filename"
-#=== Radix node CLI command reference
-#Below are the list of commands supported in cli to setup a core node process as a systemd process
-#EOT
-#declare -a systemdsubcommands=("dependencies" "install" "restart" "stop")
-#for subcommand in "${systemdsubcommands[@]}"
-#do
-#  command_help_doc "systemd" "$subcommand" "$filename"
-#done
+cat <<EOT >> "$filename"
+=== Radix node CLI command reference
+Below are the list of commands supported in cli to setup a core node process as a systemd process
+EOT
+declare -a systemdsubcommands=("dependencies" "config" "install" "restart" "stop")
+for subcommand in "${systemdsubcommands[@]}"
+do
+  command_help_doc "systemd" "$subcommand" "$filename"
+done
 
 cat <<EOT >>"$filename"
 === Set passwords for the Nginx server
