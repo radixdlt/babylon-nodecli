@@ -29,7 +29,7 @@ echo "" >"$filename"
 echo ":sectnums:" >"$filename"
 
 cat <<EOT >>"$filename"
-=== Core node or Gateway setup using docker
+=== Core node setup using docker
 Below are the list of commands that can be used with cli to setup a core node or gateway.
 EOT
 
@@ -38,16 +38,15 @@ for subcommand in "${dockersubcommands[@]}"; do
   command_help_doc "docker" "$subcommand" "$filename"
 done
 
-#Systemd not supported yet
-#cat <<EOT >> "$filename"
-#=== Radix node CLI command reference
-#Below are the list of commands supported in cli to setup a core node process as a systemd process
-#EOT
-#declare -a systemdsubcommands=("dependencies" "install" "restart" "stop")
-#for subcommand in "${systemdsubcommands[@]}"
-#do
-#  command_help_doc "systemd" "$subcommand" "$filename"
-#done
+cat <<EOT >> "$filename"
+=== Core node setup using systemd
+Below are the list of commands supported in cli to setup a core node process as a systemd process
+EOT
+declare -a systemdsubcommands=("dependencies" "install" "restart" "stop")
+for subcommand in "${systemdsubcommands[@]}"
+do
+  command_help_doc "systemd" "$subcommand" "$filename"
+done
 
 cat <<EOT >>"$filename"
 === Set passwords for the Nginx server
@@ -58,11 +57,11 @@ for subcommand in "${authcommands[@]}"; do
   command_help_doc "auth" "$subcommand" "$filename"
 done
 
-#Systemd not supported yet
-#cat <<EOT >> "$filename"
-#=== Accessing core endpoints using CLI
-#Once the nginx basic auth passwords for admin, superadmin, metrics users are setup , radixnode cli can be used to access the node endpoints
-#EOT
+
+cat <<EOT >> "$filename"
+=== Accessing core endpoints using CLI
+Once the nginx basic auth passwords for admin, superadmin, metrics users are setup , radixnode cli can be used to access the node endpoints
+EOT
 #declare -a coreapicommands=("entity" "key-list" "mempool" "mempool-transaction" "update-validator-config" "signal-protocol-update-readiness" "retract-protocol-update-readiness")
 #for subcommand in "${coreapicommands[@]}"
 #do
@@ -82,6 +81,7 @@ declare -a othercommands=("config" "install" "start" "stop")
 for subcommand in "${othercommands[@]}"; do
   command_help_doc "monitoring" "$subcommand" "$filename"
 done
+
 
 #Not supported yet
 #cat <<EOT >> "$filename"
