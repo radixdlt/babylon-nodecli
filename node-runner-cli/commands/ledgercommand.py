@@ -32,10 +32,9 @@ def ledgercommand(ledgercommand_args=[], parent=ledger_parser):
 ])
 def sync(args):
     """
-    This commands allows node-runners and gateway admins to create a config file, which can persist their custom settings.
-    Thus it allows is to decouple the updates from configuration.
-    Config is created only once as such and if there is a version change in the config file,
-    then it updated by doing a migration to newer version
+    This commands allows to sync the ledger from the content of an external S3 bucket.
+    The name and folder of an external S3 bucket is indicated, in addition with the ledger folder.
+    Content on the S3 bucket is copied to the ledger folder.
     """
     bucketName = args.bucketname
     bucketFolder = args.bucketfolder
