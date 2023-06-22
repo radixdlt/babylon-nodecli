@@ -146,8 +146,7 @@ Below are the list of commands that can be used with cli to sync the ledger with
 ==== radixnode ledger sync
 [source, bash,subs="+quotes, +attributes" ]
 ----
-usage: radixnode ledger sync [-h] [-d DEST] [-bn BUCKETNAME]
-                             [-bf BUCKETFOLDER]
+usage: radixnode ledger sync [-h] -d DEST -bn BUCKETNAME [-bf BUCKETFOLDER]
 
 This commands allows to download the content of an external S3 bucket to the
 ledger folder. The ledger folder and the name and folder of an external S3
@@ -156,12 +155,14 @@ bucket should be indicated
 optional arguments:
   -h, --help            show this help message and exit
 
-optional arguments:
+required arguments:
   -d DEST, --dest DEST  Destination path where the backup of the ledger will
                         be downloaded
   -bn BUCKETNAME, --bucketname BUCKETNAME
                         S3 bucket name to download the backup of the ledger
                         from
+
+optional arguments:
   -bf BUCKETFOLDER, --bucketfolder BUCKETFOLDER
                         S3 bucket folder to download the backup of the ledger
                         from

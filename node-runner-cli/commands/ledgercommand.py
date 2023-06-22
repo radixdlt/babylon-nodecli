@@ -19,10 +19,10 @@ def ledgercommand(ledgercommand_args=[], parent=ledger_parser):
 
 
 @ledgercommand([
-    argument("-d", "--dest",
+    argument("-d", "--dest",required=True,
              help="Destination path where the backup of the ledger will be downloaded ",
              action="store"),
-    argument("-bn", "--bucketname",
+    argument("-bn", "--bucketname",required=True,
              help="S3 bucket name to download the backup of the ledger from",
              action="store"),
     argument("-bf", "--bucketfolder",
