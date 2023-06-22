@@ -9,6 +9,7 @@ import urllib3
 from api.SystemApiHelper import SystemApiHelper
 from commands.authcommand import authcli
 from commands.dockercommand import dockercli
+from commands.ledgercommand import ledgercli
 from commands.key import keycli
 from commands.monitoring import monitoringcli
 from commands.othercommands import other_command_cli
@@ -22,7 +23,7 @@ urllib3.disable_warnings()
 
 cli = ArgumentParser()
 cli.add_argument('subcommand', help='Subcommand to run',
-                 choices=["docker", "systemd", "api", "monitoring", "version", "optimise-node", "auth", "key"])
+                 choices=["docker", "systemd", "api", "monitoring", "version", "optimise-node", "auth", "key", "ledger"])
 
 apicli = ArgumentParser(
     description='API commands')
@@ -84,6 +85,18 @@ def main():
                 handle_systemapi()
             else:
                 print(f"Invalid api command {apicli_args.apicommand}")
+
+    elif args.subcommand == "ledger":
+        ledgercli_args = ledgercli.parse_args(sys.argv[2:])
+        # ledgercli_args = sync --url --dest
+        if ledgercli_args.ledgercommand is None:
+            ledgercli.print_help()
+        else:
+            if ledgercli_args.ledgercommand == "sync":
+                print(f"Syncing fullnode ledger {sys.argv[3:]}")
+                ledgercli_args.func(ledgercli_args)
+            else:
+                print(f"Invalid ledger command {ledgercli_args.ledgercommand}")
 
     elif args.subcommand == "monitoring":
         monitoringcli_args = monitoringcli.parse_args(sys.argv[2:])
