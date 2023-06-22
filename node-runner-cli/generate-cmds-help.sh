@@ -38,6 +38,16 @@ for subcommand in "${dockersubcommands[@]}"; do
   command_help_doc "docker" "$subcommand" "$filename"
 done
 
+cat <<EOT >>"$filename"
+=== Ledger sync using an external S3 bucket
+Below are the list of commands that can be used with cli to sync the ledger with a S3 bucket.
+EOT
+
+declare -a ledgersubcommands=("sync")
+for subcommand in "${ledgersubcommands[@]}"; do
+  command_help_doc "ledger" "$subcommand" "$filename"
+done
+
 #Systemd not supported yet
 #cat <<EOT >> "$filename"
 #=== Radix node CLI command reference
