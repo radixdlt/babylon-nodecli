@@ -150,8 +150,8 @@ usage: radixnode ledger sync [-h] [-d DEST] [-bn BUCKETNAME]
                              [-bf BUCKETFOLDER]
 
 This commands allows to download the content of an external S3 bucket to the
-ledger. The ledger folder and the name and folder of an external S3 bucket
-should be indicated
+ledger folder. The ledger folder and the name and folder of an external S3
+bucket should be indicated
 
 optional arguments:
   -h, --help            show this help message and exit

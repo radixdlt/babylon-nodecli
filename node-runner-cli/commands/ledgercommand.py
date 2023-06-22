@@ -32,7 +32,7 @@ def ledgercommand(ledgercommand_args=[], parent=ledger_parser):
 ])
 def sync(args):
     """
-    This commands allows to download the content of an external S3 bucket to the ledger. 
+    This commands allows to download the content of an external S3 bucket to the ledger folder. 
     The ledger folder and the name and folder of an external S3 bucket should be indicated
     """
     bucketName = args.bucketname
