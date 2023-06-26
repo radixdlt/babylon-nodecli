@@ -99,7 +99,17 @@ class SystemdUnitTests(unittest.TestCase):
                                                   '/tmp/data',
                                                   'true',
                                                   'true',
-                                                  'development-latest']):
+                                                  'Y',
+                                                  '', # remote ip of full node
+                                                  'Core',
+                                                  'local',
+                                                  'postgres',
+                                                  'radix-ledger',
+                                                  'pgpassword',
+                                                  'dataaggregation-version',
+                                                  'gateway-api-version',
+                                                  'Y',
+                                                  'nginx-version']):
             with patch("sys.argv",
                        ["main", "docker", "config", "-m", "DETAILED", "-k", "radix", "-nk", "-a"]):
                 main()

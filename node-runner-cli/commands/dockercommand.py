@@ -10,6 +10,7 @@ from deepdiff import DeepDiff
 from commands.subcommand import get_decorator, argument
 from config.BaseConfig import SetupMode
 from config.DockerConfig import DockerConfig, CoreDockerSettings
+from config.GatewayDockerConfig import GatewayDockerSettings
 from config.Renderer import Renderer
 from github.github import latest_release
 from setup.AnsibleRunner import AnsibleRunner
@@ -60,6 +61,10 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
              default=""),
     argument("-nk", "--newkeystore", help="Set this to true to create a new store without any prompts using location"
                                           " defined in argument configdir", action="store_true"),
+    argument("-p", "--postgrespassword",
+             help="Network Gateway uses Postgres as datastore. This is password for the user `postgres`.",
+             action="store",
+             default=""),
     argument("-t", "--trustednode",
              help="Trusted node on radix network."
                   "Example format: 'radix://node_tdx_b_1qdrcdjgzl6s2ymnsssdssxllmmj0j84eagu2m6xtttj3nxrunzesyh9fwea@3.109.242.93'."
@@ -70,6 +75,9 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
     argument("-v", "--validator", help="Address of the validator ", action="store"),
     argument("-xc", "--disablenginxforcore", help="Core Node API's are protected by Basic auth setting."
                                                   "Set this to disable to nginx for core",
+             action="store", default="", choices=["true", "false"]),
+    argument("-xg", "--disablenginxforgateway", help="GateWay API's end points are protected by Basic auth settings. "
+                                                     "Set this to disable to nginx for gateway",
              action="store", default="", choices=["true", "false"])
 
 ])
@@ -85,6 +93,8 @@ def config(args):
     trustednode = args.trustednode if args.trustednode != "" else None
     keystore_password = args.keystorepassword if args.keystorepassword != "" else None
     nginx_on_core = args.disablenginxforcore if args.disablenginxforcore != "" else None
+    nginx_on_gateway = args.disablenginxforgateway if args.disablenginxforgateway != "" else None
+    postgrespassword = args.postgrespassword if args.postgrespassword != "" else None
     autoapprove = args.autoapprove
     new_keystore = args.newkeystore
     validator = args.validator
@@ -125,12 +135,12 @@ def config(args):
         configuration.common_config.ask_enable_nginx_for_core(nginx_on_core)
         config_to_dump["core_node"] = dict(configuration.core_node)
 
-    # if "GATEWAY" in setupmode.mode:
-    #     quick_gateway_settings: GatewayDockerSettings = GatewayDockerSettings({}).create_config(postgrespassword)
-    #
-    #     configuration.gateway_settings = quick_gateway_settings
-    #     configuration.common_config.ask_enable_nginx_for_gateway(nginx_on_gateway)
-    #     config_to_dump["gateway"] = dict(configuration.gateway_settings)
+    if "GATEWAY" in setupmode.mode:
+        quick_gateway_settings: GatewayDockerSettings = GatewayDockerSettings({}).create_config(postgrespassword)
+
+        configuration.gateway_settings = quick_gateway_settings
+        configuration.common_config.ask_enable_nginx_for_gateway(nginx_on_gateway)
+        config_to_dump["gateway"] = dict(configuration.gateway_settings)
 
     if "DETAILED" in setupmode.mode:
         run_fullnode = Prompts.check_for_fullnode()
@@ -144,15 +154,15 @@ def config(args):
         else:
             configuration.common_config.nginx_settings.protect_core = "false"
 
-        # run_gateway = Prompts.check_for_gateway()
-        # if run_gateway:
-        #     detailed_gateway_settings: GatewayDockerSettings = GatewayDockerSettings({}).create_config(
-        #         postgrespassword)
-        #     configuration.gateway_settings = detailed_gateway_settings
-        #     configuration.common_config.ask_enable_nginx_for_gateway(nginx_on_gateway)
-        #     config_to_dump["gateway"] = dict(configuration.gateway_settings)
-        # else:
-        #     configuration.common_config.nginx_settings.protect_gateway = "false"
+        run_gateway = Prompts.check_for_gateway()
+        if run_gateway:
+            detailed_gateway_settings: GatewayDockerSettings = GatewayDockerSettings({}).create_config(
+                postgrespassword)
+            configuration.gateway_settings = detailed_gateway_settings
+            configuration.common_config.ask_enable_nginx_for_gateway(nginx_on_gateway)
+            config_to_dump["gateway"] = dict(configuration.gateway_settings)
+        else:
+            configuration.common_config.nginx_settings.protect_gateway = "false"
 
     if configuration.common_config.check_nginx_required():
         configuration.common_config.ask_nginx_release()
