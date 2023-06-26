@@ -81,20 +81,21 @@ services:
 {% endif %}
     environment:
       ASPNETCORE_URLS: "http://*:80" # Binds to 80 on all interfaces
-      RADIX_NG_API__MaxWaitForDbOnStartupMs: "90" # Wait for PostGres to boot up
-      RADIX_NG_API__DisableCoreApiHttpsCertificateChecks: "{{gateway.gateway_api.coreApiNode.disable_core_api_https_certificate_checks or 'false'}}"
-      RADIX_NG_API__NetworkName: "{{common_config.network_name}}"
-      RADIX_NG_API__EnableSwagger: "{{gateway.gateway_api.enable_swagger or 'false'}}"
-      RADIX_NG_API__MaxPageSize: "{{gateway.gateway_api.max_page_size or '30'}}"
-      RADIX_NG_API__ConnectionStrings__ReadOnlyDbContext: "Host={{gateway.postgres_db.host}};Database={{gateway.postgres_db.dbname}};Username={{gateway.postgres_db.user}};Password={{gateway.postgres_db.password}}"
-      RADIX_NG_API__ConnectionStrings__ReadWriteDbContext: "Host={{gateway.postgres_db.host}};Database={{gateway.postgres_db.dbname}};Username={{gateway.postgres_db.user}};Password={{gateway.postgres_db.password}}"
-      RADIX_NG_API__CoreApiNodes__0__Name: "{{gateway.gateway_api.coreApiNode.Name}}"
-      RADIX_NG_API__CoreApiNodes__0__CoreApiAddress: "{{gateway.gateway_api.coreApiNode.core_api_address}}"
+      PrometheusMetricsPort: "{{gateway.gateway_api.prometheusMetricsPortHostBinding or '1235' }}"
+      EnableSwagger: "{{gateway.gateway_api.enable_swagger or 'false'}}"
+      ConnectionStrings__NetworkGatewayReadOnly: "Host={{gateway.postgres_db.host}};Database={{gateway.postgres_db.dbname}};Username={{gateway.postgres_db.user}};Password={{gateway.postgres_db.password}}"
+      ConnectionStrings__NetworkGatewayReadWrite: "Host={{gateway.postgres_db.host}};Database={{gateway.postgres_db.dbname}};Username={{gateway.postgres_db.user}};Password={{gateway.postgres_db.password}}"
+      GatewayApi__Endpoints_MaxPageSize: "{{gateway.gateway_api.max_page_size or '30'}}"
+      # GatewayApi__MaxWaitForDbOnStartupMs: "90" # Wait for PostGres to boot up
+      GatewayApi__Network__DisableCoreApiHttpsCertificateChecks: "{{gateway.gateway_api.coreApiNode.disable_core_api_https_certificate_checks or 'false'}}"
+      GatewayApi__Network__NetworkName: "{{common_config.network_name}}"
+      GatewayApi__Network__CoreApiNodes__0__Name: "{{gateway.gateway_api.coreApiNode.Name}}"
+      GatewayApi__Network__CoreApiNodes__0__CoreApiAddress: "{{gateway.gateway_api.coreApiNode.core_api_address}}"
       {% if gateway.gateway_api.coreApiNode.auth_header is defined %}
-      RADIX_NG_API__CoreApiNodes__0__CoreApiAuthorizationHeader: "{{gateway.data_aggregator.coreApiNode.auth_header.Authorization}}"
+      GatewayApi__Network__CoreApiNodes__0__CoreApiAuthorizationHeader: "{{gateway.data_aggregator.coreApiNode.auth_header.Authorization}}"
       {% endif %}
-      RADIX_NG_API__CoreApiNodes__0__RequestWeighting: "{{gateway.gateway_api.coreApiNode.request_weighting or '1'}}"
-      RADIX_NG_API__CoreApiNodes__0__Enabled: "{{gateway.gateway_api.coreApiNode.enabled or 'true'}}"
+      GatewayApi__Network__CoreApiNodes__0__RequestWeighting: "{{gateway.gateway_api.coreApiNode.request_weighting or '1'}}"
+      GatewayApi__Network__CoreApiNodes__0__Enabled: "{{gateway.gateway_api.coreApiNode.enabled or 'true'}}"
 {% endif %}
 {% if (gateway is defined and gateway.data_aggregator is defined) %}
   data_aggregator:
@@ -111,17 +112,18 @@ services:
     environment:
       # WIPE_DATABASE: "true"
       ASPNETCORE_URLS: "http://*:80" # Binds to 80 on all interfaces
-      RADIX_NG_AGGREGATOR__MaxWaitForDbOnStartupMs: "90"
-      RADIX_NG_AGGREGATOR__DisableCoreApiHttpsCertificateChecks:  "{{gateway.data_aggregator.coreApiNode.disable_core_api_https_certificate_checks or 'false'}}"
-      RADIX_NG_AGGREGATOR__NetworkName: "{{common_config.network_name}}"
-      RADIX_NG_AGGREGATOR__ConnectionStrings__AggregatorDbContext: "Host={{gateway.postgres_db.host}};Database={{gateway.postgres_db.dbname}};Username={{gateway.postgres_db.user}};Password={{gateway.postgres_db.password}}"
-      RADIX_NG_AGGREGATOR__CoreApiNodes__0__Name: "{{gateway.data_aggregator.coreApiNode.Name}}"
-      RADIX_NG_AGGREGATOR__CoreApiNodes__0__CoreApiAddress: "{{gateway.data_aggregator.coreApiNode.core_api_address}}"
+      ConnectionStrings__NetworkGatewayReadWrite: "Host={{gateway.postgres_db.host}};Database={{gateway.postgres_db.dbname}};Username={{gateway.postgres_db.user}};Password={{gateway.postgres_db.password}}"
+      PrometheusMetricsPort: "{{gateway.data_aggregator.prometheusMetricsPortHostBinding or '1234'}}"
+      #DataAggregator__Network__MaxWaitForDbOnStartupMs: "90"
+      DataAggregator__Network__DisableCoreApiHttpsCertificateChecks:  "{{gateway.data_aggregator.coreApiNode.disable_core_api_https_certificate_checks or 'false'}}"
+      DataAggregator__Network__NetworkName: "{{common_config.network_name}}"
+      DataAggregator__Network__CoreApiNodes__0__Name: "{{gateway.data_aggregator.coreApiNode.Name}}"
+      DataAggregator__Network__CoreApiNodes__0__CoreApiAddress: "{{gateway.data_aggregator.coreApiNode.core_api_address}}"
       {% if gateway.data_aggregator.coreApiNode.auth_header is defined %}
-      RADIX_NG_AGGREGATOR__CoreApiNodes__0__CoreApiAuthorizationHeader: "{{gateway.data_aggregator.coreApiNode.auth_header.Authorization}}"
+      DataAggregator__Network__CoreApiNodes__0__CoreApiAuthorizationHeader: "{{gateway.data_aggregator.coreApiNode.auth_header.Authorization}}"
       {% endif %}
-      RADIX_NG_AGGREGATOR__CoreApiNodes__0__TrustWeighting:  "{{gateway.data_aggregator.coreApiNode.trust_weighting or '1'}}"
-      RADIX_NG_AGGREGATOR__CoreApiNodes__0__Enabled:  "{{gateway.data_aggregator.coreApiNode.enabled or 'true'}}"
+      DataAggregator__Network__CoreApiNodes__0__TrustWeighting:  "{{gateway.data_aggregator.coreApiNode.trust_weighting or '1'}}"
+      DataAggregator__Network__CoreApiNodes__0__Enabled:  "{{gateway.data_aggregator.coreApiNode.enabled or 'true'}}"
 {% endif %}
 volumes:
  {% if core_node is defined and core_node.data_directory is defined %}
