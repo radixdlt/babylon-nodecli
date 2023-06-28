@@ -107,6 +107,7 @@ class SystemdUnitTests(unittest.TestCase):
                                                   'radix-ledger',
                                                   'pgpassword',
                                                   'dataaggregation-version',
+                                                  'database-migration-version',
                                                   'gateway-api-version',
                                                   'Y',
                                                   'nginx-version']):

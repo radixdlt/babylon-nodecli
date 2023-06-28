@@ -163,7 +163,7 @@ class GatewayDockerSettings(BaseConfig):
                            if not key.startswith('__') and not callable(value)}
 
         for attr, value in class_variables.items():
-            if attr in ['data_aggregator', 'gateway_api', 'postgres_db']:
+            if attr in ['data_aggregator', 'gateway_api', 'postgres_db', 'database_migration']:
                 yield attr, dict(self.__getattribute__(attr))
             elif self.__getattribute__(attr):
                 yield attr, self.__getattribute__(attr)

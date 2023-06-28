@@ -118,6 +118,8 @@ gateway_settings:
     dbname: radixdlt_ledger
     setup: local
     host: host.docker.internal:5432
+  database_migration:
+    repo: radixdlt/babylon-ng-database-migrations
 """
         self.assertEqual(config_as_yaml, fixture)
 
