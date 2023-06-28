@@ -54,6 +54,31 @@ class CoreApiNode(BaseConfig):
         self.disable_core_api_https_certificate_checks = Prompts.get_disablehttpsVerfiy()
 
 
+class DatabaseMigrationSetting:
+    release: str = None
+    repo: str = "radixdlt/babylon-ng-database-migrations"
+
+    def __init__(self, settings: dict):
+        for key, value in settings.items():
+            setattr(self, key, value)
+
+    def ask_gateway_release(self):
+        latest_gateway_release = github.latest_release("radixdlt/babylon-gateway")
+        self.release = latest_gateway_release
+        if "DETAILED" in SetupMode.instance().mode:
+            self.release = Prompts.get_gateway_release("database_migration", latest_gateway_release)
+
+    def __iter__(self):
+        class_variables = {key: value
+                           for key, value in self.__class__.__dict__.items()
+                           if not key.startswith('__') and not callable(value)}
+        for attr, value in class_variables.items():
+            if attr in ['postgresSettings', 'coreApiNode']:
+                yield attr, dict(self.__getattribute__(attr))
+            elif self.__getattribute__(attr):
+                yield attr, self.__getattribute__(attr)
+
+
 class DataAggregatorSetting:
     release: str = None
     repo: str = "radixdlt/babylon-ng-data-aggregator"
@@ -130,6 +155,7 @@ class GatewayDockerSettings(BaseConfig):
     data_aggregator = DataAggregatorSetting({})
     gateway_api = GatewayAPIDockerSettings({})
     postgres_db = PostGresSettings({})
+    database_migration = DatabaseMigrationSetting({})
 
     def __iter__(self):
         class_variables = {key: value
@@ -146,6 +172,7 @@ class GatewayDockerSettings(BaseConfig):
         self.data_aggregator.ask_core_api_node_settings()
         self.postgres_db.ask_postgress_settings(postgress_password)
         self.data_aggregator.ask_gateway_release()
+        self.database_migration.ask_gateway_release()
         self.gateway_api.ask_gateway_release()
         self.gateway_api.set_core_api_node_setings(
             self.data_aggregator.coreApiNode)

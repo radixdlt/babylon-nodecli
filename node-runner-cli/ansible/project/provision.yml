@@ -84,7 +84,7 @@
           become_user: "{{ postgresql_user }}"
           community.postgresql.postgresql_user:
             name: "{{ postgresql_user }}"
-            password: "{{postgress_password}}"
+            password: "{{ postgress_password }}"
 
         - name: Grant
           community.postgresql.postgresql_pg_hba:
@@ -109,6 +109,22 @@
 
         - name: restart postgresql
           service: name=postgresql state=restarted enabled=yes
+
+        - name: Create the database specified in vars
+          become: true
+          become_user: "{{ postgresql_user }}"
+          postgresql_db: name={{ postgresql_db_name }}
+            template='template0'
+            state=present
+
+        - name: Ensure user has access to the new database
+          become: true
+          become_user: "{{ postgresql_user }}"
+          postgresql_user: db={{ postgresql_db_name }}
+            name={{ postgresql_user }}
+            password={{ postgress_password }}
+            priv=ALL
+            state=present
 
       become: true
       when: postgres_local | bool

@@ -124,6 +124,14 @@ services:
       {% endif %}
       DataAggregator__Network__CoreApiNodes__0__TrustWeighting:  "{{gateway.data_aggregator.coreApiNode.trust_weighting or '1'}}"
       DataAggregator__Network__CoreApiNodes__0__Enabled:  "{{gateway.data_aggregator.coreApiNode.enabled or 'true'}}"
+  database_migrations: # This is the base -- the _image and _built containers are defined below
+    image: {{gateway.database_migration.repo}}:{{gateway.database_migration.release}}
+    environment:
+      ConnectionStrings__NetworkGatewayMigrations: Host={{gateway.postgres_db.host}};Database={{gateway.postgres_db.dbname}};Username={{gateway.postgres_db.user}};Password={{gateway.postgres_db.password}}
+    {% if (gateway.postgres_db is defined and gateway.postgres_db.setup == 'local') %}
+    extra_hosts:
+    - "host.docker.internal:host-gateway"
+    {% endif %}
 {% endif %}
 volumes:
  {% if core_node is defined and core_node.data_directory is defined %}

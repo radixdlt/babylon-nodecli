@@ -9,7 +9,7 @@ import requests
 import yaml
 from system_client import ApiException
 
-from env_vars import PRINT_REQUEST, NODE_HOST_IP_OR_NAME, COMPOSE_HTTP_TIMEOUT
+from env_vars import PRINT_REQUEST, NODE_HOST_IP_OR_NAME, COMPOSE_HTTP_TIMEOUT, RADIXDLT_CLI_VERSION_OVERRIDE
 from utils.PromptFeeder import PromptFeeder
 from version import __version__
 
@@ -255,6 +255,8 @@ class Helpers:
 
     @staticmethod
     def cli_version():
+        if os.environ.get(RADIXDLT_CLI_VERSION_OVERRIDE) is not None:
+            return os.environ.get(RADIXDLT_CLI_VERSION_OVERRIDE)
         return __version__
 
     @staticmethod
