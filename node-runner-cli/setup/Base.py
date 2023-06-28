@@ -18,7 +18,7 @@ class Base:
     def dependencies():
         run_shell_command('sudo apt update', shell=True)
         run_shell_command('sudo apt install -y  docker.io wget unzip docker-compose rng-tools', shell=True)
-        run_shell_command('sudo rngd -r /dev/random', shell=True)
+        run_shell_command('sudo rngd -r /dev/random | true', shell=True)
 
     @staticmethod
     def add_user_docker_group():
