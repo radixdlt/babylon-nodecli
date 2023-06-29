@@ -1,6 +1,8 @@
+import os
 from urllib.parse import urlparse
 
 from config.BaseConfig import BaseConfig, SetupMode
+from env_vars import GATEWAY_DOCKER_REPO_OVERRIDE, AGGREGATOR_DOCKER_REPO_OVERRIDE, MIGRATION_DOCKER_REPO_OVERRIDE
 from github import github
 from utils.Prompts import Prompts
 from utils.utils import Helpers
@@ -56,8 +58,7 @@ class CoreApiNode(BaseConfig):
 
 class DatabaseMigrationSetting:
     release: str = None
-    repo: str = "radixdlt/babylon-ng-database-migrations"
-
+    repo: str = os.getenv(MIGRATION_DOCKER_REPO_OVERRIDE, "radixdlt/babylon-ng-database-migrations")
     def __init__(self, settings: dict):
         for key, value in settings.items():
             setattr(self, key, value)
@@ -81,7 +82,7 @@ class DatabaseMigrationSetting:
 
 class DataAggregatorSetting:
     release: str = None
-    repo: str = "radixdlt/babylon-ng-data-aggregator"
+    repo: str = os.getenv(AGGREGATOR_DOCKER_REPO_OVERRIDE, "radixdlt/babylon-ng-data-aggregator")
     restart: str = "unless-stopped"
     NetworkName: str = None
     coreApiNode: CoreApiNode = CoreApiNode({})
@@ -124,7 +125,7 @@ class DataAggregatorSetting:
 
 class GatewayAPIDockerSettings(BaseConfig):
     release: str = None
-    repo: str = "radixdlt/babylon-ng-gateway-api"
+    repo: str = os.getenv(GATEWAY_DOCKER_REPO_OVERRIDE, "radixdlt/babylon-ng-gateway-api")
     coreApiNode: CoreApiNode = CoreApiNode({})
     restart = "unless-stopped"
     enable_swagger = "true"
