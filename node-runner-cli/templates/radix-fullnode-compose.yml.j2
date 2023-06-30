@@ -104,6 +104,8 @@ services:
 {% endif %}
 {% if (gateway is defined and gateway.data_aggregator is defined) %}
   data_aggregator:
+    depends_on:
+      - database_migrations
     image: {{gateway.data_aggregator.repo}}:{{gateway.data_aggregator.release}}
     restart: {{gateway.data_aggregator.restart or 'unless-stopped'}}
     cpus: {{gateway.data_aggregator.cpus or '2.0'}}
