@@ -29,7 +29,6 @@ class SystemD(Base):
 
     @staticmethod
     def create_service_user_password():
-        # TODO AutoApprove
         run_shell_command('sudo passwd radixdlt', shell=True)
 
     @staticmethod

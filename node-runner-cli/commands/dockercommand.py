@@ -33,7 +33,7 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
 @dockercommand([
     argument("-a", "--autoapprove", help="Set this to true to run without any prompts and in mode CORE or GATEWAY."
                                          "Prompts still appear if you run in DETAILED mode "
-                                         "Use this for automation purpose only", action="store_true"),
+                                         "Use this for automation purpose only", action="store_true", default=False),
     argument("-d", "--configdir",
              help=f"Path to node-config directory where config file will stored. Default value is {Helpers.get_default_node_config_dir()}",
              action="store",
@@ -188,7 +188,7 @@ def config(args):
             {dict(DeepDiff(old_config, config_to_dump))}
               """)
 
-    Docker.backup_save_config(config_file, config_to_dump, autoapprove, Helpers.get_current_date_time())
+    Docker.backup_save_config(config_file, config_to_dump, Helpers.get_current_date_time(), autoapprove)
 
 
 @dockercommand([
@@ -227,7 +227,7 @@ def install(args):
               Difference between existing config file and new config that you are creating
               {config_differences}
                 """)
-        Docker.backup_save_config(config_file, new_config, autoapprove, backup_time)
+        Docker.backup_save_config(config_file, new_config, backup_time, autoapprove)
 
     compose_file, compose_file_yaml = Docker.get_existing_compose_file(new_config)
     compose_file_difference = dict(DeepDiff(compose_file_yaml, render_template))

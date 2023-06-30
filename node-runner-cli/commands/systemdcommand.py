@@ -29,7 +29,7 @@ def systemdcommand(systemdcommand_args=None, parent=systemd_parser):
 @systemdcommand([
     argument("-a", "--autoapprove", help="Set this to true to run without any prompts and in mode CORE."
                                          "Prompts still appear if you run in DETAILED mode "
-                                         "Use this for automation purpose only", action="store_true"),
+                                         "Use this for automation purpose only", action="store_true", default=False),
     argument("-d", "--configdir",
              help=f"Path to node-config directory where config file will stored. Default value is {Helpers.get_default_node_config_dir()}",
              action="store",

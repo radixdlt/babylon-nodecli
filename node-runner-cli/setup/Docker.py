@@ -157,7 +157,7 @@ class Docker(Base):
         return updated_config
 
     @staticmethod
-    def backup_save_config(config_file, new_config, autoapprove, backup_time):
+    def backup_save_config(config_file, new_config,backup_time, autoapprove=False):
         to_update = ""
         if autoapprove:
             print("In Auto mode - Updating the file as suggested in above changes")

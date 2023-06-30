@@ -1,0 +1,63 @@
+---
+common_config:
+  docker_compose: /home/radixdlt/docker-compose.yml
+  genesis_json_location: /home/radixdlt/genesis_data_file.bin
+  genesis_type: 'binary'
+  network_id: 33
+  network_name: enkinet
+  nginx_settings:
+    enable_transaction_api: 'true'
+    gateway_behind_auth: 'true'
+    mode: docker
+    protect_core: 'true'
+    protect_gateway: 'true'
+    release: 1.0.0-rc2
+    repo: radixdlt/babylon-nginx
+core_node:
+  core_release: release-birch-ffbc9b5273
+  data_directory: /home/radixdlt/data
+  enable_transaction: 'true'
+  java_opts: --enable-preview -server -Xms8g -Xmx8g  -XX:MaxDirectMemorySize=2048m
+    -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts
+    -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
+  keydetails:
+    keyfile_name: node-keystore.ks
+    keyfile_path: /home/radixdlt/node-config
+    keygen_tag: 1.3.2
+    keystore_password: radix
+  nodetype: fullnode
+  repo: docker.io/radixdlt/private-babylon-node
+  trusted_node: radix://node_tdx_21_1qfk895krd3l8t8z7z7p9sxpjdszpal24f6y2sjtqe7mdkhdele5az658ak2@13.127.72.193,radix://node_tdx_21_1qvrwd0685a6gfkccevh3hykw9uy7p9dz9zrw8nv5u4twfqmkda8fqrq9yec@52.62.241.248,radix://node_tdx_21_1qfpu6e4xjnjv0anuadnf935kktd2cvycd5evavk9an56y9pzl3rtk0vzdy5@35.170.44.1,radix://node_tdx_21_1qwjql0acg60l7e3yywee99s5znlp4lydg2aenw8eel3uayrcaqcz6zshre4@34.248.128.148
+gateway:
+  database_migration:
+    release: release-birch-1805c10
+    repo: docker.io/radixdlt/private-babylon-ng-database-migrations
+  data_aggregator:
+    coreApiNode:
+      Name: Core
+      core_api_address: http://core:3333
+      enabled: 'true'
+      request_weighting: 1
+      trust_weighting: 1
+    release: release-birch-1805c10
+    repo: docker.io/radixdlt/private-babylon-ng-data-aggregator
+    restart: unless-stopped
+  gateway_api:
+    coreApiNode:
+      Name: Core
+      core_api_address: http://core:3333
+      enabled: 'true'
+      request_weighting: 1
+      trust_weighting: 1
+    enable_swagger: 'true'
+    max_page_size: '30'
+    release: release-birch-1805c10
+    repo: docker.io/radixdlt/private-babylon-ng-gateway-api
+    restart: unless-stopped
+  postgres_db:
+    dbname: radixdlt_ledger
+    host: host.docker.internal:5432
+    password: postgres
+    setup: local
+    user: postgres
+version: '0.2'
