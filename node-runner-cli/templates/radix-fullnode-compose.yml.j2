@@ -16,7 +16,12 @@ services:
       RADIXDLT_VALIDATOR_KEY_LOCATION: /home/radixdlt/node-keystore.ks
       RADIX_NODE_KEYSTORE_PASSWORD: '{{core_node.keydetails.keystore_password}}'
       {% if common_config.genesis_json_location is defined %}
-      RADIXDLT_GENESIS_FILE: "/home/radixdlt/genesis.json"
+        {% if common_config.genesis_type == 'binary' %}
+      RADIXDLT_GENESIS_DATA_FILE: '/home/radixdlt/genesis_data_file.bin'
+        {% endif %}
+        {% if common_config.genesis_type == 'json' %}
+      RADIXDLT_GENESIS_FILE: '/home/radixdlt/genesis.json'
+        {% endif %}
       {% endif %}
       {% if core_node.validator_address is defined %}
       RADIXDLT_CONSENSUS_VALIDATOR_ADDRESS: '{{core_node.validator_address}}'

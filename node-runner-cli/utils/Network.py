@@ -34,7 +34,7 @@ class Network:
         return network_id
 
     @staticmethod
-    def path_to_genesis_json(network_id: int) -> str:
+    def path_to_genesis_file(network_id: int) -> str:
         if network_id not in [1, 2, 11, 12, 32]:
             config_dir = f"{Helpers.get_default_node_config_dir()}/genesis.json"
             genesis_json_location = Prompts.check_default(Helpers.input_guestion(

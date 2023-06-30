@@ -41,6 +41,7 @@ class ConfigUnitTests(unittest.TestCase):
         self.maxDiff = None
         fixture = f"""---
 common_config:
+  genesis_type: json
   network_id: 1
   nginx_settings:
     dir: /etc/nginx
@@ -84,6 +85,7 @@ core_node:
     -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts
     -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
 common_config:
+  genesis_type: json
   nginx_settings:
     mode: docker
     protect_gateway: 'true'

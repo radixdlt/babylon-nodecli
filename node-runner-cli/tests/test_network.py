@@ -37,32 +37,32 @@ class NetworkUtilsUnitTests(unittest.TestCase):
 
     @mock.patch('sys.stdout', new_callable=StringIO)
     def test_input_stuff(self, mock_stdout):
-        genesis_location = Network.path_to_genesis_json(1)
+        genesis_location = Network.path_to_genesis_file(1)
         self.assertEqual(genesis_location, None)
 
-        genesis_location = Network.path_to_genesis_json(2)
+        genesis_location = Network.path_to_genesis_file(2)
         self.assertEqual(genesis_location, None)
 
         with self.assertRaises(SystemExit) as cm:
             with mock.patch('builtins.input', return_value='/tmp/path'):
-                genesis_location = Network.path_to_genesis_json(3)
+                genesis_location = Network.path_to_genesis_file(3)
             self.assertEqual(genesis_location, "/tmp/path")
             self.assertEqual(mock_stdout.getvalue(), f" `{genesis_location}` does not exist ")
             self.assertEqual(cm.exception.code, 1)
 
         with self.assertRaises(SystemExit) as cm:
             with mock.patch('builtins.input', return_value='/tm\\$&(*!@£^(p(^)th'):
-                Network.path_to_genesis_json(3)
+                Network.path_to_genesis_file(3)
             self.assertEqual(mock_stdout.getvalue(), "OS error occurred trying to open /tm\\$&(*!@£^(p(^)th")
             self.assertEqual(cm.exception.code, 1)
 
     @mock.patch('sys.stdout', new_callable=StringIO)
     def test_default_genesis_files(self, mock_stdout):
-        genesis_location = Network.path_to_genesis_json(11)
+        genesis_location = Network.path_to_genesis_file(11)
         self.assertIn("nebunet", genesis_location)
-        genesis_location = Network.path_to_genesis_json(12)
+        genesis_location = Network.path_to_genesis_file(12)
         self.assertIn("kisharnet", genesis_location)
-        genesis_location = Network.path_to_genesis_json(32)
+        genesis_location = Network.path_to_genesis_file(32)
         self.assertIn("gilganet", genesis_location)
 
     @mock.patch('sys.stdout', new_callable=StringIO)
