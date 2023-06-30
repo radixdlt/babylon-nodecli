@@ -46,7 +46,12 @@ services:
     {% endif %}
     - {{core_node.keydetails.keyfile_path ~ '/' ~ core_node.keydetails.keyfile_name }}:/home/radixdlt/node-keystore.ks
     {% if common_config.genesis_json_location is defined %}
+        {% if common_config.genesis_type == 'binary' %}
+    - "{{common_config.genesis_json_location}}:/home/radixdlt/genesis_data_file.bin"
+        {% endif %}
+        {% if common_config.genesis_type == 'json' %}
     - "{{common_config.genesis_json_location}}:/home/radixdlt/genesis.json"
+        {% endif %}
     {% endif %}
  {% endif %}
  {% if common_config.nginx_settings is defined  and  ((common_config.nginx_settings.protect_core | lower | trim) == "true" or (common_config.nginx_settings.protect_gateway | lower | trim) == "true") %}
