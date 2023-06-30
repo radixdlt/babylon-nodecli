@@ -95,16 +95,6 @@ class Docker(Base):
         postgres_db = all_config.get('gateway', {}).get('postgres_db')
         if Docker.check_post_db_local(all_config):
             ansible_dir = f'https://raw.githubusercontent.com/radixdlt/babylon-nodecli/{Helpers.cli_version()}/node-runner-cli'
-            run_shell_command(
-                f'echo "deb http://apt.postgresql.org/pub/repos/apt jammy-pgdg main" > /etc/apt/sources.list.d/pgdg.list',
-                shell=True)
-            run_shell_command(
-                f'wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -',
-                shell=True)
-            run_shell_command(f'sudo apt-get update',
-                              shell=True)
-            run_shell_command(f'sudo apt-get -y install postgresql',
-                              shell=True)
             AnsibleRunner(ansible_dir).run_setup_postgress(
                 postgres_db.get("password"),
                 postgres_db.get("user"),
