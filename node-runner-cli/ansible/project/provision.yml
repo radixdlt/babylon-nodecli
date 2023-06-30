@@ -65,6 +65,19 @@
       when: setup_swap | bool
 
     - block:
+        - name: Ensure gpg is installed
+          apt:
+            name: gpg
+        - name: Add repository signing key
+          apt_key:
+            url: "https://www.postgresql.org/media/keys/ACCC4CF8.asc"
+            state: present
+        - name: Add postgresql repository
+          apt_repository:
+            repo: "deb https://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release }}-pgdg main"
+            state: present
+            filename: pgdg
+
         - name: install PostgreSQL
           ansible.builtin.package:
             name:
@@ -88,7 +101,7 @@
 
         - name: Grant
           community.postgresql.postgresql_pg_hba:
-            dest: /etc/postgresql/12/main/pg_hba.conf
+            dest: /etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf
             contype: host
             users: all
             source: 0.0.0.0/0
