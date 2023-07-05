@@ -1,6 +1,6 @@
 ---
 - select_network: "34"
-- genesis_location: "/home/runner/genesis.json"
+- genesis_bin_data_file: "/home/runner/genesis_data_file.bin"
 - first_time_config: N
 - have_existing_compose: "/home/runner/docker-compose.yml"
 - setup_fullnode: Y

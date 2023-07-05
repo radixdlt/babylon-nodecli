@@ -74,7 +74,7 @@ class ValidatorUnitTests(unittest.TestCase):
         settings = CommonDockerSettings({})
         settings.ask_network_id(11)
         self.assertIn("nebunet", settings.network_name)
-        self.assertIn("nebunet", settings.genesis_json_location)
+        self.assertIn("nebunet", settings.genesis_bin_data_file)
 
 
 def suite():

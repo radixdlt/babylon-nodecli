@@ -239,7 +239,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install containerd runc
           ./radixnode docker dependencies
-          touch /home/runner/genesis.json
+          touch /home/runner/genesis_data_file.bin
       - name: core-gateway-all-local
         run: |
           ls -a
@@ -332,7 +332,7 @@ jobs:
           export RADIXDLT_APP_VERSION_OVERRIDE="release-betanet-v2-0a079cc1d"
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
           export PROMPT_FEEDS="node-runner-cli/test-prompts/core-gateway-all-local.yml"
-          cat > /home/runner/genesis.json <<EOF
+          cat > /home/runner/genesis_data_file.bin <<EOF
           {"genesis":"0321bf94398a862c0f6ed48ca7d512ccd0f2f5a2b000913f2eb99db943bd814b21038f8dbbd66648e1356911f5aba38b8e9b366e3f1ffe14f05007a30731305fd22a0345bbbd4c236968cda7e8b901d6337e47ce59b6a369cffea3d8f53e7b6a1b69470351ebefbd755ea3c29c32d29d3d870156baadd799ba911a022b6dee449a2082cb"}
           EOF
           ./radixnode docker config -m DETAILED \
