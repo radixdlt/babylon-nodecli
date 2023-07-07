@@ -2,7 +2,7 @@
 install:
 	$(shell chmod +x add-version.sh)
 	$(shell ./add-version.sh)
-	pip install pipenv
+	pip install pipenv==2020.11.15
 	pipenv lock -r > requirements.txt
 .PHONY: output
 output-ubuntu-focal: install
