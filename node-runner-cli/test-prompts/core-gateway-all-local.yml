@@ -1,6 +1,5 @@
 ---
-- select_network: "34"
-- genesis_bin_data_file: "/home/runner/genesis_data_file.bin"
+- select_network: "13"
 - first_time_config: Y
 - setup_fullnode: Y
 - input_seednode: "radix://node_tdx_22_1qvsml9pe32rzcrmw6jx204gjeng09adzkqqfz0ewhxwmjsaas99jzrje4u3@34.243.93.185"
