@@ -72,9 +72,9 @@ class ValidatorUnitTests(unittest.TestCase):
 
     def test_ask_network_id(self):
         settings = CommonDockerSettings({})
-        settings.ask_network_id(11)
-        self.assertIn("nebunet", settings.network_name)
-        self.assertIn("nebunet", settings.genesis_bin_data_file)
+        settings.ask_network_id(13)
+        self.assertIn("ansharnet", settings.network_name)
+        self.assertIn("ansharnet", settings.genesis_bin_data_file)
 
 
 def suite():

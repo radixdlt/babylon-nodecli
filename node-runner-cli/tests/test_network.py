@@ -35,36 +35,6 @@ class NetworkUtilsUnitTests(unittest.TestCase):
             Network.validate_network_id("enkinet")
         self.assertEqual(cm.exception.code, 1)
 
-    @mock.patch('sys.stdout', new_callable=StringIO)
-    def test_input_stuff(self, mock_stdout):
-        genesis_bin_data_file = Network.path_to_genesis_binary(1)
-        self.assertEqual(genesis_bin_data_file, None)
-
-        genesis_bin_data_file = Network.path_to_genesis_binary(2)
-        self.assertEqual(genesis_bin_data_file, None)
-
-        with self.assertRaises(SystemExit) as cm:
-            with mock.patch('builtins.input', return_value='/tmp/path'):
-                genesis_bin_data_file = Network.path_to_genesis_binary(3)
-            self.assertEqual(genesis_bin_data_file, "/tmp/path")
-            self.assertEqual(mock_stdout.getvalue(), f" `{genesis_bin_data_file}` does not exist ")
-            self.assertEqual(cm.exception.code, 1)
-
-        with self.assertRaises(SystemExit) as cm:
-            with mock.patch('builtins.input', return_value='/tm\\$&(*!@£^(p(^)th'):
-                Network.path_to_genesis_binary(3)
-            self.assertEqual(mock_stdout.getvalue(), "OS error occurred trying to open /tm\\$&(*!@£^(p(^)th")
-            self.assertEqual(cm.exception.code, 1)
-
-    @mock.patch('sys.stdout', new_callable=StringIO)
-    def test_hammunet_genesis_files(self, mock_stdout):
-        with self.assertRaises(SystemExit) as cm:
-            settings = CommonDockerSettings({})
-            with mock.patch('builtins.input', side_effect=['34', '/tmp/hammunet_genesis_data_file.bin']):
-                settings.ask_network_id(None)
-            self.assertIn("hammunet_genesis_data_file.bin", settings.genesis_bin_data_file)
-            self.assertEqual(mock_stdout.getvalue(), f" `{settings.genesis_bin_data_file}` does not exist ")
-            self.assertEqual(cm.exception.code, 1)
 
     def test_create_if_not_exists(self):
         genesisfile_txt = "/tmp/genesisfile.txt"
