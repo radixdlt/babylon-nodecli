@@ -33,16 +33,11 @@ class Network:
             sys.exit(1)
         return network_id
 
-
     @staticmethod
     def path_to_genesis_binary(network_id: int) -> str:
-        if network_id not in [1, 2]:
-            config_dir = f"{Helpers.get_default_node_config_dir()}/genesis_data_file.bin"
-            genesis_bin_file = Prompts.check_default(Helpers.input_guestion(
-                f"Enter absolute path to genesis data file which is binary file with extenstion '.bin' . "
-                f"Default location is {bcolors.OKBLUE}{config_dir}{bcolors.ENDC}:",
-                QuestionKeys.genesis_bin_data_file), config_dir)
-            Helpers.is_valid_file(genesis_bin_file)
+        if network_id not in [1, 2] and network_id == 13:
+            genesis_bin_file = GenesisConfig.copy_genesis_file(
+                "ansharnet_genesis_data_file.bin")
         else:
             genesis_bin_file = None
 
@@ -56,6 +51,7 @@ class Network:
             10: "adapanet",
             11: "nebunet",
             12: "kisharnet",
+            13: "ansharnet",
             32: "gilganet",
             33: "enkinet",
             34: "hammunet",

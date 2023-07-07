@@ -201,13 +201,13 @@ class Prompts:
     @staticmethod
     def ask_trusted_node() -> str:
         Helpers.section_headline("Trusted node settings")
-        default_trusted_nodes = "radix://node_tdx_c_1qvmhdlpvu3ym369ehjcmnmuam79vhs03gv0nqwhusewmvnjlfth3jpgr5ga@54.229.1.127,radix://node_tdx_c_1qfz58amtc2x8jz33uzfj9ymn8t2thhuatrt9w67he2w9x2f6eve4g20qctn@15.206.142.82,radix://node_tdx_c_1qtvxv7259j0l48gycv0zdze6he56c5sx4vjhljc7jsgkxaamnf3kccv4k4w@3.234.147.175,radix://node_tdx_c_1q2axr7xr4utg3a7hxstxdfjd7udqxzp5dqf6vgg0d0krmyrvzw775xa6nu4@3.24.207.200"
+        default_trusted_nodes = "radix://node_tdx_d_1qwq2nfe6vxqwe3mqmfm9l2xl97as7lkwndval63cymvc3qszn8nqx6g2s3m@3.109.161.178"
         value = Helpers.input_guestion(f"Fullnode requires another node to connect to network. "
                                        # ToDo: Add after main release of babylon
                                        # "\nTo connect to MAINNET or STOKENET details on these node can be found here "
                                        # "- https://docs.radixdlt.com/main/node-and-gateway/seed-nodes.html"
                                        "\nType in the node you want to connect to in format radix://<node-peer-2-peer-address>@<ip>"
-                                       "\n OR press Enter to accept default for kisharnet/rcnet :"
+                                       "\n OR press Enter to accept default for ansharnet/rcnet-v2-phase1 :"
                                        f"{default_trusted_nodes}",
                                        QuestionKeys.input_seednode)
         trustednode = Prompts.check_default(value, default_trusted_nodes)
