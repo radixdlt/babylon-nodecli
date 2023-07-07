@@ -2,7 +2,7 @@
 - select_network: "13"
 - first_time_config: Y
 - setup_fullnode: Y
-- input_seednode: "radix://node_tdx_22_1qvsml9pe32rzcrmw6jx204gjeng09adzkqqfz0ewhxwmjsaas99jzrje4u3@34.243.93.185"
+- input_seednode: "radix://node_tdx_d_1qwq2nfe6vxqwe3mqmfm9l2xl97as7lkwndval63cymvc3qszn8nqx6g2s3m@3.109.161.178"
 - have_validator_address: "N"
 - have_keystore_file: Y
 - input_path_keystore: "/home/runner/node-config"

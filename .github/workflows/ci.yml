@@ -177,8 +177,8 @@ jobs:
           echo "HOME=$HOME"
           echo "PATH=$PWD"
           ./radixnode systemd config -m CORE \
-            -n 11 \
-            -t radix://node_tdx_b_1qdrcdjgzl6s2ymnsssdssxllmmj0j84eagu2m6xtttj3nxrunzesyh9fwea@3.109.242.93 \
+            -n 13 \
+            -t radix://node_tdx_d_1qwq2nfe6vxqwe3mqmfm9l2xl97as7lkwndval63cymvc3qszn8nqx6g2s3m@3.109.161.178 \
             -i 35.178.142.54 \
             -v "not_a_real_validator_address" \
             -k $KEYSTORE_PASSWORD -nk -a
@@ -327,17 +327,13 @@ jobs:
           chmod +x ./radixnode
           mkdir -p $HOME/node-config
           export DISABLE_VERSION_CHECK=true
-          export CORE_DOCKER_REPO_OVERRIDE="eu.gcr.io/dev-container-repo/radixdlt-core"
-          export RADIXDLT_APP_VERSION_OVERRIDE="release-betanet-v2-0a079cc1d"
+          export RADIXDLT_APP_VERSION_OVERRIDE="rcnet-v2-phase1-r2"
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
           export PROMPT_FEEDS="node-runner-cli/test-prompts/core-gateway-all-local.yml"
           ./radixnode docker config -m DETAILED \
            -k $KEYSTORE_PASSWORD -nk -a
         env:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
-          CORE_DOCKER_REPO_OVERRIDE: "radixdlt/radixdlt-core"
-          RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
-          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 #      - id: auth
 #        uses: google-github-actions/auth@a61909d048e0be579b6c15b27088d19668493851
