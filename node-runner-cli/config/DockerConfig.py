@@ -112,7 +112,7 @@ class DockerConfig(BaseConfig):
             common_config = config_yaml["common_config"]
             self.core_node.core_release = core_node.get("core_release", None)
             self.core_node.data_directory = core_node.get("data_directory", None)
-            self.core_node.genesis_json_location = core_node.get("genesis_json_location", None)
+            self.core_node.genesis_bin_data_file = core_node.get("genesis_bin_data_file", None)
             self.core_node.enable_transaction = core_node.get("enable_transaction", False)
             self.common_config = CommonDockerSettings(
                 {"network_id": common_config.get("network_id", "1")})

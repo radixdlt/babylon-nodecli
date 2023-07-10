@@ -85,10 +85,10 @@ class SystemdUnitTests(unittest.TestCase):
         urllib3.disable_warnings()
         # os.environ['PROMPT_FEEDS'] = "test-prompts/individual-prompts/validator_address.yml"
         # PromptFeeder.prompts_feed = PromptFeeder.instance().load_prompt_feeds()
-        with open('/tmp/genesis.json', 'w') as fp:
+        with open('/tmp/genesis_data_file.bin', 'w') as fp:
             pass
         with patch('builtins.input', side_effect=['34',
-                                                  '/tmp/genesis.json',
+                                                  '/tmp/genesis_data_file.bin',
                                                   'Y',
                                                   'Y',
                                                   'radix://node_tdx_22_1qvsml9pe32rzcrmw6jx204gjeng09adzkqqfz0ewhxwmjsaas99jzrje4u3@34.243.93.185',
@@ -112,10 +112,10 @@ class SystemdUnitTests(unittest.TestCase):
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_systemd_setup_default_config(self, mockout):
-        with patch('builtins.input', side_effect=['/tmp/genesis.json']):
+        with patch('builtins.input', side_effect=[]):
             settings = SystemDSettings({})
             settings.common_config.host_ip = "1.1.1.1"
-            settings.common_config.network_id = 34
+            settings.common_config.network_id = 1
             settings.core_node.keydetails.keyfile_path = "/tmp/node-config"
             settings.core_node.keydetails.keyfile_name = "node-keystore.ks"
             settings.core_node.trusted_node = "someNode"
@@ -129,8 +129,7 @@ class SystemdUnitTests(unittest.TestCase):
         fixture = """ntp=false
 ntp.pool=pool.ntp.org
 
-network.id=34
-network.genesis_file=/tmp/genesis.json
+network.id=1
 
 node.key.path=/tmp/node-config/node-keystore.ks
 
@@ -152,14 +151,15 @@ db.location=/home/radixdlt/data
 consensus.validator_address=validatorAddress
 """
         self.maxDiff = None
+        print(fixture)
         self.assertEqual(default_config, fixture)
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_systemd_setup_default_config_without_validator(self, mockout):
-        with patch('builtins.input', side_effect=['/tmp/genesis.json']):
+        with patch('builtins.input', side_effect=[]):
             settings = SystemDSettings({})
             settings.common_config.host_ip = "1.1.1.1"
-            settings.common_config.network_id = 34
+            settings.common_config.network_id = 1
             settings.core_node.keydetails.keyfile_path = "/tmp/node-config"
             settings.core_node.keydetails.keyfile_name = "node-keystore.ks"
             settings.core_node.trusted_node = "someNode"
@@ -173,8 +173,7 @@ consensus.validator_address=validatorAddress
         fixture = """ntp=false
 ntp.pool=pool.ntp.org
 
-network.id=34
-network.genesis_file=/tmp/genesis.json
+network.id=1
 
 node.key.path=/tmp/node-config/node-keystore.ks
 
@@ -198,9 +197,9 @@ db.location=/home/radixdlt/data
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_systemd_setup_default_config_jinja(self, mockout):
-        with patch('builtins.input', side_effect=['/tmp/genesis.json']):
+        with patch('builtins.input', side_effect=[]):
             settings = SystemDSettings({})
-            settings.common_config.genesis_json_location = None
+            settings.common_config.genesis_bin_data_file = None
             settings.core_node.keydetails.keyfile_path = "/tmp/node-config"
             settings.core_node.keydetails.keyfile_name = "node-keystore.ks"
             settings.core_node.trusted_node = "someNode"

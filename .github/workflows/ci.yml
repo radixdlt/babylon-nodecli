@@ -177,8 +177,8 @@ jobs:
           echo "HOME=$HOME"
           echo "PATH=$PWD"
           ./radixnode systemd config -m CORE \
-            -n 11 \
-            -t radix://node_tdx_b_1qdrcdjgzl6s2ymnsssdssxllmmj0j84eagu2m6xtttj3nxrunzesyh9fwea@3.109.242.93 \
+            -n 13 \
+            -t radix://node_tdx_d_1qwq2nfe6vxqwe3mqmfm9l2xl97as7lkwndval63cymvc3qszn8nqx6g2s3m@3.109.161.178 \
             -i 35.178.142.54 \
             -v "not_a_real_validator_address" \
             -k $KEYSTORE_PASSWORD -nk -a
@@ -239,7 +239,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install containerd runc
           ./radixnode docker dependencies
-          touch /home/runner/genesis.json
       - name: core-gateway-all-local
         run: |
           ls -a
@@ -328,24 +327,13 @@ jobs:
           chmod +x ./radixnode
           mkdir -p $HOME/node-config
           export DISABLE_VERSION_CHECK=true
-          export CORE_DOCKER_REPO_OVERRIDE="eu.gcr.io/dev-container-repo/radixdlt-core"
-          export RADIXDLT_APP_VERSION_OVERRIDE="release-betanet-v2-0a079cc1d"
+          export RADIXDLT_APP_VERSION_OVERRIDE="rcnet-v2-phase1-r2"
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
           export PROMPT_FEEDS="node-runner-cli/test-prompts/core-gateway-all-local.yml"
-          cat > /home/runner/genesis.json <<EOF
-          {"genesis":"0321bf94398a862c0f6ed48ca7d512ccd0f2f5a2b000913f2eb99db943bd814b21038f8dbbd66648e1356911f5aba38b8e9b366e3f1ffe14f05007a30731305fd22a0345bbbd4c236968cda7e8b901d6337e47ce59b6a369cffea3d8f53e7b6a1b69470351ebefbd755ea3c29c32d29d3d870156baadd799ba911a022b6dee449a2082cb"}
-          EOF
           ./radixnode docker config -m DETAILED \
            -k $KEYSTORE_PASSWORD -nk -a
-
-#          ./radixnode docker config -d $HOME/node-config \
-#           -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 -m CORE -n 2 \
-#           -k $KEYSTORE_PASSWORD -nk -a
         env:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
-          CORE_DOCKER_REPO_OVERRIDE: "radixdlt/radixdlt-core"
-          RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
-          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 #      - id: auth
 #        uses: google-github-actions/auth@a61909d048e0be579b6c15b27088d19668493851
