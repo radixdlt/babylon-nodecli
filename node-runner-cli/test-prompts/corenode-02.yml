@@ -12,4 +12,4 @@
 - input_ledger_path: "/tmp/data"
 - input_transaction_api: "false"
 - core_nginx_setup: "false"
-#- setup_gateway: "false"
+- setup_gateway: "false"
