@@ -101,6 +101,25 @@ class DockerConfig(BaseConfig):
         self.gateway_settings = GatewayDockerSettings({})
         self.core_node.core_release = release
 
+    def loadConfig(self, file):
+        my_file = Path(file)
+        if not my_file.is_file():
+            sys.exit("Unable to find config file"
+                     "Run `radixnode docker init` to setup one")
+        with open(file, 'r') as file:
+            config_yaml = yaml.safe_load(file)
+            core_node = config_yaml["core_node"]
+            common_config = config_yaml["common_config"]
+            self.core_node.core_release = core_node.get("core_release", None)
+            self.core_node.data_directory = core_node.get("data_directory", None)
+            self.core_node.genesis_bin_data_file = core_node.get("genesis_bin_data_file", None)
+            self.core_node.enable_transaction = core_node.get("enable_transaction", False)
+            self.common_config = CommonDockerSettings(
+                {"network_id": common_config.get("network_id", "1")})
+            self.core_node.keydetails = KeyDetails(core_node.get("keydetails", None))
+            self.core_node.trusted_node = core_node.get("trusted_node", None)
+            self.core_node.existing_docker_compose = core_node.get("docker_compose", None)
+
     def to_yaml(self):
         config_to_dump = dict(self)
         config_to_dump["common_config"] = dict(self.common_config)

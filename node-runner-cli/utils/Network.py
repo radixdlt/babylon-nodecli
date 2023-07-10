@@ -15,7 +15,7 @@ class Network:
         Helpers.section_headline(f"Network connection")
         # TODO change this for rcnet launch
         network_prompt = Helpers.input_guestion(
-            "Enter the network_id. For babylon betanet it is 11. For babylon rcnet it is 12:",
+            "Enter the network_id. For babylon rcnet-v2 phase 1 it is 13:",
             QuestionKeys.select_network)
         network_id = Network.validate_network_id(network_prompt)
         return network_id
@@ -34,33 +34,14 @@ class Network:
         return network_id
 
     @staticmethod
-    def path_to_genesis_file(network_id: int) -> str:
-        if network_id not in [1, 2, 11, 12, 32]:
-            config_dir = f"{Helpers.get_default_node_config_dir()}/genesis.json"
-            genesis_json_location = Prompts.check_default(Helpers.input_guestion(
-                f"Enter absolute path to genesis json. Default location is {bcolors.OKBLUE}{config_dir}{bcolors.ENDC}:",
-                QuestionKeys.genesis_location), config_dir)
-            Helpers.is_valid_file(genesis_json_location)
-
-        elif network_id == 11:
-            genesis_json_location = f"{Helpers.get_default_node_config_dir()}/nebunet-genesis.json"
-            Path(Helpers.get_default_node_config_dir()).mkdir(parents=True, exist_ok=True)
-            GenesisConfig.create_nebunet_genesis_file(genesis_json_location)
-            return genesis_json_location
-        elif network_id == 12:
-            genesis_json_location = f"{Helpers.get_default_node_config_dir()}/kisharnet-genesis.json"
-            Path(Helpers.get_default_node_config_dir()).mkdir(parents=True, exist_ok=True)
-            GenesisConfig.create_kisharnet_genesis_file(genesis_json_location)
-            return genesis_json_location
-        elif network_id == 32:
-            genesis_json_location = f"{Helpers.get_default_node_config_dir()}/gilganet-genesis.json"
-            Path(Helpers.get_default_node_config_dir()).mkdir(parents=True, exist_ok=True)
-            GenesisConfig.create_gilganet_genesis_file(genesis_json_location)
-            return genesis_json_location
+    def path_to_genesis_binary(network_id: int) -> str:
+        if network_id not in [1, 2] and network_id == 13:
+            genesis_bin_file = GenesisConfig.copy_genesis_file(
+                "ansharnet_genesis_data_file.bin")
         else:
-            genesis_json_location = None
+            genesis_bin_file = None
 
-        return genesis_json_location
+        return genesis_bin_file
 
     @staticmethod
     def get_network_id_names() -> dict:
@@ -70,6 +51,7 @@ class Network:
             10: "adapanet",
             11: "nebunet",
             12: "kisharnet",
+            13: "ansharnet",
             32: "gilganet",
             33: "enkinet",
             34: "hammunet",

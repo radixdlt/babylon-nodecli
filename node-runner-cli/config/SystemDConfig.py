@@ -98,8 +98,7 @@ class CommonSystemdSettings(BaseConfig):
     host_ip: str = None
     service_user: str = "radixdlt"
     network_id: int = 1
-    genesis_json_location: str
-    genesis_type: str = "json"
+    genesis_bin_data_file: str
 
     def __iter__(self):
         class_variables = {key: value
@@ -115,9 +114,9 @@ class CommonSystemdSettings(BaseConfig):
         self.network_id = network_id
         self.set_network_name()
 
-    def set_genesis_file_location(self, genesis_json_location: str):
-        self.genesis_json_location = genesis_json_location
-
+    def set_genesis_bin_data_file(self, genesis_bin_data_file: str):
+        self.genesis_bin_data_file = genesis_bin_data_file
+        
     def set_genesis_type(self, genesis_file_location: str):
         if genesis_file_location.endswith('.json'):
             self.genesis_type = "json"
@@ -146,7 +145,7 @@ class CommonSystemdSettings(BaseConfig):
             self.set_network_id(int(network_id))
         else:
             self.set_network_id(network_id)
-        self.set_genesis_file_location(Network.path_to_genesis_file(self.network_id))
+        self.set_genesis_bin_data_file(Network.path_to_genesis_binary(self.network_id))
 
     def ask_enable_nginx_for_core(self, nginx_on_core):
         if nginx_on_core:
@@ -232,7 +231,7 @@ class SystemDSettings(BaseConfig):
             .to_file(f"{self.core_node.node_secrets_dir}/environment")
 
     def create_default_config(self):
-        self.common_config.genesis_json_location = Network.path_to_genesis_file(self.common_config.network_id)
+        self.common_config.genesis_bin_data_file = Network.path_to_genesis_binary(self.common_config.network_id)
         Renderer().load_file_based_template("systemd-default.config.j2").render(
             dict(self)).to_file(f"{self.core_node.node_dir}/default.config")
 

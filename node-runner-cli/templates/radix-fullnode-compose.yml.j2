@@ -15,13 +15,8 @@ services:
       RADIXDLT_TRANSACTIONS_API_ENABLE: '{{core_node.enable_transaction}}'
       RADIXDLT_VALIDATOR_KEY_LOCATION: /home/radixdlt/node-keystore.ks
       RADIX_NODE_KEYSTORE_PASSWORD: '{{core_node.keydetails.keystore_password}}'
-      {% if common_config.genesis_json_location is defined %}
-        {% if common_config.genesis_type == 'binary' %}
-      RADIXDLT_GENESIS_DATA_FILE: '/home/radixdlt/genesis_data_file.bin'
-        {% endif %}
-        {% if common_config.genesis_type == 'json' %}
-      RADIXDLT_GENESIS_FILE: '/home/radixdlt/genesis.json'
-        {% endif %}
+      {% if common_config.genesis_bin_data_file is defined %}
+      RADIXDLT_GENESIS_DATA_FILE: "/home/radixdlt/genesis_data_file.bin"
       {% endif %}
       {% if core_node.validator_address is defined %}
       RADIXDLT_CONSENSUS_VALIDATOR_ADDRESS: '{{core_node.validator_address}}'
@@ -45,13 +40,8 @@ services:
     - core_ledger:/home/radixdlt/RADIXDB
     {% endif %}
     - {{core_node.keydetails.keyfile_path ~ '/' ~ core_node.keydetails.keyfile_name }}:/home/radixdlt/node-keystore.ks
-    {% if common_config.genesis_json_location is defined %}
-        {% if common_config.genesis_type == 'binary' %}
-    - "{{common_config.genesis_json_location}}:/home/radixdlt/genesis_data_file.bin"
-        {% endif %}
-        {% if common_config.genesis_type == 'json' %}
-    - "{{common_config.genesis_json_location}}:/home/radixdlt/genesis.json"
-        {% endif %}
+    {% if common_config.genesis_bin_data_file is defined %}
+    - "{{common_config.genesis_bin_data_file}}:/home/radixdlt/genesis_data_file.bin"
     {% endif %}
  {% endif %}
  {% if common_config.nginx_settings is defined  and  ((common_config.nginx_settings.protect_core | lower | trim) == "true" or (common_config.nginx_settings.protect_gateway | lower | trim) == "true") %}

@@ -20,8 +20,7 @@ class NginxConfig(BaseConfig):
 class CommonDockerSettings(BaseConfig):
     network_id: int = None
     network_name: str = None
-    genesis_json_location: str = None
-    genesis_type: str = "json"
+    genesis_bin_data_file: str = None
     nginx_settings: DockerNginxConfig = DockerNginxConfig({})
     docker_compose: str = f"{Helpers.get_home_dir()}/docker-compose.yml"
 
@@ -48,8 +47,8 @@ class CommonDockerSettings(BaseConfig):
         self.network_id = network_id
         self.set_network_name()
 
-    def set_genesis_file_location(self, genesis_json_location: str):
-        self.genesis_json_location = genesis_json_location
+    def set_genesis_bin_data_file_location(self, genesis_bin_data_file: str):
+        self.genesis_bin_data_file = genesis_bin_data_file
 
     def set_genesis_type(self, genesis_file_location: str):
         if genesis_file_location is None:
@@ -71,8 +70,7 @@ class CommonDockerSettings(BaseConfig):
         if not network_id:
             network_id = Network.get_network_id()
         self.set_network_id(int(network_id))
-        self.set_genesis_file_location(Network.path_to_genesis_file(self.network_id))
-        self.set_genesis_type(self.genesis_json_location)
+        self.set_genesis_bin_data_file_location(Network.path_to_genesis_binary(self.network_id))
 
     def ask_nginx_release(self):
         latest_nginx_release = github.latest_release("radixdlt/babylon-nginx")
