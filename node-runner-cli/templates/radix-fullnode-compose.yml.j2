@@ -15,6 +15,15 @@ services:
       RADIXDLT_TRANSACTIONS_API_ENABLE: '{{core_node.enable_transaction}}'
       RADIXDLT_VALIDATOR_KEY_LOCATION: /home/radixdlt/node-keystore.ks
       RADIX_NODE_KEYSTORE_PASSWORD: '{{core_node.keydetails.keystore_password}}'
+      {% if migration.use_olympia is defined %}
+      {% if migration.use_olympia %}
+      RADIXDLT_GENESIS_USE_OLYMPIA: '{{migration.use_olympia}}'
+      RADIXDLT_GENESIS_OLYMPIA_NODE_CORE_API_URL: '{{migration.olympia_node_url}}'
+      RADIXDLT_GENESIS_OLYMPIA_NODE_CORE_API_AUTH_USER: '{{migration.olympia_node_auth_user}}'
+      RADIXDLT_GENESIS_OLYMPIA_NODE_CORE_API_AUTH_PASSWORD: '{{migration.olympia_node_auth_password}}'
+      RADIXDLT_GENESIS_OLYMPIA_NODE_BECH32_ADDRESS: '{{migration.olympia_node_bech32_address}}'
+      {% endif %}
+      {% endif %}
       {% if common_config.genesis_bin_data_file is defined %}
       RADIXDLT_GENESIS_DATA_FILE: "/home/radixdlt/genesis_data_file.bin"
       {% endif %}

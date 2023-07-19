@@ -62,6 +62,12 @@ core_node:
   node_dir: /someDir/node-config
   node_secrets_dir: /someDir/node-config/secret
   nodetype: fullnode
+migration:
+  olympia_node_auth_password: ''
+  olympia_node_auth_user: ''
+  olympia_node_bech32_address: ''
+  olympia_node_url: ''
+  use_olympia: false
 """
         self.assertEqual(config_as_yaml, fixture)
 
@@ -118,6 +124,12 @@ gateway_settings:
     dbname: radixdlt_ledger
     setup: local
     host: host.docker.internal:5432
+migration:
+  use_olympia: false
+  olympia_node_url: ''
+  olympia_node_auth_user: ''
+  olympia_node_auth_password: ''
+  olympia_node_bech32_address: ''
 """
         self.assertEqual(config_as_yaml, fixture)
 
@@ -135,7 +147,7 @@ gateway_settings:
 def suite():
     """ This defines all the tests of a module"""
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(SystemdUnitTests))
+    suite.addTest(unittest.makeSuite(ConfigUnitTests))
     return suite
 
 

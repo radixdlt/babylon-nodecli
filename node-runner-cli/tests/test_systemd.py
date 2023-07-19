@@ -149,6 +149,7 @@ api.bind.address=0.0.0.0
 db.location=/home/radixdlt/data
 
 consensus.validator_address=validatorAddress
+
 """
         self.maxDiff = None
         print(fixture)
@@ -231,6 +232,7 @@ api.bind.address=0.0.0.0
 db.location=/home/radixdlt/data
 
 consensus.validator_address=validatorAddress
+
 """
         self.maxDiff = None
         self.assertEqual(render_template, fixture)
