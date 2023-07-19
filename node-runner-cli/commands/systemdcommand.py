@@ -50,7 +50,14 @@ def systemdcommand(systemdcommand_args=None, parent=systemd_parser):
               \n\nCORE: Use this value to setup CORE using defaults.
               \n\nDETAILED: Default value if not provided. This mode takes your through series of questions.
               """,
-             choices=["CORE", "DETAILED"], action="store"),
+             choices=["CORE", "DETAILED", "MIGRATION"], action="store"),
+    argument("-miu", "--migration_url", help="The url of the olympia node to migrate the ledger from", action="store"),
+    argument("-miau", "--migration_auth_user", help="The user to authenticate to the olympia node for migration",
+             action="store"),
+    argument("-miap", "--migration_auth_password",
+             help="The password to authenticate to the olympia node for migration", action="store"),
+    argument("-miba", "--migration_bech_url", help="The bech url of the olympia node to migrate the ledger from",
+             action="store"),
     argument("-n", "--networkid",
              help="Network id of network you want to connect.For stokenet it is 2 and for mainnet it is 1."
                   "If not provided you will be prompted to enter a value ",
@@ -95,6 +102,11 @@ def config(args):
     data_directory = args.data_directory
     new_keystore = args.newkeystore
 
+    olympia_node_url = args.migration_url
+    olympia_node_bech32_address = args.migration_auth_user
+    olympia_node_auth_user = args.migration_auth_user
+    olympia_node_auth_password = args.migration_auth_password
+
     Helpers.section_headline("CONFIG FILE")
     config_file = f"{args.configdir}/config.yaml"
     Path(f"{args.configdir}").mkdir(parents=True, exist_ok=True)
@@ -117,6 +129,12 @@ def config(args):
                                                                     trustednode,
                                                                     keystore_password, new_keystore)
     configuration.common_config.ask_enable_nginx_for_core(nginx_on_core)
+
+    if "MIGRATION" in setupmode.mode:
+        configuration.migration.ask_migration_config(olympia_node_url, olympia_node_auth_user,
+                                                     olympia_node_auth_password,
+                                                     olympia_node_bech32_address)
+
     config_to_dump["core_node"] = dict(configuration.core_node)
 
     if configuration.common_config.check_nginx_required():
