@@ -5,6 +5,7 @@ from pathlib import Path
 import yaml
 
 from config.BaseConfig import BaseConfig, SetupMode
+from config.GatewayDockerConfig import GatewayDockerSettings
 from config.KeyDetails import KeyDetails
 from config.MigrationConfig import CommonMigrationSettings
 from config.Nginx import SystemdNginxConfig
@@ -166,7 +167,7 @@ class CommonSystemdSettings(BaseConfig):
 class SystemDSettings(BaseConfig):
     core_node: CoreSystemdSettings = CoreSystemdSettings({})
     common_config: CommonSystemdSettings = CommonSystemdSettings({})
-    gateway_settings: None
+    gateway_settings: GatewayDockerSettings = GatewayDockerSettings({})
     migration: CommonMigrationSettings = CommonMigrationSettings({})
 
     def __iter__(self):
@@ -186,6 +187,7 @@ class SystemDSettings(BaseConfig):
         config_to_dump["common_config"] = dict(self.common_config)
         config_to_dump["common_config"]["nginx_settings"] = dict(self.common_config.nginx_settings)
         config_to_dump["migration"] = dict(self.migration)
+        config_to_dump["gateway_settings"] = dict(self.gateway_settings)
         return yaml.dump(config_to_dump, sort_keys=True, default_flow_style=False, explicit_start=True,
                          allow_unicode=True)
 
@@ -196,6 +198,7 @@ class SystemDSettings(BaseConfig):
         config_to_dump["common_config"] = dict(self.common_config)
         config_to_dump["common_config"]["nginx_settings"] = dict(self.common_config.nginx_settings)
         config_to_dump["migration"] = dict(self.migration)
+        config_to_dump["gateway_settings"] = dict(self.gateway_settings)
         with open(config_file, 'w') as f:
             yaml.dump(config_to_dump, f, sort_keys=True, default_flow_style=False)
 

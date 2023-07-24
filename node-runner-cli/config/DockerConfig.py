@@ -101,6 +101,7 @@ class DockerConfig(BaseConfig):
         self.core_node = CoreDockerSettings({})
         self.common_config = CommonDockerSettings({})
         self.gateway_settings = GatewayDockerSettings({})
+        self.migration = CommonMigrationSettings({})
         self.core_node.core_release = release
 
     def loadConfig(self, file):
