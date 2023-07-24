@@ -274,6 +274,7 @@ jobs:
           echo "PATH=$PWD"
           export PROMPT_FEEDS="node-runner-cli/test-prompts/core-gateway-all-local.yml"
           ./radixnode docker config -m DETAILED \
+           -d $HOME/node-config \
            -k $KEYSTORE_PASSWORD -nk -a
         env:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
@@ -286,6 +287,7 @@ jobs:
           chmod +x ./radixnode
           export PROMPT_FEEDS="node-runner-cli/test-prompts/corenode-01.yml"
           ./radixnode docker config -m DETAILED \
+           -d $HOME/node-config \
            -k $KEYSTORE_PASSWORD -nk -a
         env:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
@@ -297,6 +299,7 @@ jobs:
           ls -a
           export PROMPT_FEEDS="node-runner-cli/test-prompts/corenode-02.yml"
           ./radixnode docker config -m DETAILED \
+           -d $HOME/node-config \
            -k $KEYSTORE_PASSWORD -nk -a
         env:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
@@ -309,6 +312,7 @@ jobs:
 #          ls -a
 #          export PROMPT_FEEDS="node-runner-cli/test-prompts/gateway-remote-core-local-postgress.yml"
 #          ./radixnode docker config -m DETAILED \
+#           -d $HOME/node-config \
 #           -k $KEYSTORE_PASSWORD -nk -a
 #        env:
 #          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
@@ -319,6 +323,7 @@ jobs:
 #          ls -a
 #          export PROMPT_FEEDS="node-runner-cli/test-prompts/gateway-remote-core-remote-postgress.yml"
 #          ./radixnode docker config -m DETAILED \
+#           -d $HOME/node-config \
 #           -k $KEYSTORE_PASSWORD -nk -a
 #        env:
 #          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
@@ -357,6 +362,7 @@ jobs:
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
           export PROMPT_FEEDS="node-runner-cli/test-prompts/core-gateway-all-local.yml"
           ./radixnode docker config -m DETAILED \
+           -d $HOME/node-config \
            -k $KEYSTORE_PASSWORD -nk -a
         env:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
