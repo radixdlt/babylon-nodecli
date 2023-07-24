@@ -32,7 +32,7 @@ class SystemdUnitTests(unittest.TestCase):
                     "-k", "password",
                     "-n", "S",
                     "-d", "/tmp/config",
-                    "-dd", "/tmp/data"]):
+                    "-dd", "/tmp/babylon-ledger"]):
             main()
 
     def test_systemd_config_can_be_saved_and_restored_as_yaml(self):
@@ -96,7 +96,7 @@ class SystemdUnitTests(unittest.TestCase):
                                                   'Y',
                                                   '/tmp/babylon-node',
                                                   'node-keystore.ks',
-                                                  '/tmp/data',
+                                                  '/tmp/babylon-ledger',
                                                   'true',
                                                   'true',
                                                   'development-latest']):
@@ -146,7 +146,7 @@ api.transactions.enable=true
 api.sign.enable=true
 api.bind.address=0.0.0.0
 
-db.location=/home/radixdlt/data
+db.location=/home/radixdlt/babylon-ledger
 
 consensus.validator_address=validatorAddress
 
@@ -191,7 +191,7 @@ api.transactions.enable=true
 api.sign.enable=true
 api.bind.address=0.0.0.0
 
-db.location=/home/radixdlt/data
+db.location=/home/radixdlt/babylon-ledger
 """
         self.maxDiff = None
         self.assertEqual(default_config.strip(), fixture.strip())
@@ -229,7 +229,7 @@ api.transactions.enable=true
 api.sign.enable=true
 api.bind.address=0.0.0.0
 
-db.location=/home/radixdlt/data
+db.location=/home/radixdlt/babylon-ledger
 
 consensus.validator_address=validatorAddress
 

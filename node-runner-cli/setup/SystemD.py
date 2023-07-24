@@ -64,8 +64,8 @@ class SystemD(Base):
 
     @staticmethod
     def make_data_directory():
-        run_shell_command('sudo mkdir -p /data', shell=True)
-        run_shell_command('sudo chown radixdlt:radixdlt -R /data', shell=True)
+        run_shell_command('sudo mkdir -p /babylon-ledger', shell=True)
+        run_shell_command('sudo chown radixdlt:radixdlt -R /babylon-ledger', shell=True)
 
     @staticmethod
     def fetch_universe_json(trustenode, extraction_path):

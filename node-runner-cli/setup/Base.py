@@ -106,10 +106,10 @@ class Base:
             f"\nRadix node stores all the ledger data on a folder. "
             f"Mounting this location as a docker volume, "
             f"will allow to restart the node without a need to download ledger"
-            f"\n{bcolors.WARNING}Press Enter to store ledger on \"{Helpers.get_home_dir()}/data\" directory OR "
+            f"\n{bcolors.WARNING}Press Enter to store ledger on \"{Helpers.get_home_dir()}/babylon-ledger\" directory OR "
             f"Type the absolute path of existing ledger data folder:{bcolors.ENDC}", QuestionKeys.input_ledger_path)
         if data_dir_path == "":
-            data_dir_path = f"{Helpers.get_home_dir()}/data"
+            data_dir_path = f"{Helpers.get_home_dir()}/babylon-ledger"
         if create_dir:
             run_shell_command(f'sudo mkdir -p {data_dir_path}', shell=True)
         return data_dir_path

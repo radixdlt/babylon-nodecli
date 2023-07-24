@@ -21,7 +21,7 @@ class CoreDockerSettings(BaseConfig):
     keydetails: KeyDetails = KeyDetails({})
     core_release: str = None
     repo: str = os.getenv(CORE_DOCKER_REPO_OVERRIDE, "radixdlt/babylon-node")
-    data_directory: str = f"{Helpers.get_home_dir()}/data"
+    data_directory: str = f"{Helpers.get_home_dir()}/babylon-ledger"
     enable_transaction: str = "false"
     trusted_node: str = None
     validator_address: str = None

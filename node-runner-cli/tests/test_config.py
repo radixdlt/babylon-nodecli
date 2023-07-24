@@ -50,7 +50,7 @@ common_config:
     secrets_dir: /etc/nginx/secrets
   service_user: radixdlt
 core_node:
-  data_directory: {home_directory}/data
+  data_directory: {home_directory}/babylon-ledger
   enable_transaction: 'false'
   java_opts: --enable-preview -server -Xms8g -Xmx8g  -XX:MaxDirectMemorySize=2048m
     -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts
@@ -84,7 +84,7 @@ core_node:
     keyfile_name: node-keystore.ks
     keygen_tag: 1.3.2
   repo: radixdlt/babylon-node
-  data_directory: {home_directory}/data
+  data_directory: {home_directory}/babylon-ledger
   enable_transaction: 'false'
   java_opts: --enable-preview -server -Xms8g -Xmx8g  -XX:MaxDirectMemorySize=2048m
     -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts

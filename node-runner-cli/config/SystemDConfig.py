@@ -24,7 +24,7 @@ class CoreSystemdSettings(BaseConfig):
     core_release: str = None
     core_binary_url: str = None
     core_library_url: str = None
-    data_directory: str = f"{Helpers.get_home_dir()}/data"
+    data_directory: str = f"{Helpers.get_home_dir()}/babylon-ledger"
     enable_transaction: str = "false"
     trusted_node: str = None
     node_dir: str = '/etc/radixdlt/node'
