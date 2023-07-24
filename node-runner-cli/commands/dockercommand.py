@@ -182,6 +182,8 @@ def config(args):
         configuration.common_config.nginx_settings = None
 
     config_to_dump["common_config"] = dict(configuration.common_config)
+    config_to_dump["migration"] = dict(configuration.migration)
+    config_to_dump["gateway_settings"] = dict(configuration.gateway_settings)
 
     yaml.add_representer(type(None), Helpers.represent_none)
     Helpers.section_headline("CONFIG is Generated as below")

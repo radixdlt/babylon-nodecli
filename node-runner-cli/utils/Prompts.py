@@ -384,7 +384,7 @@ class Prompts:
     def ask_olympia_node_auth_user(cls) -> str:
         Helpers.section_headline("Migration: Olympia API Authentication")
         answer = Helpers.input_guestion(
-            f"Enter the credentials for your olympia node. Leave blank if no authentication is required: \n User:"
+            f"Enter the credentials for your olympia node. Leave blank if no authentication is required: \nUser:"
             , QuestionKeys.olympia_migrations_user)
         return answer
 
@@ -398,6 +398,6 @@ class Prompts:
     @classmethod
     def ask_olympia_node_bech32_address(cls) -> str:
         answer = Helpers.input_guestion(
-            f"Enter the bech32 address of your olympia node"
+            f"Enter the bech32 address of your olympia node."
             , QuestionKeys.olympia_migrations_bech32)
         return answer

@@ -46,7 +46,7 @@ services:
         soft: 65536
     volumes:
     {% if core_node.data_directory is defined %}
-    - core_ledger:/home/radixdlt/RADIXDB
+    - babylon_ledger:/home/radixdlt/RADIXDB
     {% endif %}
     - {{core_node.keydetails.keyfile_path ~ '/' ~ core_node.keydetails.keyfile_name }}:/home/radixdlt/node-keystore.ks
     {% if common_config.genesis_bin_data_file is defined %}
@@ -134,7 +134,7 @@ services:
 {% endif %}
 volumes:
  {% if core_node is defined and core_node.data_directory is defined %}
-  core_ledger:
+  babylon_ledger:
     driver: local
     driver_opts:
       device: {{ core_node.data_directory }}
