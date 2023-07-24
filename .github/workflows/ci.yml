@@ -80,6 +80,7 @@ jobs:
           path: "${{ github.workspace }}/node-runner-cli/out/ubuntu/jammy/radixnode"
       - name: Build the binary for ubuntu focal
         run: |
+          cd node-runner-cli
           make output-ubuntu-focal
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
