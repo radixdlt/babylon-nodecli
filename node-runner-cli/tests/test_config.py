@@ -35,8 +35,8 @@ class ConfigUnitTests(unittest.TestCase):
     def test_config_systemd_defaut_config_matches_fixture(self):
         config = SystemDSettings({})
         home_directory = Path.home()
-        config.core_node.node_dir = f"/someDir/node-config"
-        config.core_node.node_secrets_dir = f"/someDir/node-config/secret"
+        config.core_node.node_dir = f"/someDir/babylon-node"
+        config.core_node.node_secrets_dir = f"/someDir/babylon-node/secret"
         config_as_yaml = config.to_yaml()
         self.maxDiff = None
         fixture = f"""---
@@ -57,10 +57,10 @@ core_node:
     -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
   keydetails:
     keyfile_name: node-keystore.ks
-    keyfile_path: {home_directory}/node-config
+    keyfile_path: {home_directory}/babylon-node
     keygen_tag: 1.3.2
-  node_dir: /someDir/node-config
-  node_secrets_dir: /someDir/node-config/secret
+  node_dir: /someDir/babylon-node
+  node_secrets_dir: /someDir/babylon-node/secret
   nodetype: fullnode
 migration:
   olympia_node_auth_password: ''
@@ -80,7 +80,7 @@ migration:
 core_node:
   nodetype: fullnode
   keydetails:
-    keyfile_path: {home_directory}/node-config
+    keyfile_path: {home_directory}/babylon-node
     keyfile_name: node-keystore.ks
     keygen_tag: 1.3.2
   repo: radixdlt/babylon-node
