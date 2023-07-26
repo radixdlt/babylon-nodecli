@@ -27,8 +27,12 @@ db.location=/home/radixdlt/babylon-ledger
 consensus.validator_address={{core_node.validator_address}}
 {% endif %}
 
+{% if migration.use_olympia is defined %}
+{% if migration.use_olympia %}
 genesis.use_olympia={{migration.use_olympia}}
 genesis.olympia.node_core_api_url={{migration.olympia_node_url}}
 genesis.olympia.node_core_api_auth_user={{migration.olympia_node_auth_user}}
 genesis.olympia.node_core_api_auth_password={{migration.olympia_node_auth_password}}
 genesis.olympia.node_bech32_address={{migration.olympia_node_bech32_address}}
+{% endif %}
+{% endif %}
