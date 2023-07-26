@@ -168,7 +168,7 @@ jobs:
         with:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: ./radixnode
-          asset_name: radixnode-ubuntu-22.04
+          asset_name: radixnode-ubuntu-20.04
           asset_content_type: application/octet-stream
         if: ${{ github.event_name == 'release' }}
 
