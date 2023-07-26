@@ -144,6 +144,9 @@ def config(args):
 
     config_to_dump["common_config"] = dict(configuration.common_config)
 
+    config_to_dump["migration"] = dict(configuration.migration)
+    config_to_dump["gateway_settings"] = dict(configuration.gateway_settings)
+
     yaml.add_representer(type(None), Helpers.represent_none)
     Helpers.section_headline("CONFIG is Generated as below")
     print(f"\n{yaml.dump(config_to_dump)}")
@@ -271,14 +274,19 @@ def restart(args):
         sys.exit(1)
 
 
-@systemdcommand([])
+@systemdcommand([
+    argument("-s", "--skip", default="false",
+             help="Skip installation of base dependencies",
+             action="store_true")
+])
 def dependencies(args):
     """
     This commands installs all necessary software on the Virtual Machine(VM).
     Run this command on fresh VM or on an existing VM  as the command is tested to be idempotent
     """
 
-    Base.dependencies()
+    if not args.skip:
+        Base.dependencies()
     SystemD.install_java()
     SystemD.setup_user()
     SystemD.make_etc_directory()

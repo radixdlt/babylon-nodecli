@@ -263,4 +263,5 @@ def from_dict(dictionary: dict) -> SystemDSettings:
     settings.core_node.keydetails = KeyDetails(dictionary["core_node"]["keydetails"])
     settings.common_config = CommonSystemdSettings(dictionary["common_config"])
     settings.common_config.nginx_settings = SystemdNginxConfig(dictionary["common_config"]["nginx_settings"])
+    settings.migration = CommonMigrationSettings(dictionary["migration"])
     return settings
