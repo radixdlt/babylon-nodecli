@@ -367,28 +367,6 @@ jobs:
         env:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#      - id: auth
-#        uses: google-github-actions/auth@a61909d048e0be579b6c15b27088d19668493851
-#        with:
-#          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDP }}
-#          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
-#      - name: 'Register gcloud as Docker credential helper'
-#        run: |
-#          gcloud auth configure-docker -q
-#      - uses: radixdlt/iac-resuable-artifacts/fetch-secrets@v0.8.0
-#        with:
-#          role_name: "arn:aws:iam::308190735829:role/gh-common-secrets-read-access"
-#          app_name: "dashboard"
-#          step_name: "push-dash"
-#          secret_prefix: "GH_GCR_JSON_KEY"
-#          secret_name: "arn:aws:secretsmanager:eu-west-2:308190735829:secret:github-actions/common/gcr-credentials-OeJwWi"
-#          parse_json: false
-      - name: Login to GCR
-        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
-        with:
-          registry: eu.gcr.io
-          username: _json_key
-          password: ${{ secrets.GCR_EU_DEV_JSON_KEY }}
       - name: Run CLI setup
         run: |
           export DISABLE_VERSION_CHECK=true
