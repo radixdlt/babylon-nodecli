@@ -209,7 +209,7 @@ jobs:
             -v "not_a_real_validator_address" \
             -k $KEYSTORE_PASSWORD -nk -a \
             -dd $HOME/babylon-ledger
-          ./radixnode systemd stop && rm -rf $HOME/babylon-ledger
+          ./radixnode systemd stop && sudo rm -rf $HOME/babylon-ledger
         env:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
