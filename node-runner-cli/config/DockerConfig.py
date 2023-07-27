@@ -8,6 +8,7 @@ from config.BaseConfig import BaseConfig, SetupMode
 from config.CommonDockerSettings import CommonDockerSettings
 from config.GatewayDockerConfig import GatewayDockerSettings
 from config.KeyDetails import KeyDetails
+from config.MigrationConfig import CommonMigrationSettings
 from env_vars import MOUNT_LEDGER_VOLUME, CORE_DOCKER_REPO_OVERRIDE
 from setup.Base import Base
 from utils.Prompts import Prompts
@@ -20,7 +21,7 @@ class CoreDockerSettings(BaseConfig):
     keydetails: KeyDetails = KeyDetails({})
     core_release: str = None
     repo: str = os.getenv(CORE_DOCKER_REPO_OVERRIDE, "radixdlt/babylon-node")
-    data_directory: str = f"{Helpers.get_home_dir()}/data"
+    data_directory: str = f"{Helpers.get_home_dir()}/babylon-ledger"
     enable_transaction: str = "false"
     trusted_node: str = None
     validator_address: str = None
@@ -94,11 +95,13 @@ class DockerConfig(BaseConfig):
     core_node: CoreDockerSettings = CoreDockerSettings({})
     common_config: CommonDockerSettings = CommonDockerSettings({})
     gateway_settings: GatewayDockerSettings = GatewayDockerSettings({})
+    migration: CommonMigrationSettings = CommonMigrationSettings({})
 
     def __init__(self, release: str):
         self.core_node = CoreDockerSettings({})
         self.common_config = CommonDockerSettings({})
         self.gateway_settings = GatewayDockerSettings({})
+        self.migration = CommonMigrationSettings({})
         self.core_node.core_release = release
 
     def loadConfig(self, file):
@@ -125,5 +128,6 @@ class DockerConfig(BaseConfig):
         config_to_dump["common_config"] = dict(self.common_config)
         config_to_dump["core_node"] = dict(self.core_node)
         config_to_dump["gateway_settings"] = dict(self.gateway_settings)
+        config_to_dump["migration"] = dict(self.migration)
         return yaml.dump(config_to_dump, sort_keys=False, default_flow_style=False, explicit_start=True,
                          allow_unicode=True)

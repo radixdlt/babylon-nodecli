@@ -46,10 +46,10 @@ services:
       - "nginx_secrets:/etc/nginx/secrets"
 volumes:
     nginx_secrets:
-# BIND MOUNT Named core ledger volume : Uncomment below lines to bind core_ledger volume. The directory /data should exist before in hand and should have permission 640
+# BIND MOUNT Named core ledger volume : Uncomment below lines to bind core_ledger volume. The directory /babylon-ledger should exist before in hand and should have permission 640
 #    core_ledger:
 #      driver: local
 #      driver_opts:
 #        o: bind
 #        type: none
-#        device: /data
+#        device: /babylon-ledger

@@ -6,6 +6,10 @@ from env_vars import PROMPT_FEEDS
 
 
 class QuestionKeys:
+    olympia_migrations_bech32 = "olympia_migrations_bech32"
+    olympia_migrations_user = "olympia_migrations_user"
+    olympia_migrations_password = "olympia_migrations_password"
+    olympia_migrations_url = "olympia_migrations_url"
     select_network = "select_network"
     first_time_config = "first_time_config"
     have_existing_compose = "have_existing_compose"

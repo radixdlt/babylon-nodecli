@@ -47,8 +47,8 @@ Mounting radix ledger to external directory
 ```bash
 This is required if you want to map radix ledger to external directory
 
-sudo mkdir /data
-sudo chmod 647 /data
+sudo mkdir /babylon-ledger
+sudo chmod 647 /babylon-ledger
 ```
 
 Add below line under volumes section for docker service core
@@ -63,7 +63,7 @@ Add below lines under volumes section for the main file
       driver_opts:
         o: bind
         type: none
-        device: /data
+        device: /babylon-ledger
 ```
 
 

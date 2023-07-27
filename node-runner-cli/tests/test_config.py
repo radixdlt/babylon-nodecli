@@ -35,8 +35,8 @@ class ConfigUnitTests(unittest.TestCase):
     def test_config_systemd_defaut_config_matches_fixture(self):
         config = SystemDSettings({})
         home_directory = Path.home()
-        config.core_node.node_dir = f"/someDir/node-config"
-        config.core_node.node_secrets_dir = f"/someDir/node-config/secret"
+        config.core_node.node_dir = f"/someDir/babylon-node-config"
+        config.core_node.node_secrets_dir = f"/someDir/babylon-node-config/secret"
         config_as_yaml = config.to_yaml()
         self.maxDiff = None
         fixture = f"""---
@@ -51,18 +51,50 @@ common_config:
     secrets_dir: /etc/nginx/secrets
   service_user: radixdlt
 core_node:
-  data_directory: {home_directory}/data
+  data_directory: {home_directory}/babylon-ledger
   enable_transaction: 'false'
   java_opts: --enable-preview -server -Xms8g -Xmx8g  -XX:MaxDirectMemorySize=2048m
     -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts
     -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
   keydetails:
     keyfile_name: node-keystore.ks
-    keyfile_path: {home_directory}/node-config
+    keyfile_path: {home_directory}/babylon-node-config
     keygen_tag: 1.3.2
-  node_dir: /someDir/node-config
-  node_secrets_dir: /someDir/node-config/secret
+  node_dir: /someDir/babylon-node-config
+  node_secrets_dir: /someDir/babylon-node-config/secret
   nodetype: fullnode
+gateway_settings:
+  data_aggregator:
+    coreApiNode:
+      Name: Core
+      core_api_address: http://core:3333
+      enabled: 'true'
+      request_weighting: 1
+      trust_weighting: 1
+    repo: radixdlt/babylon-ng-data-aggregator
+    restart: unless-stopped
+  gateway_api:
+    coreApiNode:
+      Name: Core
+      core_api_address: http://core:3333
+      enabled: 'true'
+      request_weighting: 1
+      trust_weighting: 1
+    enable_swagger: 'true'
+    max_page_size: '30'
+    repo: radixdlt/babylon-ng-gateway-api
+    restart: unless-stopped
+  postgres_db:
+    dbname: radixdlt_ledger
+    host: host.docker.internal:5432
+    setup: local
+    user: postgres
+migration:
+  olympia_node_auth_password: ''
+  olympia_node_auth_user: ''
+  olympia_node_bech32_address: ''
+  olympia_node_url: ''
+  use_olympia: false
 """
         self.assertEqual(config_as_yaml, fixture)
 
@@ -75,11 +107,11 @@ core_node:
 core_node:
   nodetype: fullnode
   keydetails:
-    keyfile_path: {home_directory}/node-config
+    keyfile_path: {home_directory}/babylon-node-config
     keyfile_name: node-keystore.ks
     keygen_tag: 1.3.2
   repo: radixdlt/babylon-node
-  data_directory: {home_directory}/data
+  data_directory: {home_directory}/babylon-ledger
   enable_transaction: 'false'
   java_opts: --enable-preview -server -Xms8g -Xmx8g  -XX:MaxDirectMemorySize=2048m
     -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts
@@ -122,6 +154,12 @@ gateway_settings:
     host: host.docker.internal:5432
   database_migration:
     repo: radixdlt/babylon-ng-database-migrations
+migration:
+  use_olympia: false
+  olympia_node_url: ''
+  olympia_node_auth_user: ''
+  olympia_node_auth_password: ''
+  olympia_node_bech32_address: ''
 """
         self.assertEqual(config_as_yaml, fixture)
 
@@ -139,7 +177,7 @@ gateway_settings:
 def suite():
     """ This defines all the tests of a module"""
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(SystemdUnitTests))
+    suite.addTest(unittest.makeSuite(ConfigUnitTests))
     return suite
 
 

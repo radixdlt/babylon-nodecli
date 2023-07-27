@@ -37,7 +37,8 @@ class ValidatorUnitTests(unittest.TestCase):
                                   'core_release': '2.4',
                                   'keydetails': {'something': 'else'}
                                   },
-                    'common_config': {'test': 'test'}}
+                    'common_config': {'test': 'test'},
+                    'migration': {}}
         compose_yml = Renderer().load_file_based_template("radix-fullnode-compose.yml.j2").render(
             dict(settings)).to_yaml()
         compose_yml_str = str(compose_yml)
@@ -48,7 +49,8 @@ class ValidatorUnitTests(unittest.TestCase):
                                   'core_release': '2.4',
                                   'keydetails': {'something': 'else'}
                                   },
-                    'common_config': {'test': 'test'}}
+                    'common_config': {'test': 'test'},
+                    'migration': {'use_olympia': 'true'}}
         compose_yml = Renderer().load_file_based_template("radix-fullnode-compose.yml.j2").render(
             dict(settings)).to_yaml()
         compose_yml_str = str(compose_yml)

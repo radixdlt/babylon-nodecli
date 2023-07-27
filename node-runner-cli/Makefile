@@ -7,6 +7,9 @@ install:
 .PHONY: output
 output-ubuntu-focal: install
 	DOCKER_BUILDKIT=1 docker build --platform linux/amd64 --output type=local,dest=out/ubuntu/focal --progress plain -f Dockerfile.ubuntufocal  .
+.PHONY: output
+output-ubuntu-jammy: install
+	DOCKER_BUILDKIT=1 docker build --platform linux/amd64 --output type=local,dest=out/ubuntu/jammy --progress plain -f Dockerfile.ubuntujammy  .
 
 .PHONY: local
 local: install
