@@ -5,9 +5,9 @@
 - input_seednode: "radix://node_tdx_d_1qwq2nfe6vxqwe3mqmfm9l2xl97as7lkwndval63cymvc3qszn8nqx6g2s3m@3.109.161.178"
 - have_validator_address: "N"
 - have_keystore_file: Y
-- input_path_keystore: "/home/runner/node-config"
+- input_path_keystore: "/home/runner/babylon-node"
 - enter_keystore_name: "node-keystore.ks"
-- input_ledger_path: "/tmp/data"
+- input_ledger_path: "/tmp/babylon-ledger"
 - input_transaction_api: "true"
 - core_nginx_setup: "true"
 #- setup_gateway: "false"

@@ -78,15 +78,15 @@ class Monitoring:
         req = requests.Request('GET', f'{default_datasource_cfg_url}')
         prepared = req.prepare()
         resp = Helpers.send_request(prepared, print_response=False)
-        Path(f"{monitoring_config_dir}/grafana/provisioning/datasources").mkdir(parents=True, exist_ok=True)
-        with open(f"{monitoring_config_dir}/grafana/provisioning/datasources/datasource.yml", 'wb') as f:
+        Path(f"{monitoring_config_dir}/grafana/provisioning/babylon-ledgersources").mkdir(parents=True, exist_ok=True)
+        with open(f"{monitoring_config_dir}/grafana/provisioning/babylon-ledgersources/babylon-ledgersource.yml", 'wb') as f:
             f.write(resp.content)
 
     @staticmethod
     def template_datasource(monitoring_config_dir):
         render_template = Renderer().load_file_based_template("datasource.yml.j2").render({}).to_yaml()
-        Path(f"{monitoring_config_dir}/grafana/provisioning/datasources").mkdir(parents=True, exist_ok=True)
-        file_location = f"{monitoring_config_dir}/grafana/provisioning/datasources/datasource.yml"
+        Path(f"{monitoring_config_dir}/grafana/provisioning/babylon-ledgersources").mkdir(parents=True, exist_ok=True)
+        file_location = f"{monitoring_config_dir}/grafana/provisioning/babylon-ledgersources/babylon-ledgersource.yml"
         Helpers.section_headline("Downloading datasource for grafana")
         Helpers.dump_rendered_template(render_template, file_location)
 

@@ -21,8 +21,18 @@ api.transactions.enable=true
 api.sign.enable=true
 api.bind.address=0.0.0.0
 
-db.location=/home/radixdlt/data
+db.location=/home/radixdlt/babylon-ledger
 
 {% if core_node.validator_address is defined and core_node.validator_address is not none %}
 consensus.validator_address={{core_node.validator_address}}
+{% endif %}
+
+{% if migration.use_olympia is defined %}
+{% if migration.use_olympia %}
+genesis.use_olympia={{migration.use_olympia}}
+genesis.olympia.node_core_api_url={{migration.olympia_node_url}}
+genesis.olympia.node_core_api_auth_user={{migration.olympia_node_auth_user}}
+genesis.olympia.node_core_api_auth_password={{migration.olympia_node_auth_password}}
+genesis.olympia.node_bech32_address={{migration.olympia_node_bech32_address}}
+{% endif %}
 {% endif %}

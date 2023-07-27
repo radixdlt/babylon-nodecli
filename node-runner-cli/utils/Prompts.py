@@ -207,8 +207,7 @@ class Prompts:
                                        # "\nTo connect to MAINNET or STOKENET details on these node can be found here "
                                        # "- https://docs.radixdlt.com/main/node-and-gateway/seed-nodes.html"
                                        "\nType in the node you want to connect to in format radix://<node-peer-2-peer-address>@<ip>"
-                                       "\n OR press Enter to accept default for ansharnet/rcnet-v2-phase1 :"
-                                       f"{default_trusted_nodes}",
+                                       "\n OR press Enter to accept default for ansharnet/rcnet-v2-phase1 :",
                                        QuestionKeys.input_seednode)
         trustednode = Prompts.check_default(value, default_trusted_nodes)
         Helpers.parse_trustednode(trustednode)
@@ -364,3 +363,40 @@ class Prompts:
         else:
             print("\nYou can find your validator address using 'radixnode api system identity'")
         return validator_address
+
+    @classmethod
+    def ask_olympia_node_url(cls) -> str:
+        Helpers.section_headline("Migration: Olympia API Url")
+        answer = Helpers.input_guestion(f"Enter the API Url of your Olympia node with olympia-end-state.: "
+                                        , QuestionKeys.olympia_migrations_url)
+        return answer
+
+    @classmethod
+    def ask_olympia_node_auth(cls) -> str:
+        Helpers.section_headline("Migration: Olympia API Authentication")
+        answer = Helpers.input_guestion(
+            f"Enter the credentials for your olympia node. Leave blank if no authentication is required: "
+            , QuestionKeys.olympia_migrations_user)
+        return answer
+
+    @classmethod
+    def ask_olympia_node_auth_user(cls) -> str:
+        Helpers.section_headline("Migration: Olympia API Authentication")
+        answer = Helpers.input_guestion(
+            f"Enter the credentials for your olympia node. Leave blank if no authentication is required: \nUser:"
+            , QuestionKeys.olympia_migrations_user)
+        return answer
+
+    @classmethod
+    def ask_olympia_node_auth_password(cls) -> str:
+        answer = Helpers.input_guestion(
+            f"Password: "
+            , QuestionKeys.olympia_migrations_password)
+        return answer
+
+    @classmethod
+    def ask_olympia_node_bech32_address(cls) -> str:
+        answer = Helpers.input_guestion(
+            f"Enter the bech32 address of your olympia node."
+            , QuestionKeys.olympia_migrations_bech32)
+        return answer

@@ -64,8 +64,8 @@ class SystemD(Base):
 
     @staticmethod
     def make_data_directory():
-        run_shell_command('sudo mkdir -p /data', shell=True)
-        run_shell_command('sudo chown radixdlt:radixdlt -R /data', shell=True)
+        run_shell_command('sudo mkdir -p /babylon-ledger', shell=True)
+        run_shell_command('sudo chown radixdlt:radixdlt -R /babylon-ledger', shell=True)
 
     @staticmethod
     def fetch_universe_json(trustenode, extraction_path):
@@ -111,7 +111,8 @@ class SystemD(Base):
         run_shell_command(
             ['wget', '--no-check-certificate', '-O', 'babylon-node-lib.zip', library_location_url])
         run_shell_command('unzip babylon-node-lib.zip', shell=True)
-        run_shell_command(f'mkdir -p /usr/lib/jni', shell=True)
+        run_shell_command(f'sudo mkdir -p /usr/lib/jni', shell=True)
+        run_shell_command(f'sudo chown radixdlt:radixdlt /usr/lib/jni', shell=True)
         run_shell_command(f'sudo mv libcorerust.so /usr/lib/jni/libcorerust.so', shell=True)
 
     @staticmethod

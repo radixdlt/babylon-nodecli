@@ -1,4 +1,4 @@
 ---
 - select_network: S
-- input_ledger_path: "/tmp/data"
+- input_ledger_path: "/tmp/babylon-ledger"
 - continue_systemd_install: Y

@@ -32,15 +32,15 @@ class SystemdUnitTests(unittest.TestCase):
                     "-k", "password",
                     "-n", "S",
                     "-d", "/tmp/config",
-                    "-dd", "/tmp/data"]):
+                    "-dd", "/tmp/babylon-ledger"]):
             main()
 
     def test_systemd_config_can_be_saved_and_restored_as_yaml(self):
         # Make Python Class YAML Serializable
         settings = SystemDSettings({})
         home_directory = Path.home()
-        settings.core_node.node_dir = "/somedir/node-config"
-        settings.core_node.node_secrets_dir = "/somedir/node-config/secret"
+        settings.core_node.node_dir = "/somedir/babylon-node"
+        settings.core_node.node_secrets_dir = "/somedir/babylon-node/secret"
         key_details = KeyDetails({})
         settings.core_node.keydetails = key_details
         settings.common_config.host_ip = "6.6.6.6"
@@ -52,7 +52,7 @@ class SystemdUnitTests(unittest.TestCase):
         self.maxDiff = None
         new_settings = SystemD.load_settings(config_file)
         self.assertEqual(new_settings.to_yaml(), settings.to_yaml())
-        self.assertEqual(new_settings.core_node.node_dir, "/somedir/node-config")
+        self.assertEqual(new_settings.core_node.node_dir, "/somedir/babylon-node")
 
     @unittest.skip("Can only be executed on Ubuntu")
     def test_systemd_dependencies(self):
@@ -94,9 +94,9 @@ class SystemdUnitTests(unittest.TestCase):
                                                   'radix://node_tdx_22_1qvsml9pe32rzcrmw6jx204gjeng09adzkqqfz0ewhxwmjsaas99jzrje4u3@34.243.93.185',
                                                   'N',
                                                   'Y',
-                                                  '/tmp/node-config',
+                                                  '/tmp/babylon-node',
                                                   'node-keystore.ks',
-                                                  '/tmp/data',
+                                                  '/tmp/babylon-ledger',
                                                   'true',
                                                   'true',
                                                   'development-latest']):
@@ -107,7 +107,7 @@ class SystemdUnitTests(unittest.TestCase):
     @unittest.skip("For verification only")
     def test_systemd_install_manual(self):
         with patch("sys.argv",
-                   ["main", "systemd", "install", "-a", "-m", "-f", "/tmp/node-config/test-config.yaml"]):
+                   ["main", "systemd", "install", "-a", "-m", "-f", "/tmp/babylon-node/test-config.yaml"]):
             main()
 
     @patch('sys.stdout', new_callable=StringIO)
@@ -116,7 +116,7 @@ class SystemdUnitTests(unittest.TestCase):
             settings = SystemDSettings({})
             settings.common_config.host_ip = "1.1.1.1"
             settings.common_config.network_id = 1
-            settings.core_node.keydetails.keyfile_path = "/tmp/node-config"
+            settings.core_node.keydetails.keyfile_path = "/tmp/babylon-node"
             settings.core_node.keydetails.keyfile_name = "node-keystore.ks"
             settings.core_node.trusted_node = "someNode"
             settings.core_node.validator_address = "validatorAddress"
@@ -131,7 +131,7 @@ ntp.pool=pool.ntp.org
 
 network.id=1
 
-node.key.path=/tmp/node-config/node-keystore.ks
+node.key.path=/tmp/babylon-node/node-keystore.ks
 
 network.p2p.broadcast_port=30000
 network.p2p.listen_port=30001
@@ -146,9 +146,10 @@ api.transactions.enable=true
 api.sign.enable=true
 api.bind.address=0.0.0.0
 
-db.location=/home/radixdlt/data
+db.location=/home/radixdlt/babylon-ledger
 
 consensus.validator_address=validatorAddress
+
 """
         self.maxDiff = None
         print(fixture)
@@ -160,7 +161,7 @@ consensus.validator_address=validatorAddress
             settings = SystemDSettings({})
             settings.common_config.host_ip = "1.1.1.1"
             settings.common_config.network_id = 1
-            settings.core_node.keydetails.keyfile_path = "/tmp/node-config"
+            settings.core_node.keydetails.keyfile_path = "/tmp/babylon-node"
             settings.core_node.keydetails.keyfile_name = "node-keystore.ks"
             settings.core_node.trusted_node = "someNode"
             settings.core_node.validator_address = None
@@ -175,7 +176,7 @@ ntp.pool=pool.ntp.org
 
 network.id=1
 
-node.key.path=/tmp/node-config/node-keystore.ks
+node.key.path=/tmp/babylon-node/node-keystore.ks
 
 network.p2p.broadcast_port=30000
 network.p2p.listen_port=30001
@@ -190,7 +191,7 @@ api.transactions.enable=true
 api.sign.enable=true
 api.bind.address=0.0.0.0
 
-db.location=/home/radixdlt/data
+db.location=/home/radixdlt/babylon-ledger
 """
         self.maxDiff = None
         self.assertEqual(default_config.strip(), fixture.strip())
@@ -200,7 +201,7 @@ db.location=/home/radixdlt/data
         with patch('builtins.input', side_effect=[]):
             settings = SystemDSettings({})
             settings.common_config.genesis_bin_data_file = None
-            settings.core_node.keydetails.keyfile_path = "/tmp/node-config"
+            settings.core_node.keydetails.keyfile_path = "/tmp/babylon-node"
             settings.core_node.keydetails.keyfile_name = "node-keystore.ks"
             settings.core_node.trusted_node = "someNode"
             settings.common_config.host_ip = "1.1.1.1"
@@ -213,7 +214,7 @@ ntp.pool=pool.ntp.org
 
 network.id=1
 
-node.key.path=/tmp/node-config/node-keystore.ks
+node.key.path=/tmp/babylon-node/node-keystore.ks
 
 network.p2p.broadcast_port=30000
 network.p2p.listen_port=30001
@@ -228,9 +229,10 @@ api.transactions.enable=true
 api.sign.enable=true
 api.bind.address=0.0.0.0
 
-db.location=/home/radixdlt/data
+db.location=/home/radixdlt/babylon-ledger
 
 consensus.validator_address=validatorAddress
+
 """
         self.maxDiff = None
         self.assertEqual(render_template, fixture)
