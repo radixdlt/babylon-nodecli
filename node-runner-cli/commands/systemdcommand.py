@@ -11,6 +11,7 @@ from config.BaseConfig import SetupMode
 from config.SystemDConfig import SystemDSettings, CoreSystemdSettings, CommonSystemdSettings
 from github.github import latest_release
 from setup.Base import Base
+from setup.Gateway import Gateway
 from setup.SystemD import SystemD
 from utils.utils import Helpers, bcolors
 
@@ -135,6 +136,10 @@ def config(args):
                                                      olympia_node_auth_password,
                                                      olympia_node_bech32_address)
 
+    if "GATEWAY" in setupmode.mode:
+        configuration.gateway_settings.enabled = True
+        configuration.gateway_settings.gateway_api.coreApiNode.core_api_address = "http://localhost:3332"
+
     config_to_dump["core_node"] = dict(configuration.core_node)
 
     if configuration.common_config.check_nginx_required():
@@ -221,6 +226,8 @@ def install(args):
     if args.manual:
         service_file_path = f"{settings.core_node.node_dir}/radixdlt-node.service"
     settings.create_service_file(service_file_path)
+
+    Gateway.conditionally_install_local_postgreSQL(settings.gateway_settings)
 
     if not args.manual:
         if not args.update:

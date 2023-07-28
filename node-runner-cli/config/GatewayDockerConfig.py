@@ -59,6 +59,7 @@ class CoreApiNode(BaseConfig):
 class DatabaseMigrationSetting:
     release: str = None
     repo: str = os.getenv(MIGRATION_DOCKER_REPO_OVERRIDE, "radixdlt/babylon-ng-database-migrations")
+
     def __init__(self, settings: dict):
         for key, value in settings.items():
             setattr(self, key, value)
@@ -153,10 +154,11 @@ class GatewayAPIDockerSettings(BaseConfig):
 
 
 class GatewayDockerSettings(BaseConfig):
-    data_aggregator = DataAggregatorSetting({})
-    gateway_api = GatewayAPIDockerSettings({})
-    postgres_db = PostGresSettings({})
-    database_migration = DatabaseMigrationSetting({})
+    data_aggregator: DataAggregatorSetting = DataAggregatorSetting({})
+    gateway_api: GatewayAPIDockerSettings = GatewayAPIDockerSettings({})
+    postgres_db: PostGresSettings = PostGresSettings({})
+    database_migration: DatabaseMigrationSetting = DatabaseMigrationSetting({})
+    enabled: bool = False
 
     def __iter__(self):
         class_variables = {key: value
