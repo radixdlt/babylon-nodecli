@@ -232,7 +232,7 @@ class Prompts:
     @staticmethod
     def ask_enable_nginx(service='CORE') -> str:
         Helpers.section_headline(f"NGINX SETUP FOR {service} NODE")
-        print(f"\n {service} API can be protected by running Nginx infront of it.")
+        print(f"\n {service} API can be protected by running Nginx in front of it.")
         question_key = None
         if service == "CORE":
             question_key = QuestionKeys.core_nginx_setup

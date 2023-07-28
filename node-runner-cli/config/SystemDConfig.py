@@ -76,11 +76,7 @@ class CoreSystemdSettings(BaseConfig):
         self.core_release = release
         self.keydetails.keygen_tag = "1.3.2"
 
-    def create_config(self, release, data_directory, trustednode, ks_password, new_keystore):
-        self.set_core_release(release)
-        self.set_trusted_node(trustednode)
-        self.keydetails = Base.ask_keydetails(ks_password, new_keystore)
-        self.ask_data_directory(data_directory)
+    def generate_download_urls(self):
         self.core_binary_url = os.getenv(NODE_BINARY_OVERIDE,
                                          f"https://github.com/radixdlt/babylon-node/releases/download/{self.core_release}/babylon-node-{self.core_release}.zip")
         self.core_library_url = f"https://github.com/radixdlt/babylon-node/releases/download/{self.core_release}/babylon-node-rust-arch-linux-x86_64-release-{self.core_release}.zip"

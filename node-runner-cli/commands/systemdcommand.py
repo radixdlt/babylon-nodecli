@@ -87,12 +87,8 @@ def config(args):
     # add values from arguments and do validations
     # ask for values and do validation differently -> do validations the same way.
 
-    if args.hostip:
-        try:
-            ipaddress.ip_address(args.hostip)
-        except ValueError:
-            print(f"'{args.hostip}' is not a valid ip address.")
-            sys.exit(1)
+    ################### PARSE ARGUMENTS
+    validate_ip(args.hostip)
 
     setupmode = SetupMode.instance()
     setupmode.mode = args.setupmode
@@ -108,63 +104,89 @@ def config(args):
     olympia_node_auth_user = args.migration_auth_user
     olympia_node_auth_password = args.migration_auth_password
 
-    Helpers.section_headline("CONFIG FILE")
+    release = args.release if args.release is not None else latest_release()
+
     config_file = f"{args.configdir}/config.yaml"
-    Path(f"{args.configdir}").mkdir(parents=True, exist_ok=True)
-    print(
-        "\nCreating config file using the answers from the questions that would be asked in next steps."
-        f"\nLocation of the config file: {bcolors.OKBLUE}{config_file}{bcolors.ENDC}")
-    config_to_dump = {"version": "0.1"}
-    if not args.release:
-        release = latest_release()
-    else:
-        release = args.release
+
+    ################### QUESTIONARY
+
+    print_questionary_header(config_file)
 
     configuration = SystemDSettings({})
-    configuration.common_config = CommonSystemdSettings({})
+
+    ########### Common Config
     configuration.common_config.ask_network_id(args.networkid)
     configuration.common_config.ask_host_ip(args.hostip)
-    configuration.core_node.ask_validator_address(args.validator)
-
-    configuration.core_node = CoreSystemdSettings({}).create_config(release, data_directory,
-                                                                    trustednode,
-                                                                    keystore_password, new_keystore)
     configuration.common_config.ask_enable_nginx_for_core(nginx_on_core)
-
-    if "MIGRATION" in setupmode.mode:
-        configuration.migration.ask_migration_config(olympia_node_url, olympia_node_auth_user,
-                                                     olympia_node_auth_password,
-                                                     olympia_node_bech32_address)
-
-    if "GATEWAY" in setupmode.mode:
-        configuration.gateway_settings.enabled = True
-        configuration.gateway_settings.gateway_api.coreApiNode.core_api_address = "http://localhost:3332"
-
-    config_to_dump["core_node"] = dict(configuration.core_node)
 
     if configuration.common_config.check_nginx_required():
         configuration.common_config.ask_nginx_release()
     else:
         configuration.common_config.nginx_settings = None
 
-    config_to_dump["common_config"] = dict(configuration.common_config)
+    ########### Core Config
+    configuration.core_node.set_core_release(release)
+    configuration.core_node.set_trusted_node(trustednode)
+    configuration.core_node.generate_download_urls()
+    configuration.core_node.keydetails = Base.ask_keydetails(keystore_password, new_keystore)
+    configuration.core_node.ask_data_directory(data_directory)
+    configuration.core_node.ask_validator_address(args.validator)
 
-    config_to_dump["migration"] = dict(configuration.migration)
-    config_to_dump["gateway_settings"] = dict(configuration.gateway_settings)
+    ########### Gateway Config
+    if "GATEWAY" in setupmode.mode:
+        configuration.gateway_settings.enabled = True
+        configuration.gateway_settings.gateway_api.coreApiNode.core_api_address = "http://localhost:3332"
 
+    ########### Migration Config
+    if "MIGRATION" in setupmode.mode:
+        configuration.migration.ask_migration_config(olympia_node_url, olympia_node_auth_user,
+                                                     olympia_node_auth_password,
+                                                     olympia_node_bech32_address)
+
+    ################### File comparisson and generation
+    Path(f"{args.configdir}").mkdir(parents=True, exist_ok=True)
+    dump_config_as_yaml(configuration)
+    compare_old_and_new_config(config_file,configuration)
+    SystemD.save_settings(configuration, config_file, autoapprove=args.autoapprove)
+
+
+def validate_ip(hostip: str):
+    if hostip:
+        try:
+            ipaddress.ip_address(hostip)
+        except ValueError:
+            print(f"'{hostip}' is not a valid ip address.")
+            sys.exit(1)
+
+
+def compare_old_and_new_config(config_file : str, configuration: SystemDSettings):
+    old_config = SystemD.load_all_config(config_file)
+    config_to_dump = {"version": "0.1", "core_node": dict(configuration.core_node),
+                      "common_config": dict(configuration.common_config), "migration": dict(configuration.migration),
+                      "gateway_settings": dict(configuration.gateway_settings)}
+    if len(old_config) != 0:
+        print(f"""
+            {Helpers.section_headline("Differences")}
+            Difference between existing config file and new config that you are creating
+            {dict(DeepDiff(old_config, config_to_dump))}
+              """)
+
+
+def dump_config_as_yaml(configuration):
+    config_to_dump = {"version": "0.1", "core_node": dict(configuration.core_node),
+                      "common_config": dict(configuration.common_config), "migration": dict(configuration.migration),
+                      "gateway_settings": dict(configuration.gateway_settings)}
     yaml.add_representer(type(None), Helpers.represent_none)
     Helpers.section_headline("CONFIG is Generated as below")
     print(f"\n{yaml.dump(config_to_dump)}")
+    return config_to_dump
 
-    old_config = SystemD.load_all_config(config_file)
-    if len(old_config) != 0:
-        print(f"""
-                {Helpers.section_headline("Differences")}
-                Difference between existing config file and new config that you are creating
-                {dict(DeepDiff(old_config, config_to_dump))}
-                  """)
 
-    SystemD.save_settings(configuration, config_file, autoapprove=args.autoapprove)
+def print_questionary_header(config_file):
+    Helpers.section_headline("CONFIG FILE")
+    print(
+        "\nCreating config file using the answers from the questions that would be asked in next steps."
+        f"\nLocation of the config file: {bcolors.OKBLUE}{config_file}{bcolors.ENDC}")
 
 
 @systemdcommand([
