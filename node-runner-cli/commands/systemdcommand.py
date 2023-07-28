@@ -8,7 +8,7 @@ from deepdiff import DeepDiff
 
 from commands.subcommand import get_decorator, argument
 from config.BaseConfig import SetupMode
-from config.SystemDConfig import SystemDSettings, CoreSystemdSettings, CommonSystemdSettings
+from config.SystemDConfig import SystemDSettings
 from github.github import latest_release
 from setup.Base import Base
 from setup.Gateway import Gateway
@@ -109,7 +109,6 @@ def config(args):
     config_file = f"{args.configdir}/config.yaml"
 
     ################### QUESTIONARY
-
     print_questionary_header(config_file)
 
     configuration = SystemDSettings({})
@@ -148,46 +147,6 @@ def config(args):
     dump_config_as_yaml(configuration)
     compare_old_and_new_config(config_file,configuration)
     SystemD.save_settings(configuration, config_file, autoapprove=args.autoapprove)
-
-
-def validate_ip(hostip: str):
-    if hostip:
-        try:
-            ipaddress.ip_address(hostip)
-        except ValueError:
-            print(f"'{hostip}' is not a valid ip address.")
-            sys.exit(1)
-
-
-def compare_old_and_new_config(config_file : str, configuration: SystemDSettings):
-    old_config = SystemD.load_all_config(config_file)
-    config_to_dump = {"version": "0.1", "core_node": dict(configuration.core_node),
-                      "common_config": dict(configuration.common_config), "migration": dict(configuration.migration),
-                      "gateway_settings": dict(configuration.gateway_settings)}
-    if len(old_config) != 0:
-        print(f"""
-            {Helpers.section_headline("Differences")}
-            Difference between existing config file and new config that you are creating
-            {dict(DeepDiff(old_config, config_to_dump))}
-              """)
-
-
-def dump_config_as_yaml(configuration):
-    config_to_dump = {"version": "0.1", "core_node": dict(configuration.core_node),
-                      "common_config": dict(configuration.common_config), "migration": dict(configuration.migration),
-                      "gateway_settings": dict(configuration.gateway_settings)}
-    yaml.add_representer(type(None), Helpers.represent_none)
-    Helpers.section_headline("CONFIG is Generated as below")
-    print(f"\n{yaml.dump(config_to_dump)}")
-    return config_to_dump
-
-
-def print_questionary_header(config_file):
-    Helpers.section_headline("CONFIG FILE")
-    print(
-        "\nCreating config file using the answers from the questions that would be asked in next steps."
-        f"\nLocation of the config file: {bcolors.OKBLUE}{config_file}{bcolors.ENDC}")
-
 
 @systemdcommand([
     argument("-a", "--auto", help="Automatically approve all Yes/No prompts", action="store_true"),
@@ -323,3 +282,42 @@ def dependencies(args):
     SystemD.create_service_user_password()
     SystemD.create_initial_service_file()
     SystemD.sudoers_instructions()
+
+
+def validate_ip(hostip: str):
+    if hostip:
+        try:
+            ipaddress.ip_address(hostip)
+        except ValueError:
+            print(f"'{hostip}' is not a valid ip address.")
+            sys.exit(1)
+
+
+def compare_old_and_new_config(config_file : str, configuration: SystemDSettings):
+    old_config = SystemD.load_all_config(config_file)
+    config_to_dump = {"version": "0.1", "core_node": dict(configuration.core_node),
+                      "common_config": dict(configuration.common_config), "migration": dict(configuration.migration),
+                      "gateway": dict(configuration.gateway_settings)}
+    if len(old_config) != 0:
+        print(f"""
+            {Helpers.section_headline("Differences")}
+            Difference between existing config file and new config that you are creating
+            {dict(DeepDiff(old_config, config_to_dump))}
+              """)
+
+
+def dump_config_as_yaml(configuration):
+    config_to_dump = {"version": "0.1", "core_node": dict(configuration.core_node),
+                      "common_config": dict(configuration.common_config), "migration": dict(configuration.migration),
+                      "gateway": dict(configuration.gateway)}
+    yaml.add_representer(type(None), Helpers.represent_none)
+    Helpers.section_headline("CONFIG is Generated as below")
+    print(f"\n{yaml.dump(config_to_dump)}")
+    return config_to_dump
+
+
+def print_questionary_header(config_file):
+    Helpers.section_headline("CONFIG FILE")
+    print(
+        "\nCreating config file using the answers from the questions that would be asked in next steps."
+        f"\nLocation of the config file: {bcolors.OKBLUE}{config_file}{bcolors.ENDC}")

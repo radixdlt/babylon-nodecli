@@ -1,17 +1,11 @@
-import os
 import unittest
 from io import StringIO
-from pathlib import Path
 from unittest.mock import patch
 
 import urllib3
 
-from config.KeyDetails import KeyDetails
-from config.Renderer import Renderer
-from config.SystemDConfig import SystemDSettings
 from radixnode import main
-from setup.SystemD import SystemD
-from utils.PromptFeeder import PromptFeeder
+from setup.Docker import Docker
 
 
 class DockerUnitTests(unittest.TestCase):
@@ -60,6 +54,12 @@ class DockerUnitTests(unittest.TestCase):
             with patch("sys.argv",
                        ["main", "docker", "config", "-m", "DETAILED", "-k", "radix", "-nk", "-a"]):
                 main()
+
+    # @patch('sys.stdout', new_callable=StringIO)
+    # def test_docker_config2(self, mockout):
+    #     config = Docker.load_settings("/tmp/config.yaml")
+    #     self.assertEqual("",config.to_yaml())
+
 
 def suite():
     """ This defines all the tests of a module"""

@@ -95,6 +95,7 @@ class SystemdUnitTests(unittest.TestCase):
                                                   'radix://node_tdx_22_1qvsml9pe32rzcrmw6jx204gjeng09adzkqqfz0ewhxwmjsaas99jzrje4u3@34.243.93.185',
                                                   'N',
                                                   'Y',
+                                                  'Y',
                                                   '/tmp/babylon-node',
                                                   'node-keystore.ks',
                                                   '/tmp/babylon-ledger',

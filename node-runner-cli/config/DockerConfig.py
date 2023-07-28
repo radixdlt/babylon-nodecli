@@ -9,6 +9,7 @@ from config.CommonDockerSettings import CommonDockerSettings
 from config.GatewayDockerConfig import GatewayDockerSettings
 from config.KeyDetails import KeyDetails
 from config.MigrationConfig import CommonMigrationSettings
+from config.Nginx import SystemdNginxConfig
 from env_vars import MOUNT_LEDGER_VOLUME, CORE_DOCKER_REPO_OVERRIDE
 from setup.Base import Base
 from utils.Prompts import Prompts
@@ -94,13 +95,13 @@ class CoreDockerSettings(BaseConfig):
 class DockerConfig(BaseConfig):
     core_node: CoreDockerSettings = CoreDockerSettings({})
     common_config: CommonDockerSettings = CommonDockerSettings({})
-    gateway_settings: GatewayDockerSettings = GatewayDockerSettings({})
+    gateway: GatewayDockerSettings = GatewayDockerSettings({})
     migration: CommonMigrationSettings = CommonMigrationSettings({})
 
     def __init__(self, release: str):
         self.core_node = CoreDockerSettings({})
         self.common_config = CommonDockerSettings({})
-        self.gateway_settings = GatewayDockerSettings({})
+        self.gateway = GatewayDockerSettings({})
         self.migration = CommonMigrationSettings({})
         self.core_node.core_release = release
 
@@ -127,7 +128,19 @@ class DockerConfig(BaseConfig):
         config_to_dump = dict(self)
         config_to_dump["common_config"] = dict(self.common_config)
         config_to_dump["core_node"] = dict(self.core_node)
-        config_to_dump["gateway_settings"] = dict(self.gateway_settings)
+        config_to_dump["gateway"] = dict(self.gateway)
         config_to_dump["migration"] = dict(self.migration)
         return yaml.dump(config_to_dump, sort_keys=False, default_flow_style=False, explicit_start=True,
                          allow_unicode=True)
+
+
+def from_dict(dictionary: dict) -> DockerConfig:
+    settings = DockerConfig({})
+    settings.core_node = DockerConfig({})
+    settings.common_config = CommonDockerSettings({})
+    settings.core_node = CoreDockerSettings(dictionary["core_node"])
+    settings.core_node.keydetails = KeyDetails(dictionary["core_node"]["keydetails"])
+    settings.common_config = CommonDockerSettings(dictionary["common_config"])
+    settings.common_config.nginx_settings = SystemdNginxConfig(dictionary["common_config"]["nginx_settings"])
+    settings.migration = CommonMigrationSettings(dictionary["migration"])
+    return settings

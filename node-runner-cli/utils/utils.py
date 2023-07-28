@@ -260,7 +260,7 @@ class Helpers:
         return __version__
 
     @staticmethod
-    def yaml_as_dict(my_file):
+    def yaml_as_dict(my_file) -> dict:
         my_dict = {}
         with open(my_file, 'r') as fp:
             docs = yaml.safe_load_all(fp)

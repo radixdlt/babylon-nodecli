@@ -62,7 +62,7 @@ core_node:
   node_dir: /someDir/babylon-node-config
   node_secrets_dir: /someDir/babylon-node-config/secret
   nodetype: fullnode
-gateway_settings:
+gateway:
   data_aggregator:
     coreApiNode:
       Name: Core
@@ -126,7 +126,7 @@ common_config:
     protect_core: 'true'
     repo: radixdlt/babylon-nginx
   docker_compose: {home_directory}/docker-compose.yml
-gateway_settings:
+gateway:
   data_aggregator:
     repo: radixdlt/babylon-ng-data-aggregator
     restart: unless-stopped

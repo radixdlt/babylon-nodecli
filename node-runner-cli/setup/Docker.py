@@ -1,9 +1,12 @@
 import getpass
 import os
 import sys
+from typing import Tuple, Dict, Any
 
 import yaml
+from yaml import UnsafeLoader
 
+from config.DockerConfig import DockerConfig, from_dict
 from env_vars import DOCKER_COMPOSE_FOLDER_PREFIX, COMPOSE_HTTP_TIMEOUT, RADIXDLT_NODE_KEY_PASSWORD, POSTGRES_PASSWORD
 from github import github
 from setup.AnsibleRunner import AnsibleRunner
@@ -65,9 +68,9 @@ class Docker(Base):
         Helpers.docker_compose_down(composefile, removevolumes)
 
     @staticmethod
-    def check_set_passwords(all_config):
-        keystore_password = all_config.get('core_node', {}).get('keydetails', {}).get("keystore_password")
-        if all_config.get('core_node') and not keystore_password:
+    def check_set_passwords(docker_config: DockerConfig):
+        keystore_password = docker_config.core_node.keydetails.keystore_password
+        if docker_config.core_node and not keystore_password:
             keystore_password_from_env = os.getenv(RADIXDLT_NODE_KEY_PASSWORD, None)
             if not keystore_password_from_env:
                 print(
@@ -75,10 +78,10 @@ class Docker(Base):
                     "or as environment variable RADIXDLT_NODE_KEY_PASSWORD")
                 sys.exit(1)
             else:
-                all_config['core_node']["keydetails"]["keystore_password"] = keystore_password_from_env
+                docker_config.core_node.keydetails.keystore_password = keystore_password_from_env
 
-        postgres_password = all_config.get('gateway', {}).get('postgres_db', {}).get("password")
-        if all_config.get('gateway') and not postgres_password:
+        postgres_password = docker_config.gateway.postgres_db.password
+        if docker_config.gateway and not postgres_password:
             postgres_password_from_env = os.getenv(POSTGRES_PASSWORD, None)
 
             if not postgres_password_from_env:
@@ -87,13 +90,13 @@ class Docker(Base):
                     "or as environment variable POSTGRES_PASSWORD")
                 sys.exit(1)
             else:
-                all_config['gateway']["postgres_db"]["password"] = postgres_password_from_env
-        return all_config
+                docker_config.gateway.postgres_db.password = postgres_password_from_env
+        return docker_config
 
     @staticmethod
-    def check_run_local_postgreSQL(all_config):
-        postgres_db = all_config.get('gateway', {}).get('postgres_db')
-        if Docker.check_post_db_local(all_config):
+    def check_run_local_postgreSQL(docker_config: DockerConfig):
+        postgres_db = docker_config.gateway.postgres_db
+        if Docker.check_post_db_local(docker_config):
             ansible_dir = f'https://raw.githubusercontent.com/radixdlt/babylon-nodecli/{Helpers.cli_version()}/node-runner-cli'
             AnsibleRunner(ansible_dir).run_setup_postgress(
                 postgres_db.get("password"),
@@ -102,21 +105,21 @@ class Docker(Base):
                 'ansible/project/provision.yml')
 
     @staticmethod
-    def check_post_db_local(all_config):
-        postgres_db = all_config.get('gateway', {}).get('postgres_db')
+    def check_post_db_local(docker_config: DockerConfig):
+        postgres_db = docker_config.gateway.postgres_db
         if postgres_db and postgres_db.get("setup", None) == "local":
             return True
         return False
 
     @staticmethod
-    def get_existing_compose_file(all_config):
-        compose_file = all_config['common_config']['docker_compose']
+    def get_existing_compose_file(docker_config: DockerConfig) -> Tuple[str, dict]:
+        compose_file = docker_config.common_config.docker_compose
         Helpers.section_headline("Checking if you have existing docker compose file")
         if os.path.exists(compose_file):
             return compose_file, Helpers.yaml_as_dict(compose_file)
         else:
             Helpers.print_info("Seems you are creating docker compose file for first time")
-            return compose_file, {}
+            return compose_file, dict({})
 
     @staticmethod
     def exit_on_missing_trustednode():
@@ -124,40 +127,38 @@ class Docker(Base):
         sys.exit(1)
 
     @staticmethod
-    def update_versions(all_config, autoapprove):
-        updated_config = dict(all_config)
-
-        if all_config.get('core_node'):
-            current_core_release = all_config['core_node']["core_release"]
+    def update_versions(docker_config: DockerConfig, autoapprove=False):
+        if docker_config.core_node:
+            current_core_release = docker_config.core_node.core_release
             latest_core_release = github.latest_release("radixdlt/babylon-node")
-            updated_config['core_node']["core_release"] = Prompts.confirm_version_updates(current_core_release,
-                                                                                          latest_core_release, 'CORE',
-                                                                                          autoapprove)
-        if all_config.get("gateway"):
+            docker_config.core_node.core_release = Prompts.confirm_version_updates(current_core_release,
+                                                                                   latest_core_release, 'CORE',
+                                                                                   autoapprove)
+        if docker_config.gateway:
             latest_gateway_release = github.latest_release("radixdlt/babylon-gateway")
-            current_gateway_release = all_config['gateway']["data_aggregator"]["release"]
+            current_gateway_release = docker_config.gateway.data_aggregator.release
 
-            if all_config.get('gateway', {}).get('data_aggregator'):
-                updated_config['gateway']["data_aggregator"]["release"] = Prompts.confirm_version_updates(
+            if docker_config.gateway.data_aggregator:
+                docker_config.gateway.data_aggregator.release = Prompts.confirm_version_updates(
                     current_gateway_release,
                     latest_gateway_release, 'AGGREGATOR', autoapprove)
 
-            if all_config.get('gateway', {}).get('gateway_api'):
-                updated_config['gateway']["gateway_api"]["release"] = Prompts.confirm_version_updates(
+            if docker_config.gateway.gateway_api:
+                docker_config.gatewa.gateway_api.release = Prompts.confirm_version_updates(
                     current_gateway_release,
                     latest_gateway_release, 'GATEWAY', autoapprove)
 
-        if all_config.get("common_config").get("nginx_settings"):
+        if docker_config.common_config.nginx_settings:
             latest_nginx_release = github.latest_release("radixdlt/babylon-nginx")
-            current_nginx_release = all_config['common_config']["nginx_settings"]["release"]
-            updated_config['common_config']["nginx_settings"]["release"] = Prompts.confirm_version_updates(
+            current_nginx_release = docker_config['common_config']["nginx_settings"]["release"]
+            docker_config.common_config.nginx_settings.release = Prompts.confirm_version_updates(
                 current_nginx_release, latest_nginx_release, "RADIXDLT NGINX", autoapprove
             )
 
-        return updated_config
+        return docker_config
 
     @staticmethod
-    def backup_save_config(config_file, new_config,backup_time, autoapprove=False):
+    def backup_save_config(config_file, new_config, backup_time, autoapprove=False):
         to_update = ""
         if autoapprove:
             print("In Auto mode - Updating the file as suggested in above changes")
@@ -170,3 +171,12 @@ class Docker(Base):
             print(f"\n\n Saving to file {config_file} ")
             with open(config_file, 'w') as f:
                 yaml.dump(new_config, f, default_flow_style=False, explicit_start=True, allow_unicode=True)
+
+    @staticmethod
+    def load_settings(config_file) -> DockerConfig:
+        if not os.path.isfile(config_file):
+            print(f"No configuration found. Execute 'radixnode systemd config' first.")
+            sys.exit(1)
+        with open(config_file, 'r') as f:
+            dictionary = yaml.load(f, Loader=UnsafeLoader)
+        return from_dict(dictionary)
