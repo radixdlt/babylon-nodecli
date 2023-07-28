@@ -15,7 +15,7 @@ class Network:
         Helpers.section_headline(f"Network connection")
         # TODO change this for rcnet launch
         network_prompt = Helpers.input_guestion(
-            "Enter the network_id. For babylon rcnet-v2 phase 1 it is 13:",
+            "Enter the network_id. The network id for the most recent network (ansharnet / rcnet-v2 phase 2) is 13:",
             QuestionKeys.select_network)
         network_id = Network.validate_network_id(network_prompt)
         return network_id
