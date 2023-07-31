@@ -6,7 +6,7 @@ from key_interaction.KeyInteraction import KeyInteraction
 # Setup key subcommand parser
 keycli = ArgumentParser(
     description='Subcommand to aid interaction with key',
-    usage="radixnode key "
+    usage="babylonnode key "
 )
 key_parser = keycli.add_subparsers(dest="keycommand")
 

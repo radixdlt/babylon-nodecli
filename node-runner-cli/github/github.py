@@ -32,7 +32,7 @@ def latest_release(repo_name="radixdlt/babylon-node") -> str:
     token = os.getenv('GITHUB_TOKEN')
     prepared = req.prepare()
     prepared.headers['Content-Type'] = 'application/json'
-    prepared.headers['user-agent'] = 'radixnode-cli'
+    prepared.headers['user-agent'] = 'babylonnode-cli'
     if token is not None:
         prepared.headers['Authorization'] = f'token {token}'
     resp = Helpers.send_request(prepared, print_response=False)

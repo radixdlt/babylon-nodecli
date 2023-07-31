@@ -157,7 +157,7 @@ class Monitoring:
         else:
             print(f"""Exiting the command ..
                      Once you verified the file {composefile}, you can start the monitoring by running
-                     $ radixnode monitoring start -f {composefile}
+                     $ babylonnode monitoring start -f {composefile}
              """)
 
     @staticmethod

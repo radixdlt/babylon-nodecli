@@ -35,9 +35,9 @@ COPY requirements.txt /app/requirements.txt
 RUN pip install -r requirements.txt
 
 COPY . /app
-RUN pyinstaller --onefile --windowed radixnode.spec
+RUN pyinstaller --onefile --windowed babylonnode.spec
 
-RUN DISABLE_VERSION_CHECK=true /app/dist/radixnode version
+RUN DISABLE_VERSION_CHECK=true /app/dist/babylonnode version
 
 FROM scratch AS export-stage
 COPY --from=BUILD /app/dist /

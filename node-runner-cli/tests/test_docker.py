@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 import urllib3
 
-from radixnode import main
+from babylonnode import main
 from setup.Docker import Docker
 
 

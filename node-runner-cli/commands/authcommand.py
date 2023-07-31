@@ -6,7 +6,7 @@ from setup.SystemD import SystemD
 
 authcli = ArgumentParser(
     description='Subcommand to aid creation of nginx basic auth users',
-    usage="radixnode auth "
+    usage="babylonnode auth "
 )
 
 auth_parser = authcli.add_subparsers(dest="authcommand")

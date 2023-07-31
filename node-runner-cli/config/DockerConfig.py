@@ -109,7 +109,7 @@ class DockerConfig(BaseConfig):
         my_file = Path(file)
         if not my_file.is_file():
             sys.exit("Unable to find config file"
-                     "Run `radixnode docker init` to setup one")
+                     "Run `babylonnode docker init` to setup one")
         with open(file, 'r') as file:
             config_yaml = yaml.safe_load(file)
             core_node = config_yaml["core_node"]

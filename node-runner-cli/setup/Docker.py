@@ -175,7 +175,7 @@ class Docker(Base):
     @staticmethod
     def load_settings(config_file) -> DockerConfig:
         if not os.path.isfile(config_file):
-            print(f"No configuration found. Execute 'radixnode systemd config' first.")
+            print(f"No configuration found. Execute 'babylonnode systemd config' first.")
             sys.exit(1)
         with open(config_file, 'r') as f:
             dictionary = yaml.load(f, Loader=UnsafeLoader)

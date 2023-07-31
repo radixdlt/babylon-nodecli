@@ -14,7 +14,7 @@ from utils.utils import Helpers, bcolors
 
 monitoringcli = ArgumentParser(
     description='Subcommand to setup monitoring for CORE or GATEWAY',
-    usage="radixnode monitoring "
+    usage="babylonnode monitoring "
 )
 monitoring_parser = monitoringcli.add_subparsers(dest="monitoringcommand")
 

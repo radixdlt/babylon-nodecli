@@ -175,15 +175,15 @@ class Prompts:
                 f"{bcolors.WARNING}Enter the absolute path of the folder, just the folder, where the keystore file is located:{bcolors.ENDC}",
                 QuestionKeys.input_path_keystore)
         else:
-            radixnode_dir = f"{Helpers.get_default_node_config_dir()}"
+            babylonnode_dir = f"{Helpers.get_default_node_config_dir()}"
             print(
-                f"\nDefault folder location for Keystore file will be: {bcolors.OKBLUE}{radixnode_dir}{bcolors.ENDC}")
+                f"\nDefault folder location for Keystore file will be: {bcolors.OKBLUE}{babylonnode_dir}{bcolors.ENDC}")
             answer = Helpers.input_guestion(
                 'Press ENTER to accept default. otherwise enter the absolute path of the new folder:',
                 QuestionKeys.input_path_keystore)
             # TODO this needs to moved out of init
-            run_shell_command(f'mkdir -p {radixnode_dir}', shell=True, quite=True)
-            return Prompts.check_default(answer, radixnode_dir)
+            run_shell_command(f'mkdir -p {babylonnode_dir}', shell=True, quite=True)
+            return Prompts.check_default(answer, babylonnode_dir)
 
     @staticmethod
     def ask_keyfile_name() -> str:
@@ -350,7 +350,7 @@ class Prompts:
               "you would need to store validator address in the config"
               "\nAfter your node is up and running, you can get you node public key by"
               " sending a request to /system/identity"
-              " or by executing 'radixnode api system identity'. "
+              " or by executing 'babylonnode api system identity'. "
               "Refer this link for more details"
               "\n https://docs-babylon.radixdlt.com/main/node-and-gateway/register-as-validator.html#_gather_your_node_public_key"
               "")
@@ -361,7 +361,7 @@ class Prompts:
             validator_address = Helpers.input_guestion(f"Enter your validator address:",
                                                        QuestionKeys.validator_address)
         else:
-            print("\nYou can find your validator address using 'radixnode api system identity'")
+            print("\nYou can find your validator address using 'babylonnode api system identity'")
         return validator_address
 
     @classmethod

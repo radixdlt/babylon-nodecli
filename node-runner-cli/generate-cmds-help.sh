@@ -5,10 +5,10 @@ command_help_doc() {
   #$3 filename
   echo $1 $2 $3
   echo "" >>$3
-  echo "==== radixnode $1 $2" >>$3
+  echo "==== babylonnode $1 $2" >>$3
   echo '[source, bash,subs="+quotes, +attributes" ]' >>$3
   echo "----" >>$3
-  ./radixnode.py $1 $2 -h >>$3
+  ./babylonnode.py $1 $2 -h >>$3
   echo "----" >>$3
 }
 
@@ -18,10 +18,10 @@ command_api_help_doc() {
   #$3 filename
   echo $1 $2 $3
   echo "" >>$3
-  echo "==== radixnode $1 $2" >>$3
+  echo "==== babylonnode $1 $2" >>$3
   echo '[source, bash,subs="+quotes, +attributes" ]' >>$3
   echo "----" >>$3
-  ./radixnode.py "api" $1 $2 -h >>$3
+  ./babylonnode.py "api" $1 $2 -h >>$3
   echo "----" >>$3
 }
 
@@ -70,7 +70,7 @@ done
 
 cat <<EOT >> "$filename"
 === Accessing core endpoints using CLI
-Once the nginx basic auth passwords for admin, superadmin, metrics users are setup , radixnode cli can be used to access the node endpoints
+Once the nginx basic auth passwords for admin, superadmin, metrics users are setup , babylonnode cli can be used to access the node endpoints
 EOT
 #declare -a coreapicommands=("entity" "key-list" "mempool" "mempool-transaction" "update-validator-config" "signal-protocol-update-readiness" "retract-protocol-update-readiness")
 #for subcommand in "${coreapicommands[@]}"

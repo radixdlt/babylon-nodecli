@@ -6,7 +6,7 @@ from unittest import mock
 from jinja2.exceptions import TemplateNotFound
 
 from monitoring import Monitoring
-from radixnode import main
+from babylonnode import main
 
 
 class MonitoringTests(unittest.TestCase):

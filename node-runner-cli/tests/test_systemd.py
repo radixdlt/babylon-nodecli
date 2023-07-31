@@ -9,7 +9,7 @@ import urllib3
 from config.KeyDetails import KeyDetails
 from config.Renderer import Renderer
 from config.SystemDConfig import SystemDSettings
-from radixnode import main
+from babylonnode import main
 from setup.SystemD import SystemD
 from utils.PromptFeeder import PromptFeeder
 

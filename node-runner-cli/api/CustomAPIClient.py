@@ -12,7 +12,7 @@ class CustomAPIClient:
 
         self.verify_ssl = verify_ssl
 
-        self.user_agent = 'Babylon radixnode cli'
+        self.user_agent = 'Babylon babylonnode cli'
         self.default_headers = {}
         self.set_default_header('User-Agent', self.user_agent)
 

@@ -9,7 +9,7 @@ import boto3
 
 ledgercli = ArgumentParser(
     description='Subcommand to help to sync up the ledger from a S3 bucket',
-    usage="radixnode ledger ",
+    usage="babylonnode ledger ",
     formatter_class=RawTextHelpFormatter)
 ledger_parser = ledgercli.add_subparsers(dest="ledgercommand")
 
