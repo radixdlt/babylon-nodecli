@@ -52,7 +52,7 @@ class CoreDockerSettings(BaseConfig):
     def set_core_release(self, release):
         self.core_release = release
         # Using hardcoded tag value till we publish keygen image
-        self.keydetails.keygen_tag = "1.3.2"
+        self.keydetails.keygen_tag = "v1.4.1"
 
     def ask_data_directory(self):
         if "DETAILED" in SetupMode.instance().mode:
@@ -132,6 +132,25 @@ class DockerConfig(BaseConfig):
         config_to_dump["migration"] = dict(self.migration)
         return yaml.dump(config_to_dump, sort_keys=False, default_flow_style=False, explicit_start=True,
                          allow_unicode=True)
+
+    def to_file(self, config_file):
+        config_to_dump = dict(self)
+        config_to_dump["core_node"] = dict(self.core_node)
+        config_to_dump["core_node"]["keydetails"] = dict(self.core_node.keydetails)
+        config_to_dump["common_config"] = dict(self.common_config)
+        # config_to_dump["common_config"]["nginx_settings"] = dict(self.common_config.nginx_settings)
+        config_to_dump["migration"] = dict(self.migration)
+        config_to_dump["gateway"] = dict(self.gateway)
+        with open(config_file, 'w') as f:
+            yaml.dump(config_to_dump, f, sort_keys=True, default_flow_style=False)
+
+    def toDict(configuration):
+        config_to_dump = {"version": "0.2"}
+        config_to_dump["common_config"] = dict(configuration.common_config)
+        config_to_dump["migration"] = dict(configuration.migration)
+        config_to_dump["gateway"] = dict(configuration.gateway)
+        config_to_dump["core_node"] = dict(configuration.gateway)
+        return config_to_dump
 
 
 def from_dict(dictionary: dict) -> DockerConfig:

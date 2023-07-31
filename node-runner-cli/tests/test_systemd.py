@@ -10,7 +10,7 @@ from config.KeyDetails import KeyDetails
 from config.Renderer import Renderer
 from config.SystemDConfig import SystemDSettings
 from babylonnode import main
-from setup.SystemD import SystemD
+from setup.SystemDSetup import SystemD
 from utils.PromptFeeder import PromptFeeder
 
 
@@ -76,7 +76,7 @@ class SystemdUnitTests(unittest.TestCase):
         urllib3.disable_warnings()
         # os.environ['PROMPT_FEEDS'] = "test-prompts/individual-prompts/validator_address.yml"
         # PromptFeeder.prompts_feed = PromptFeeder.instance().load_prompt_feeds()
-        with patch('builtins.input', side_effect=['S', 'N', 'N', '/home/runner/docker-compose.yml', 'N']):
+        with patch('builtins.input', side_effect=['S', 'N', 'N', '/home/runner/docker-compose.yml', 'N', 'development-latest']):
             with patch("sys.argv",
                        ["main", "docker", "config", "-m", "DETAILED", "-k", "radix", "-nk", "-a"]):
                 main()
@@ -86,22 +86,23 @@ class SystemdUnitTests(unittest.TestCase):
         urllib3.disable_warnings()
         # os.environ['PROMPT_FEEDS'] = "test-prompts/individual-prompts/validator_address.yml"
         # PromptFeeder.prompts_feed = PromptFeeder.instance().load_prompt_feeds()
-        with open('/tmp/genesis_data_file.bin', 'w') as fp:
-            pass
         with patch('builtins.input', side_effect=['34',
-                                                  '/tmp/genesis_data_file.bin',
                                                   'Y',
                                                   'Y',
                                                   'radix://node_tdx_22_1qvsml9pe32rzcrmw6jx204gjeng09adzkqqfz0ewhxwmjsaas99jzrje4u3@34.243.93.185',
                                                   'N',
                                                   'Y',
-                                                  'Y',
-                                                  '/tmp/babylon-node',
+                                                  '/tmp/babylon-node-config',
                                                   'node-keystore.ks',
                                                   '/tmp/babylon-ledger',
+                                                  'false',
                                                   'true',
-                                                  'true',
-                                                  'development-latest']):
+                                                  'development-latest',
+                                                  '',
+                                                  '',
+                                                  '',
+                                                  '',
+                                                  '']):
             with patch("sys.argv",
                        ["main", "docker", "config", "-m", "DETAILED", "-k", "radix", "-nk", "-a"]):
                 main()

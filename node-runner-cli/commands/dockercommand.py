@@ -15,7 +15,7 @@ from config.Renderer import Renderer
 from github.github import latest_release
 from setup.AnsibleRunner import AnsibleRunner
 from setup.Base import Base
-from setup.Docker import Docker
+from setup.DockerSetup import DockerSetup, DockerConfigArguments
 from utils.Prompts import Prompts
 from utils.utils import Helpers, run_shell_command, bcolors
 
@@ -91,127 +91,49 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
 def config(args):
     """
     This commands allows node-runners and gateway admins to create a config file, which can persist their custom settings.
-    Thus it allows is to decouple the updates from configuration.
+    Thus it allows is to decouple the updates from docker_config.
     Config is created only once as such and if there is a version change in the config file,
     then it updated by doing a migration to newer version
     """
 
     ################### PARSE ARGUMENTS
-    setupmode = SetupMode.instance()
-    setupmode.mode = args.setupmode
-    trustednode = args.trustednode if args.trustednode != "" else None
-    keystore_password = args.keystorepassword if args.keystorepassword != "" else None
-    nginx_on_core = args.disablenginxforcore if args.disablenginxforcore != "" else None
-    nginx_on_gateway = args.disablenginxforgateway if args.disablenginxforgateway != "" else None
-    postgrespassword = args.postgrespassword if args.postgrespassword != "" else None
-    autoapprove = args.autoapprove
-    new_keystore = args.newkeystore
-    validator = args.validator
-
-    olympia_node_url = args.migration_url
-    olympia_node_bech32_address = args.migration_auth_user
-    olympia_node_auth_user = args.migration_auth_user
-    olympia_node_auth_password = args.migration_auth_password
-
-    release = latest_release()
-    if "DETAILED" in setupmode.mode and len(setupmode.mode) > 1:
+    argument_object = DockerConfigArguments(args)
+    if "DETAILED" in argument_object.setupmode.mode and len(argument_object.setupmode.mode) > 1:
         print(f"{bcolors.FAIL}You cannot have DETAILED option with other options together."
               f"\nDETAILED option goes through asking each and every question that to customize setup. "
               f"Hence cannot be clubbed together with options"
               f"{bcolors.ENDC}")
         sys.exit(1)
 
+
     ################### QUESTIONARY
+    print_questionary_header(argument_object.config_file)
+    docker_config = DockerSetup.questionary(argument_object)
+
+    ################### Saving Answers
     Path(f"{Helpers.get_default_node_config_dir()}").mkdir(parents=True, exist_ok=True)
+    print_config(docker_config)
+    compare_config_file_with_config_object(argument_object.config_file, docker_config)
+    DockerSetup.save_settings(docker_config, argument_object.config_file, argument_object.autoapprove)
 
-    config_file = f"{args.configdir}/config.yaml"
-    print_questionary_header(config_file)
+def compare_config_file_with_config_object(config_file: str, config_object: DockerConfig):
+    if os.path.exists(config_file):
+        old_config: DockerConfig = DockerSetup.load_settings(config_file)
+        if old_config is not None:
+            print(f"""
+                {Helpers.section_headline("Differences")}
+                Difference between existing config file and new config that you are creating
+                {dict(DeepDiff(old_config, config_object.toDict()))}
+                  """)
 
-    # Print old config if it exists
-    old_config: DockerConfig = Docker.load_settings(config_file)
-    if old_config is not None:
-        print("\n----There is existing config file and contents are as below----\n")
-        print(f"\n{yaml.dump(old_config)}")
 
-    configuration = DockerConfig(release)
-    print(
-        "\nCreating config file using the answers from the questions that would be asked in next steps."
-        f"\nLocation of the config file: {bcolors.OKBLUE}{config_file}{bcolors.ENDC}")
 
-    configuration.common_config.ask_network_id(args.networkid)
-    configuration.common_config.ask_existing_docker_compose_file()
-
-    config_to_dump = {"version": "0.2"}
-
-    if "CORE" in setupmode.mode:
-        quick_node_settings: CoreDockerSettings = CoreDockerSettings({}).create_config(release, trustednode,
-                                                                                       keystore_password, new_keystore,
-                                                                                       validator)
-        configuration.core_node = quick_node_settings
-        configuration.common_config.ask_enable_nginx_for_core(nginx_on_core)
-        config_to_dump["core_node"] = dict(configuration.core_node)
-
-    if "GATEWAY" in setupmode.mode:
-        quick_gateway_settings: GatewayDockerSettings = GatewayDockerSettings({}).create_config(postgrespassword)
-
-        configuration.gateway = quick_gateway_settings
-        configuration.common_config.ask_enable_nginx_for_gateway(nginx_on_gateway)
-        config_to_dump["gateway"] = dict(configuration.gateway)
-
-    if "DETAILED" in setupmode.mode:
-        run_fullnode = Prompts.check_for_fullnode()
-        if run_fullnode:
-            detailed_node_settings: CoreDockerSettings = CoreDockerSettings({}).create_config(release, trustednode,
-                                                                                              keystore_password,
-                                                                                              new_keystore, validator)
-            configuration.core_node = detailed_node_settings
-            configuration.common_config.ask_enable_nginx_for_core(nginx_on_core)
-            config_to_dump["core_node"] = dict(configuration.core_node)
-        else:
-            configuration.common_config.nginx_settings.protect_core = "false"
-
-        run_gateway = Prompts.check_for_gateway()
-        if run_gateway:
-            detailed_gateway_settings: GatewayDockerSettings = GatewayDockerSettings({}).create_config(
-                postgrespassword)
-            configuration.gateway = detailed_gateway_settings
-            configuration.common_config.ask_enable_nginx_for_gateway(nginx_on_gateway)
-            config_to_dump["gateway"] = dict(configuration.gateway)
-        else:
-            configuration.common_config.nginx_settings.protect_gateway = "false"
-
-    if "MIGRATION" in setupmode.mode:
-        configuration.migration.ask_migration_config(olympia_node_url, olympia_node_auth_user,
-                                                     olympia_node_auth_password,
-                                                     olympia_node_bech32_address)
-
-    if configuration.common_config.check_nginx_required():
-        configuration.common_config.ask_nginx_release()
-        if configuration.core_node.enable_transaction == "true":
-            configuration.common_config.nginx_settings.enable_transaction_api = "true"
-        else:
-            configuration.common_config.nginx_settings.enable_transaction_api = "false"
-
-    else:
-        configuration.common_config.nginx_settings = None
-
-    config_to_dump["common_config"] = dict(configuration.common_config)
-    config_to_dump["migration"] = dict(configuration.migration)
-    config_to_dump["gateway"] = dict(configuration.gateway)
-
+def print_config(configuration):
+    config_dict: dict = configuration.toDict()
     yaml.add_representer(type(None), Helpers.represent_none)
     Helpers.section_headline("CONFIG is Generated as below")
-    print(f"\n{yaml.dump(config_to_dump)}")
-
-    old_config: DockerConfig = Docker.load_settings(config_file)
-    if old_config is not None :
-        print(f"""
-            {Helpers.section_headline("Differences")}
-            Difference between existing config file and new config that you are creating
-            {dict(DeepDiff(old_config, config_to_dump))}
-              """)
-
-    Docker.backup_save_config(config_file, config_to_dump, Helpers.get_current_date_time(), autoapprove)
+    print(f"\n{yaml.dump(config_dict)}")
+    return config_dict
 
 
 def print_questionary_header(config_file):
@@ -239,13 +161,13 @@ def install(args):
     """
     autoapprove = args.autoapprove
     config_file = args.configfile
-    docker_config: DockerConfig = Docker.load_settings(config_file)
+    docker_config: DockerConfig = DockerSetup.load_settings(config_file)
     update = args.update
 
-    new_config = Docker.update_versions(docker_config, autoapprove) if update else docker_config
+    new_config = DockerSetup.update_versions(docker_config, autoapprove) if update else docker_config
 
-    new_config = Docker.check_set_passwords(new_config)
-    Docker.check_run_local_postgreSQL(new_config)
+    new_config = DockerSetup.check_set_passwords(new_config)
+    DockerSetup.check_run_local_postgreSQL(new_config)
 
     render_template = Renderer().load_file_based_template("radix-fullnode-compose.yml.j2").render(new_config).to_yaml()
     config_differences = dict(DeepDiff(docker_config, new_config))
@@ -257,9 +179,9 @@ def install(args):
               Difference between existing config file and new config that you are creating
               {config_differences}
                 """)
-        Docker.backup_save_config(config_file, new_config, backup_time, autoapprove)
+        DockerSetup.backup_save_config(config_file, new_config, backup_time, autoapprove)
 
-    compose_file, compose_file_yaml = Docker.get_existing_compose_file(new_config)
+    compose_file, compose_file_yaml = DockerSetup.get_existing_compose_file(new_config)
     compose_file_difference = dict(DeepDiff(compose_file_yaml, render_template))
     if len(compose_file_difference) != 0:
         print(f"""
@@ -276,7 +198,7 @@ def install(args):
         if Helpers.check_Yes(to_update) or autoapprove:
             if os.path.exists(compose_file):
                 Helpers.backup_file(compose_file, f"{compose_file}_{backup_time}")
-            Docker.save_compose_file(compose_file, render_template)
+            DockerSetup.save_compose_file(compose_file, render_template)
 
     run_shell_command(f"cat {compose_file}", shell=True)
 
@@ -286,7 +208,7 @@ def install(args):
     else:
         should_start = input("\nOkay to start the containers [Y/n]?:")
     if Helpers.check_Yes(should_start) or autoapprove:
-        Docker.run_docker_compose_up(compose_file)
+        DockerSetup.run_docker_compose_up(compose_file)
 
 
 @dockercommand([
@@ -301,11 +223,11 @@ def start(args):
     This commands starts the docker containers based on what is stored in the config.yaml file.
     If you have modified the config file, it is advised to use setup command.
     """
-    docker_config = Docker.load_settings(args.configfile)
-    docker_config = Docker.check_set_passwords(docker_config)
-    Docker.check_run_local_postgreSQL(docker_config)
-    compose_file, compose_file_yaml = Docker.get_existing_compose_file(docker_config)
-    Docker.run_docker_compose_up(compose_file)
+    docker_config = DockerSetup.load_settings(args.configfile)
+    docker_config = DockerSetup.check_set_passwords(docker_config)
+    DockerSetup.check_run_local_postgreSQL(docker_config)
+    compose_file, compose_file_yaml = DockerSetup.get_existing_compose_file(docker_config)
+    DockerSetup.run_docker_compose_up(compose_file)
 
 
 @dockercommand([
@@ -325,9 +247,9 @@ def stop(args):
             """ 
             Removing volumes including Nginx volume. Nginx password needs to be recreated again when you bring node up
             """)
-    docker_config = Docker.load_settings(args.configfile)
-    compose_file, compose_file_yaml = Docker.get_existing_compose_file(docker_config)
-    Docker.run_docker_compose_down(compose_file, args.removevolumes)
+    docker_config = DockerSetup.load_settings(args.configfile)
+    compose_file, compose_file_yaml = DockerSetup.get_existing_compose_file(docker_config)
+    DockerSetup.run_docker_compose_down(compose_file, args.removevolumes)
 
 
 @dockercommand([])

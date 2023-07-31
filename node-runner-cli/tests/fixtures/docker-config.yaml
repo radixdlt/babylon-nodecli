@@ -23,7 +23,7 @@ core_node:
   keydetails:
     keyfile_name: node-keystore.ks
     keyfile_path: /home/radixdlt/node-config
-    keygen_tag: 1.3.2
+    keygen_tag: v1.4.1
     keystore_password: radix
   nodetype: fullnode
   repo: docker.io/radixdlt/private-babylon-node

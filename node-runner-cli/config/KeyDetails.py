@@ -5,7 +5,7 @@ from utils.utils import Helpers
 class KeyDetails(BaseConfig):
     keyfile_path: str = Helpers.get_default_node_config_dir()
     keyfile_name: str = "node-keystore.ks"
-    keygen_tag: str = "1.3.2"
+    keygen_tag: str = "v1.4.1"
     keystore_password: str = None
 
     # def __init__(self,

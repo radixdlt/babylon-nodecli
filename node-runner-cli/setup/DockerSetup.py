@@ -1,21 +1,73 @@
 import getpass
 import os
 import sys
-from typing import Tuple, Dict, Any
+from typing import Tuple
 
 import yaml
 from yaml import UnsafeLoader
 
-from config.DockerConfig import DockerConfig, from_dict
+from config.BaseConfig import SetupMode
+from config.DockerConfig import DockerConfig, from_dict, CoreDockerSettings
+from config.GatewayDockerConfig import GatewayDockerSettings
 from env_vars import DOCKER_COMPOSE_FOLDER_PREFIX, COMPOSE_HTTP_TIMEOUT, RADIXDLT_NODE_KEY_PASSWORD, POSTGRES_PASSWORD
 from github import github
+from github.github import latest_release
 from setup.AnsibleRunner import AnsibleRunner
 from setup.Base import Base
 from utils.Prompts import Prompts
-from utils.utils import run_shell_command, Helpers
+from utils.utils import run_shell_command, Helpers, bcolors
 
 
-class Docker(Base):
+class DockerConfigArguments:
+    setupmode: SetupMode
+    trustednode: str
+    keystore_password: str
+    postgrespassword: str
+    validator: str
+    olympia_node_url: str
+    olympia_node_bech32_address: str
+    olympia_node_auth_user: str
+    olympia_node_auth_password: str
+    release: str
+    nginx_on_core: bool
+    nginx_on_gateway: bool
+    autoapprove: bool
+    new_keystore: bool
+    config_file: str
+    networkid: str
+
+    def __init__(self, args):
+        self.setupmode = SetupMode.instance()
+        self.setupmode.mode = args.setupmode
+        self.trustednode = args.trustednode if args.trustednode != "" else None
+        self.keystore_password = args.keystorepassword if args.keystorepassword != "" else None
+        self.nginx_on_core = args.disablenginxforcore if args.disablenginxforcore != "" else None
+        self.nginx_on_gateway = args.disablenginxforgateway if args.disablenginxforgateway != "" else None
+        self.postgrespassword = args.postgrespassword if args.postgrespassword != "" else None
+        self.autoapprove = args.autoapprove
+        self.new_keystore = args.newkeystore
+        self.validator = args.validator
+        self.olympia_node_url = args.migration_url
+        self.olympia_node_bech32_address = args.migration_auth_user
+        self.olympia_node_auth_user = args.migration_auth_user
+        self.olympia_node_auth_password = args.migration_auth_password
+        self.release = latest_release()
+        self.config_file = f"{args.configdir}/config.yaml"
+        self.networkid = args.networkid
+
+
+class DockerSetup(Base):
+
+    @staticmethod
+    def save_settings(settings: DockerConfig, config_file: str, autoapprove=False):
+        to_update = ""
+        if autoapprove:
+            print("In Auto mode - Updating the file as suggested in above changes")
+        else:
+            to_update = input("\nOkay to update the config file [Y/n]?:")
+        if Helpers.check_Yes(to_update) or autoapprove:
+            print(f"Saving configuration to {config_file}")
+            settings.to_file(config_file)
 
     @staticmethod
     def setup_nginx_Password(usertype, username, password=None):
@@ -96,7 +148,7 @@ class Docker(Base):
     @staticmethod
     def check_run_local_postgreSQL(docker_config: DockerConfig):
         postgres_db = docker_config.gateway.postgres_db
-        if Docker.check_post_db_local(docker_config):
+        if DockerSetup.check_post_db_local(docker_config):
             ansible_dir = f'https://raw.githubusercontent.com/radixdlt/babylon-nodecli/{Helpers.cli_version()}/node-runner-cli'
             AnsibleRunner(ansible_dir).run_setup_postgress(
                 postgres_db.get("password"),
@@ -180,3 +232,66 @@ class Docker(Base):
         with open(config_file, 'r') as f:
             dictionary = yaml.load(f, Loader=UnsafeLoader)
         return from_dict(dictionary)
+
+    @staticmethod
+    def questionary(argument_object: DockerConfigArguments) -> DockerConfig:
+        docker_config = DockerConfig(argument_object.release)
+        print(
+            "\nCreating config file using the answers from the questions that would be asked in next steps."
+            f"\nLocation of the config file: {bcolors.OKBLUE}{argument_object.config_file}{bcolors.ENDC}")
+
+        docker_config.common_config.ask_network_id(argument_object.networkid)
+        docker_config.common_config.ask_existing_docker_compose_file()
+
+        if "CORE" in argument_object.setupmode.mode:
+            quick_node_settings: CoreDockerSettings = CoreDockerSettings({}).create_config(argument_object.release,
+                                                                                           argument_object.trustednode,
+                                                                                           argument_object.keystore_password,
+                                                                                           argument_object.new_keystore,
+                                                                                           argument_object.validator)
+            docker_config.core_node = quick_node_settings
+            docker_config.common_config.ask_enable_nginx_for_core(argument_object.nginx_on_core)
+
+        if "GATEWAY" in argument_object.setupmode.mode:
+            quick_gateway: GatewayDockerSettings = GatewayDockerSettings({}).create_config(
+                argument_object.postgrespassword)
+
+            docker_config.gateway = quick_gateway
+            docker_config.common_config.ask_enable_nginx_for_gateway(argument_object.nginx_on_gateway)
+        if "DETAILED" in argument_object.setupmode.mode:
+            run_fullnode = Prompts.check_for_fullnode()
+            if run_fullnode:
+                detailed_node_settings: CoreDockerSettings = CoreDockerSettings({}).create_config(
+                    argument_object.release,
+                    argument_object.trustednode,
+                    argument_object.keystore_password,
+                    argument_object.new_keystore,
+                    argument_object.validator)
+                docker_config.core_node = detailed_node_settings
+                docker_config.common_config.ask_enable_nginx_for_core(argument_object.nginx_on_core)
+            else:
+                docker_config.common_config.nginx_settings.protect_core = "false"
+
+            run_gateway = Prompts.check_for_gateway()
+            if run_gateway:
+                detailed_gateway: GatewayDockerSettings = GatewayDockerSettings({}).create_config(
+                    argument_object.postgrespassword)
+                docker_config.gateway = detailed_gateway
+                docker_config.common_config.ask_enable_nginx_for_gateway(argument_object.nginx_on_gateway)
+            else:
+                docker_config.common_config.nginx_settings.protect_gateway = "false"
+
+        if "MIGRATION" in argument_object.setupmode.mode:
+            docker_config.migration.ask_migration_config(argument_object.olympia_node_url,
+                                                         argument_object.olympia_node_auth_user,
+                                                         argument_object.olympia_node_auth_password,
+                                                         argument_object.olympia_node_bech32_address)
+
+        if docker_config.common_config.check_nginx_required():
+            docker_config.common_config.ask_nginx_release()
+            if docker_config.core_node.enable_transaction == "true":
+                docker_config.common_config.nginx_settings.enable_transaction_api = "true"
+            else:
+                docker_config.common_config.nginx_settings.enable_transaction_api = "false"
+
+        return docker_config

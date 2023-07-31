@@ -11,8 +11,8 @@ from config.BaseConfig import SetupMode
 from config.SystemDConfig import SystemDSettings
 from github.github import latest_release
 from setup.Base import Base
-from setup.Gateway import Gateway
-from setup.SystemD import SystemD
+from setup.GatewaySetup import Gateway
+from setup.SystemDSetup import SystemD
 from utils.utils import Helpers, bcolors
 
 systemdcli = ArgumentParser(
@@ -133,8 +133,8 @@ def config(args):
 
     ########### Gateway Config
     if "GATEWAY" in setupmode.mode:
-        configuration.gateway_settings.enabled = True
-        configuration.gateway_settings.gateway_api.coreApiNode.core_api_address = "http://localhost:3332"
+        configuration.gateway.enabled = True
+        configuration.gateway.gateway_api.coreApiNode.core_api_address = "http://localhost:3332"
 
     ########### Migration Config
     if "MIGRATION" in setupmode.mode:
@@ -208,7 +208,7 @@ def install(args):
         service_file_path = f"{settings.core_node.node_dir}/radixdlt-node.service"
     settings.create_service_file(service_file_path)
 
-    Gateway.conditionally_install_local_postgreSQL(settings.gateway_settings)
+    Gateway.conditionally_install_local_postgreSQL(settings.gateway)
 
     if not args.manual:
         if not args.update:
@@ -297,7 +297,7 @@ def compare_old_and_new_config(config_file : str, configuration: SystemDSettings
     old_config = SystemD.load_all_config(config_file)
     config_to_dump = {"version": "0.1", "core_node": dict(configuration.core_node),
                       "common_config": dict(configuration.common_config), "migration": dict(configuration.migration),
-                      "gateway": dict(configuration.gateway_settings)}
+                      "gateway": dict(configuration.gateway)}
     if len(old_config) != 0:
         print(f"""
             {Helpers.section_headline("Differences")}

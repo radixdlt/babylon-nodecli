@@ -58,7 +58,7 @@ core_node:
   keydetails:
     keyfile_name: node-keystore.ks
     keyfile_path: {home_directory}/babylon-node-config
-    keygen_tag: 1.3.2
+    keygen_tag: v1.4.1
   node_dir: /someDir/babylon-node-config
   node_secrets_dir: /someDir/babylon-node-config/secret
   nodetype: fullnode
@@ -110,7 +110,7 @@ core_node:
   keydetails:
     keyfile_path: {home_directory}/babylon-node-config
     keyfile_name: node-keystore.ks
-    keygen_tag: 1.3.2
+    keygen_tag: v1.4.1
   repo: radixdlt/babylon-node
   data_directory: {home_directory}/babylon-ledger
   enable_transaction: 'false'

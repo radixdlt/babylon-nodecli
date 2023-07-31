@@ -74,7 +74,7 @@ class CoreSystemdSettings(BaseConfig):
 
     def set_core_release(self, release):
         self.core_release = release
-        self.keydetails.keygen_tag = "1.3.2"
+        self.keydetails.keygen_tag = "v1.4.1"
 
     def generate_download_urls(self):
         self.core_binary_url = os.getenv(NODE_BINARY_OVERIDE,
