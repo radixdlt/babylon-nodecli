@@ -1,18 +1,12 @@
-import ipaddress
 import sys
 from argparse import ArgumentParser
 from pathlib import Path
 
-import yaml
-from deepdiff import DeepDiff
-
 from commands.subcommand import get_decorator, argument
-from config.BaseConfig import SetupMode
 from config.SystemDConfig import SystemDSettings
-from github.github import latest_release
 from setup.Base import Base
 from setup.GatewaySetup import Gateway
-from setup.SystemDSetup import SystemD
+from setup.SystemDSetup import SystemDSetup, SystemDConfigArguments
 from utils.utils import Helpers, bcolors
 
 systemdcli = ArgumentParser(
@@ -79,74 +73,29 @@ def systemdcommand(systemdcommand_args=None, parent=systemd_parser):
 def config(args):
     """
     This commands allows node-runners and gateway admins to create a config file, which can persist their custom
-    settings. Thus, it allows is to decouple the updates from configuration. Config is created only once as such and
+    settings. Thus, it allows is to decouple the updates from systemd_config. Config is created only once as such and
     if there is a version change in the config file, then it updated by doing a migration to newer version
     """
 
-    # make default object
-    # add values from arguments and do validations
-    # ask for values and do validation differently -> do validations the same way.
-
     ################### PARSE ARGUMENTS
-    validate_ip(args.hostip)
-
-    setupmode = SetupMode.instance()
-    setupmode.mode = args.setupmode
-
-    trustednode = args.trustednode if args.trustednode != "" else None
-    keystore_password = args.keystorepassword if args.keystorepassword != "" else None
-    nginx_on_core = args.disablenginxforcore if args.disablenginxforcore != "" else None
-    data_directory = args.data_directory
-    new_keystore = args.newkeystore
-
-    olympia_node_url = args.migration_url
-    olympia_node_bech32_address = args.migration_auth_user
-    olympia_node_auth_user = args.migration_auth_user
-    olympia_node_auth_password = args.migration_auth_password
-
-    release = args.release if args.release is not None else latest_release()
-
-    config_file = f"{args.configdir}/config.yaml"
+    argument_object = SystemDConfigArguments(args)
 
     ################### QUESTIONARY
-    print_questionary_header(config_file)
+    print_questionary_header(argument_object.config_file)
 
-    configuration = SystemDSettings({})
+    systemd_config = SystemDSettings({})
 
-    ########### Common Config
-    configuration.common_config.ask_network_id(args.networkid)
-    configuration.common_config.ask_host_ip(args.hostip)
-    configuration.common_config.ask_enable_nginx_for_core(nginx_on_core)
-
-    if configuration.common_config.check_nginx_required():
-        configuration.common_config.ask_nginx_release()
-    else:
-        configuration.common_config.nginx_settings = None
-
-    ########### Core Config
-    configuration.core_node.set_core_release(release)
-    configuration.core_node.set_trusted_node(trustednode)
-    configuration.core_node.generate_download_urls()
-    configuration.core_node.keydetails = Base.ask_keydetails(keystore_password, new_keystore)
-    configuration.core_node.ask_data_directory(data_directory)
-    configuration.core_node.ask_validator_address(args.validator)
-
-    ########### Gateway Config
-    if "GATEWAY" in setupmode.mode:
-        configuration.gateway.enabled = True
-        configuration.gateway.gateway_api.coreApiNode.core_api_address = "http://localhost:3332"
-
-    ########### Migration Config
-    if "MIGRATION" in setupmode.mode:
-        configuration.migration.ask_migration_config(olympia_node_url, olympia_node_auth_user,
-                                                     olympia_node_auth_password,
-                                                     olympia_node_bech32_address)
+    systemd_config.common_config = SystemDSetup.ask_common_config(argument_object)
+    systemd_config.core_node = SystemDSetup.ask_core_node(argument_object)
+    systemd_config.gateway = SystemDSetup.ask_gateway(argument_object)
+    systemd_config.gateway = SystemDSetup.ask_migration(argument_object)
 
     ################### File comparisson and generation
     Path(f"{args.configdir}").mkdir(parents=True, exist_ok=True)
-    dump_config_as_yaml(configuration)
-    compare_old_and_new_config(config_file,configuration)
-    SystemD.save_settings(configuration, config_file, autoapprove=args.autoapprove)
+    SystemDSetup.dump_config_as_yaml(systemd_config)
+    SystemDSetup.compare_old_and_new_config(argument_object.config_file, systemd_config)
+    SystemDSetup.save_settings(systemd_config, argument_object.config_file, autoapprove=args.autoapprove)
+
 
 @systemdcommand([
     argument("-a", "--auto", help="Automatically approve all Yes/No prompts", action="store_true"),
@@ -163,7 +112,7 @@ def config(args):
 def install(args):
     """This sets up the systemd service for the core node."""
     auto_approve = args.auto
-    settings = SystemD.load_settings(args.configfile)
+    settings = SystemDSetup.load_settings(args.configfile)
 
     print("--------------------------------")
     print("\nUsing following configuration:")
@@ -171,38 +120,38 @@ def install(args):
     print(settings.to_yaml())
 
     if auto_approve is None:
-        SystemD.confirm_config(settings.core_node.nodetype,
-                               settings.core_node.core_release,
-                               settings.core_node.core_binary_url,
-                               settings.common_config.nginx_settings.config_url)
+        SystemDSetup.confirm_config(settings.core_node.nodetype,
+                                    settings.core_node.core_release,
+                                    settings.core_node.core_binary_url,
+                                    settings.common_config.nginx_settings.config_url)
 
-    SystemD.checkUser()
+    SystemDSetup.checkUser()
 
-    SystemD.download_binaries(binary_location_url=settings.core_node.core_binary_url,
-                              library_location_url=settings.core_node.core_library_url,
-                              node_dir=settings.core_node.node_dir,
-                              node_version=settings.core_node.core_release,
-                              auto_approve=auto_approve)
+    SystemDSetup.download_binaries(binary_location_url=settings.core_node.core_binary_url,
+                                   library_location_url=settings.core_node.core_library_url,
+                                   node_dir=settings.core_node.node_dir,
+                                   node_version=settings.core_node.core_release,
+                                   auto_approve=auto_approve)
 
     backup_time = Helpers.get_current_date_time()
 
     settings.create_default_config()
-    SystemD.backup_file(settings.core_node.node_dir, f"default.config", backup_time, auto_approve)
+    SystemDSetup.backup_file(settings.core_node.node_dir, f"default.config", backup_time, auto_approve)
 
     # Below steps only required if user want's setup nginx in same node
-    SystemD.backup_file("/lib/systemd/system", "nginx.service", backup_time, auto_approve)
-    SystemD.create_ssl_certs(settings.common_config.nginx_settings.secrets_dir, auto_approve)
-    nginx_configured = SystemD.setup_nginx_config(
+    SystemDSetup.backup_file("/lib/systemd/system", "nginx.service", backup_time, auto_approve)
+    SystemDSetup.create_ssl_certs(settings.common_config.nginx_settings.secrets_dir, auto_approve)
+    nginx_configured = SystemDSetup.setup_nginx_config(
         nginx_config_location_url=settings.common_config.nginx_settings.config_url,
         node_type=settings.core_node.nodetype,
         nginx_etc_dir=settings.common_config.nginx_settings.dir, backup_time=backup_time,
         auto_approve=auto_approve)
 
     # Core node environment files
-    SystemD.backup_file(settings.core_node.node_secrets_dir, "environment", backup_time, auto_approve)
+    SystemDSetup.backup_file(settings.core_node.node_secrets_dir, "environment", backup_time, auto_approve)
     settings.create_environment_file()
     # Core node systemd service file
-    SystemD.backup_file("/etc/systemd/system", "radixdlt-node.service", backup_time, auto_approve)
+    SystemDSetup.backup_file("/etc/systemd/system", "radixdlt-node.service", backup_time, auto_approve)
     service_file_path = "/etc/systemd/system/radixdlt-node.service"
     if args.manual:
         service_file_path = f"{settings.core_node.node_dir}/radixdlt-node.service"
@@ -212,14 +161,14 @@ def install(args):
 
     if not args.manual:
         if not args.update:
-            SystemD.start_node_service()
+            SystemDSetup.start_node_service()
         else:
-            SystemD.restart_node_service()
+            SystemDSetup.restart_node_service()
 
         if nginx_configured and not args.update:
-            SystemD.start_nginx_service()
+            SystemDSetup.start_nginx_service()
         elif nginx_configured and args.update:
-            SystemD.start_nginx_service()
+            SystemDSetup.start_nginx_service()
         else:
             print("Nginx not configured or not updated")
 
@@ -232,12 +181,12 @@ def install(args):
 def stop(args):
     """This stops the CORE node systemd service."""
     if args.services == "all":
-        SystemD.stop_nginx_service()
-        SystemD.stop_node_service()
+        SystemDSetup.stop_nginx_service()
+        SystemDSetup.stop_node_service()
     elif args.services == "nginx":
-        SystemD.stop_nginx_service()
+        SystemDSetup.stop_nginx_service()
     elif args.services == "radixdlt-node":
-        SystemD.stop_node_service()
+        SystemDSetup.stop_node_service()
     else:
         print(f"Invalid service name {args.services}")
         sys.exit(1)
@@ -251,12 +200,12 @@ def stop(args):
 def restart(args):
     """This restarts the CORE node systemd service."""
     if args.services == "all":
-        SystemD.restart_node_service()
-        SystemD.restart_nginx_service()
+        SystemDSetup.restart_node_service()
+        SystemDSetup.restart_nginx_service()
     elif args.services == "nginx":
-        SystemD.restart_nginx_service()
+        SystemDSetup.restart_nginx_service()
     elif args.services == "radixdlt-node":
-        SystemD.restart_node_service()
+        SystemDSetup.restart_node_service()
     else:
         print(f"Invalid service name {args.services}")
         sys.exit(1)
@@ -275,45 +224,13 @@ def dependencies(args):
 
     if not args.skip:
         Base.dependencies()
-    SystemD.install_java()
-    SystemD.setup_user()
-    SystemD.make_etc_directory()
-    SystemD.make_data_directory()
-    SystemD.create_service_user_password()
-    SystemD.create_initial_service_file()
-    SystemD.sudoers_instructions()
-
-
-def validate_ip(hostip: str):
-    if hostip:
-        try:
-            ipaddress.ip_address(hostip)
-        except ValueError:
-            print(f"'{hostip}' is not a valid ip address.")
-            sys.exit(1)
-
-
-def compare_old_and_new_config(config_file : str, configuration: SystemDSettings):
-    old_config = SystemD.load_all_config(config_file)
-    config_to_dump = {"version": "0.1", "core_node": dict(configuration.core_node),
-                      "common_config": dict(configuration.common_config), "migration": dict(configuration.migration),
-                      "gateway": dict(configuration.gateway)}
-    if len(old_config) != 0:
-        print(f"""
-            {Helpers.section_headline("Differences")}
-            Difference between existing config file and new config that you are creating
-            {dict(DeepDiff(old_config, config_to_dump))}
-              """)
-
-
-def dump_config_as_yaml(configuration):
-    config_to_dump = {"version": "0.1", "core_node": dict(configuration.core_node),
-                      "common_config": dict(configuration.common_config), "migration": dict(configuration.migration),
-                      "gateway": dict(configuration.gateway)}
-    yaml.add_representer(type(None), Helpers.represent_none)
-    Helpers.section_headline("CONFIG is Generated as below")
-    print(f"\n{yaml.dump(config_to_dump)}")
-    return config_to_dump
+    SystemDSetup.install_java()
+    SystemDSetup.setup_user()
+    SystemDSetup.make_etc_directory()
+    SystemDSetup.make_data_directory()
+    SystemDSetup.create_service_user_password()
+    SystemDSetup.create_initial_service_file()
+    SystemDSetup.sudoers_instructions()
 
 
 def print_questionary_header(config_file):

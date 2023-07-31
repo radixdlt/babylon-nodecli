@@ -1,19 +1,70 @@
+import ipaddress
 import os
 import sys
 from pathlib import Path
 
 import yaml
+from deepdiff import DeepDiff
 from yaml import UnsafeLoader
 
+from config.BaseConfig import SetupMode
+from config.GatewayDockerConfig import GatewayDockerSettings
+from config.MigrationConfig import CommonMigrationSettings
 from config.Renderer import Renderer
-from config.SystemDConfig import SystemDSettings, from_dict
+from config.SystemDConfig import SystemDSettings, from_dict, CoreSystemdSettings, CommonSystemdSettings
 from env_vars import UNZIPPED_NODE_DIST_FOLDER
 from setup.Base import Base
 from utils.PromptFeeder import QuestionKeys
 from utils.utils import run_shell_command, Helpers
 
 
-class SystemD(Base):
+def validate_ip(hostip: str):
+    if hostip:
+        try:
+            ipaddress.ip_address(hostip)
+        except ValueError:
+            print(f"'{hostip}' is not a valid ip address.")
+            sys.exit(1)
+
+
+class SystemDConfigArguments:
+    setupmode: SetupMode
+    trustednode: str
+    keystore_password: str
+    nginx_on_core: str
+    data_directory: str
+    new_keystore: str
+    olympia_node_url: str
+    olympia_node_bech32_address: str
+    olympia_node_auth_user: str
+    olympia_node_auth_password: str
+    release: str
+    config_file: str
+    networkid: str
+    hostip: str
+    validator: str
+
+    def __init__(self, args):
+        validate_ip(args.hostip)
+        self.hostip = args.hostip
+        self.setupmode = SetupMode.instance()
+        self.setupmode.mode = args.setupmode
+        self.trustednode = args.trustednode if args.trustednode != "" else None
+        self.keystore_password = args.keystorepassword if args.keystorepassword != "" else None
+        self.nginx_on_core = args.disablenginxforcore if args.disablenginxforcore != "" else None
+        self.data_directory = args.data_directory
+        self.new_keystore = args.newkeystore
+        self.olympia_node_url = args.migration_url
+        self.olympia_node_bech32_address = args.migration_auth_user
+        self.olympia_node_auth_user = args.migration_auth_user
+        self.olympia_node_auth_password = args.migration_auth_password
+        self.release = args.release if args.release is not None else latest_release()
+        self.config_file = f"{args.configdir}/config.yaml"
+        self.networkid = args.networkid
+        self.validator = args.validator
+
+
+class SystemDSetup(Base):
 
     @staticmethod
     def install_java():
@@ -134,7 +185,7 @@ class SystemD(Base):
 
     @staticmethod
     def setup_nginx_config(nginx_config_location_url, node_type, nginx_etc_dir, backup_time, auto_approve=None):
-        SystemD.install_nginx()
+        SystemDSetup.install_nginx()
         if node_type == "archivenode":
             conf_file = 'nginx-archive.conf'
         elif node_type == "fullnode":
@@ -165,7 +216,7 @@ class SystemD(Base):
 
     @staticmethod
     def create_ssl_certs(secrets_dir, auto_approve=None):
-        SystemD.make_nginx_secrets_directory()
+        SystemDSetup.make_nginx_secrets_directory()
         if os.path.isfile(f'{secrets_dir}/server.key') and os.path.isfile(f'{secrets_dir}/server.pem'):
             if auto_approve is None:
                 print(f"Files  {secrets_dir}/server.key and os.path.isfile(f'{secrets_dir}/server.pem already exists")
@@ -289,3 +340,70 @@ class SystemD(Base):
         with open(config_file, 'r') as f:
             dictionary = yaml.load(f, Loader=UnsafeLoader)
         return from_dict(dictionary)
+
+    @staticmethod
+    def compare_old_and_new_config(config_file: str, systemd_config: SystemDSettings):
+        old_config = SystemDSetup.load_all_config(config_file)
+        config_to_dump = {"version": "0.1", "core_node": dict(systemd_config.core_node),
+                          "common_config": dict(systemd_config.common_config),
+                          "migration": dict(systemd_config.migration),
+                          "gateway": dict(systemd_config.gateway)}
+        if len(old_config) != 0:
+            print(f"""
+                    {Helpers.section_headline("Differences")}
+                    Difference between existing config file and new config that you are creating
+                    {dict(DeepDiff(old_config, config_to_dump))}
+                      """)
+
+    @staticmethod
+    def dump_config_as_yaml(systemd_config):
+        config_to_dump = {"version": "0.1", "core_node": dict(systemd_config.core_node),
+                          "common_config": dict(systemd_config.common_config),
+                          "migration": dict(systemd_config.migration),
+                          "gateway": dict(systemd_config.gateway)}
+        yaml.add_representer(type(None), Helpers.represent_none)
+        Helpers.section_headline("CONFIG is Generated as below")
+        print(f"\n{yaml.dump(config_to_dump)}")
+        return config_to_dump
+
+    @staticmethod
+    def ask_common_config(argument_object: SystemDConfigArguments) -> CommonSystemdSettings:
+        systemd_config = SystemDSettings({})
+        systemd_config.common_config.ask_network_id(argument_object.networkid)
+        systemd_config.common_config.ask_host_ip(argument_object.hostip)
+        systemd_config.common_config.ask_enable_nginx_for_core(argument_object.nginx_on_core)
+
+        if systemd_config.common_config.check_nginx_required():
+            systemd_config.common_config.ask_nginx_release()
+        else:
+            systemd_config.common_config.nginx_settings = None
+
+        return systemd_config.common_config
+
+    @staticmethod
+    def ask_core_node(argument_object: SystemDConfigArguments) -> CoreSystemdSettings:
+        systemd_config = SystemDSettings({})
+        systemd_config.core_node.set_core_release(argument_object.release)
+        systemd_config.core_node.set_trusted_node(argument_object.trustednode)
+        systemd_config.core_node.generate_download_urls()
+        systemd_config.core_node.keydetails = Base.ask_keydetails(argument_object.keystore_password,
+                                                                  argument_object.new_keystore)
+        systemd_config.core_node.ask_data_directory(argument_object.data_directory)
+        systemd_config.core_node.ask_validator_address(argument_object.validator)
+        return systemd_config.core_node
+
+    @staticmethod
+    def ask_gateway(argument_object: SystemDConfigArguments) -> GatewayDockerSettings:
+        systemd_config = SystemDSettings({})
+        if "GATEWAY" in argument_object.setupmode.mode:
+            systemd_config.gateway.enabled = True
+            systemd_config.gateway.gateway_api.coreApiNode.core_api_address = "http://localhost:3332"
+
+    @staticmethod
+    def ask_migration(argument_object: SystemDConfigArguments) -> CommonMigrationSettings:
+        systemd_config = SystemDSettings({})
+        if "MIGRATION" in argument_object.setupmode.mode:
+            systemd_config.migration.ask_migration_config(argument_object.olympia_node_url,
+                                                          argument_object.olympia_node_auth_user,
+                                                          argument_object.olympia_node_auth_password,
+                                                          argument_object.olympia_node_bech32_address)

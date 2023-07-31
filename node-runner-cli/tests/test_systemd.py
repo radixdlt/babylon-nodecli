@@ -10,7 +10,7 @@ from config.KeyDetails import KeyDetails
 from config.Renderer import Renderer
 from config.SystemDConfig import SystemDSettings
 from babylonnode import main
-from setup.SystemDSetup import SystemD
+from setup.SystemDSetup import SystemDSetup
 from utils.PromptFeeder import PromptFeeder
 
 
@@ -20,7 +20,7 @@ class SystemdUnitTests(unittest.TestCase):
     def test_systemd_install_continue_prompt_feed(self):
         os.environ['PROMPT_FEEDS'] = "test-prompts/individual-prompts/systemd_install_continue.yml"
         PromptFeeder.instance().load_prompt_feeds()
-        SystemD.confirm_config("dummy1", "dummy2", "dummy3", "dummy4")
+        SystemDSetup.confirm_config("dummy1", "dummy2", "dummy3", "dummy4")
 
     @unittest.skip("Can only be executed on Ubuntu")
     def test_systemd_config_can_run_without_prompt(self):
@@ -47,10 +47,10 @@ class SystemdUnitTests(unittest.TestCase):
 
         config_file = f"/tmp/config.yaml"
         with patch('builtins.input', side_effect=['Y']):
-            SystemD.save_settings(settings, config_file)
+            SystemDSetup.save_settings(settings, config_file)
 
         self.maxDiff = None
-        new_settings = SystemD.load_settings(config_file)
+        new_settings = SystemDSetup.load_settings(config_file)
         self.assertEqual(new_settings.to_yaml(), settings.to_yaml())
         self.assertEqual(new_settings.core_node.node_dir, "/somedir/babylon-node")
 
