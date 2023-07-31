@@ -4,11 +4,13 @@ import sys
 from typing import Tuple
 
 import yaml
+from deepdiff import DeepDiff
 from yaml import UnsafeLoader
 
 from config.BaseConfig import SetupMode
 from config.DockerConfig import DockerConfig, from_dict, CoreDockerSettings
 from config.GatewayDockerConfig import GatewayDockerSettings
+from config.Renderer import Renderer
 from env_vars import DOCKER_COMPOSE_FOLDER_PREFIX, COMPOSE_HTTP_TIMEOUT, RADIXDLT_NODE_KEY_PASSWORD, POSTGRES_PASSWORD
 from github import github
 from github.github import latest_release
@@ -54,6 +56,24 @@ class DockerConfigArguments:
         self.release = latest_release()
         self.config_file = f"{args.configdir}/config.yaml"
         self.networkid = args.networkid
+
+
+class DockerInstallArguments:
+    autoapprove: bool
+    config_file: str
+    update: bool
+
+    def __init__(self, args):
+        self.autoapprove = args.autoapprove
+        self.config_file = args.configfile
+        self.update = args.update
+
+
+def print_questionary_header(config_file):
+    Helpers.section_headline("CONFIG FILE")
+    print(
+        "\nCreating config file using the answers from the questions that would be asked in next steps."
+        f"\nLocation of the config file: {bcolors.OKBLUE}{config_file}{bcolors.ENDC}")
 
 
 class DockerSetup(Base):
@@ -146,7 +166,7 @@ class DockerSetup(Base):
         return docker_config
 
     @staticmethod
-    def check_run_local_postgreSQL(docker_config: DockerConfig):
+    def conditionally_start_local_postgres(docker_config: DockerConfig):
         postgres_db = docker_config.gateway.postgres_db
         if DockerSetup.check_post_db_local(docker_config):
             ansible_dir = f'https://raw.githubusercontent.com/radixdlt/babylon-nodecli/{Helpers.cli_version()}/node-runner-cli'
@@ -164,14 +184,14 @@ class DockerSetup(Base):
         return False
 
     @staticmethod
-    def get_existing_compose_file(docker_config: DockerConfig) -> Tuple[str, dict]:
+    def get_existing_compose_file(docker_config: DockerConfig) -> str:
         compose_file = docker_config.common_config.docker_compose
         Helpers.section_headline("Checking if you have existing docker compose file")
         if os.path.exists(compose_file):
-            return compose_file, Helpers.yaml_as_dict(compose_file)
+            return compose_file
         else:
             Helpers.print_info("Seems you are creating docker compose file for first time")
-            return compose_file, dict({})
+            sys.exit(1)
 
     @staticmethod
     def exit_on_missing_trustednode():
@@ -209,20 +229,20 @@ class DockerSetup(Base):
 
         return docker_config
 
-    @staticmethod
-    def backup_save_config(config_file, new_config, backup_time, autoapprove=False):
-        to_update = ""
-        if autoapprove:
-            print("In Auto mode - Updating the file as suggested in above changes")
-        else:
-            to_update = input("\nOkay to update the config file [Y/n]?:")
-        if Helpers.check_Yes(to_update) or autoapprove:
-            if os.path.exists(config_file):
-                print(f"\n\n Backing up existing config file")
-                Helpers.backup_file(config_file, f"{config_file}_{backup_time}")
-            print(f"\n\n Saving to file {config_file} ")
-            with open(config_file, 'w') as f:
-                yaml.dump(new_config, f, default_flow_style=False, explicit_start=True, allow_unicode=True)
+    # @staticmethod
+    # def backup_save_config(config_file, new_config, backup_time, autoapprove=False):
+    #     to_update = ""
+    #     if autoapprove:
+    #         print("In Auto mode - Updating the file as suggested in above changes")
+    #     else:
+    #         to_update = input("\nOkay to update the config file [Y/n]?:")
+    #     if Helpers.check_Yes(to_update) or autoapprove:
+    #         if os.path.exists(config_file):
+    #             print(f"\n\n Backing up existing config file")
+    #             Helpers.backup_file(config_file, f"{config_file}_{backup_time}")
+    #         print(f"\n\n Saving to file {config_file} ")
+    #         with open(config_file, 'w') as f:
+    #             yaml.dump(new_config, f, default_flow_style=False, explicit_start=True, allow_unicode=True)
 
     @staticmethod
     def load_settings(config_file) -> DockerConfig:
@@ -235,6 +255,7 @@ class DockerSetup(Base):
 
     @staticmethod
     def questionary(argument_object: DockerConfigArguments) -> DockerConfig:
+        print_questionary_header(argument_object.config_file)
         docker_config = DockerConfig(argument_object.release)
         print(
             "\nCreating config file using the answers from the questions that would be asked in next steps."
@@ -295,3 +316,75 @@ class DockerSetup(Base):
                 docker_config.common_config.nginx_settings.enable_transaction_api = "false"
 
         return docker_config
+
+    @staticmethod
+    def compare_config_file_with_config_object(config_file: str, config_object: DockerConfig):
+        if os.path.exists(config_file):
+            old_config: DockerConfig = DockerSetup.load_settings(config_file)
+            if old_config is not None:
+                print(f"""
+                    {Helpers.section_headline("Differences")}
+                    Difference between existing config file and new config that you are creating
+                    {dict(DeepDiff(old_config, config_object.toDict()))}
+                      """)
+
+    @staticmethod
+    def print_config(configuration):
+        config_dict: dict = configuration.toDict()
+        yaml.add_representer(type(None), Helpers.represent_none)
+        Helpers.section_headline("CONFIG is Generated as below")
+        print(f"\n{yaml.dump(config_dict)}")
+        return config_dict
+
+    @staticmethod
+    def render_docker_compose(docker_config_updated_versions):
+        return Renderer().load_file_based_template("radix-fullnode-compose.yml.j2").render(
+            docker_config_updated_versions).to_yaml()
+
+    @staticmethod
+    def confirm_config_changes(argument_object: DockerConfigArguments, docker_config, docker_config_updated_versions):
+        config_differences = dict(DeepDiff(docker_config, docker_config_updated_versions))
+
+        if len(config_differences) != 0:
+            print(f"""
+                      {Helpers.section_headline("Differences in config file with updated software versions")}
+                      Difference between existing config file and new config that you are creating
+                      {config_differences}
+                        """)
+            DockerSetup.save_settings(docker_config_updated_versions, argument_object.config_file,
+                                      argument_object.autoapprove)
+
+    @staticmethod
+    def confirm_docker_compose_file_changes(argument_object, docker_config_updated_versions):
+        docker_compose_yaml: yaml = DockerSetup.render_docker_compose(docker_config_updated_versions)
+        backup_time = Helpers.get_current_date_time()
+        compose_file, compose_file_yaml = DockerSetup.get_existing_compose_file(docker_config_updated_versions)
+        compose_file_difference = dict(DeepDiff(compose_file_yaml, docker_compose_yaml))
+        if len(compose_file_difference) != 0:
+            print(f"""
+                    {Helpers.section_headline("Differences between existing compose file and new compose file")}
+                     Difference between existing compose file and new compose file that you are creating
+                    {compose_file_difference}
+                      """)
+            to_update = ""
+            if argument_object.autoapprove:
+                print("In Auto mode - Updating file as suggested in above changes")
+            else:
+                to_update = input("\nOkay to update the file [Y/n]?:")
+
+            if Helpers.check_Yes(to_update) or argument_object.autoapprove:
+                if os.path.exists(compose_file):
+                    Helpers.backup_file(compose_file, f"{compose_file}_{backup_time}")
+                DockerSetup.save_compose_file(compose_file, docker_compose_yaml)
+        run_shell_command(f"cat {compose_file}", shell=True)
+        return compose_file
+
+    @staticmethod
+    def confirm_run_docker_compose(argument_object, compose_file):
+        if argument_object.autoapprove:
+            print("In Auto mode -  Updating the node as per above contents of docker file")
+            should_start = "Y"
+        else:
+            should_start = input("\nOkay to start the containers [Y/n]?:")
+        if Helpers.check_Yes(should_start):
+            DockerSetup.run_docker_compose_up(compose_file)

@@ -1,23 +1,14 @@
-import os
 import sys
 from argparse import ArgumentParser
 from argparse import RawTextHelpFormatter
 from pathlib import Path
 
-import yaml
-from deepdiff import DeepDiff
-
 from commands.subcommand import get_decorator, argument
-from config.BaseConfig import SetupMode
-from config.DockerConfig import DockerConfig, CoreDockerSettings
-from config.GatewayDockerConfig import GatewayDockerSettings
-from config.Renderer import Renderer
-from github.github import latest_release
+from config.DockerConfig import DockerConfig
 from setup.AnsibleRunner import AnsibleRunner
 from setup.Base import Base
-from setup.DockerSetup import DockerSetup, DockerConfigArguments
-from utils.Prompts import Prompts
-from utils.utils import Helpers, run_shell_command, bcolors
+from setup.DockerSetup import DockerSetup, DockerConfigArguments, DockerInstallArguments
+from utils.utils import Helpers, bcolors
 
 dockercli = ArgumentParser(
     description='Subcommand to help setup CORE or GATEWAY using Docker containers',
@@ -105,42 +96,14 @@ def config(args):
               f"{bcolors.ENDC}")
         sys.exit(1)
 
-
     ################### QUESTIONARY
-    print_questionary_header(argument_object.config_file)
     docker_config = DockerSetup.questionary(argument_object)
 
     ################### Saving Answers
     Path(f"{Helpers.get_default_node_config_dir()}").mkdir(parents=True, exist_ok=True)
-    print_config(docker_config)
-    compare_config_file_with_config_object(argument_object.config_file, docker_config)
+    DockerSetup.print_config(docker_config)
+    DockerSetup.compare_config_file_with_config_object(argument_object.config_file, docker_config)
     DockerSetup.save_settings(docker_config, argument_object.config_file, argument_object.autoapprove)
-
-def compare_config_file_with_config_object(config_file: str, config_object: DockerConfig):
-    if os.path.exists(config_file):
-        old_config: DockerConfig = DockerSetup.load_settings(config_file)
-        if old_config is not None:
-            print(f"""
-                {Helpers.section_headline("Differences")}
-                Difference between existing config file and new config that you are creating
-                {dict(DeepDiff(old_config, config_object.toDict()))}
-                  """)
-
-
-
-def print_config(configuration):
-    config_dict: dict = configuration.toDict()
-    yaml.add_representer(type(None), Helpers.represent_none)
-    Helpers.section_headline("CONFIG is Generated as below")
-    print(f"\n{yaml.dump(config_dict)}")
-    return config_dict
-
-
-def print_questionary_header(config_file):
-    Helpers.section_headline("CONFIG FILE")
-    print(
-        "\nCreating config file using the answers from the questions that would be asked in next steps."
-        f"\nLocation of the config file: {bcolors.OKBLUE}{config_file}{bcolors.ENDC}")
 
 
 @dockercommand([
@@ -159,56 +122,24 @@ def install(args):
     This commands setups up the software and deploys it based on what is stored in the config.yaml file.
     To update software versions, most of the time it is required to update the versions in config file and run this command
     """
-    autoapprove = args.autoapprove
-    config_file = args.configfile
-    docker_config: DockerConfig = DockerSetup.load_settings(config_file)
-    update = args.update
+    ########## Parse Arguments
+    argument_object = DockerInstallArguments(args)
 
-    new_config = DockerSetup.update_versions(docker_config, autoapprove) if update else docker_config
+    ########## Update existing Config
+    docker_config: DockerConfig = DockerSetup.load_settings(argument_object.config_file)
+    docker_config_updated_versions = DockerSetup.update_versions(docker_config,
+                                                                 argument_object.autoapprove) if argument_object.update else docker_config
 
-    new_config = DockerSetup.check_set_passwords(new_config)
-    DockerSetup.check_run_local_postgreSQL(new_config)
+    docker_config_updated_versions = DockerSetup.check_set_passwords(docker_config_updated_versions)
+    DockerSetup.confirm_config_changes(argument_object, docker_config, docker_config_updated_versions)
 
-    render_template = Renderer().load_file_based_template("radix-fullnode-compose.yml.j2").render(new_config).to_yaml()
-    config_differences = dict(DeepDiff(docker_config, new_config))
-    backup_time = Helpers.get_current_date_time()
+    ########## Install dependent services
+    DockerSetup.conditionally_start_local_postgres(docker_config_updated_versions)
 
-    if len(config_differences) != 0:
-        print(f"""
-              {Helpers.section_headline("Differences in config file with updated software versions")}
-              Difference between existing config file and new config that you are creating
-              {config_differences}
-                """)
-        DockerSetup.backup_save_config(config_file, new_config, backup_time, autoapprove)
+    ########## Render Docker Compose
+    compose_file = DockerSetup.confirm_docker_compose_file_changes(argument_object, docker_config_updated_versions)
 
-    compose_file, compose_file_yaml = DockerSetup.get_existing_compose_file(new_config)
-    compose_file_difference = dict(DeepDiff(compose_file_yaml, render_template))
-    if len(compose_file_difference) != 0:
-        print(f"""
-            {Helpers.section_headline("Differences between existing compose file and new compose file")}
-             Difference between existing compose file and new compose file that you are creating
-            {compose_file_difference}
-              """)
-        to_update = ""
-        if autoapprove:
-            print("In Auto mode - Updating file as suggested in above changes")
-        else:
-            to_update = input("\nOkay to update the file [Y/n]?:")
-
-        if Helpers.check_Yes(to_update) or autoapprove:
-            if os.path.exists(compose_file):
-                Helpers.backup_file(compose_file, f"{compose_file}_{backup_time}")
-            DockerSetup.save_compose_file(compose_file, render_template)
-
-    run_shell_command(f"cat {compose_file}", shell=True)
-
-    should_start = ""
-    if autoapprove:
-        print("In Auto mode -  Updating the node as per above contents of docker file")
-    else:
-        should_start = input("\nOkay to start the containers [Y/n]?:")
-    if Helpers.check_Yes(should_start) or autoapprove:
-        DockerSetup.run_docker_compose_up(compose_file)
+    DockerSetup.confirm_run_docker_compose(argument_object, compose_file)
 
 
 @dockercommand([
@@ -223,10 +154,12 @@ def start(args):
     This commands starts the docker containers based on what is stored in the config.yaml file.
     If you have modified the config file, it is advised to use setup command.
     """
+    ########## Load settings from file
     docker_config = DockerSetup.load_settings(args.configfile)
     docker_config = DockerSetup.check_set_passwords(docker_config)
-    DockerSetup.check_run_local_postgreSQL(docker_config)
-    compose_file, compose_file_yaml = DockerSetup.get_existing_compose_file(docker_config)
+    ########## Install dependent services
+    DockerSetup.conditionally_start_local_postgres(docker_config)
+    compose_file = DockerSetup.get_existing_compose_file(docker_config)
     DockerSetup.run_docker_compose_up(compose_file)
 
 
@@ -248,7 +181,7 @@ def stop(args):
             Removing volumes including Nginx volume. Nginx password needs to be recreated again when you bring node up
             """)
     docker_config = DockerSetup.load_settings(args.configfile)
-    compose_file, compose_file_yaml = DockerSetup.get_existing_compose_file(docker_config)
+    compose_file = DockerSetup.get_existing_compose_file(docker_config)
     DockerSetup.run_docker_compose_down(compose_file, args.removevolumes)
 
 

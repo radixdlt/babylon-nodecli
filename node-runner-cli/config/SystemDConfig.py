@@ -5,6 +5,8 @@ from pathlib import Path
 import yaml
 
 from config.BaseConfig import BaseConfig, SetupMode
+from config.CommonDockerSettings import CommonDockerSettings
+from config.DockerConfig import CoreDockerSettings
 from config.GatewayDockerConfig import GatewayDockerSettings
 from config.KeyDetails import KeyDetails
 from config.MigrationConfig import CommonMigrationSettings
@@ -173,6 +175,13 @@ class SystemDSettings(BaseConfig):
     common_config: CommonSystemdSettings = CommonSystemdSettings({})
     gateway: GatewayDockerSettings = GatewayDockerSettings({})
     migration: CommonMigrationSettings = CommonMigrationSettings({})
+
+    core_node: CoreDockerSettings = CoreDockerSettings({})
+    common_config: CommonDockerSettings = CommonDockerSettings({})
+    gateway: GatewayDockerSettings = GatewayDockerSettings({})
+    migration: CommonMigrationSettings = CommonMigrationSettings({})
+
+
 
     def __iter__(self):
         class_variables = {key: value
