@@ -1,0 +1,7 @@
+FROM python:3.10
+
+WORKDIR /node-runner-cli
+ADD . .
+RUN pip install .
+
+RUN radixnode version

@@ -5,8 +5,8 @@
 #    pipenv lock --requirements
 #
 
--i https://pypi.org/simple
--e git+https://github.com/radixdlt/python-core-client@1a61f8a1e2acae859522bbff923b0042ec8955e5#egg=core-client
+#-i https://pypi.org/simple
+core-client @ git+https://github.com/radixdlt/python-core-client@1a61f8a1e2acae859522bbff923b0042ec8955e5#egg=core-client
 bech32==1.2.0
 boto3==1.20.33
 botocore==1.23.33
