@@ -6,12 +6,12 @@ import yaml
 from deepdiff import DeepDiff
 from yaml import UnsafeLoader
 
-from config.GatewayDockerConfig import GatewayDockerSettings
+from config.EnvVars import UNZIPPED_NODE_DIST_FOLDER
 from config.MigrationConfig import CommonMigrationSettings
 from config.Renderer import Renderer
 from config.SystemDConfig import SystemDSettings, from_dict, CoreSystemdSettings, CommonSystemdSettings
-from config.EnvVars import UNZIPPED_NODE_DIST_FOLDER
 from setup.Base import Base
+from setup.DockerCompose import DockerCompose
 from setup.GatewaySetup import GatewaySetup
 from setup.SystemDCommandArguments import SystemDConfigArguments
 from utils.PromptFeeder import QuestionKeys
@@ -406,7 +406,8 @@ class SystemDSetup(Base):
 
         # Gateway
         GatewaySetup.conditionally_install_local_postgreSQL(settings.gateway)
-        GatewaySetup.install_standalone_gateway_in_docker(settings)
+        GatewaySetup.install_standalone_gateway(settings)
+
 
         if not args.manual:
             if not args.update:

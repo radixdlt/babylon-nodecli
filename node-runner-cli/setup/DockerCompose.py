@@ -1,4 +1,7 @@
+from config.EnvVars import COMPOSE_HTTP_TIMEOUT
 from config.Renderer import Renderer
+from config.SystemDConfig import SystemDSettings
+from setup.DockerCommandArguments import DockerInstallArguments
 from utils.utils import Helpers, run_shell_command
 
 
@@ -22,8 +25,8 @@ class DockerCompose:
     @staticmethod
     def restart_gateway_containers():
         docker_compose_file: str = "~/gateway.docker-compose.yml"
-        DockerSetup.run_docker_compose_down(docker_compose_file)
-        DockerSetup.run_docker_compose_up(docker_compose_file)
+        DockerCompose.run_docker_compose_down(docker_compose_file)
+        DockerCompose.run_docker_compose_up(docker_compose_file)
 
     @staticmethod
     def confirm_run_docker_compose(argument_object: DockerInstallArguments, compose_file):

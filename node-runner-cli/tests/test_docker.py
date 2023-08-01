@@ -5,7 +5,6 @@ from unittest.mock import patch
 import urllib3
 
 from babylonnode import main
-from setup.DockerSetup import DockerSetup
 
 
 class DockerUnitTests(unittest.TestCase):

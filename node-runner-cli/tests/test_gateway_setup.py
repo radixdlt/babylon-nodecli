@@ -15,7 +15,6 @@ class GatewaySetupTests(unittest.TestCase):
         urllib3.disable_warnings()
         with patch('builtins.input', side_effect=['', '', '', 'postgres', 'radix', '', '', '']):
             gateway_config = GatewaySetup.ask_gateway_standalone_docker("radix")
-
             self.assertEqual(True, gateway_config.enabled)
             self.assertEqual("http://localhost:3332", gateway_config.gateway_api.coreApiNode.core_api_address)
             self.assertEqual("postgres", gateway_config.postgres_db.user)

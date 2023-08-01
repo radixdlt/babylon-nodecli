@@ -4,6 +4,7 @@ from config.BaseConfig import SetupMode
 from config.GatewayDockerConfig import GatewayDockerSettings, CoreApiNode
 from github import github
 from setup.AnsibleRunner import AnsibleRunner
+from setup.DockerCompose import DockerCompose
 from utils.Prompts import Prompts
 from utils.utils import Helpers
 
@@ -96,3 +97,7 @@ class GatewaySetup():
         if "DETAILED" in SetupMode.instance().mode:
             release = Prompts.get_gateway_release(component, latest_gateway_release)
         return release
+
+    @staticmethod
+    def install_standalone_gateway(settings):
+        DockerCompose.install_standalone_gateway_in_docker(settings)
