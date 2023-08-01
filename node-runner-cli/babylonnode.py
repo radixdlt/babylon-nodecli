@@ -15,7 +15,7 @@ from commands.monitoring import monitoringcli
 from commands.othercommands import other_command_cli
 from commands.systemapi import handle_systemapi
 from commands.systemdcommand import systemdcli
-from env_vars import DISABLE_VERSION_CHECK
+from config.EnvVars import DISABLE_VERSION_CHECK
 from github.github import latest_release
 from utils.utils import Helpers
 

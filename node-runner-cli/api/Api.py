@@ -1,7 +1,7 @@
 #TODO this needs updating when a new python client is created
 import os
 
-from env_vars import PRINT_RESPONSE, NGINX, NODE_END_POINT
+from config.EnvVars import PRINT_RESPONSE, NGINX, NODE_END_POINT
 from utils.utils import Helpers
 
 

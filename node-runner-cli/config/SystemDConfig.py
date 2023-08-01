@@ -12,7 +12,7 @@ from config.KeyDetails import KeyDetails
 from config.MigrationConfig import CommonMigrationSettings
 from config.Nginx import SystemdNginxConfig
 from config.Renderer import Renderer
-from env_vars import MOUNT_LEDGER_VOLUME, NODE_BINARY_OVERIDE, NGINX_BINARY_OVERIDE, APPEND_DEFAULT_CONFIG_OVERIDES
+from config.EnvVars import MOUNT_LEDGER_VOLUME, NODE_BINARY_OVERIDE, NGINX_BINARY_OVERIDE, APPEND_DEFAULT_CONFIG_OVERIDES
 from github import github
 from github.github import latest_release
 from setup.Base import Base
@@ -271,4 +271,11 @@ def from_dict(dictionary: dict) -> SystemDSettings:
     settings.common_config = CommonSystemdSettings(dictionary["common_config"])
     settings.common_config.nginx_settings = SystemdNginxConfig(dictionary["common_config"]["nginx_settings"])
     settings.migration = CommonMigrationSettings(dictionary["migration"])
+    settings.migration = CommonMigrationSettings(dictionary["gateway"])
+    settings.migration = CommonMigrationSettings(dictionary["gateway"]["data_aggregator"])
+    settings.migration = CommonMigrationSettings(dictionary["gateway"]["data_aggregator"]["coreApiNode"])
+    settings.migration = CommonMigrationSettings(dictionary["gateway"]["database_migration"])
+    settings.migration = CommonMigrationSettings(dictionary["gateway"]["gateway_api"])
+    settings.migration = CommonMigrationSettings(dictionary["gateway"]["gateway_api"]["coreApiNode"])
+    settings.migration = CommonMigrationSettings(dictionary["gateway"]["postgres_db"])
     return settings

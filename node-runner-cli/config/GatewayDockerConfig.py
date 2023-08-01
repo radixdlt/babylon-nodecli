@@ -1,9 +1,7 @@
 import os
-from urllib.parse import urlparse
 
 from config.BaseConfig import BaseConfig, SetupMode
-from env_vars import GATEWAY_DOCKER_REPO_OVERRIDE, AGGREGATOR_DOCKER_REPO_OVERRIDE, MIGRATION_DOCKER_REPO_OVERRIDE
-from github import github
+from config.EnvVars import GATEWAY_DOCKER_REPO_OVERRIDE, AGGREGATOR_DOCKER_REPO_OVERRIDE, MIGRATION_DOCKER_REPO_OVERRIDE
 from utils.Prompts import Prompts
 from utils.utils import Helpers
 
@@ -51,6 +49,7 @@ class CoreApiNode(BaseConfig):
                 })
             elif self.__getattribute__(attr):
                 yield attr, self.__getattribute__(attr)
+        return self
 
     def ask_disablehttpsVerify(self):
         self.disable_core_api_https_certificate_checks = Prompts.get_disablehttpsVerfiy()
@@ -63,12 +62,6 @@ class DatabaseMigrationSetting:
     def __init__(self, settings: dict):
         for key, value in settings.items():
             setattr(self, key, value)
-
-    def ask_gateway_release(self):
-        latest_gateway_release = github.latest_release("radixdlt/babylon-gateway")
-        self.release = latest_gateway_release
-        if "DETAILED" in SetupMode.instance().mode:
-            self.release = Prompts.get_gateway_release("database_migration", latest_gateway_release)
 
     def __iter__(self):
         class_variables = {key: value
@@ -92,36 +85,23 @@ class DataAggregatorSetting:
         for key, value in settings.items():
             setattr(self, key, value)
 
-    def ask_gateway_release(self):
-        latest_gateway_release = github.latest_release("radixdlt/babylon-gateway")
-        self.release = latest_gateway_release
-        if "DETAILED" in SetupMode.instance().mode:
-            self.release = Prompts.get_gateway_release("data_aggregator", latest_gateway_release)
-
     def ask_core_api_node_settings(self):
         if "DETAILED" in SetupMode.instance().mode:
             self.coreApiNode.core_api_address = Prompts.get_CoreApiAddress(self.coreApiNode.core_api_address)
-            self.set_basic_auth(self.coreApiNode.core_api_address)
-            self.coreApiNode.Name = Prompts.get_CopeAPINodeName(self.coreApiNode.Name)
+            self.ask_basic_auth(self.coreApiNode.core_api_address)
+            self.coreApiNode.Name = Prompts.ask_CopeAPINodeName(self.coreApiNode.Name)
             self.coreApiNode = self.coreApiNode
-
-    def set_basic_auth(self, url):
-        parsed_url = urlparse(url)
-        if parsed_url.scheme == "https":
-            auth = Prompts.get_basic_auth()
-            self.coreApiNode.basic_auth_password = auth["password"]
-            self.coreApiNode.basic_auth_user = auth["name"]
-            self.coreApiNode.ask_disablehttpsVerify()
 
     def __iter__(self):
         class_variables = {key: value
                            for key, value in self.__class__.__dict__.items()
                            if not key.startswith('__') and not callable(value)}
         for attr, value in class_variables.items():
-            if attr in ['postgresSettings', 'coreApiNode']:
+            if attr in ['coreApiNode']:
                 yield attr, dict(self.__getattribute__(attr))
             elif self.__getattribute__(attr):
                 yield attr, self.__getattribute__(attr)
+        return self
 
 
 class GatewayAPIDockerSettings(BaseConfig):
@@ -131,12 +111,6 @@ class GatewayAPIDockerSettings(BaseConfig):
     restart = "unless-stopped"
     enable_swagger = "true"
     max_page_size = "30"
-
-    def ask_gateway_release(self):
-        latest_gateway_release = github.latest_release("radixdlt/babylon-gateway")
-        self.release = latest_gateway_release
-        if "DETAILED" in SetupMode.instance().mode:
-            self.release = Prompts.get_gateway_release("gateway_api", latest_gateway_release)
 
     def set_core_api_node_setings(self, coreApiNode: CoreApiNode):
         self.coreApiNode = coreApiNode
@@ -151,6 +125,7 @@ class GatewayAPIDockerSettings(BaseConfig):
                 yield attr, dict(self.__getattribute__(attr))
             elif self.__getattribute__(attr):
                 yield attr, self.__getattribute__(attr)
+        return self
 
 
 class GatewayDockerSettings(BaseConfig):
@@ -159,6 +134,7 @@ class GatewayDockerSettings(BaseConfig):
     postgres_db: PostGresSettings = PostGresSettings({})
     database_migration: DatabaseMigrationSetting = DatabaseMigrationSetting({})
     enabled: bool = False
+
 
     def __iter__(self):
         class_variables = {key: value
@@ -170,13 +146,14 @@ class GatewayDockerSettings(BaseConfig):
                 yield attr, dict(self.__getattribute__(attr))
             elif self.__getattribute__(attr):
                 yield attr, self.__getattribute__(attr)
-
-    def create_config(self, postgress_password):
-        self.data_aggregator.ask_core_api_node_settings()
-        self.postgres_db.ask_postgress_settings(postgress_password)
-        self.data_aggregator.ask_gateway_release()
-        self.database_migration.ask_gateway_release()
-        self.gateway_api.ask_gateway_release()
-        self.gateway_api.set_core_api_node_setings(
-            self.data_aggregator.coreApiNode)
         return self
+
+    # def create_config(self, postgress_password):
+    #     self.data_aggregator.ask_core_api_node_settings()
+    #     self.postgres_db.ask_postgress_settings(postgress_password)
+    #     self.data_aggregator.ask_gateway_release()
+    #     self.database_migration.ask_gateway_release()
+    #     self.gateway_api.ask_gateway_release()
+    #     self.gateway_api.set_core_api_node_setings(
+    #         self.data_aggregator.coreApiNode)
+    #     return self

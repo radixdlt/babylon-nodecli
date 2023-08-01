@@ -7,7 +7,7 @@ import requests
 import yaml
 
 from config.Renderer import Renderer
-from env_vars import COMPOSE_HTTP_TIMEOUT
+from config.EnvVars import COMPOSE_HTTP_TIMEOUT
 from utils.utils import Helpers, run_shell_command
 
 

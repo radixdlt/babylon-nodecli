@@ -10,25 +10,7 @@ from config.GatewayDockerConfig import GatewayDockerSettings
 from config.MigrationConfig import CommonMigrationSettings
 from config.Renderer import Renderer
 from config.SystemDConfig import SystemDSettings, from_dict, CoreSystemdSettings, CommonSystemdSettings
-from env_vars import UNZIPPED_NODE_DIST_FOLDER
-from setup.Base import Base
-from setup.GatewaySetup import GatewaySetup
-from setup.SystemDCommandArguments import SystemDConfigArguments
-from utils.PromptFeeder import QuestionKeys
-from utils.utils import run_shell_command, Helpers
-import os
-import sys
-from pathlib import Path
-
-import yaml
-from deepdiff import DeepDiff
-from yaml import UnsafeLoader
-
-from config.GatewayDockerConfig import GatewayDockerSettings
-from config.MigrationConfig import CommonMigrationSettings
-from config.Renderer import Renderer
-from config.SystemDConfig import SystemDSettings, from_dict, CoreSystemdSettings, CommonSystemdSettings
-from env_vars import UNZIPPED_NODE_DIST_FOLDER
+from config.EnvVars import UNZIPPED_NODE_DIST_FOLDER
 from setup.Base import Base
 from setup.GatewaySetup import GatewaySetup
 from setup.SystemDCommandArguments import SystemDConfigArguments
@@ -367,14 +349,6 @@ class SystemDSetup(Base):
         return systemd_config.core_node
 
     @staticmethod
-    def ask_gateway(argument_object: SystemDConfigArguments) -> GatewayDockerSettings:
-        systemd_config = SystemDSettings({})
-        if "GATEWAY" in argument_object.setupmode.mode:
-            systemd_config.gateway.enabled = True
-            systemd_config.gateway.gateway_api.coreApiNode.core_api_address = "http://localhost:3332"
-        return systemd_config.gateway
-
-    @staticmethod
     def ask_migration(argument_object: SystemDConfigArguments) -> CommonMigrationSettings:
         systemd_config = SystemDSettings({})
         if "MIGRATION" in argument_object.setupmode.mode:
@@ -427,9 +401,12 @@ class SystemDSetup(Base):
             service_file_path = "/etc/systemd/system/radixdlt-node.service"
         settings.create_service_file(service_file_path)
 
+        # Nginx
         nginx_configured = SystemDSetup.setup_nginx_service(settings, backup_time, args.auto)
 
+        # Gateway
         GatewaySetup.conditionally_install_local_postgreSQL(settings.gateway)
+        GatewaySetup.install_standalone_gateway_in_docker(settings)
 
         if not args.manual:
             if not args.update:

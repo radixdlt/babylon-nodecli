@@ -7,13 +7,15 @@ from deepdiff import DeepDiff
 from yaml import UnsafeLoader
 
 from config.DockerConfig import DockerConfig, from_dict, CoreDockerSettings
+from config.EnvVars import DOCKER_COMPOSE_FOLDER_PREFIX, COMPOSE_HTTP_TIMEOUT, RADIXDLT_NODE_KEY_PASSWORD, \
+    POSTGRES_PASSWORD
 from config.GatewayDockerConfig import GatewayDockerSettings
 from config.Renderer import Renderer
-from env_vars import DOCKER_COMPOSE_FOLDER_PREFIX, COMPOSE_HTTP_TIMEOUT, RADIXDLT_NODE_KEY_PASSWORD, POSTGRES_PASSWORD
 from github import github
 from setup.AnsibleRunner import AnsibleRunner
 from setup.Base import Base
 from setup.DockerCommandArguments import DockerConfigArguments, DockerInstallArguments
+from setup.GatewaySetup import GatewaySetup
 from utils.Prompts import Prompts
 from utils.utils import run_shell_command, Helpers, bcolors
 
@@ -67,26 +69,10 @@ class DockerSetup(Base):
         return nginx_password
 
     @staticmethod
-    def run_docker_compose_up(composefile):
-        docker_compose_binary = os.getenv("DOCKER_COMPOSE_LOCATION", 'docker-compose')
-        result = run_shell_command([docker_compose_binary, '-f', composefile, 'up', '-d'],
-                                   env={
-                                       COMPOSE_HTTP_TIMEOUT: os.getenv(COMPOSE_HTTP_TIMEOUT, "200")
-                                   }, fail_on_error=False)
-        if result.returncode != 0:
-            run_shell_command([docker_compose_binary, '-f', composefile, 'up', '-d'],
-                              env={
-                                  COMPOSE_HTTP_TIMEOUT: os.getenv(COMPOSE_HTTP_TIMEOUT, "200")
-                              }, fail_on_error=True)
-
-    @staticmethod
     def save_compose_file(existing_docker_compose: str, composefile_yaml: dict):
         with open(existing_docker_compose, 'w') as f:
             yaml.dump(composefile_yaml, f, default_flow_style=False, explicit_start=True, allow_unicode=True)
 
-    @staticmethod
-    def run_docker_compose_down(composefile, removevolumes=False):
-        Helpers.docker_compose_down(composefile, removevolumes)
 
     @staticmethod
     def check_set_passwords(docker_config: DockerConfig):
@@ -244,9 +230,7 @@ class DockerSetup(Base):
 
             run_gateway = Prompts.check_for_gateway()
             if run_gateway:
-                detailed_gateway: GatewayDockerSettings = GatewayDockerSettings({}).create_config(
-                    argument_object.postgrespassword)
-                docker_config.gateway = detailed_gateway
+                docker_config.gateway = GatewaySetup.ask_gateway_full_docker(argument_object.postgrespassword, argument_object.olympia_node_url)
                 docker_config.common_config.ask_enable_nginx_for_gateway(argument_object.nginx_on_gateway)
             else:
                 docker_config.common_config.nginx_settings.protect_gateway = "false"
@@ -327,13 +311,3 @@ class DockerSetup(Base):
                 DockerSetup.save_compose_file(compose_file, docker_compose_yaml)
         run_shell_command(f"cat {compose_file}", shell=True)
         return compose_file
-
-    @staticmethod
-    def confirm_run_docker_compose(argument_object: DockerInstallArguments, compose_file):
-        if argument_object.autoapprove:
-            print("In Auto mode -  Updating the node as per above contents of docker file")
-            should_start = "Y"
-        else:
-            should_start = input("\nOkay to start the containers [Y/n]?:")
-        if Helpers.check_Yes(should_start):
-            DockerSetup.run_docker_compose_up(compose_file)

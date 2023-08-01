@@ -3,6 +3,9 @@ class BaseConfig:
         for key, value in settings.items():
             setattr(self, key, value)
 
+    def __repr__(self):
+        return repr(vars(self))
+
     def __iter__(self):
         class_variables = {key: value
                            for key, value in self.__class__.__dict__.items()

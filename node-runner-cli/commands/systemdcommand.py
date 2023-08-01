@@ -5,6 +5,7 @@ from pathlib import Path
 from commands.subcommand import get_decorator, argument
 from config.SystemDConfig import SystemDSettings
 from setup.Base import Base
+from setup.GatewaySetup import GatewaySetup
 from setup.SystemDCommandArguments import SystemDConfigArguments
 from setup.SystemDSetup import SystemDSetup
 from utils.utils import Helpers, bcolors
@@ -44,8 +45,10 @@ def systemdcommand(systemdcommand_args=None, parent=systemd_parser):
              help="""Quick config mode with assumed defaults. It supports two quick modes and a detailed config mode.
               \n\nCORE: Use this value to setup CORE using defaults.
               \n\nDETAILED: Default value if not provided. This mode takes your through series of questions.
+              \n\nGATEWAY: This mode adds questions regarding the Network Gateway API and enables it for installation
+              \n\nMIGRATION: This mode adds questions regarding the migration from an Olympia End-State node to a Babylon node
               """,
-             choices=["CORE", "DETAILED", "MIGRATION"], action="store"),
+             choices=["CORE", "DETAILED", "GATEWAY", "MIGRATION"], action="store"),
     argument("-miu", "--migration_url", help="The url of the olympia node to migrate the ledger from", action="store"),
     argument("-miau", "--migration_auth_user", help="The user to authenticate to the olympia node for migration",
              action="store"),
@@ -87,8 +90,9 @@ def config(args):
 
     systemd_config.common_config = SystemDSetup.ask_common_config(argument_object)
     systemd_config.core_node = SystemDSetup.ask_core_node(argument_object)
-    systemd_config.gateway = SystemDSetup.ask_gateway(argument_object)
-    systemd_config.gateway = SystemDSetup.ask_migration(argument_object)
+    if "GATEWAY" in argument_object.setupmode.mode:
+        systemd_config.gateway = GatewaySetup.ask_gateway_standalone_docker(argument_object)
+    systemd_config.migration = SystemDSetup.ask_migration(argument_object)
 
     ################### File comparisson and generation
     Path(f"{args.configdir}").mkdir(parents=True, exist_ok=True)
@@ -112,7 +116,7 @@ def config(args):
 def install(args):
     """This sets up the systemd service for the core node."""
     settings: SystemDSettings = SystemDSetup.load_settings(args.configfile)
-    SystemDSetup.install_systemd_service(settings)
+    SystemDSetup.install_systemd_service(settings, args)
 
 
 @systemdcommand([
@@ -125,6 +129,7 @@ def stop(args):
     if args.services == "all":
         SystemDSetup.stop_nginx_service()
         SystemDSetup.stop_node_service()
+        GatewaySetup.stop_gateway_containers()
     elif args.services == "nginx":
         SystemDSetup.stop_nginx_service()
     elif args.services == "radixdlt-node":
@@ -144,6 +149,7 @@ def restart(args):
     if args.services == "all":
         SystemDSetup.restart_node_service()
         SystemDSetup.restart_nginx_service()
+        GatewaySetup.restart_gateway_containers()
     elif args.services == "nginx":
         SystemDSetup.restart_nginx_service()
     elif args.services == "radixdlt-node":

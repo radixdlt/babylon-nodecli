@@ -2,7 +2,7 @@ import ipaddress
 import os
 import sys
 
-from env_vars import SUPPRESS_API_COMMAND_WARN
+from config.EnvVars import SUPPRESS_API_COMMAND_WARN
 from utils.PromptFeeder import QuestionKeys
 from utils.utils import Helpers, run_shell_command, bcolors
 
@@ -61,7 +61,7 @@ class Prompts:
         return Prompts.check_default(answer, "radix-ledger")
 
     @staticmethod
-    def get_CoreApiAddress(default) -> str:
+    def get_CoreApiAddress(default: str) -> str:
         Helpers.section_headline("CORE API NODE DETAILS")
         print(
             "\nThis will be node either running locally or remote using which Gateway aggregator will stream ledger data"
@@ -73,7 +73,7 @@ class Prompts:
         return Prompts.check_default(answer, default)
 
     @staticmethod
-    def get_CopeAPINodeName(default) -> str:
+    def ask_CopeAPINodeName(default: str = "Core") -> str:
         print("\nNODE NAME: This can be any string and logs would refer this name on related info/errors")
         answer = Helpers.input_guestion(
             f"Default value is '{default}'. Press ENTER to accept default value or type in new name':",
@@ -101,7 +101,7 @@ class Prompts:
         return Prompts.check_default(answer, "true").lower()
 
     @staticmethod
-    def get_basic_auth(target="CORE_API_NODE", user_type="admin") -> dict:
+    def ask_basic_auth(target="CORE_API_NODE", user_type="admin") -> dict:
         print(
             f"{target} is setup on different machine or behind https protected by basic auth."
             f" It would require Nginx {user_type} user and password.")
@@ -339,7 +339,7 @@ class Prompts:
         try:
             ipaddress.ip_address(answer)
         except ValueError:
-            print(f"'{ip_string}' is not a valid ip address.")
+            print(f"'{answer}' is not a valid ip address.")
             sys.exit(1)
         return answer
 

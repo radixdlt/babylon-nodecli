@@ -9,7 +9,7 @@ import requests
 import yaml
 from system_client import ApiException
 
-from env_vars import PRINT_REQUEST, NODE_HOST_IP_OR_NAME, COMPOSE_HTTP_TIMEOUT, RADIXDLT_CLI_VERSION_OVERRIDE
+from config.EnvVars import PRINT_REQUEST, NODE_HOST_IP_OR_NAME, COMPOSE_HTTP_TIMEOUT, RADIXDLT_CLI_VERSION_OVERRIDE
 from utils.PromptFeeder import PromptFeeder
 from version import __version__
 
