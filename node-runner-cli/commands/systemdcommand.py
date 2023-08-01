@@ -114,10 +114,7 @@ def install(args):
     auto_approve = args.auto
     settings = SystemDSetup.load_settings(args.configfile)
 
-    print("--------------------------------")
-    print("\nUsing following configuration:")
-    print("\n--------------------------------")
-    print(settings.to_yaml())
+    SystemDSetup.print_config(settings)
 
     if auto_approve is None:
         SystemDSetup.confirm_config(settings.core_node.nodetype,

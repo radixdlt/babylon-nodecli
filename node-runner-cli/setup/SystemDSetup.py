@@ -13,6 +13,7 @@ from config.MigrationConfig import CommonMigrationSettings
 from config.Renderer import Renderer
 from config.SystemDConfig import SystemDSettings, from_dict, CoreSystemdSettings, CommonSystemdSettings
 from env_vars import UNZIPPED_NODE_DIST_FOLDER
+from github.github import latest_release
 from setup.Base import Base
 from utils.PromptFeeder import QuestionKeys
 from utils.utils import run_shell_command, Helpers
@@ -356,7 +357,7 @@ class SystemDSetup(Base):
                       """)
 
     @staticmethod
-    def dump_config_as_yaml(systemd_config):
+    def dump_config_as_yaml(systemd_config: SystemDSettings):
         config_to_dump = {"version": "0.1", "core_node": dict(systemd_config.core_node),
                           "common_config": dict(systemd_config.common_config),
                           "migration": dict(systemd_config.migration),
@@ -398,6 +399,7 @@ class SystemDSetup(Base):
         if "GATEWAY" in argument_object.setupmode.mode:
             systemd_config.gateway.enabled = True
             systemd_config.gateway.gateway_api.coreApiNode.core_api_address = "http://localhost:3332"
+        return systemd_config.gateway
 
     @staticmethod
     def ask_migration(argument_object: SystemDConfigArguments) -> CommonMigrationSettings:
@@ -407,3 +409,11 @@ class SystemDSetup(Base):
                                                           argument_object.olympia_node_auth_user,
                                                           argument_object.olympia_node_auth_password,
                                                           argument_object.olympia_node_bech32_address)
+        return systemd_config.migration
+
+    @staticmethod
+    def print_config(settings):
+        print("--------------------------------")
+        print("\nUsing following configuration:")
+        print("\n--------------------------------")
+        print(settings.to_yaml())

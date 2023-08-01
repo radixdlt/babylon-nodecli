@@ -176,12 +176,6 @@ class SystemDSettings(BaseConfig):
     gateway: GatewayDockerSettings = GatewayDockerSettings({})
     migration: CommonMigrationSettings = CommonMigrationSettings({})
 
-    core_node: CoreDockerSettings = CoreDockerSettings({})
-    common_config: CommonDockerSettings = CommonDockerSettings({})
-    gateway: GatewayDockerSettings = GatewayDockerSettings({})
-    migration: CommonMigrationSettings = CommonMigrationSettings({})
-
-
 
     def __iter__(self):
         class_variables = {key: value
