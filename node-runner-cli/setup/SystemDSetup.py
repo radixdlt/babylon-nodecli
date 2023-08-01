@@ -1,4 +1,3 @@
-import ipaddress
 import os
 import sys
 from pathlib import Path
@@ -7,62 +6,34 @@ import yaml
 from deepdiff import DeepDiff
 from yaml import UnsafeLoader
 
-from config.BaseConfig import SetupMode
 from config.GatewayDockerConfig import GatewayDockerSettings
 from config.MigrationConfig import CommonMigrationSettings
 from config.Renderer import Renderer
 from config.SystemDConfig import SystemDSettings, from_dict, CoreSystemdSettings, CommonSystemdSettings
 from env_vars import UNZIPPED_NODE_DIST_FOLDER
-from github.github import latest_release
 from setup.Base import Base
+from setup.GatewaySetup import GatewaySetup
+from setup.SystemDCommandArguments import SystemDConfigArguments
 from utils.PromptFeeder import QuestionKeys
 from utils.utils import run_shell_command, Helpers
+import os
+import sys
+from pathlib import Path
 
+import yaml
+from deepdiff import DeepDiff
+from yaml import UnsafeLoader
 
-def validate_ip(hostip: str):
-    if hostip:
-        try:
-            ipaddress.ip_address(hostip)
-        except ValueError:
-            print(f"'{hostip}' is not a valid ip address.")
-            sys.exit(1)
-
-
-class SystemDConfigArguments:
-    setupmode: SetupMode
-    trustednode: str
-    keystore_password: str
-    nginx_on_core: str
-    data_directory: str
-    new_keystore: str
-    olympia_node_url: str
-    olympia_node_bech32_address: str
-    olympia_node_auth_user: str
-    olympia_node_auth_password: str
-    release: str
-    config_file: str
-    networkid: str
-    hostip: str
-    validator: str
-
-    def __init__(self, args):
-        validate_ip(args.hostip)
-        self.hostip = args.hostip
-        self.setupmode = SetupMode.instance()
-        self.setupmode.mode = args.setupmode
-        self.trustednode = args.trustednode if args.trustednode != "" else None
-        self.keystore_password = args.keystorepassword if args.keystorepassword != "" else None
-        self.nginx_on_core = args.disablenginxforcore if args.disablenginxforcore != "" else None
-        self.data_directory = args.data_directory
-        self.new_keystore = args.newkeystore
-        self.olympia_node_url = args.migration_url
-        self.olympia_node_bech32_address = args.migration_auth_user
-        self.olympia_node_auth_user = args.migration_auth_user
-        self.olympia_node_auth_password = args.migration_auth_password
-        self.release = args.release if args.release is not None else latest_release()
-        self.config_file = f"{args.configdir}/config.yaml"
-        self.networkid = args.networkid
-        self.validator = args.validator
+from config.GatewayDockerConfig import GatewayDockerSettings
+from config.MigrationConfig import CommonMigrationSettings
+from config.Renderer import Renderer
+from config.SystemDConfig import SystemDSettings, from_dict, CoreSystemdSettings, CommonSystemdSettings
+from env_vars import UNZIPPED_NODE_DIST_FOLDER
+from setup.Base import Base
+from setup.GatewaySetup import GatewaySetup
+from setup.SystemDCommandArguments import SystemDConfigArguments
+from utils.PromptFeeder import QuestionKeys
+from utils.utils import run_shell_command, Helpers
 
 
 class SystemDSetup(Base):
@@ -313,14 +284,16 @@ class SystemDSetup(Base):
         run_shell_command('sudo systemctl disable radixdlt-node.service', shell=True)
 
     @staticmethod
-    def confirm_config(nodetype, release, node_binary_url, nginx_config_url) -> str:
+    def confirm_config(nodetype: str, release: str, node_binary_url: str, nginx_config_url: str, auto_approve):
+        if auto_approve:
+            return
         answer = Helpers.input_guestion(
             f"\nGoing to setup node type {nodetype} for version {release} from location {node_binary_url} and {nginx_config_url}. \n Do you want to continue Y/n:",
             QuestionKeys.continue_systemd_install)
         if not Helpers.check_Yes(answer):
             print(" Quitting ....")
             sys.exit(1)
-        return answer
+        return
 
     @staticmethod
     def save_settings(settings: SystemDSettings, config_file: str, autoapprove=False):
@@ -417,3 +390,65 @@ class SystemDSetup(Base):
         print("\nUsing following configuration:")
         print("\n--------------------------------")
         print(settings.to_yaml())
+
+    @staticmethod
+    def install_systemd_service(settings: SystemDSettings, args):
+        SystemDSetup.print_config(settings)
+
+        SystemDSetup.confirm_config(settings.core_node.nodetype,
+                                    settings.core_node.core_release,
+                                    settings.core_node.core_binary_url,
+                                    settings.common_config.nginx_settings.config_url,
+                                    args.auto)
+
+        SystemDSetup.checkUser()
+
+        SystemDSetup.download_binaries(binary_location_url=settings.core_node.core_binary_url,
+                                       library_location_url=settings.core_node.core_library_url,
+                                       node_dir=settings.core_node.node_dir,
+                                       node_version=settings.core_node.core_release,
+                                       auto_approve=args.auto)
+
+        # default.conf file
+
+        backup_time = Helpers.get_current_date_time()
+        SystemDSetup.backup_file(settings.core_node.node_dir, f"default.config", backup_time, args.auto)
+        settings.create_default_config_file()
+
+        # environment file
+        SystemDSetup.backup_file(settings.core_node.node_secrets_dir, "environment", backup_time, args.auto)
+        settings.create_environment_file()
+
+        # radixdlt-node.service file
+        SystemDSetup.backup_file("/etc/systemd/system", "radixdlt-node.service", backup_time, args.auto)
+        if args.manual:
+            service_file_path = f"{settings.core_node.node_dir}/radixdlt-node.service"
+        else:
+            service_file_path = "/etc/systemd/system/radixdlt-node.service"
+        settings.create_service_file(service_file_path)
+
+        nginx_configured = SystemDSetup.setup_nginx_service(settings, backup_time, args.auto)
+
+        GatewaySetup.conditionally_install_local_postgreSQL(settings.gateway)
+
+        if not args.manual:
+            if not args.update:
+                SystemDSetup.start_node_service()
+            else:
+                SystemDSetup.restart_node_service()
+
+            if nginx_configured:
+                SystemDSetup.start_nginx_service()
+            else:
+                print("Nginx not configured or not updated.")
+
+    @staticmethod
+    def setup_nginx_service(settings: SystemDSettings, backup_time: str, autoapprove: bool):
+        SystemDSetup.backup_file("/lib/systemd/system", "nginx.service", backup_time, autoapprove)
+        SystemDSetup.create_ssl_certs(settings.common_config.nginx_settings.secrets_dir, autoapprove)
+        nginx_configured = SystemDSetup.setup_nginx_config(
+            nginx_config_location_url=settings.common_config.nginx_settings.config_url,
+            node_type=settings.core_node.nodetype,
+            nginx_etc_dir=settings.common_config.nginx_settings.dir, backup_time=backup_time,
+            auto_approve=autoapprove)
+        return nginx_configured

@@ -124,7 +124,7 @@ class SystemdUnitTests(unittest.TestCase):
             settings.core_node.trusted_node = "someNode"
             settings.core_node.validator_address = "validatorAddress"
             settings.core_node.node_dir = "/tmp"
-            settings.create_default_config()
+            settings.create_default_config_file()
         self.assertTrue(os.path.isfile("/tmp/default.config"))
 
         f = open("/tmp/default.config", "r")
@@ -169,7 +169,7 @@ consensus.validator_address=validatorAddress
             settings.core_node.trusted_node = "someNode"
             settings.core_node.validator_address = None
             settings.core_node.node_dir = "/tmp"
-            settings.create_default_config()
+            settings.create_default_config_file()
         self.assertTrue(os.path.isfile("/tmp/default.config"))
 
         f = open("/tmp/default.config", "r")

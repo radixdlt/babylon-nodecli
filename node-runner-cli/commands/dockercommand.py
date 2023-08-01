@@ -7,7 +7,8 @@ from commands.subcommand import get_decorator, argument
 from config.DockerConfig import DockerConfig
 from setup.AnsibleRunner import AnsibleRunner
 from setup.Base import Base
-from setup.DockerSetup import DockerSetup, DockerConfigArguments, DockerInstallArguments
+from setup.DockerCommandArguments import DockerInstallArguments, DockerConfigArguments
+from setup.DockerSetup import DockerSetup
 from utils.utils import Helpers, bcolors
 
 dockercli = ArgumentParser(

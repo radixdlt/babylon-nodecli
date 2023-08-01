@@ -3,7 +3,7 @@ from setup.AnsibleRunner import AnsibleRunner
 from utils.utils import Helpers
 
 
-class Gateway():
+class GatewaySetup():
     @staticmethod
     def conditionally_install_local_postgreSQL(gateway_config: GatewayDockerSettings):
         if gateway_config.postgres_db.setup == 'local' and gateway_config.enabled:

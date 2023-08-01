@@ -1,72 +1,21 @@
 import getpass
 import os
 import sys
-from typing import Tuple
 
 import yaml
 from deepdiff import DeepDiff
 from yaml import UnsafeLoader
 
-from config.BaseConfig import SetupMode
 from config.DockerConfig import DockerConfig, from_dict, CoreDockerSettings
 from config.GatewayDockerConfig import GatewayDockerSettings
 from config.Renderer import Renderer
 from env_vars import DOCKER_COMPOSE_FOLDER_PREFIX, COMPOSE_HTTP_TIMEOUT, RADIXDLT_NODE_KEY_PASSWORD, POSTGRES_PASSWORD
 from github import github
-from github.github import latest_release
 from setup.AnsibleRunner import AnsibleRunner
 from setup.Base import Base
+from setup.DockerCommandArguments import DockerConfigArguments, DockerInstallArguments
 from utils.Prompts import Prompts
 from utils.utils import run_shell_command, Helpers, bcolors
-
-
-class DockerConfigArguments:
-    setupmode: SetupMode
-    trustednode: str
-    keystore_password: str
-    postgrespassword: str
-    validator: str
-    olympia_node_url: str
-    olympia_node_bech32_address: str
-    olympia_node_auth_user: str
-    olympia_node_auth_password: str
-    release: str
-    nginx_on_core: bool
-    nginx_on_gateway: bool
-    autoapprove: bool
-    new_keystore: bool
-    config_file: str
-    networkid: str
-
-    def __init__(self, args):
-        self.setupmode = SetupMode.instance()
-        self.setupmode.mode = args.setupmode
-        self.trustednode = args.trustednode if args.trustednode != "" else None
-        self.keystore_password = args.keystorepassword if args.keystorepassword != "" else None
-        self.nginx_on_core = args.disablenginxforcore if args.disablenginxforcore != "" else None
-        self.nginx_on_gateway = args.disablenginxforgateway if args.disablenginxforgateway != "" else None
-        self.postgrespassword = args.postgrespassword if args.postgrespassword != "" else None
-        self.autoapprove = args.autoapprove
-        self.new_keystore = args.newkeystore
-        self.validator = args.validator
-        self.olympia_node_url = args.migration_url
-        self.olympia_node_bech32_address = args.migration_auth_user
-        self.olympia_node_auth_user = args.migration_auth_user
-        self.olympia_node_auth_password = args.migration_auth_password
-        self.release = latest_release()
-        self.config_file = f"{args.configdir}/config.yaml"
-        self.networkid = args.networkid
-
-
-class DockerInstallArguments:
-    autoapprove: bool
-    config_file: str
-    update: bool
-
-    def __init__(self, args):
-        self.autoapprove = args.autoapprove
-        self.config_file = args.configfile
-        self.update = args.update
 
 
 def print_questionary_header(config_file):
@@ -342,7 +291,7 @@ class DockerSetup(Base):
             docker_config_updated_versions).to_yaml()
 
     @staticmethod
-    def confirm_config_changes(argument_object: DockerConfigArguments, docker_config, docker_config_updated_versions):
+    def confirm_config_changes(argument_object: DockerInstallArguments, docker_config, docker_config_updated_versions):
         config_differences = dict(DeepDiff(docker_config, docker_config_updated_versions))
 
         if len(config_differences) != 0:
@@ -355,7 +304,7 @@ class DockerSetup(Base):
                                       argument_object.autoapprove)
 
     @staticmethod
-    def confirm_docker_compose_file_changes(argument_object, docker_config_updated_versions):
+    def confirm_docker_compose_file_changes(argument_object: DockerInstallArguments, docker_config_updated_versions):
         docker_compose_yaml: yaml = DockerSetup.render_docker_compose(docker_config_updated_versions)
         backup_time = Helpers.get_current_date_time()
         compose_file, compose_file_yaml = DockerSetup.get_existing_compose_file(docker_config_updated_versions)
@@ -380,7 +329,7 @@ class DockerSetup(Base):
         return compose_file
 
     @staticmethod
-    def confirm_run_docker_compose(argument_object, compose_file):
+    def confirm_run_docker_compose(argument_object: DockerInstallArguments, compose_file):
         if argument_object.autoapprove:
             print("In Auto mode -  Updating the node as per above contents of docker file")
             should_start = "Y"

@@ -5,8 +5,8 @@ from pathlib import Path
 from commands.subcommand import get_decorator, argument
 from config.SystemDConfig import SystemDSettings
 from setup.Base import Base
-from setup.GatewaySetup import Gateway
-from setup.SystemDSetup import SystemDSetup, SystemDConfigArguments
+from setup.SystemDCommandArguments import SystemDConfigArguments
+from setup.SystemDSetup import SystemDSetup
 from utils.utils import Helpers, bcolors
 
 systemdcli = ArgumentParser(
@@ -111,63 +111,8 @@ def config(args):
 ])
 def install(args):
     """This sets up the systemd service for the core node."""
-    auto_approve = args.auto
-    settings = SystemDSetup.load_settings(args.configfile)
-
-    SystemDSetup.print_config(settings)
-
-    if auto_approve is None:
-        SystemDSetup.confirm_config(settings.core_node.nodetype,
-                                    settings.core_node.core_release,
-                                    settings.core_node.core_binary_url,
-                                    settings.common_config.nginx_settings.config_url)
-
-    SystemDSetup.checkUser()
-
-    SystemDSetup.download_binaries(binary_location_url=settings.core_node.core_binary_url,
-                                   library_location_url=settings.core_node.core_library_url,
-                                   node_dir=settings.core_node.node_dir,
-                                   node_version=settings.core_node.core_release,
-                                   auto_approve=auto_approve)
-
-    backup_time = Helpers.get_current_date_time()
-
-    settings.create_default_config()
-    SystemDSetup.backup_file(settings.core_node.node_dir, f"default.config", backup_time, auto_approve)
-
-    # Below steps only required if user want's setup nginx in same node
-    SystemDSetup.backup_file("/lib/systemd/system", "nginx.service", backup_time, auto_approve)
-    SystemDSetup.create_ssl_certs(settings.common_config.nginx_settings.secrets_dir, auto_approve)
-    nginx_configured = SystemDSetup.setup_nginx_config(
-        nginx_config_location_url=settings.common_config.nginx_settings.config_url,
-        node_type=settings.core_node.nodetype,
-        nginx_etc_dir=settings.common_config.nginx_settings.dir, backup_time=backup_time,
-        auto_approve=auto_approve)
-
-    # Core node environment files
-    SystemDSetup.backup_file(settings.core_node.node_secrets_dir, "environment", backup_time, auto_approve)
-    settings.create_environment_file()
-    # Core node systemd service file
-    SystemDSetup.backup_file("/etc/systemd/system", "radixdlt-node.service", backup_time, auto_approve)
-    service_file_path = "/etc/systemd/system/radixdlt-node.service"
-    if args.manual:
-        service_file_path = f"{settings.core_node.node_dir}/radixdlt-node.service"
-    settings.create_service_file(service_file_path)
-
-    Gateway.conditionally_install_local_postgreSQL(settings.gateway)
-
-    if not args.manual:
-        if not args.update:
-            SystemDSetup.start_node_service()
-        else:
-            SystemDSetup.restart_node_service()
-
-        if nginx_configured and not args.update:
-            SystemDSetup.start_nginx_service()
-        elif nginx_configured and args.update:
-            SystemDSetup.start_nginx_service()
-        else:
-            print("Nginx not configured or not updated")
+    settings: SystemDSettings = SystemDSetup.load_settings(args.configfile)
+    SystemDSetup.install_systemd_service(settings)
 
 
 @systemdcommand([

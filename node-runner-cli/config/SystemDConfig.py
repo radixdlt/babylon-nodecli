@@ -236,7 +236,7 @@ class SystemDSettings(BaseConfig):
             .render(dict(self.core_node.keydetails)) \
             .to_file(f"{self.core_node.node_secrets_dir}/environment")
 
-    def create_default_config(self):
+    def create_default_config_file(self):
         self.common_config.genesis_bin_data_file = Network.path_to_genesis_binary(self.common_config.network_id)
         Renderer().load_file_based_template("systemd-default.config.j2").render(
             dict(self)).to_file(f"{self.core_node.node_dir}/default.config")
