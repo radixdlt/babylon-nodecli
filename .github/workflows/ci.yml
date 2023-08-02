@@ -12,7 +12,7 @@ on:
     branches:
       - main
 jobs:
-  snyk-scan-deps-licences:
+  snyk-scan:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -41,90 +41,21 @@ jobs:
           pipenv install
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Run Snyk to check for deps vulnerabilities - Network
+      - name: Install Snyk cli
         run: |
           npm install snyk -g
           snyk -v
           snyk auth ${{ env.SNYK_TOKEN }}
-          snyk test --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --severity-threshold=critical
+      - name: Run Snyk to check for deps vulnerabilities
+        run: snyk test --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --severity-threshold=critical
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  snyk-scan-code:
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      pull-requests: read
-      contents: read
-      deployments: write
-    steps:
-      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
-      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
-        with:
-          role_name: ${{ secrets.AWS_ROLE_NAME_SNYK_SECRET }}
-          app_name: 'babylon-nodecli'
-          step_name: 'snyk-scan-code'
-          secret_prefix: 'SNYK'
-          secret_name: ${{ secrets.AWS_SECRET_NAME_SNYK }}
-          parse_json: true
-      - name: Setup python
-        uses: actions/setup-python@v4.5.0
-        with:
-          python-version: 3.10.6
-      - name: Install pipenv
-        run: python -m pip install --upgrade pipenv wheel
-      - name: Install dependencies
-        run: |
-          cd ./node-runner-cli
-          pipenv install
+      - name: Run Snyk to check for code vulnerabilities
+        run: snyk code test --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --severity-threshold=high
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Run Snyk to check for deps vulnerabilities - Network
-        run: |
-          npm install snyk -g
-          snyk -v
-          snyk auth ${{ env.SNYK_TOKEN }}
-          snyk code test --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --severity-threshold=high
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  snyk-sbom:
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      pull-requests: read
-      contents: read
-      deployments: write
-    steps:
-      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
-      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
-        with:
-          role_name: ${{ secrets.AWS_ROLE_NAME_SNYK_SECRET }}
-          app_name: 'babylon-nodecli'
-          step_name: 'snyk-sbom'
-          secret_prefix: 'SNYK'
-          secret_name: ${{ secrets.AWS_SECRET_NAME_SNYK }}
-          parse_json: true
-      - name: Setup python
-        uses: actions/setup-python@v4.5.0
-        with:
-          python-version: 3.10.6
-      - name: Install pipenv
-        run: python -m pip install --upgrade pipenv wheel
-      - name: Install dependencies
-        run: |
-          cd ./node-runner-cli
-          pipenv install
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Generate SBOM
-        run: |
-          npm install snyk -g
-          snyk -v
-          snyk auth ${{ env.SNYK_TOKEN }}
-          snyk sbom --file=./node-runner-cli/Pipfile ---format=cyclonedx1.4+json --json-file-output sbom.json
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Test SBOM generation
+        run: snyk sbom --file=./node-runner-cli/Pipfile ---format=cyclonedx1.4+json --json-file-output sbom.json
 
   package_ubuntu_cli:
     name: "Package cli for Ubuntu"
