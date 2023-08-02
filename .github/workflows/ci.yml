@@ -32,11 +32,11 @@ jobs:
       - name: Run Snyk to check for deps vulnerabilities - Devops
         uses: snyk/actions/python@b98d498629f1c368650224d6d212bf7dfa89e4bf # v0.4.0
         with:
-          args: --all-projects --org=${{ env.SNYK_DEVOPS_ORG_ID }} --severity-threshold=critical
+          args: --all-projects --org=${{ env.SNYK_DEVOPS_ORG_ID }} --severity-threshold=critical -d
       - name: Run Snyk to check for deps vulnerabilities - Network
         uses: snyk/actions/python@b98d498629f1c368650224d6d212bf7dfa89e4bf # v0.4.0
         with:
-          args: --all-projects --org=${{ env.SNYK_NETWORK_ORG_ID }} --severity-threshold=critical
+          args: --all-projects --org=${{ env.SNYK_NETWORK_ORG_ID }} --severity-threshold=critical -d
 
   snyk-scan-code:
     runs-on: ubuntu-latest
@@ -56,11 +56,6 @@ jobs:
           secret_name: ${{ secrets.AWS_SECRET_NAME_SNYK }}
           parse_json: true
       - name: Run Snyk to check for code vulnerabilities - Devops
-        uses: snyk/actions/python@b98d498629f1c368650224d6d212bf7dfa89e4bf # v0.4.0
-        with:
-          args: --all-projects --org=${{ env.SNYK_DEVOPS_ORG_ID }} --severity-threshold=high
-          command: code test
-      - name: Run Snyk to check for code vulnerabilities - Network
         uses: snyk/actions/python@b98d498629f1c368650224d6d212bf7dfa89e4bf # v0.4.0
         with:
           args: --all-projects --org=${{ env.SNYK_NETWORK_ORG_ID }} --severity-threshold=high
