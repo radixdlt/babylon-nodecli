@@ -33,7 +33,7 @@ jobs:
 #        uses: snyk/actions/python@b98d498629f1c368650224d6d212bf7dfa89e4bf # v0.4.0
 #        with:
 #          args: --all-projects --org=${{ env.SNYK_DEVOPS_ORG_ID }} --severity-threshold=critical -d
-      - name: setup python
+      - name: Setup python
         uses: actions/setup-python@v4.5.0
         with:
           python-version: 3.10.6
@@ -43,6 +43,8 @@ jobs:
         run: |
           cd ./node-runner-cli
           pipenv install
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Run Snyk to check for deps vulnerabilities - Network
         run: |
           npm install snyk -g
