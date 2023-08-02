@@ -42,8 +42,6 @@ jobs:
           python -m pip install --upgrade pipenv wheel
       - name: Run Snyk to check for deps vulnerabilities - Network
         run: |
-          whereis pipenv
-          pipenv -v
           npm install snyk -g
           snyk -v
           snyk auth ${{ env.SNYK_TOKEN }}
