@@ -33,8 +33,11 @@ jobs:
 #        uses: snyk/actions/python@b98d498629f1c368650224d6d212bf7dfa89e4bf # v0.4.0
 #        with:
 #          args: --all-projects --org=${{ env.SNYK_DEVOPS_ORG_ID }} --severity-threshold=critical -d
+      - name: Install pipenv
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install pipenv
       - name: Run Snyk to check for deps vulnerabilities - Network
-        shell: bash
         run: |
           npm install snyk -g
           snyk -v
