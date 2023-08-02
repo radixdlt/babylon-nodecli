@@ -35,8 +35,7 @@ jobs:
 #          args: --all-projects --org=${{ env.SNYK_DEVOPS_ORG_ID }} --severity-threshold=critical -d
       - name: Install pipenv
         run: |
-          sudo apt-get update
-          sudo apt-get -y install pipenv
+          python -m pip install --upgrade pipenv wheel
       - name: Run Snyk to check for deps vulnerabilities - Network
         run: |
           npm install snyk -g
