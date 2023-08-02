@@ -102,7 +102,6 @@ jobs:
 
 
   package_ubuntu_cli:
-    if: ${{ github.event_name == 'release' }}
     name: "Package cli for Ubuntu"
     runs-on: ubuntu-22.04
     steps:
