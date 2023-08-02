@@ -29,30 +29,30 @@ jobs:
           secret_prefix: 'SNYK'
           secret_name: ${{ secrets.AWS_SECRET_NAME_SNYK }}
           parse_json: true
-#      - name: Run Snyk to check for deps vulnerabilities - Devops
-#        uses: snyk/actions/python@b98d498629f1c368650224d6d212bf7dfa89e4bf # v0.4.0
-#        with:
-#          args: --all-projects --org=${{ env.SNYK_DEVOPS_ORG_ID }} --severity-threshold=critical -d
-      - name: Setup python
-        uses: actions/setup-python@v4.5.0
+      - name: Run Snyk to check for deps vulnerabilities - Devops
+        uses: snyk/actions/python3.10@b98d498629f1c368650224d6d212bf7dfa89e4bf # v0.4.0
         with:
-          python-version: 3.10.6
-      - name: Install pipenv
-        run: python -m pip install --upgrade pipenv wheel
-      - name: Install dependencies
-        run: |
-          cd ./node-runner-cli
-          pipenv install
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Run Snyk to check for deps vulnerabilities - Network
-        run: |
-          npm install snyk -g
-          snyk -v
-          snyk auth ${{ env.SNYK_TOKEN }}
-          snyk test --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --severity-threshold=critical -d
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          args: --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_DEVOPS_ORG_ID }} --severity-threshold=critical -d
+#      - name: Setup python
+#        uses: actions/setup-python@v4.5.0
+#        with:
+#          python-version: 3.10.6
+#      - name: Install pipenv
+#        run: python -m pip install --upgrade pipenv wheel
+#      - name: Install dependencies
+#        run: |
+#          cd ./node-runner-cli
+#          pipenv install
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#      - name: Run Snyk to check for deps vulnerabilities - Network
+#        run: |
+#          npm install snyk -g
+#          snyk -v
+#          snyk auth ${{ env.SNYK_TOKEN }}
+#          snyk test --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --severity-threshold=critical -d
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   snyk-scan-code:
     runs-on: ubuntu-latest
