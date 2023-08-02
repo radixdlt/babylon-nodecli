@@ -40,7 +40,9 @@ jobs:
       - name: Install pipenv
         run: python -m pip install --upgrade pipenv wheel
       - name: Install dependencies
-        run: pipenv install
+        run: |
+          pipenv install
+          pipenv update
       - name: Run Snyk to check for deps vulnerabilities - Network
         run: |
           npm install snyk -g
