@@ -12,6 +12,87 @@ on:
     branches:
       - main
 jobs:
+  snyk-scan-deps-licences:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      pull-requests: read
+      contents: read
+      deployments: write
+    steps:
+      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
+      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
+        with:
+          role_name: ${{ secrets.AWS_ROLE_NAME_SNYK_SECRET }}
+          app_name: 'babylon-nodecli'
+          step_name: 'snyk-scan-deps-licenses'
+          secret_prefix: 'SNYK'
+          secret_name: ${{ secrets.AWS_SECRET_NAME_SNYK }}
+          parse_json: true
+      - name: Run Snyk to check for deps vulnerabilities - Devops
+        uses: snyk/actions/python@b98d498629f1c368650224d6d212bf7dfa89e4bf # v0.4.0
+        with:
+          args: --all-projects --org=${{ env.SNYK_DEVOPS_ORG_ID }} --severity-threshold=critical
+      - name: Run Snyk to check for deps vulnerabilities - Network
+        uses: snyk/actions/python@b98d498629f1c368650224d6d212bf7dfa89e4bf # v0.4.0
+        with:
+          args: --all-projects --org=${{ env.SNYK_NETWORK_ORG_ID }} --severity-threshold=critical
+
+  snyk-scan-code:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      pull-requests: read
+      contents: read
+      deployments: write
+    steps:
+      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
+      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
+        with:
+          role_name: ${{ secrets.AWS_ROLE_NAME_SNYK_SECRET }}
+          app_name: 'babylon-nodecli'
+          step_name: 'snyk-scan-code'
+          secret_prefix: 'SNYK'
+          secret_name: ${{ secrets.AWS_SECRET_NAME_SNYK }}
+          parse_json: true
+      - name: Run Snyk to check for code vulnerabilities - Devops
+        uses: snyk/actions/python@b98d498629f1c368650224d6d212bf7dfa89e4bf # v0.4.0
+        with:
+          args: --all-projects --org=${{ env.SNYK_DEVOPS_ORG_ID }} --severity-threshold=high
+          command: code test
+      - name: Run Snyk to check for code vulnerabilities - Network
+        uses: snyk/actions/python@b98d498629f1c368650224d6d212bf7dfa89e4bf # v0.4.0
+        with:
+          args: --all-projects --org=${{ env.SNYK_NETWORK_ORG_ID }} --severity-threshold=high
+          command: code test
+
+  snyk-sbom:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      pull-requests: read
+      contents: read
+      deployments: write
+    needs:
+      - snyk-scan-deps-licences
+      - snyk-scan-code
+    steps:
+      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
+      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
+        with:
+          role_name: ${{ secrets.AWS_ROLE_NAME_SNYK_SECRET }}
+          app_name: 'babylon-nodecli'
+          step_name: 'snyk-sbom'
+          secret_prefix: 'SNYK'
+          secret_name: ${{ secrets.AWS_SECRET_NAME_SNYK }}
+          parse_json: true
+      - name: Generate SBOM # check SBOM can be generated but nothing is done with it
+        uses: snyk/actions/python@b98d498629f1c368650224d6d212bf7dfa89e4bf # v0.4.0
+        with:
+          args: --all-projects --format=cyclonedx1.4+json --json-file-output sbom.json
+          command: sbom
+
+
   package_ubuntu_cli:
     name: "Package cli for Ubuntu"
     runs-on: ubuntu-22.04
@@ -425,6 +506,35 @@ jobs:
           NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
           NGINX_SUPERADMIN_PASSWORD: ${{secrets.NGINX_SUPERADMIN_PASSWORD}}
 
+  snyk-monitor:
+    runs-on: ubuntu-latest
+    #needs:
+    #  - upload-release-jammy
+    permissions:
+      id-token: write
+      pull-requests: read
+      contents: read
+      deployments: write
+    steps:
+      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
+      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
+        with:
+          role_name: ${{ secrets.AWS_ROLE_NAME_SNYK_SECRET }}
+          app_name: 'babylon-nodecli'
+          step_name: 'snyk-monitor'
+          secret_prefix: 'SNYK'
+          secret_name: ${{ secrets.AWS_SECRET_NAME_SNYK }}
+          parse_json: true
+      - name: Enable Snyk online monitoring to check for vulnerabilities
+        uses: snyk/actions/python@b98d498629f1c368650224d6d212bf7dfa89e4bf # v0.4.0
+        with:
+          args: --all-projects --org=${{ env.SNYK_DEVOPS_ORG_ID }} --target-reference=${{ github.ref_name }}
+          command: monitor
+      - name: Enable Snyk online monitoring to check for vulnerabilities
+        uses: snyk/actions/python@b98d498629f1c368650224d6d212bf7dfa89e4bf # v0.4.0
+        with:
+          args: --all-projects --org=${{ env.SNYK_NETWORK_ORG_ID }} --target-reference=${{ github.ref_name }}
+          command: monitor
 
 #  These do not run on Babylon
 #  test-core-api:
