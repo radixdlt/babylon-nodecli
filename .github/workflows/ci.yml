@@ -29,14 +29,17 @@ jobs:
           secret_prefix: 'SNYK'
           secret_name: ${{ secrets.AWS_SECRET_NAME_SNYK }}
           parse_json: true
-      - name: Run Snyk to check for deps vulnerabilities - Devops
-        uses: snyk/actions/python@b98d498629f1c368650224d6d212bf7dfa89e4bf # v0.4.0
-        with:
-          args: --all-projects --org=${{ env.SNYK_DEVOPS_ORG_ID }} --severity-threshold=critical -d
+#      - name: Run Snyk to check for deps vulnerabilities - Devops
+#        uses: snyk/actions/python@b98d498629f1c368650224d6d212bf7dfa89e4bf # v0.4.0
+#        with:
+#          args: --all-projects --org=${{ env.SNYK_DEVOPS_ORG_ID }} --severity-threshold=critical -d
       - name: Run Snyk to check for deps vulnerabilities - Network
-        uses: snyk/actions/python@b98d498629f1c368650224d6d212bf7dfa89e4bf # v0.4.0
-        with:
-          args: --all-projects --org=${{ env.SNYK_NETWORK_ORG_ID }} --severity-threshold=critical -d
+        shell: bash
+        run: |
+          npm install snyk -g
+          snyk -v
+          snyk auth ${{ env.SNYK_TOKEN }}
+          snyk test --all-projects --org=${{ env.SNYK_NETWORK_ORG_ID }} --severity-threshold=critical -d
 
   snyk-scan-code:
     runs-on: ubuntu-latest
