@@ -203,11 +203,10 @@ class Prompts:
         Helpers.section_headline("Trusted node settings")
         default_trusted_nodes = "radix://node_tdx_d_1qwq2nfe6vxqwe3mqmfm9l2xl97as7lkwndval63cymvc3qszn8nqx6g2s3m@3.109.161.178"
         value = Helpers.input_guestion(f"Fullnode requires another node to connect to network. "
-                                       # ToDo: Add after main release of babylon
                                        # "\nTo connect to MAINNET or STOKENET details on these node can be found here "
                                        # "- https://docs.radixdlt.com/main/node-and-gateway/seed-nodes.html"
                                        "\nType in the node you want to connect to in format radix://<node-peer-2-peer-address>@<ip>"
-                                       "\n OR press Enter to accept default for ansharnet/rcnet-v2-phase1 :",
+                                       "\n OR press Enter to accept defaults for ansharnet (rcnet-v2 phase 2):",
                                        QuestionKeys.input_seednode)
         trustednode = Prompts.check_default(value, default_trusted_nodes)
         Helpers.parse_trustednode(trustednode)

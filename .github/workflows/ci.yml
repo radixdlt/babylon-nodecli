@@ -12,6 +12,51 @@ on:
     branches:
       - main
 jobs:
+  snyk-scan:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      pull-requests: read
+      contents: read
+      deployments: write
+    steps:
+      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
+      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
+        with:
+          role_name: ${{ secrets.AWS_ROLE_NAME_SNYK_SECRET }}
+          app_name: 'babylon-nodecli'
+          step_name: 'snyk-scan-deps-licenses'
+          secret_prefix: 'SNYK'
+          secret_name: ${{ secrets.AWS_SECRET_NAME_SNYK }}
+          parse_json: true
+      - name: Setup python
+        uses: actions/setup-python@v4.5.0
+        with:
+          python-version: 3.10.6
+      - name: Install pipenv
+        run: python -m pip install --upgrade pipenv wheel
+      - name: Install dependencies
+        run: |
+          cd ./node-runner-cli
+          pipenv install
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install Snyk cli
+        run: |
+          npm install snyk -g
+          snyk -v
+          snyk auth ${{ env.SNYK_TOKEN }}
+      - name: Run Snyk to check for deps vulnerabilities
+        run: snyk test --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --severity-threshold=critical
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run Snyk to check for code vulnerabilities
+        run: snyk code test --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --severity-threshold=high
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Test SBOM generation
+        run: snyk sbom --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --format=cyclonedx1.4+json --json-file-output sbom.json
+
   package_ubuntu_cli:
     name: "Package cli for Ubuntu"
     runs-on: ubuntu-22.04
@@ -96,6 +141,7 @@ jobs:
     if: ${{ github.event_name == 'push' }}
     needs:
       - package_ubuntu_cli
+      - snyk-scan
     permissions:
       id-token: write
       contents: read
@@ -135,6 +181,7 @@ jobs:
     if: ${{ github.event_name == 'release' }}
     needs:
       - package_ubuntu_cli
+      - snyk-scan
     steps:
       - name: Download packaged cli
         uses: actions/download-artifact@v3
@@ -151,11 +198,54 @@ jobs:
           asset_content_type: application/octet-stream
         if: ${{ github.event_name == 'release' }}
 
+  upload-sbom:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'release' }}
+    permissions: write-all
+    needs:
+      - package_ubuntu_cli
+      - snyk-scan
+    steps:
+      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
+      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
+        with:
+          role_name: ${{ secrets.AWS_ROLE_NAME_SNYK_SECRET }}
+          app_name: 'babylon-nodecli'
+          step_name: 'upload-sbom'
+          secret_prefix: 'SNYK'
+          secret_name: ${{ secrets.AWS_SECRET_NAME_SNYK }}
+          parse_json: true
+      - name: Setup python
+        uses: actions/setup-python@v4.5.0
+        with:
+          python-version: 3.10.6
+      - name: Install pipenv
+        run: python -m pip install --upgrade pipenv wheel
+      - name: Install dependencies
+        run: |
+          cd ./node-runner-cli
+          pipenv install
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install Snyk cli
+        run: |
+          npm install snyk -g
+          snyk -v
+          snyk auth ${{ env.SNYK_TOKEN }}
+      - name: Generate SBOM
+        run: snyk sbom --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --format=cyclonedx1.4+json --json-file-output sbom.json
+      - name: Upload SBOM
+        uses: AButler/upload-release-assets@c94805dc72e4b20745f543da0f62eaee7722df7a # v2.0.2
+        with:
+          files: sbom.json
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
   upload-release-focal:
     runs-on: ubuntu-20.04
     if: ${{ github.event_name == 'release' }}
     needs:
       - package_ubuntu_cli
+      - snyk-scan
     steps:
       - name: Download packaged cli
         uses: actions/download-artifact@v3
@@ -176,6 +266,7 @@ jobs:
     runs-on: [node-only]
     needs:
       - package_ubuntu_cli
+      - snyk-scan
     steps:
       - name: Checkout
         uses: actions/checkout@v3.4.0
@@ -207,7 +298,9 @@ jobs:
             -t radix://node_tdx_d_1qwq2nfe6vxqwe3mqmfm9l2xl97as7lkwndval63cymvc3qszn8nqx6g2s3m@3.109.161.178 \
             -i 35.178.142.54 \
             -v "not_a_real_validator_address" \
-            -k $KEYSTORE_PASSWORD -nk -a
+            -k $KEYSTORE_PASSWORD -nk -a \
+            -dd $HOME/babylon-ledger
+          ./radixnode systemd stop && sudo rm -rf $HOME/babylon-ledger
         env:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -250,6 +343,7 @@ jobs:
     runs-on: ubuntu-22.04
     needs:
       - package_ubuntu_cli
+      - snyk-scan
     steps:
       - name: Checkout
         uses: actions/checkout@v3.4.0
@@ -338,6 +432,7 @@ jobs:
       contents: read
     needs:
       - package_ubuntu_cli
+      - snyk-scan
     steps:
       - name: Checkout
         uses: actions/checkout@v3.4.0
@@ -358,7 +453,7 @@ jobs:
           chmod +x ./radixnode
           mkdir -p $HOME/node-config
           export DISABLE_VERSION_CHECK=true
-          export RADIXDLT_APP_VERSION_OVERRIDE="rcnet-v2-phase1-r2"
+          export RADIXDLT_APP_VERSION_OVERRIDE="rcnet-v2-phase2-r4"
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
           export PROMPT_FEEDS="node-runner-cli/test-prompts/core-gateway-all-local.yml"
           ./radixnode docker config -m DETAILED \
@@ -401,6 +496,48 @@ jobs:
           NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
           NGINX_SUPERADMIN_PASSWORD: ${{secrets.NGINX_SUPERADMIN_PASSWORD}}
 
+  snyk-monitor:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'release' }}
+    needs:
+      - package_ubuntu_cli
+      - snyk-scan
+    permissions:
+      id-token: write
+      pull-requests: read
+      contents: read
+      deployments: write
+    steps:
+      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
+      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
+        with:
+          role_name: ${{ secrets.AWS_ROLE_NAME_SNYK_SECRET }}
+          app_name: 'babylon-nodecli'
+          step_name: 'snyk-monitor'
+          secret_prefix: 'SNYK'
+          secret_name: ${{ secrets.AWS_SECRET_NAME_SNYK }}
+          parse_json: true
+      - name: Setup python
+        uses: actions/setup-python@v4.5.0
+        with:
+          python-version: 3.10.6
+      - name: Install pipenv
+        run: python -m pip install --upgrade pipenv wheel
+      - name: Install dependencies
+        run: |
+          cd ./node-runner-cli
+          pipenv install
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install Snyk cli
+        run: |
+          npm install snyk -g
+          snyk -v
+          snyk auth ${{ env.SNYK_TOKEN }}
+      - name: Enable Snyk online monitoring - Devops
+        run: snyk monitor --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_DEVOPS_ORG_ID }} --target-reference=${{ github.ref_name }}
+      - name: Enable Snyk online monitoring - Network
+        run: snyk monitor --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --target-reference=${{ github.ref_name }}
 
 #  These do not run on Babylon
 #  test-core-api:
