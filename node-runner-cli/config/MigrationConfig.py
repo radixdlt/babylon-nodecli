@@ -9,18 +9,6 @@ class CommonMigrationSettings(BaseConfig):
     olympia_node_auth_password: str = ""
     olympia_node_bech32_address: str = ""
 
-    def __init__(self, settings: dict):
-        super().__init__(settings)
-        for key, value in settings.items():
-            setattr(self, key, value)
-
-    def __iter__(self):
-        class_variables = {key: value
-                           for key, value in self.__class__.__dict__.items()
-                           if not key.startswith('__') and not callable(value)}
-        for attr, value in class_variables.items():
-            yield attr, self.__getattribute__(attr)
-
     def ask_migration_config(self, olympia_node_url, olympia_node_auth_user, olympia_node_auth_password,
                              olympia_node_bech32_address):
         self.use_olympia = True
@@ -40,3 +28,5 @@ class CommonMigrationSettings(BaseConfig):
         if olympia_node_auth_password is None:
             olympia_node_auth_password = Prompts.ask_olympia_node_auth_password()
         self.olympia_node_auth_password = olympia_node_auth_password
+
+

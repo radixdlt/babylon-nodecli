@@ -6,10 +6,10 @@ from unittest.mock import patch
 
 import urllib3
 
+from babylonnode import main
 from config.KeyDetails import KeyDetails
 from config.Renderer import Renderer
 from config.SystemDConfig import SystemDSettings
-from babylonnode import main
 from setup.SystemDSetup import SystemDSetup
 from utils.PromptFeeder import PromptFeeder
 
@@ -41,6 +41,7 @@ class SystemdUnitTests(unittest.TestCase):
         home_directory = Path.home()
         settings.core_node.node_dir = "/somedir/babylon-node"
         settings.core_node.node_secrets_dir = "/somedir/babylon-node/secret"
+        settings.migration.use_olympia = False
         key_details = KeyDetails({})
         settings.core_node.keydetails = key_details
         settings.common_config.host_ip = "6.6.6.6"
@@ -67,16 +68,17 @@ class SystemdUnitTests(unittest.TestCase):
             with patch("sys.argv",
                        ["main", "systemd", "config", "-m", "CORE", "-i", "18.133.170.30", "-t",
                         "radix://tn1q28eygvxshszxk48jhjxdmyne06m3x6hfyvxg7a45qt8cksffx6z7uu6392@15.236.228.96",
-                        "-n", "2", "-k", "radix", "-d", "/tmp", "-dd", "/tmp", "-v", "randomvalidatoraddress", "-nk", "-a"]):
+                        "-n", "2", "-k", "radix", "-d", "/tmp", "-dd", "/tmp", "-v", "randomvalidatoraddress", "-nk",
+                        "-a"]):
                 main()
-
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_docker_config(self, mockout):
         urllib3.disable_warnings()
         # os.environ['PROMPT_FEEDS'] = "test-prompts/individual-prompts/validator_address.yml"
         # PromptFeeder.prompts_feed = PromptFeeder.instance().load_prompt_feeds()
-        with patch('builtins.input', side_effect=['S', 'N', 'N', '/home/runner/docker-compose.yml', 'N', 'development-latest']):
+        with patch('builtins.input',
+                   side_effect=['S', 'N', 'N', '/home/runner/docker-compose.yml', 'N', 'development-latest']):
             with patch("sys.argv",
                        ["main", "docker", "config", "-m", "DETAILED", "-k", "radix", "-nk", "-a"]):
                 main()
@@ -106,7 +108,7 @@ class SystemdUnitTests(unittest.TestCase):
             with patch("sys.argv",
                        ["main", "docker", "config", "-m", "DETAILED", "-k", "radix", "-nk", "-a"]):
                 main()
-                
+
     @unittest.skip("For verification only")
     def test_systemd_install_manual(self):
         with patch("sys.argv",
@@ -210,6 +212,7 @@ db.location=/home/radixdlt/babylon-ledger
             settings.common_config.host_ip = "1.1.1.1"
             settings.common_config.network_id = 1
             settings.core_node.validator_address = "validatorAddress"
+            settings.migration.use_olympia = False
             render_template = Renderer().load_file_based_template("systemd-default.config.j2").render(
                 dict(settings)).rendered
         fixture = """ntp=false
@@ -238,7 +241,7 @@ consensus.validator_address=validatorAddress
 
 """
         self.maxDiff = None
-        self.assertEqual(render_template, fixture)
+        self.assertEqual(fixture, render_template)
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_systemd_service_file_jinja(self, mockout):

@@ -6,7 +6,7 @@ import yaml
 from yaml import UnsafeLoader
 
 from config.DockerConfig import DockerConfig
-from config.Nginx import SystemdNginxConfig
+from config.Nginx import SystemdNginxConfig, DockerNginxConfig
 from config.SystemDConfig import SystemDSettings
 from utils.Network import Network
 
@@ -34,6 +34,7 @@ class ConfigUnitTests(unittest.TestCase):
 
     def test_config_systemd_defaut_config_matches_fixture(self):
         config = SystemDSettings({})
+        config.migration.use_olympia = True
         home_directory = Path.home()
         config.core_node.node_dir = f"/someDir/babylon-node-config"
         config.core_node.node_secrets_dir = f"/someDir/babylon-node-config/secret"
@@ -74,6 +75,7 @@ gateway:
     restart: unless-stopped
   database_migration:
     repo: radixdlt/babylon-ng-database-migrations
+  docker_compose_file: ~/gateway.docker-compose.yml
   gateway_api:
     coreApiNode:
       Name: Core
@@ -91,16 +93,13 @@ gateway:
     setup: local
     user: postgres
 migration:
-  olympia_node_auth_password: ''
-  olympia_node_auth_user: ''
-  olympia_node_bech32_address: ''
-  olympia_node_url: ''
-  use_olympia: false
+  use_olympia: true
 """
-        self.assertEqual(config_as_yaml, fixture)
+        self.assertEqual(fixture, config_as_yaml)
 
     def test_config_docker_defaut_config_matches_fixture(self):
         config = DockerConfig({})
+        config.migration.use_olympia = True
         config_as_yaml = config.to_yaml()
         home_directory = Path.home()
         self.maxDiff = None
@@ -154,14 +153,11 @@ gateway:
     host: host.docker.internal:5432
   database_migration:
     repo: radixdlt/babylon-ng-database-migrations
+  docker_compose_file: ~/gateway.docker-compose.yml
 migration:
-  use_olympia: false
-  olympia_node_url: ''
-  olympia_node_auth_user: ''
-  olympia_node_auth_password: ''
-  olympia_node_bech32_address: ''
+  use_olympia: true
 """
-        self.assertEqual(config_as_yaml, fixture)
+        self.assertEqual(fixture, config_as_yaml)
 
     def test_network_id_can_be_parsed(self):
         self.assertEqual(Network.validate_network_id("1"), 1)

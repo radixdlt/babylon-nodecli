@@ -5,14 +5,13 @@ from pathlib import Path
 import yaml
 
 from config.BaseConfig import BaseConfig, SetupMode
-from config.CommonDockerSettings import CommonDockerSettings
-from config.DockerConfig import CoreDockerSettings
+from config.EnvVars import MOUNT_LEDGER_VOLUME, NODE_BINARY_OVERIDE, NGINX_BINARY_OVERIDE, \
+    APPEND_DEFAULT_CONFIG_OVERIDES
 from config.GatewayDockerConfig import GatewayDockerSettings
 from config.KeyDetails import KeyDetails
 from config.MigrationConfig import CommonMigrationSettings
 from config.Nginx import SystemdNginxConfig
 from config.Renderer import Renderer
-from config.EnvVars import MOUNT_LEDGER_VOLUME, NODE_BINARY_OVERIDE, NGINX_BINARY_OVERIDE, APPEND_DEFAULT_CONFIG_OVERIDES
 from github import github
 from github.github import latest_release
 from setup.Base import Base
@@ -39,16 +38,6 @@ class CoreSystemdSettings(BaseConfig):
                      "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts " \
                      "-Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom " \
                      "-DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
-
-    def __iter__(self):
-        class_variables = {key: value
-                           for key, value in self.__class__.__dict__.items()
-                           if not key.startswith('__') and not callable(value)}
-        for attr, value in class_variables.items():
-            if attr in ['keydetails']:
-                yield attr, dict(self.__getattribute__(attr))
-            elif self.__getattribute__(attr):
-                yield attr, self.__getattribute__(attr)
 
     def ask_enable_transaction(self):
         if "DETAILED" in SetupMode.instance().mode:
@@ -100,23 +89,13 @@ class CommonSystemdSettings(BaseConfig):
     network_id: int = 1
     genesis_bin_data_file: str
 
-    def __iter__(self):
-        class_variables = {key: value
-                           for key, value in self.__class__.__dict__.items()
-                           if not key.startswith('__') and not callable(value)}
-        for attr, value in class_variables.items():
-            if attr in ['nginx_settings'] and self.__getattribute__(attr):
-                yield attr, dict(self.__getattribute__(attr))
-            elif self.__getattribute__(attr):
-                yield attr, self.__getattribute__(attr)
-
     def set_network_id(self, network_id: int):
         self.network_id = network_id
         self.set_network_name()
 
     def set_genesis_bin_data_file(self, genesis_bin_data_file: str):
         self.genesis_bin_data_file = genesis_bin_data_file
-        
+
     def set_genesis_type(self, genesis_file_location: str):
         if genesis_file_location.endswith('.json'):
             self.genesis_type = "json"
@@ -170,42 +149,22 @@ class CommonSystemdSettings(BaseConfig):
                                                    f"{self.nginx_settings.release}/babylon-nginx-fullnode-conf.zip")
 
 
+
 class SystemDSettings(BaseConfig):
+    migration: CommonMigrationSettings = CommonMigrationSettings({})
     core_node: CoreSystemdSettings = CoreSystemdSettings({})
     common_config: CommonSystemdSettings = CommonSystemdSettings({})
     gateway: GatewayDockerSettings = GatewayDockerSettings({})
-    migration: CommonMigrationSettings = CommonMigrationSettings({})
 
 
-    def __iter__(self):
-        class_variables = {key: value
-                           for key, value in self.__class__.__dict__.items()
-                           if not key.startswith('__') and not callable(value)}
-        for attr, value in class_variables.items():
-            if attr in ['keydetails']:
-                yield attr, dict(self.__getattribute__(attr))
-            elif self.__getattribute__(attr):
-                yield attr, self.__getattribute__(attr)
 
     def to_yaml(self):
-        config_to_dump = dict(self)
-        config_to_dump["core_node"] = dict(self.core_node)
-        config_to_dump["core_node"]["keydetails"] = dict(self.core_node.keydetails)
-        config_to_dump["common_config"] = dict(self.common_config)
-        config_to_dump["common_config"]["nginx_settings"] = dict(self.common_config.nginx_settings)
-        config_to_dump["migration"] = dict(self.migration)
-        config_to_dump["gateway"] = dict(self.gateway)
+        config_to_dump = self.to_dict()
         return yaml.dump(config_to_dump, sort_keys=True, default_flow_style=False, explicit_start=True,
                          allow_unicode=True)
 
     def to_file(self, config_file):
-        config_to_dump = dict(self)
-        config_to_dump["core_node"] = dict(self.core_node)
-        config_to_dump["core_node"]["keydetails"] = dict(self.core_node.keydetails)
-        config_to_dump["common_config"] = dict(self.common_config)
-        config_to_dump["common_config"]["nginx_settings"] = dict(self.common_config.nginx_settings)
-        config_to_dump["migration"] = dict(self.migration)
-        config_to_dump["gateway"] = dict(self.gateway)
+        config_to_dump = self.to_dict()
         with open(config_file, 'w') as f:
             yaml.dump(config_to_dump, f, sort_keys=True, default_flow_style=False)
 

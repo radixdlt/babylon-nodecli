@@ -2,6 +2,7 @@ from urllib.parse import urlparse
 
 from config.BaseConfig import SetupMode
 from config.GatewayDockerConfig import GatewayDockerSettings, CoreApiNode
+from config.SystemDConfig import SystemDSettings
 from github import github
 from setup.AnsibleRunner import AnsibleRunner
 from setup.DockerCompose import DockerCompose
@@ -99,5 +100,5 @@ class GatewaySetup():
         return release
 
     @staticmethod
-    def install_standalone_gateway(settings):
+    def install_standalone_gateway(settings: SystemDSettings):
         DockerCompose.install_standalone_gateway_in_docker(settings)

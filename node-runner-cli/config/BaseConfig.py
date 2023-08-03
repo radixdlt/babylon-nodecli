@@ -1,7 +1,8 @@
 class BaseConfig:
     def __init__(self, settings: dict):
-        for key, value in settings.items():
-            setattr(self, key, value)
+        if settings is not None:
+            for key, value in settings.items():
+                setattr(self, key, value)
 
     def __repr__(self):
         return repr(vars(self))
@@ -13,6 +14,17 @@ class BaseConfig:
         for attr, value in class_variables.items():
             if self.__getattribute__(attr):
                 yield attr, self.__getattribute__(attr)
+
+    def to_dict(self):
+        class_variables = {key: value
+                           for key, value in self.__class__.__dict__.items()
+                           if not key.startswith('__') and not callable(value)}
+        returning_dict = dict(self)
+        for attr, value in class_variables.items():
+            if type(self.__getattribute__(attr)) not in (str, int, bool, dict) and self.__getattribute__(
+                    attr) is not None:
+                returning_dict[attr] = self.__getattribute__(attr).to_dict()
+        return returning_dict
 
 
 class SetupMode:

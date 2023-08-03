@@ -11,7 +11,6 @@ from config.MigrationConfig import CommonMigrationSettings
 from config.Renderer import Renderer
 from config.SystemDConfig import SystemDSettings, from_dict, CoreSystemdSettings, CommonSystemdSettings
 from setup.Base import Base
-from setup.DockerCompose import DockerCompose
 from setup.GatewaySetup import GatewaySetup
 from setup.SystemDCommandArguments import SystemDConfigArguments
 from utils.PromptFeeder import QuestionKeys
@@ -304,19 +303,20 @@ class SystemDSetup(Base):
                           "common_config": dict(systemd_config.common_config),
                           "migration": dict(systemd_config.migration),
                           "gateway": dict(systemd_config.gateway)}
-        if len(old_config) != 0:
-            print(f"""
-                    {Helpers.section_headline("Differences")}
-                    Difference between existing config file and new config that you are creating
-                    {dict(DeepDiff(old_config, config_to_dump))}
-                      """)
+        if old_config is not None:
+            if len(old_config) != 0:
+                print(f"""
+                        {Helpers.section_headline("Differences")}
+                        Difference between existing config file and new config that you are creating
+                        {dict(DeepDiff(old_config, config_to_dump))}
+                          """)
 
     @staticmethod
     def dump_config_as_yaml(systemd_config: SystemDSettings):
-        config_to_dump = {"version": "0.1", "core_node": dict(systemd_config.core_node),
-                          "common_config": dict(systemd_config.common_config),
-                          "migration": dict(systemd_config.migration),
-                          "gateway": dict(systemd_config.gateway)}
+        config_to_dump = {"version": "0.1", "core_node": systemd_config.core_node.to_dict(),
+                          "common_config": systemd_config.common_config.to_dict(),
+                          "migration": systemd_config.migration.to_dict(),
+                          "gateway": systemd_config.gateway.to_dict()}
         yaml.add_representer(type(None), Helpers.represent_none)
         Helpers.section_headline("CONFIG is Generated as below")
         print(f"\n{yaml.dump(config_to_dump)}")
@@ -407,7 +407,6 @@ class SystemDSetup(Base):
         # Gateway
         GatewaySetup.conditionally_install_local_postgreSQL(settings.gateway)
         GatewaySetup.install_standalone_gateway(settings)
-
 
         if not args.manual:
             if not args.update:

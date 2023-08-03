@@ -8,15 +8,8 @@ class KeyDetails(BaseConfig):
     keygen_tag: str = "v1.4.1"
     keystore_password: str = None
 
-    # def __init__(self,
-    #              keyfile_path=None,
-    #              keyfile_name="node-keystore.ks",
-    #              keygen_tag=None,
-    #              keystore_password=None):
-    #     self.keyfile_path = keyfile_path
-    #     self.keyfile_name = keyfile_name
-    #     self.keygen_tag = keygen_tag
-    #     self.keystore_password = keystore_password
+    def __init__(self, settings: dict):
+        super().__init__(settings)
 
     def __repr__(self):
         return "%s (keyfile_path=%r, keyfile_name=%r, keygen_tag=%r, keystore_password=%r)" % (

@@ -10,7 +10,7 @@ from config.EnvVars import MOUNT_LEDGER_VOLUME, CORE_DOCKER_REPO_OVERRIDE
 from config.GatewayDockerConfig import GatewayDockerSettings
 from config.KeyDetails import KeyDetails
 from config.MigrationConfig import CommonMigrationSettings
-from config.Nginx import SystemdNginxConfig
+from config.Nginx import DockerNginxConfig
 from setup.Base import Base
 from utils.Prompts import Prompts
 from utils.utils import Helpers
@@ -35,16 +35,6 @@ class CoreDockerSettings(BaseConfig):
 
     def __init__(self, settings: dict):
         super().__init__(settings)
-
-    def __iter__(self):
-        class_variables = {key: value
-                           for key, value in self.__class__.__dict__.items()
-                           if not key.startswith('__') and not callable(value)}
-        for attr, value in class_variables.items():
-            if attr in ['keydetails']:
-                yield attr, dict(self.__getattribute__(attr))
-            elif self.__getattribute__(attr):
-                yield attr, self.__getattribute__(attr)
 
     def set_node_type(self, nodetype="fullnode"):
         self.nodetype = nodetype
@@ -101,6 +91,7 @@ class DockerConfig(BaseConfig):
     def __init__(self, release: str):
         self.core_node = CoreDockerSettings({})
         self.common_config = CommonDockerSettings({})
+        self.common_config.nginx_settings = DockerNginxConfig({})
         self.gateway = GatewayDockerSettings({})
         self.migration = CommonMigrationSettings({})
         self.core_node.core_release = release
@@ -125,11 +116,7 @@ class DockerConfig(BaseConfig):
             self.core_node.existing_docker_compose = core_node.get("docker_compose", None)
 
     def to_yaml(self):
-        config_to_dump = dict(self)
-        config_to_dump["common_config"] = dict(self.common_config)
-        config_to_dump["core_node"] = dict(self.core_node)
-        config_to_dump["gateway"] = dict(self.gateway)
-        config_to_dump["migration"] = dict(self.migration)
+        config_to_dump = self.to_dict()
         return yaml.dump(config_to_dump, sort_keys=False, default_flow_style=False, explicit_start=True,
                          allow_unicode=True)
 
@@ -160,6 +147,6 @@ def from_dict(dictionary: dict) -> DockerConfig:
     settings.core_node = CoreDockerSettings(dictionary["core_node"])
     settings.core_node.keydetails = KeyDetails(dictionary["core_node"]["keydetails"])
     settings.common_config = CommonDockerSettings(dictionary["common_config"])
-    settings.common_config.nginx_settings = SystemdNginxConfig(dictionary["common_config"]["nginx_settings"])
+    settings.common_config.nginx_settings = dictionary["common_config"]["nginx_settings"]
     settings.migration = CommonMigrationSettings(dictionary["migration"])
     return settings

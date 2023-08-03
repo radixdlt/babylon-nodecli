@@ -8,7 +8,7 @@ from utils.utils import Helpers, run_shell_command
 class DockerCompose:
     @staticmethod
     def install_standalone_gateway_in_docker(systemd_settings: SystemDSettings):
-        docker_compose_file: str = "~/gateway.docker-compose.yml"
+        docker_compose_file: str = systemd_settings.gateway.docker_compose_file
         Renderer() \
             .load_file_based_template("standalone-gateway-compose.yml.j2") \
             .render(dict(systemd_settings)) \
