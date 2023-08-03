@@ -1,5 +1,0 @@
-ignore:
-  python/SSLVerificationBypass:
-    - node-runner-cli > utils > utils.py
-        reason: None given
-        expires: '2050-06-19T20:36:54.553Z'
