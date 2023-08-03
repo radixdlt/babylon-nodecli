@@ -55,7 +55,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Test SBOM generation
-        run: snyk sbom --file=./node-runner-cli/Pipfile --format=cyclonedx1.4+json --json-file-output sbom.json
+        run: snyk sbom --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --format=cyclonedx1.4+json --json-file-output sbom.json
 
   package_ubuntu_cli:
     name: "Package cli for Ubuntu"
@@ -201,7 +201,7 @@ jobs:
     if: ${{ github.event_name == 'release' }}
     permissions: write-all
     needs:
-      - upload-release-jammy
+      - package_ubuntu_cli
     steps:
       - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
       - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
@@ -230,7 +230,7 @@ jobs:
           snyk -v
           snyk auth ${{ env.SNYK_TOKEN }}
       - name: Generate SBOM
-        run: snyk sbom --file=./node-runner-cli/Pipfile --format=cyclonedx1.4+json --json-file-output sbom.json
+        run: snyk sbom --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --format=cyclonedx1.4+json --json-file-output sbom.json
       - name: Upload SBOM
         uses: AButler/upload-release-assets@c94805dc72e4b20745f543da0f62eaee7722df7a # v2.0.2
         with:
@@ -513,8 +513,9 @@ jobs:
 
   snyk-monitor:
     runs-on: ubuntu-latest
-    #needs:
-    #  - upload-release-jammy
+    if: ${{ github.event_name == 'release' }}
+    needs:
+      - package_ubuntu_cli
     permissions:
       id-token: write
       pull-requests: read
