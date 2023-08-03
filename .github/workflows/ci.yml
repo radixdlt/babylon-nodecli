@@ -141,6 +141,7 @@ jobs:
     if: ${{ github.event_name == 'push' }}
     needs:
       - package_ubuntu_cli
+      - snyk-scan
     permissions:
       id-token: write
       contents: read
@@ -180,6 +181,7 @@ jobs:
     if: ${{ github.event_name == 'release' }}
     needs:
       - package_ubuntu_cli
+      - snyk-scan
     steps:
       - name: Download packaged cli
         uses: actions/download-artifact@v3
@@ -202,6 +204,7 @@ jobs:
     permissions: write-all
     needs:
       - package_ubuntu_cli
+      - snyk-scan
     steps:
       - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
       - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
@@ -242,6 +245,7 @@ jobs:
     if: ${{ github.event_name == 'release' }}
     needs:
       - package_ubuntu_cli
+      - snyk-scan
     steps:
       - name: Download packaged cli
         uses: actions/download-artifact@v3
@@ -262,6 +266,7 @@ jobs:
     runs-on: [node-only]
     needs:
       - package_ubuntu_cli
+      - snyk-scan
     steps:
       - name: Checkout
         uses: actions/checkout@v3.4.0
@@ -338,6 +343,7 @@ jobs:
     runs-on: ubuntu-22.04
     needs:
       - package_ubuntu_cli
+      - snyk-scan
     steps:
       - name: Checkout
         uses: actions/checkout@v3.4.0
@@ -426,6 +432,7 @@ jobs:
       contents: read
     needs:
       - package_ubuntu_cli
+      - snyk-scan
     steps:
       - name: Checkout
         uses: actions/checkout@v3.4.0
@@ -516,6 +523,7 @@ jobs:
     if: ${{ github.event_name == 'release' }}
     needs:
       - package_ubuntu_cli
+      - snyk-scan
     permissions:
       id-token: write
       pull-requests: read
