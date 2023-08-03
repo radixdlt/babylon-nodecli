@@ -10,7 +10,6 @@ from config.EnvVars import MOUNT_LEDGER_VOLUME, CORE_DOCKER_REPO_OVERRIDE
 from config.GatewayDockerConfig import GatewayDockerSettings
 from config.KeyDetails import KeyDetails
 from config.MigrationConfig import CommonMigrationSettings
-from config.Nginx import DockerNginxConfig
 from setup.Base import Base
 from utils.Prompts import Prompts
 from utils.utils import Helpers
@@ -89,12 +88,9 @@ class DockerConfig(BaseConfig):
     migration: CommonMigrationSettings = CommonMigrationSettings({})
 
     def __init__(self, release: str):
-        self.core_node = CoreDockerSettings({})
-        self.common_config = CommonDockerSettings({})
-        self.common_config.nginx_settings = DockerNginxConfig({})
-        self.gateway = GatewayDockerSettings({})
-        self.migration = CommonMigrationSettings({})
+        super().__init__({})
         self.core_node.core_release = release
+
 
     def loadConfig(self, file):
         my_file = Path(file)

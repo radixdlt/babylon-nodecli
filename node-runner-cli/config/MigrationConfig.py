@@ -4,10 +4,10 @@ from utils.Prompts import Prompts
 
 class CommonMigrationSettings(BaseConfig):
     use_olympia: bool = False
-    olympia_node_url: str = ""
-    olympia_node_auth_user: str = ""
-    olympia_node_auth_password: str = ""
-    olympia_node_bech32_address: str = ""
+    olympia_node_url: str = "http://localhost:3332"
+    olympia_node_auth_user: str = "radixdlt"
+    olympia_node_auth_password: str = "somepassword"
+    olympia_node_bech32_address: str = "bech32_address"
 
     def ask_migration_config(self, olympia_node_url, olympia_node_auth_user, olympia_node_auth_password,
                              olympia_node_bech32_address):

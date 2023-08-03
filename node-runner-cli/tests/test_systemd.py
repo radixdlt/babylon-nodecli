@@ -7,6 +7,7 @@ from unittest.mock import patch
 import urllib3
 
 from babylonnode import main
+from config.DockerConfig import DockerConfig
 from config.KeyDetails import KeyDetails
 from config.Renderer import Renderer
 from config.SystemDConfig import SystemDSettings
@@ -291,6 +292,22 @@ WantedBy=multi-user.target"""
 RADIX_NODE_KEYSTORE_PASSWORD=nowthatyouknowmysecretiwillfollowyouuntilyouforgetit"""
         self.maxDiff = None
         self.assertEqual(render_template, fixture)
+
+    def test_systemd_settings_roundtrip(self):
+        settings = SystemDSettings({})
+        to_dict = settings.to_dict()
+        new_settings = SystemDSettings(to_dict)
+        self.assertEqual(settings.to_dict(), new_settings.to_dict())
+        self.assertEqual(settings.to_yaml(), new_settings.to_yaml())
+
+
+    def test_docker_settings_roundtrip(self):
+        self.maxDiff = None
+        settings = DockerConfig({})
+        to_dict = settings.to_dict()
+        new_settings = DockerConfig(to_dict)
+        self.assertEqual(settings.to_dict(), new_settings.to_dict())
+        self.assertEqual(settings.to_yaml(), new_settings.to_yaml())
 
 
 def suite():

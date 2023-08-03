@@ -5,6 +5,7 @@ from unittest.mock import patch
 import urllib3
 
 from babylonnode import main
+from config.DockerConfig import DockerConfig
 
 
 class DockerUnitTests(unittest.TestCase):
@@ -39,7 +40,7 @@ class DockerUnitTests(unittest.TestCase):
                                                   'true',
                                                   'true',
                                                   'Y',
-                                                  '', # remote ip of full node
+                                                  '',  # remote ip of full node
                                                   'Core',
                                                   'local',
                                                   'postgres',
@@ -58,6 +59,14 @@ class DockerUnitTests(unittest.TestCase):
     # def test_docker_config2(self, mockout):
     #     config = Docker.load_settings("/tmp/config.yaml")
     #     self.assertEqual("",config.to_yaml())
+
+    def test_docker_settings_roundtrip(self):
+        self.maxDiff = None
+        settings = DockerConfig({})
+        to_dict = settings.to_dict()
+        new_settings = DockerConfig(to_dict)
+        self.assertEqual(settings.to_yaml(), new_settings.to_yaml())
+        self.assertEqual(settings.to_dict(), new_settings.to_dict())
 
 
 def suite():
