@@ -7,7 +7,7 @@ import yaml
 
 from commands.subcommand import get_decorator, argument
 from config.BaseConfig import SetupMode
-from config.MonitoringConfig import MonitoringSettings
+from config.MonitoringConfig import MonitoringConfig
 from monitoring import Monitoring
 from utils.Prompts import Prompts
 from utils.utils import Helpers, bcolors
@@ -88,7 +88,7 @@ def config(args):
     print(
         "\nCreating config file using the answers from the questions that would be asked in next steps."
         f"\nLocation of the config file: {bcolors.OKBLUE}{config_file}{bcolors.ENDC}")
-    monitoring_config: MonitoringSettings = MonitoringSettings({})
+    monitoring_config: MonitoringConfig = MonitoringConfig({})
 
     config_to_dump = {
         "common_config": dict(monitoring_config.common_config),

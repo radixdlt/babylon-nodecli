@@ -10,16 +10,9 @@ class DockerNginxConfig(BaseConfig):
     release = None
     repo = "radixdlt/babylon-nginx"
 
-    def __init__(self, settings: dict):
+    def __init__(self, config_dict: dict):
         self.mode = "docker"
-        self.protect_gateway = "true" if settings.get("protect_gateway") is None else settings.get("protect_gateway")
-        self.gateway_behind_auth = "true" if settings.get("gateway_behind_auth") is None else settings.get(
-            "gateway_behind_auth")
-        self.enable_transaction_api = "false" if settings.get("enable_transaction_api") is None else settings.get(
-            "enable_transaction_api")
-        self.protect_core = "true" if settings.get("protect_core") is None else settings.get("protect_core")
-        self.repo = "radixdlt/babylon-nginx" if settings.get("repo") is None else settings.get("repo")
-        self.release = settings.get("release")
+        super().__init__(config_dict)
 
 
 class SystemdNginxConfig(BaseConfig):
@@ -31,8 +24,9 @@ class SystemdNginxConfig(BaseConfig):
     release: str = None
     config_url: str = None
 
-    def __init__(self, settings: dict):
-        super().__init__(settings)
+    def __init__(self, config_dict: dict):
+        self.mode = "systemd"
+        super().__init__(config_dict)
 
     def __repr__(self):
         return "%s (dir=%r, secrets_dir=%r, release=%r, config_url=%r)" % (

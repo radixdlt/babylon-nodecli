@@ -1,8 +1,8 @@
 from urllib.parse import urlparse
 
 from config.BaseConfig import SetupMode
-from config.GatewayDockerConfig import GatewayDockerSettings, CoreApiNode
-from config.SystemDConfig import SystemDSettings
+from config.GatewayDockerConfig import GatewayDockerConfig, CoreApiNodeConfig
+from config.SystemDConfig import SystemDConfig
 from github import github
 from setup.AnsibleRunner import AnsibleRunner
 from setup.DockerCompose import DockerCompose
@@ -12,7 +12,7 @@ from utils.utils import Helpers
 
 class GatewaySetup():
     @staticmethod
-    def conditionally_install_local_postgreSQL(gateway_config: GatewayDockerSettings):
+    def conditionally_install_local_postgreSQL(gateway_config: GatewayDockerConfig):
         if gateway_config.postgres_db.setup == 'local' and gateway_config.enabled:
             ansible_dir = f'https://raw.githubusercontent.com/radixdlt/babylon-nodecli/{Helpers.cli_version()}/node-runner-cli'
             AnsibleRunner(ansible_dir).run_setup_postgress(
@@ -31,8 +31,8 @@ class GatewaySetup():
     # Aggregatorr Release
     # DatabaseMigration Release
     @staticmethod
-    def ask_gateway_standalone_docker(postgres_password: str) -> GatewayDockerSettings:
-        gateway_config: GatewayDockerSettings = GatewayDockerSettings({})
+    def ask_gateway_standalone_docker(postgres_password: str) -> GatewayDockerConfig:
+        gateway_config: GatewayDockerConfig = GatewayDockerConfig({})
         gateway_config.enabled = True
 
         gateway_config.data_aggregator.coreApiNode = GatewaySetup.ask_core_api_node_settings("http://localhost:3332")
@@ -56,8 +56,8 @@ class GatewaySetup():
     # Aggregatorr Release
     # DatabaseMigration Release
     @staticmethod
-    def ask_gateway_full_docker(postgres_password: str, url: str) -> GatewayDockerSettings:
-        gateway_config: GatewayDockerSettings = GatewayDockerSettings({})
+    def ask_gateway_full_docker(postgres_password: str, url: str) -> GatewayDockerConfig:
+        gateway_config: GatewayDockerConfig = GatewayDockerConfig({})
         gateway_config.enabled = True
 
         gateway_config.data_aggregator.coreApiNode = GatewaySetup.ask_core_api_node_settings(url)
@@ -76,7 +76,7 @@ class GatewaySetup():
     # Core Node Name
     @staticmethod
     def ask_core_api_node_settings(core_api_address: str):
-        coreApiNode = CoreApiNode({})
+        coreApiNode = CoreApiNodeConfig({})
         if "DETAILED" in SetupMode.instance().mode:
             coreApiNode.core_api_address = Prompts.get_CoreApiAddress(core_api_address)
 
@@ -100,5 +100,5 @@ class GatewaySetup():
         return release
 
     @staticmethod
-    def install_standalone_gateway(settings: SystemDSettings):
+    def install_standalone_gateway(settings: SystemDConfig):
         DockerCompose.install_standalone_gateway_in_docker(settings)

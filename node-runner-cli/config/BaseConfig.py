@@ -2,9 +2,9 @@ import yaml
 
 
 class BaseConfig:
-    def __init__(self, settings: dict):
-        if settings is not None:
-            for key, value in settings.items():
+    def __init__(self, config_dict: dict):
+        if config_dict is not None:
+            for key, value in config_dict.items():
                 setattr(self, key, value)
 
             class_variables = {key: value
@@ -13,8 +13,8 @@ class BaseConfig:
             for attr, value in class_variables.items():
                 if type(self.__getattribute__(attr)) not in (str, int, bool, dict) and self.__getattribute__(
                         attr) is not None:
-                    if (settings.get(attr) is not None):
-                        self.__getattribute__(attr).__init__(settings[attr])
+                    if (config_dict.get(attr) is not None):
+                        self.__getattribute__(attr).__init__(config_dict[attr])
 
     def __repr__(self):
         return repr(vars(self))

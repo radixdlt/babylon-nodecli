@@ -3,7 +3,6 @@ import unittest
 from io import StringIO
 from unittest import mock
 
-from config.CommonDockerSettings import CommonDockerSettings
 from config.Genesis import GenesisConfig
 from utils.Network import Network
 

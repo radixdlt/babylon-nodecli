@@ -6,10 +6,10 @@ import yaml
 from deepdiff import DeepDiff
 from yaml import UnsafeLoader
 
-from config.DockerConfig import DockerConfig, CoreDockerSettings
-from config.EnvVars import DOCKER_COMPOSE_FOLDER_PREFIX, COMPOSE_HTTP_TIMEOUT, RADIXDLT_NODE_KEY_PASSWORD, \
+from config.DockerConfig import DockerConfig, CoreDockerConfig
+from config.EnvVars import DOCKER_COMPOSE_FOLDER_PREFIX, RADIXDLT_NODE_KEY_PASSWORD, \
     POSTGRES_PASSWORD
-from config.GatewayDockerConfig import GatewayDockerSettings
+from config.GatewayDockerConfig import GatewayDockerConfig
 from config.Renderer import Renderer
 from github import github
 from setup.AnsibleRunner import AnsibleRunner
@@ -30,7 +30,7 @@ def print_questionary_header(config_file):
 class DockerSetup(Base):
 
     @staticmethod
-    def save_settings(settings: DockerConfig, config_file: str, autoapprove=False):
+    def save_config(config: DockerConfig, config_file: str, autoapprove=False):
         to_update = ""
         if autoapprove:
             print("In Auto mode - Updating the file as suggested in above changes")
@@ -38,7 +38,7 @@ class DockerSetup(Base):
             to_update = input("\nOkay to update the config file [Y/n]?:")
         if Helpers.check_Yes(to_update) or autoapprove:
             print(f"Saving configuration to {config_file}")
-            settings.to_file(config_file)
+            config.to_file(config_file)
 
     @staticmethod
     def setup_nginx_Password(usertype, username, password=None):
@@ -72,7 +72,6 @@ class DockerSetup(Base):
     def save_compose_file(existing_docker_compose: str, composefile_yaml: dict):
         with open(existing_docker_compose, 'w') as f:
             yaml.dump(composefile_yaml, f, default_flow_style=False, explicit_start=True, allow_unicode=True)
-
 
     @staticmethod
     def check_set_passwords(docker_config: DockerConfig):
@@ -200,16 +199,16 @@ class DockerSetup(Base):
         docker_config.common_config.ask_existing_docker_compose_file()
 
         if "CORE" in argument_object.setupmode.mode:
-            quick_node_settings: CoreDockerSettings = CoreDockerSettings({}).create_config(argument_object.release,
-                                                                                           argument_object.trustednode,
-                                                                                           argument_object.keystore_password,
-                                                                                           argument_object.new_keystore,
-                                                                                           argument_object.validator)
+            quick_node_settings: CoreDockerConfig = CoreDockerConfig({}).create_config(argument_object.release,
+                                                                                       argument_object.trustednode,
+                                                                                       argument_object.keystore_password,
+                                                                                       argument_object.new_keystore,
+                                                                                       argument_object.validator)
             docker_config.core_node = quick_node_settings
             docker_config.common_config.ask_enable_nginx_for_core(argument_object.nginx_on_core)
 
         if "GATEWAY" in argument_object.setupmode.mode:
-            quick_gateway: GatewayDockerSettings = GatewayDockerSettings({}).create_config(
+            quick_gateway: GatewayDockerConfig = GatewayDockerConfig({}).create_config(
                 argument_object.postgrespassword)
 
             docker_config.gateway = quick_gateway
@@ -217,7 +216,7 @@ class DockerSetup(Base):
         if "DETAILED" in argument_object.setupmode.mode:
             run_fullnode = Prompts.check_for_fullnode()
             if run_fullnode:
-                detailed_node_settings: CoreDockerSettings = CoreDockerSettings({}).create_config(
+                detailed_node_settings: CoreDockerConfig = CoreDockerConfig({}).create_config(
                     argument_object.release,
                     argument_object.trustednode,
                     argument_object.keystore_password,
@@ -230,7 +229,8 @@ class DockerSetup(Base):
 
             run_gateway = Prompts.check_for_gateway()
             if run_gateway:
-                docker_config.gateway = GatewaySetup.ask_gateway_full_docker(argument_object.postgrespassword, argument_object.olympia_node_url)
+                docker_config.gateway = GatewaySetup.ask_gateway_full_docker(argument_object.postgrespassword,
+                                                                             argument_object.olympia_node_url)
                 docker_config.common_config.ask_enable_nginx_for_gateway(argument_object.nginx_on_gateway)
             else:
                 docker_config.common_config.nginx_settings.protect_gateway = "false"
@@ -284,8 +284,8 @@ class DockerSetup(Base):
                       Difference between existing config file and new config that you are creating
                       {config_differences}
                         """)
-            DockerSetup.save_settings(docker_config_updated_versions, argument_object.config_file,
-                                      argument_object.autoapprove)
+            DockerSetup.save_config(docker_config_updated_versions, argument_object.config_file,
+                                    argument_object.autoapprove)
 
     @staticmethod
     def confirm_docker_compose_file_changes(argument_object: DockerInstallArguments, docker_config_updated_versions):

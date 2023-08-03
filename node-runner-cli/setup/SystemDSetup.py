@@ -7,9 +7,9 @@ from deepdiff import DeepDiff
 from yaml import UnsafeLoader
 
 from config.EnvVars import UNZIPPED_NODE_DIST_FOLDER
-from config.MigrationConfig import CommonMigrationSettings
+from config.MigrationConfig import CommonMigrationConfig
 from config.Renderer import Renderer
-from config.SystemDConfig import SystemDSettings, CoreSystemdSettings, CommonSystemdSettings
+from config.SystemDConfig import SystemDConfig, CoreSystemdConfig, CommonSystemdConfig
 from setup.Base import Base
 from setup.GatewaySetup import GatewaySetup
 from setup.SystemDCommandArguments import SystemDConfigArguments
@@ -85,7 +85,7 @@ class SystemDSetup(Base):
                 run_shell_command(f"cp {filepath}/{filename} {backup_time}/{filename}", shell=True)
 
     @staticmethod
-    def setup_service_file(settings: SystemDSettings,
+    def setup_service_file(settings: SystemDConfig,
                            service_file_path="/etc/systemd/system/radixdlt-node.service"):
         # This may need to be moved to jinja template
         tmp_service: str = "/tmp/radixdlt-node.service"
@@ -277,7 +277,7 @@ class SystemDSetup(Base):
         return
 
     @staticmethod
-    def save_settings(settings: SystemDSettings, config_file: str, autoapprove=False):
+    def save_config(settings: SystemDConfig, config_file: str, autoapprove=False):
         to_update = ""
         if autoapprove:
             print("In Auto mode - Updating the file as suggested in above changes")
@@ -288,16 +288,16 @@ class SystemDSetup(Base):
             settings.to_file(config_file)
 
     @staticmethod
-    def load_settings(config_file) -> SystemDSettings:
+    def load_settings(config_file) -> SystemDConfig:
         if not os.path.isfile(config_file):
             print(f"No configuration found. Execute 'babylonnode systemd config' first.")
             sys.exit(1)
         with open(config_file, 'r') as f:
             dictionary = yaml.load(f, Loader=UnsafeLoader)
-        return SystemDSettings(dictionary)
+        return SystemDConfig(dictionary)
 
     @staticmethod
-    def compare_old_and_new_config(config_file: str, systemd_config: SystemDSettings):
+    def compare_old_and_new_config(config_file: str, systemd_config: SystemDConfig):
         old_config = SystemDSetup.load_all_config(config_file)
         config_to_dump = {"version": "0.1", "core_node": dict(systemd_config.core_node),
                           "common_config": dict(systemd_config.common_config),
@@ -312,7 +312,7 @@ class SystemDSetup(Base):
                           """)
 
     @staticmethod
-    def dump_config_as_yaml(systemd_config: SystemDSettings):
+    def dump_config_as_yaml(systemd_config: SystemDConfig):
         config_to_dump = {"version": "0.1", "core_node": systemd_config.core_node.to_dict(),
                           "common_config": systemd_config.common_config.to_dict(),
                           "migration": systemd_config.migration.to_dict(),
@@ -323,8 +323,8 @@ class SystemDSetup(Base):
         return config_to_dump
 
     @staticmethod
-    def ask_common_config(argument_object: SystemDConfigArguments) -> CommonSystemdSettings:
-        systemd_config = SystemDSettings({})
+    def ask_common_config(argument_object: SystemDConfigArguments) -> CommonSystemdConfig:
+        systemd_config = SystemDConfig({})
         systemd_config.common_config.ask_network_id(argument_object.networkid)
         systemd_config.common_config.ask_host_ip(argument_object.hostip)
         systemd_config.common_config.ask_enable_nginx_for_core(argument_object.nginx_on_core)
@@ -337,8 +337,8 @@ class SystemDSetup(Base):
         return systemd_config.common_config
 
     @staticmethod
-    def ask_core_node(argument_object: SystemDConfigArguments) -> CoreSystemdSettings:
-        systemd_config = SystemDSettings({})
+    def ask_core_node(argument_object: SystemDConfigArguments) -> CoreSystemdConfig:
+        systemd_config = SystemDConfig({})
         systemd_config.core_node.set_core_release(argument_object.release)
         systemd_config.core_node.set_trusted_node(argument_object.trustednode)
         systemd_config.core_node.generate_download_urls()
@@ -349,8 +349,8 @@ class SystemDSetup(Base):
         return systemd_config.core_node
 
     @staticmethod
-    def ask_migration(argument_object: SystemDConfigArguments) -> CommonMigrationSettings:
-        systemd_config = SystemDSettings({})
+    def ask_migration(argument_object: SystemDConfigArguments) -> CommonMigrationConfig:
+        systemd_config = SystemDConfig({})
         if "MIGRATION" in argument_object.setupmode.mode:
             systemd_config.migration.ask_migration_config(argument_object.olympia_node_url,
                                                           argument_object.olympia_node_auth_user,
@@ -366,7 +366,7 @@ class SystemDSetup(Base):
         print(settings.to_yaml())
 
     @staticmethod
-    def install_systemd_service(settings: SystemDSettings, args):
+    def install_systemd_service(settings: SystemDConfig, args):
         SystemDSetup.print_config(settings)
 
         SystemDSetup.confirm_config(settings.core_node.nodetype,
@@ -420,7 +420,7 @@ class SystemDSetup(Base):
                 print("Nginx not configured or not updated.")
 
     @staticmethod
-    def setup_nginx_service(settings: SystemDSettings, backup_time: str, autoapprove: bool):
+    def setup_nginx_service(settings: SystemDConfig, backup_time: str, autoapprove: bool):
         SystemDSetup.backup_file("/lib/systemd/system", "nginx.service", backup_time, autoapprove)
         SystemDSetup.create_ssl_certs(settings.common_config.nginx_settings.secrets_dir, autoapprove)
         nginx_configured = SystemDSetup.setup_nginx_config(

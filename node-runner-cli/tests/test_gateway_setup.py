@@ -5,13 +5,13 @@ from unittest.mock import patch
 
 import urllib3
 
-from config.SystemDConfig import SystemDSettings
+from config.SystemDConfig import SystemDConfig
 from setup.GatewaySetup import GatewaySetup
 from utils.Prompts import Prompts
 
 
 class GatewaySetupTests(unittest.TestCase):
-    fixture: SystemDSettings = SystemDSettings({})
+    fixture: SystemDConfig = SystemDConfig({})
 
     @classmethod
     def setUpClass(cls):

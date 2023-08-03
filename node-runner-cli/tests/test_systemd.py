@@ -10,7 +10,7 @@ from babylonnode import main
 from config.DockerConfig import DockerConfig
 from config.KeyDetails import KeyDetails
 from config.Renderer import Renderer
-from config.SystemDConfig import SystemDSettings
+from config.SystemDConfig import SystemDConfig
 from setup.SystemDSetup import SystemDSetup
 from utils.PromptFeeder import PromptFeeder
 
@@ -38,25 +38,25 @@ class SystemdUnitTests(unittest.TestCase):
 
     def test_systemd_config_can_be_saved_and_restored_as_yaml(self):
         # Make Python Class YAML Serializable
-        settings = SystemDSettings({})
+        config = SystemDConfig({})
         home_directory = Path.home()
-        settings.core_node.node_dir = "/somedir/babylon-node"
-        settings.core_node.node_secrets_dir = "/somedir/babylon-node/secret"
-        settings.migration.use_olympia = True
+        config.core_node.node_dir = "/somedir/babylon-node"
+        config.core_node.node_secrets_dir = "/somedir/babylon-node/secret"
+        config.migration.use_olympia = True
         key_details = KeyDetails({})
-        settings.core_node.keydetails = key_details
-        settings.common_config.host_ip = "6.6.6.6"
+        config.core_node.keydetails = key_details
+        config.common_config.host_ip = "6.6.6.6"
 
         config_file = f"/tmp/config.yaml"
         with patch('builtins.input', side_effect=['Y']):
-            SystemDSetup.save_settings(settings, config_file)
+            SystemDSetup.save_config(config, config_file)
 
         self.maxDiff = None
-        new_settings = SystemDSetup.load_settings(config_file)
-        self.assertEqual(new_settings.to_yaml(), settings.to_yaml())
-        self.assertEqual("/somedir/babylon-node", settings.core_node.node_dir)
-        self.assertEqual(type(settings), type(new_settings))
-        self.assertEqual("/somedir/babylon-node", new_settings.core_node.get("node_dir"))
+        new_config = SystemDSetup.load_settings(config_file)
+        self.assertEqual(new_config.to_yaml(), config.to_yaml())
+        self.assertEqual("/somedir/babylon-node", config.core_node.node_dir)
+        self.assertEqual(type(config), type(new_config))
+        self.assertEqual("/somedir/babylon-node", new_config.core_node.get("node_dir"))
 
     @unittest.skip("Can only be executed on Ubuntu")
     def test_systemd_dependencies(self):
@@ -121,16 +121,16 @@ class SystemdUnitTests(unittest.TestCase):
     @patch('sys.stdout', new_callable=StringIO)
     def test_systemd_setup_default_config(self, mockout):
         with patch('builtins.input', side_effect=[]):
-            settings = SystemDSettings({})
-            settings.common_config.host_ip = "1.1.1.1"
-            settings.common_config.network_id = 1
-            settings.core_node.keydetails.keyfile_path = "/tmp/babylon-node"
-            settings.core_node.keydetails.keyfile_name = "node-keystore.ks"
-            settings.core_node.trusted_node = "someNode"
-            settings.core_node.validator_address = "validatorAddress"
-            settings.core_node.node_dir = "/tmp"
-            settings.migration.use_olympia = False
-            settings.create_default_config_file()
+            config = SystemDConfig({})
+            config.common_config.host_ip = "1.1.1.1"
+            config.common_config.network_id = 1
+            config.core_node.keydetails.keyfile_path = "/tmp/babylon-node"
+            config.core_node.keydetails.keyfile_name = "node-keystore.ks"
+            config.core_node.trusted_node = "someNode"
+            config.core_node.validator_address = "validatorAddress"
+            config.core_node.node_dir = "/tmp"
+            config.migration.use_olympia = False
+            config.create_default_config_file()
         self.assertTrue(os.path.isfile("/tmp/default.config"))
 
         f = open("/tmp/default.config", "r")
@@ -167,7 +167,7 @@ consensus.validator_address=validatorAddress
     @patch('sys.stdout', new_callable=StringIO)
     def test_systemd_setup_default_config_without_validator(self, mockout):
         with patch('builtins.input', side_effect=[]):
-            settings = SystemDSettings({})
+            settings = SystemDConfig({})
             settings.common_config.host_ip = "1.1.1.1"
             settings.common_config.network_id = 1
             settings.core_node.keydetails.keyfile_path = "/tmp/babylon-node"
@@ -208,7 +208,7 @@ db.location=/home/radixdlt/babylon-ledger
     @patch('sys.stdout', new_callable=StringIO)
     def test_systemd_setup_default_config_jinja(self, mockout):
         with patch('builtins.input', side_effect=[]):
-            settings = SystemDSettings({})
+            settings = SystemDConfig({})
             settings.common_config.genesis_bin_data_file = None
             settings.core_node.keydetails.keyfile_path = "/tmp/babylon-node"
             settings.core_node.keydetails.keyfile_name = "node-keystore.ks"
@@ -249,7 +249,7 @@ consensus.validator_address=validatorAddress
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_systemd_service_file_jinja(self, mockout):
-        settings = SystemDSettings({})
+        settings = SystemDConfig({})
         settings.core_node.node_dir = "/nodedir"
         settings.core_node.node_secrets_dir = "/nodedir/secrets"
         settings.core_node.core_release = "1.1.0"
@@ -283,7 +283,7 @@ WantedBy=multi-user.target"""
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_systemd_service_file_jinja(self, mockout):
-        settings = SystemDSettings({})
+        settings = SystemDConfig({})
         settings.core_node.keydetails.keystore_password = "nowthatyouknowmysecretiwillfollowyouuntilyouforgetit"
 
         render_template = Renderer().load_file_based_template("systemd-environment.j2").render(
@@ -294,12 +294,11 @@ RADIX_NODE_KEYSTORE_PASSWORD=nowthatyouknowmysecretiwillfollowyouuntilyouforgeti
         self.assertEqual(render_template, fixture)
 
     def test_systemd_settings_roundtrip(self):
-        settings = SystemDSettings({})
+        settings = SystemDConfig({})
         to_dict = settings.to_dict()
-        new_settings = SystemDSettings(to_dict)
+        new_settings = SystemDConfig(to_dict)
         self.assertEqual(settings.to_dict(), new_settings.to_dict())
         self.assertEqual(settings.to_yaml(), new_settings.to_yaml())
-
 
     def test_docker_settings_roundtrip(self):
         self.maxDiff = None

@@ -2,7 +2,7 @@ from config.BaseConfig import BaseConfig
 from utils.Prompts import Prompts
 
 
-class CommonMigrationSettings(BaseConfig):
+class CommonMigrationConfig(BaseConfig):
     use_olympia: bool = False
     olympia_node_url: str = "http://localhost:3332"
     olympia_node_auth_user: str = "radixdlt"
@@ -28,5 +28,3 @@ class CommonMigrationSettings(BaseConfig):
         if olympia_node_auth_password is None:
             olympia_node_auth_password = Prompts.ask_olympia_node_auth_password()
         self.olympia_node_auth_password = olympia_node_auth_password
-
-

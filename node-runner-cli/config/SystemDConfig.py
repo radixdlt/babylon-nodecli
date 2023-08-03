@@ -5,9 +5,9 @@ from pathlib import Path
 from config.BaseConfig import BaseConfig, SetupMode
 from config.EnvVars import MOUNT_LEDGER_VOLUME, NODE_BINARY_OVERIDE, NGINX_BINARY_OVERIDE, \
     APPEND_DEFAULT_CONFIG_OVERIDES
-from config.GatewayDockerConfig import GatewayDockerSettings
+from config.GatewayDockerConfig import GatewayDockerConfig
 from config.KeyDetails import KeyDetails
-from config.MigrationConfig import CommonMigrationSettings
+from config.MigrationConfig import CommonMigrationConfig
 from config.Nginx import SystemdNginxConfig
 from config.Renderer import Renderer
 from github import github
@@ -18,7 +18,7 @@ from utils.Prompts import Prompts
 from utils.utils import Helpers, run_shell_command
 
 
-class CoreSystemdSettings(BaseConfig):
+class CoreSystemdConfig(BaseConfig):
     nodetype: str = "fullnode"
     keydetails: KeyDetails = KeyDetails({})
     core_release: str = None
@@ -80,7 +80,7 @@ class CoreSystemdSettings(BaseConfig):
         self.set_validator_address(validator_address)
 
 
-class CommonSystemdSettings(BaseConfig):
+class CommonSystemdConfig(BaseConfig):
     nginx_settings: SystemdNginxConfig = SystemdNginxConfig({})
     host_ip: str = None
     service_user: str = "radixdlt"
@@ -147,11 +147,11 @@ class CommonSystemdSettings(BaseConfig):
                                                    f"{self.nginx_settings.release}/babylon-nginx-fullnode-conf.zip")
 
 
-class SystemDSettings(BaseConfig):
-    migration: CommonMigrationSettings = CommonMigrationSettings({})
-    core_node: CoreSystemdSettings = CoreSystemdSettings({})
-    common_config: CommonSystemdSettings = CommonSystemdSettings({})
-    gateway: GatewayDockerSettings = GatewayDockerSettings({})
+class SystemDConfig(BaseConfig):
+    migration: CommonMigrationConfig = CommonMigrationConfig({})
+    core_node: CoreSystemdConfig = CoreSystemdConfig({})
+    common_config: CommonSystemdConfig = CommonSystemdConfig({})
+    gateway: GatewayDockerConfig = GatewayDockerConfig({})
 
     def parse_config_from_args(self, args):
         self.core_node.trusted_node = args.trustednode

@@ -3,7 +3,7 @@ from argparse import ArgumentParser
 from pathlib import Path
 
 from commands.subcommand import get_decorator, argument
-from config.SystemDConfig import SystemDSettings
+from config.SystemDConfig import SystemDConfig
 from setup.Base import Base
 from setup.GatewaySetup import GatewaySetup
 from setup.SystemDCommandArguments import SystemDConfigArguments
@@ -86,7 +86,7 @@ def config(args):
     ################### QUESTIONARY
     print_questionary_header(argument_object.config_file)
 
-    systemd_config = SystemDSettings({})
+    systemd_config = SystemDConfig({})
 
     systemd_config.common_config = SystemDSetup.ask_common_config(argument_object)
     systemd_config.core_node = SystemDSetup.ask_core_node(argument_object)
@@ -98,7 +98,7 @@ def config(args):
     Path(f"{args.configdir}").mkdir(parents=True, exist_ok=True)
     SystemDSetup.dump_config_as_yaml(systemd_config)
     SystemDSetup.compare_old_and_new_config(argument_object.config_file, systemd_config)
-    SystemDSetup.save_settings(systemd_config, argument_object.config_file, autoapprove=args.autoapprove)
+    SystemDSetup.save_config(systemd_config, argument_object.config_file, autoapprove=args.autoapprove)
 
 
 @systemdcommand([
@@ -115,7 +115,7 @@ def config(args):
 ])
 def install(args):
     """This sets up the systemd service for the core node."""
-    settings: SystemDSettings = SystemDSetup.load_settings(args.configfile)
+    settings: SystemDConfig = SystemDSetup.load_settings(args.configfile)
     SystemDSetup.install_systemd_service(settings, args)
 
 

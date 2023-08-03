@@ -5,12 +5,12 @@ from utils.Prompts import Prompts
 from utils.utils import Helpers
 
 
-class CommonMonitoringSettings(BaseConfig):
+class CommonMonitoringConfig(BaseConfig):
     docker_compose_file = f"{Helpers.get_default_monitoring_config_dir()}/node-monitoring.yml"
     config_dir = Helpers.get_default_monitoring_config_dir()
 
 
-class PrometheusSettings(BaseConfig):
+class PrometheusConfig(BaseConfig):
     metrics_path = "/metrics"
     metrics_target = "localhost"
     basic_auth_password = None
@@ -40,11 +40,11 @@ class PrometheusSettings(BaseConfig):
             self.basic_auth_user = auth["name"]
 
 
-class MonitoringSettings(BaseConfig):
-    core_prometheus_settings: PrometheusSettings = PrometheusSettings({})
-    gateway_api_prometheus_settings: PrometheusSettings = PrometheusSettings({})
-    aggregator_prometheus_settings: PrometheusSettings = PrometheusSettings({})
-    common_config: CommonMonitoringSettings = CommonMonitoringSettings({})
+class MonitoringConfig(BaseConfig):
+    core_prometheus_settings: PrometheusConfig = PrometheusConfig({})
+    gateway_api_prometheus_settings: PrometheusConfig = PrometheusConfig({})
+    aggregator_prometheus_settings: PrometheusConfig = PrometheusConfig({})
+    common_config: CommonMonitoringConfig = CommonMonitoringConfig({})
 
     def configure_core_target(self, basic_auth_password):
         self.core_prometheus_settings.ask_prometheus_target(basic_auth_password, target_name="CORE_NODE")

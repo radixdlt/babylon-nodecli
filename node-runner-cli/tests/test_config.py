@@ -7,7 +7,7 @@ from yaml import UnsafeLoader
 
 from config.DockerConfig import DockerConfig
 from config.Nginx import SystemdNginxConfig, DockerNginxConfig
-from config.SystemDConfig import SystemDSettings
+from config.SystemDConfig import SystemDConfig
 from utils.Network import Network
 
 
@@ -15,7 +15,7 @@ class ConfigUnitTests(unittest.TestCase):
 
     # @unittest.skip("Tests with PROMPT_FEEDS can only be run individually")
     def test_config_systemd_can_be_instantiated_with_defaults(self):
-        config = SystemDSettings({})
+        config = SystemDConfig({})
         self.assertEqual(config.core_node.node_dir, "/etc/radixdlt/node")
 
     def test_config_systemd_nginx_can_be_serialized(self):

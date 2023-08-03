@@ -104,7 +104,7 @@ def config(args):
     Path(f"{Helpers.get_default_node_config_dir()}").mkdir(parents=True, exist_ok=True)
     DockerSetup.print_config(docker_config)
     DockerSetup.compare_config_file_with_config_object(argument_object.config_file, docker_config)
-    DockerSetup.save_settings(docker_config, argument_object.config_file, argument_object.autoapprove)
+    DockerSetup.save_config(docker_config, argument_object.config_file, argument_object.autoapprove)
 
 
 @dockercommand([

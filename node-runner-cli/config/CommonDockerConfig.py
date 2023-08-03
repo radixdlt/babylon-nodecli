@@ -7,26 +7,16 @@ from utils.Network import Network
 from utils.Prompts import Prompts, Helpers
 
 
-class NginxConfig(BaseConfig):
-    # uncomment below when support to gateway is added
-    # protect_gateway: str = "true"
-    # gateway_behind_auth: str = "true"
-    enable_transaction_api = "false"
-    protect_core: str = "true"
-    release = None
-    repo = "radixdlt/babylon-nginx"
-
-
-class CommonDockerSettings(BaseConfig):
+class CommonDockerConfig(BaseConfig):
     network_id: int = None
     network_name: str = None
     genesis_bin_data_file: str = None
     nginx_settings: DockerNginxConfig = DockerNginxConfig({})
     docker_compose: str = f"{Helpers.get_home_dir()}/docker-compose.yml"
 
-    def __init__(self, settings: dict):
-        super().__init__(settings)
-        for key, value in settings.items():
+    def __init__(self, config_dict: dict):
+        super().__init__(config_dict)
+        for key, value in config_dict.items():
             setattr(self, key, value)
 
         if self.network_id:
@@ -38,16 +28,6 @@ class CommonDockerSettings(BaseConfig):
 
     def set_genesis_bin_data_file_location(self, genesis_bin_data_file: str):
         self.genesis_bin_data_file = genesis_bin_data_file
-
-    def set_genesis_type(self, genesis_file_location: str):
-        if genesis_file_location is None:
-            self.genesis_type = "json"
-        elif genesis_file_location.endswith('.json'):
-            self.genesis_type = "json"
-        elif genesis_file_location.endswith('.bin'):
-            self.genesis_type = "binary"
-        else:
-            self.genesis_type = "json"
 
     def set_network_name(self):
         if self.network_id:

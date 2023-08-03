@@ -1,13 +1,13 @@
 from config.EnvVars import COMPOSE_HTTP_TIMEOUT
 from config.Renderer import Renderer
-from config.SystemDConfig import SystemDSettings
+from config.SystemDConfig import SystemDConfig
 from setup.DockerCommandArguments import DockerInstallArguments
 from utils.utils import Helpers, run_shell_command
 
 
 class DockerCompose:
     @staticmethod
-    def install_standalone_gateway_in_docker(systemd_settings: SystemDSettings):
+    def install_standalone_gateway_in_docker(systemd_settings: SystemDConfig):
         docker_compose_file: str = systemd_settings.gateway.docker_compose_file
         Renderer() \
             .load_file_based_template("standalone-gateway-compose.yml.j2") \
