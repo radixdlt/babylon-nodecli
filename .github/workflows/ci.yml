@@ -51,7 +51,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Run Snyk to check for code vulnerabilities
-        run: snyk code test --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --severity-threshold=high
+        run: snyk code test --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --severity-threshold=high --report
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Test SBOM generation
