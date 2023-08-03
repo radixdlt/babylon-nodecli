@@ -55,7 +55,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Test SBOM generation
-        run: snyk sbom --file=./node-runner-cli/Pipfile ---format=cyclonedx1.4+json --json-file-output sbom.json
+        run: snyk sbom --file=./node-runner-cli/Pipfile --format=cyclonedx1.4+json --json-file-output sbom.json
 
   package_ubuntu_cli:
     name: "Package cli for Ubuntu"
@@ -195,6 +195,47 @@ jobs:
           asset_name: radixnode-ubuntu-22.04
           asset_content_type: application/octet-stream
         if: ${{ github.event_name == 'release' }}
+
+  upload-sbom:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'release' }}
+    permissions: write-all
+    needs:
+      - upload-release-jammy
+    steps:
+      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
+      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
+        with:
+          role_name: ${{ secrets.AWS_ROLE_NAME_SNYK_SECRET }}
+          app_name: 'babylon-nodecli'
+          step_name: 'upload-sbom'
+          secret_prefix: 'SNYK'
+          secret_name: ${{ secrets.AWS_SECRET_NAME_SNYK }}
+          parse_json: true
+      - name: Setup python
+        uses: actions/setup-python@v4.5.0
+        with:
+          python-version: 3.10.6
+      - name: Install pipenv
+        run: python -m pip install --upgrade pipenv wheel
+      - name: Install dependencies
+        run: |
+          cd ./node-runner-cli
+          pipenv install
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install Snyk cli
+        run: |
+          npm install snyk -g
+          snyk -v
+          snyk auth ${{ env.SNYK_TOKEN }}
+      - name: Generate SBOM
+        run: snyk sbom --file=./node-runner-cli/Pipfile --format=cyclonedx1.4+json --json-file-output sbom.json
+      - name: Upload SBOM
+        uses: AButler/upload-release-assets@c94805dc72e4b20745f543da0f62eaee7722df7a # v2.0.2
+        with:
+          files: sbom.json
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
   upload-release-focal:
     runs-on: ubuntu-20.04
