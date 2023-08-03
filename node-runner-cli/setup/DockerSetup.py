@@ -6,7 +6,7 @@ import yaml
 from deepdiff import DeepDiff
 from yaml import UnsafeLoader
 
-from config.DockerConfig import DockerConfig, from_dict, CoreDockerSettings
+from config.DockerConfig import DockerConfig, CoreDockerSettings
 from config.EnvVars import DOCKER_COMPOSE_FOLDER_PREFIX, COMPOSE_HTTP_TIMEOUT, RADIXDLT_NODE_KEY_PASSWORD, \
     POSTGRES_PASSWORD
 from config.GatewayDockerConfig import GatewayDockerSettings
@@ -186,7 +186,7 @@ class DockerSetup(Base):
             sys.exit(1)
         with open(config_file, 'r') as f:
             dictionary = yaml.load(f, Loader=UnsafeLoader)
-        return from_dict(dictionary)
+        return DockerConfig(dictionary)
 
     @staticmethod
     def questionary(argument_object: DockerConfigArguments) -> DockerConfig:
@@ -258,12 +258,12 @@ class DockerSetup(Base):
                 print(f"""
                     {Helpers.section_headline("Differences")}
                     Difference between existing config file and new config that you are creating
-                    {dict(DeepDiff(old_config, config_object.toDict()))}
+                    {dict(DeepDiff(old_config, config_object.to_dict()))}
                       """)
 
     @staticmethod
     def print_config(configuration):
-        config_dict: dict = configuration.toDict()
+        config_dict: dict = configuration.to_dict()
         yaml.add_representer(type(None), Helpers.represent_none)
         Helpers.section_headline("CONFIG is Generated as below")
         print(f"\n{yaml.dump(config_dict)}")

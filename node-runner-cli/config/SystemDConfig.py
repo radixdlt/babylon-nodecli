@@ -2,8 +2,6 @@ import json
 import os
 from pathlib import Path
 
-import yaml
-
 from config.BaseConfig import BaseConfig, SetupMode
 from config.EnvVars import MOUNT_LEDGER_VOLUME, NODE_BINARY_OVERIDE, NGINX_BINARY_OVERIDE, \
     APPEND_DEFAULT_CONFIG_OVERIDES
@@ -149,24 +147,11 @@ class CommonSystemdSettings(BaseConfig):
                                                    f"{self.nginx_settings.release}/babylon-nginx-fullnode-conf.zip")
 
 
-
 class SystemDSettings(BaseConfig):
     migration: CommonMigrationSettings = CommonMigrationSettings({})
     core_node: CoreSystemdSettings = CoreSystemdSettings({})
     common_config: CommonSystemdSettings = CommonSystemdSettings({})
     gateway: GatewayDockerSettings = GatewayDockerSettings({})
-
-
-
-    def to_yaml(self):
-        config_to_dump = self.to_dict()
-        return yaml.dump(config_to_dump, sort_keys=True, default_flow_style=False, explicit_start=True,
-                         allow_unicode=True)
-
-    def to_file(self, config_file):
-        config_to_dump = self.to_dict()
-        with open(config_file, 'w') as f:
-            yaml.dump(config_to_dump, f, sort_keys=True, default_flow_style=False)
 
     def parse_config_from_args(self, args):
         self.core_node.trusted_node = args.trustednode
@@ -219,22 +204,3 @@ class SystemDSettings(BaseConfig):
         Renderer().load_file_based_template("systemd.service.j2").render(dict(self)).to_file(tmp_service)
         command = f"sudo mv {tmp_service} {service_file_path}"
         run_shell_command(command, shell=True)
-
-
-def from_dict(dictionary: dict) -> SystemDSettings:
-    settings = SystemDSettings({})
-    settings.core_node = CoreSystemdSettings({})
-    settings.common_config = CommonSystemdSettings({})
-    settings.core_node = CoreSystemdSettings(dictionary["core_node"])
-    settings.core_node.keydetails = KeyDetails(dictionary["core_node"]["keydetails"])
-    settings.common_config = CommonSystemdSettings(dictionary["common_config"])
-    settings.common_config.nginx_settings = SystemdNginxConfig(dictionary["common_config"]["nginx_settings"])
-    settings.migration = CommonMigrationSettings(dictionary["migration"])
-    settings.migration = CommonMigrationSettings(dictionary["gateway"])
-    settings.migration = CommonMigrationSettings(dictionary["gateway"]["data_aggregator"])
-    settings.migration = CommonMigrationSettings(dictionary["gateway"]["data_aggregator"]["coreApiNode"])
-    settings.migration = CommonMigrationSettings(dictionary["gateway"]["database_migration"])
-    settings.migration = CommonMigrationSettings(dictionary["gateway"]["gateway_api"])
-    settings.migration = CommonMigrationSettings(dictionary["gateway"]["gateway_api"]["coreApiNode"])
-    settings.migration = CommonMigrationSettings(dictionary["gateway"]["postgres_db"])
-    return settings

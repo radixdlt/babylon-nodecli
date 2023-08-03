@@ -41,7 +41,7 @@ class SystemdUnitTests(unittest.TestCase):
         home_directory = Path.home()
         settings.core_node.node_dir = "/somedir/babylon-node"
         settings.core_node.node_secrets_dir = "/somedir/babylon-node/secret"
-        settings.migration.use_olympia = False
+        settings.migration.use_olympia = True
         key_details = KeyDetails({})
         settings.core_node.keydetails = key_details
         settings.common_config.host_ip = "6.6.6.6"
@@ -53,7 +53,9 @@ class SystemdUnitTests(unittest.TestCase):
         self.maxDiff = None
         new_settings = SystemDSetup.load_settings(config_file)
         self.assertEqual(new_settings.to_yaml(), settings.to_yaml())
-        self.assertEqual(new_settings.core_node.node_dir, "/somedir/babylon-node")
+        self.assertEqual("/somedir/babylon-node", settings.core_node.node_dir)
+        self.assertEqual(type(settings), type(new_settings))
+        self.assertEqual("/somedir/babylon-node", new_settings.core_node.get("node_dir"))
 
     @unittest.skip("Can only be executed on Ubuntu")
     def test_systemd_dependencies(self):
@@ -126,6 +128,7 @@ class SystemdUnitTests(unittest.TestCase):
             settings.core_node.trusted_node = "someNode"
             settings.core_node.validator_address = "validatorAddress"
             settings.core_node.node_dir = "/tmp"
+            settings.migration.use_olympia = False
             settings.create_default_config_file()
         self.assertTrue(os.path.isfile("/tmp/default.config"))
 
@@ -158,7 +161,7 @@ consensus.validator_address=validatorAddress
 """
         self.maxDiff = None
         print(fixture)
-        self.assertEqual(default_config, fixture)
+        self.assertEqual(fixture, default_config)
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_systemd_setup_default_config_without_validator(self, mockout):

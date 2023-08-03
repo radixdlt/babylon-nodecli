@@ -114,39 +114,3 @@ class DockerConfig(BaseConfig):
             self.core_node.keydetails = KeyDetails(core_node.get("keydetails", None))
             self.core_node.trusted_node = core_node.get("trusted_node", None)
             self.core_node.existing_docker_compose = core_node.get("docker_compose", None)
-
-    def to_yaml(self):
-        config_to_dump = self.to_dict()
-        return yaml.dump(config_to_dump, sort_keys=False, default_flow_style=False, explicit_start=True,
-                         allow_unicode=True)
-
-    def to_file(self, config_file):
-        config_to_dump = dict(self)
-        config_to_dump["core_node"] = dict(self.core_node)
-        config_to_dump["core_node"]["keydetails"] = dict(self.core_node.keydetails)
-        config_to_dump["common_config"] = dict(self.common_config)
-        # config_to_dump["common_config"]["nginx_settings"] = dict(self.common_config.nginx_settings)
-        config_to_dump["migration"] = dict(self.migration)
-        config_to_dump["gateway"] = dict(self.gateway)
-        with open(config_file, 'w') as f:
-            yaml.dump(config_to_dump, f, sort_keys=True, default_flow_style=False)
-
-    def toDict(configuration):
-        config_to_dump = {"version": "0.2"}
-        config_to_dump["common_config"] = dict(configuration.common_config)
-        config_to_dump["migration"] = dict(configuration.migration)
-        config_to_dump["gateway"] = dict(configuration.gateway)
-        config_to_dump["core_node"] = dict(configuration.gateway)
-        return config_to_dump
-
-
-def from_dict(dictionary: dict) -> DockerConfig:
-    settings = DockerConfig({})
-    settings.core_node = DockerConfig({})
-    settings.common_config = CommonDockerSettings({})
-    settings.core_node = CoreDockerSettings(dictionary["core_node"])
-    settings.core_node.keydetails = KeyDetails(dictionary["core_node"]["keydetails"])
-    settings.common_config = CommonDockerSettings(dictionary["common_config"])
-    settings.common_config.nginx_settings = dictionary["common_config"]["nginx_settings"]
-    settings.migration = CommonMigrationSettings(dictionary["migration"])
-    return settings

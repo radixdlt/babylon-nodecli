@@ -4,12 +4,10 @@ from pathlib import Path
 from unittest.mock import patch
 
 import urllib3
-import yaml
 
 from config.SystemDConfig import SystemDSettings
 from setup.GatewaySetup import GatewaySetup
 from utils.Prompts import Prompts
-from utils.utils import Helpers
 
 
 class GatewaySetupTests(unittest.TestCase):
@@ -154,15 +152,6 @@ services:
             # Core Node Address
             core_api_address = Prompts.get_CoreApiAddress(default_value)
         self.assertEqual(keyboard_input, core_api_address)
-
-    def test_to_dict(self):
-        config_to_dump = {"version": "0.1", "core_node": self.fixture.core_node.to_dict(),
-                          "common_config": self.fixture.common_config.to_dict(),
-                          "migration": self.fixture.migration.to_dict(),
-                          "gateway": self.fixture.gateway.to_dict()}
-        yaml.add_representer(type(None), Helpers.represent_none)
-        Helpers.section_headline("CONFIG is Generated as below")
-        self.assertEqual("", yaml.dump(config_to_dump))
 
 
 def suite():

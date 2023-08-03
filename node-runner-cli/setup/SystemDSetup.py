@@ -9,7 +9,7 @@ from yaml import UnsafeLoader
 from config.EnvVars import UNZIPPED_NODE_DIST_FOLDER
 from config.MigrationConfig import CommonMigrationSettings
 from config.Renderer import Renderer
-from config.SystemDConfig import SystemDSettings, from_dict, CoreSystemdSettings, CommonSystemdSettings
+from config.SystemDConfig import SystemDSettings, CoreSystemdSettings, CommonSystemdSettings
 from setup.Base import Base
 from setup.GatewaySetup import GatewaySetup
 from setup.SystemDCommandArguments import SystemDConfigArguments
@@ -294,7 +294,7 @@ class SystemDSetup(Base):
             sys.exit(1)
         with open(config_file, 'r') as f:
             dictionary = yaml.load(f, Loader=UnsafeLoader)
-        return from_dict(dictionary)
+        return SystemDSettings(dictionary)
 
     @staticmethod
     def compare_old_and_new_config(config_file: str, systemd_config: SystemDSettings):
