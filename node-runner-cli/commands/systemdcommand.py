@@ -294,3 +294,4 @@ def dependencies(args):
     SystemD.create_service_user_password()
     SystemD.create_initial_service_file()
     SystemD.sudoers_instructions()
+    Base.add_user_docker_group()
