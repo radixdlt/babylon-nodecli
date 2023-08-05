@@ -333,8 +333,12 @@ class Prompts:
 
     @classmethod
     def ask_host_ip(cls) -> str:
+        from requests import get
+        ip = get('https://api.ipify.org').content.decode('utf8')
         answer = input(
-            f"\n{bcolors.WARNING}Enter the host ip of this node:{bcolors.ENDC}")
+            f"\n{bcolors.WARNING}Enter the host ip of this node (defaults to {ip}):{bcolors.ENDC}")
+        if answer == "" or answer is None:
+            answer = ip
         try:
             ipaddress.ip_address(answer)
         except ValueError:
