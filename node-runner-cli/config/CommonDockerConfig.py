@@ -8,10 +8,10 @@ from utils.Prompts import Prompts, Helpers
 
 
 class CommonDockerConfig(BaseConfig):
-    network_id: int = None
-    network_name: str = None
-    genesis_bin_data_file: str = None
     nginx_settings: DockerNginxConfig = DockerNginxConfig({})
+    network_id: int = None
+    network_name: str = ""
+    genesis_bin_data_file: str = None
     docker_compose: str = f"{Helpers.get_home_dir()}/docker-compose.yml"
 
     def __init__(self, config_dict: dict):
@@ -38,8 +38,11 @@ class CommonDockerConfig(BaseConfig):
     def ask_network_id(self, network_id):
         if not network_id:
             network_id = Network.get_network_id()
-        self.set_network_id(int(network_id))
-        self.set_genesis_bin_data_file_location(Network.path_to_genesis_binary(self.network_id))
+        if isinstance(network_id, str):
+            self.set_network_id(int(network_id))
+        else:
+            self.set_network_id(network_id)
+        self.set_genesis_bin_data_file(Network.path_to_genesis_binary(self.network_id))
 
     def ask_nginx_release(self):
         latest_nginx_release = github.latest_release("radixdlt/babylon-nginx")
