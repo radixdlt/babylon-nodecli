@@ -17,8 +17,8 @@ class PostGresConfig(BaseConfig):
         Helpers.section_headline("POSTGRES SETTINGS")
         if "DETAILED" in SetupMode.instance().mode:
             self.setup, self.host = Prompts.ask_postgress_location(self.host)
-            self.user = Prompts.get_postgress_user()
             self.dbname = Prompts.get_postgress_dbname()
+            self.user = Prompts.get_postgress_user()
         if not postgress_password:
             self.password = Prompts.ask_postgress_password()
         else:
@@ -68,4 +68,4 @@ class GatewayDockerConfig(BaseConfig):
     postgres_db: PostGresConfig = PostGresConfig({})
     database_migration: DatabaseMigrationConfig = DatabaseMigrationConfig({})
     enabled: bool = False
-    docker_compose_file: str = "~/gateway.docker-compose.yml"
+    docker_compose: str = f"{Helpers.get_home_dir()}/gateway.docker-compose.yml"

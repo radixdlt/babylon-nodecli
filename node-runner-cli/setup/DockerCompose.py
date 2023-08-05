@@ -7,13 +7,16 @@ from utils.utils import Helpers, run_shell_command
 
 class DockerCompose:
     @staticmethod
-    def install_standalone_gateway_in_docker(systemd_settings: SystemDConfig):
-        docker_compose_file: str = systemd_settings.gateway.docker_compose_file
+    def install_standalone_gateway_in_docker(systemd_config: SystemDConfig, auto_approve: bool = False):
+        docker_compose_file: str = systemd_config.gateway.docker_compose
         Renderer() \
             .load_file_based_template("standalone-gateway-compose.yml.j2") \
-            .render(dict(systemd_settings)) \
+            .render(dict(systemd_config)) \
             .to_file(docker_compose_file)
-        should_start = input("\nOkay to start the containers [Y/n]?:")
+        if auto_approve:
+            should_start = "Y"
+        else:
+            should_start = input("\nOkay to start the containers [Y/n]?:")
         if Helpers.check_Yes(should_start):
             DockerCompose.run_docker_compose_up(docker_compose_file)
 

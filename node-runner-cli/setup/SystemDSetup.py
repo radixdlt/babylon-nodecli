@@ -406,7 +406,7 @@ class SystemDSetup(Base):
 
         # Gateway
         GatewaySetup.conditionally_install_local_postgreSQL(settings.gateway)
-        GatewaySetup.install_standalone_gateway(settings)
+        GatewaySetup.conditionaly_install_standalone_gateway(settings, args.auto)
 
         if not args.manual:
             if not args.update:

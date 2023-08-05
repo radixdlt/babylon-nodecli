@@ -38,11 +38,11 @@ class GatewaySetup():
         gateway_config.data_aggregator.coreApiNode = GatewaySetup.ask_core_api_node_settings("http://localhost:3332")
         gateway_config.gateway_api.coreApiNode = gateway_config.data_aggregator.coreApiNode
 
-        gateway_config.postgres_db.ask_postgress_settings(postgres_password)
-
         gateway_config.gateway_api.release = GatewaySetup.ask_gateway_release("gateway_api")
         gateway_config.data_aggregator.release = GatewaySetup.ask_gateway_release("data_aggregator")
         gateway_config.database_migration.release = GatewaySetup.ask_gateway_release("database_migration")
+
+        gateway_config.postgres_db.ask_postgress_settings(postgres_password)
 
         return gateway_config
 
@@ -81,11 +81,12 @@ class GatewaySetup():
             coreApiNode.core_api_address = Prompts.get_CoreApiAddress(core_api_address)
 
             # ask basic auth
-            parsed_url = urlparse(core_api_address)
+            parsed_url = urlparse(coreApiNode.core_api_address)
             if parsed_url.scheme == "https":
                 auth = Prompts.ask_basic_auth()
                 coreApiNode.basic_auth_password = auth["password"]
                 coreApiNode.basic_auth_user = auth["name"]
+                coreApiNode.auth_header = Helpers.get_basic_auth_header(auth)
                 coreApiNode.ask_disablehttpsVerify()
 
             coreApiNode.Name = Prompts.ask_CopeAPINodeName()
@@ -100,5 +101,6 @@ class GatewaySetup():
         return release
 
     @staticmethod
-    def install_standalone_gateway(settings: SystemDConfig):
-        DockerCompose.install_standalone_gateway_in_docker(settings)
+    def conditionaly_install_standalone_gateway(config: SystemDConfig, auto_approve: bool = False):
+        if config.gateway.enabled:
+            DockerCompose.install_standalone_gateway_in_docker(config, auto_approve)
