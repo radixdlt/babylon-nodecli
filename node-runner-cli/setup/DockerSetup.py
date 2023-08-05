@@ -288,10 +288,10 @@ class DockerSetup(Base):
                                     argument_object.autoapprove)
 
     @staticmethod
-    def confirm_docker_compose_file_changes(argument_object: DockerInstallArguments, docker_config_updated_versions):
-        docker_compose_yaml: yaml = DockerSetup.render_docker_compose(docker_config_updated_versions)
+    def confirm_docker_compose_file_changes(docker_config: DockerConfig, autoapprove: bool):
+        docker_compose_yaml: yaml = DockerSetup.render_docker_compose(docker_config)
         backup_time = Helpers.get_current_date_time()
-        compose_file, compose_file_yaml = DockerSetup.get_existing_compose_file(docker_config_updated_versions)
+        compose_file, compose_file_yaml = DockerSetup.get_existing_compose_file(docker_config)
         compose_file_difference = dict(DeepDiff(compose_file_yaml, docker_compose_yaml))
         if len(compose_file_difference) != 0:
             print(f"""
@@ -300,12 +300,12 @@ class DockerSetup(Base):
                     {compose_file_difference}
                       """)
             to_update = ""
-            if argument_object.autoapprove:
+            if autoapprove:
                 print("In Auto mode - Updating file as suggested in above changes")
             else:
                 to_update = input("\nOkay to update the file [Y/n]?:")
 
-            if Helpers.check_Yes(to_update) or argument_object.autoapprove:
+            if Helpers.check_Yes(to_update) or autoapprove:
                 if os.path.exists(compose_file):
                     Helpers.backup_file(compose_file, f"{compose_file}_{backup_time}")
                 DockerSetup.save_compose_file(compose_file, docker_compose_yaml)

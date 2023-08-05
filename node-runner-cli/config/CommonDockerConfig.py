@@ -38,11 +38,8 @@ class CommonDockerConfig(BaseConfig):
     def ask_network_id(self, network_id):
         if not network_id:
             network_id = Network.get_network_id()
-        if isinstance(network_id, str):
-            self.set_network_id(int(network_id))
-        else:
-            self.set_network_id(network_id)
-        self.set_genesis_bin_data_file(Network.path_to_genesis_binary(self.network_id))
+        self.set_network_id(int(network_id))
+        self.set_genesis_bin_data_file_location(Network.path_to_genesis_binary(self.network_id))
 
     def ask_nginx_release(self):
         latest_nginx_release = github.latest_release("radixdlt/babylon-nginx")

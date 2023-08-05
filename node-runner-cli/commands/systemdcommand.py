@@ -144,6 +144,26 @@ def stop(args):
              help="Name of the service either to be started. Valid values nginx or radixdlt-node",
              choices=["all", "nginx", "radixdlt-node"], action="store")
 ])
+def start(args):
+    """This starts the CORE node systemd service."""
+    if args.services == "all":
+        SystemDSetup.restart_node_service()
+        SystemDSetup.restart_nginx_service()
+        GatewaySetup.restart_gateway_containers()
+    elif args.services == "nginx":
+        SystemDSetup.restart_nginx_service()
+    elif args.services == "radixdlt-node":
+        SystemDSetup.restart_node_service()
+    else:
+        print(f"Invalid service name {args.services}")
+        sys.exit(1)
+
+
+@systemdcommand([
+    argument("-s", "--services", default="all",
+             help="Name of the service either to be started. Valid values nginx or radixdlt-node",
+             choices=["all", "nginx", "radixdlt-node"], action="store")
+])
 def restart(args):
     """This restarts the CORE node systemd service."""
     if args.services == "all":

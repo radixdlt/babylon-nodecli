@@ -70,10 +70,13 @@ class Base:
         return key_details
 
     @staticmethod
-    def ask_keydetails(ks_password=None, new_keystore=False):
+    def ask_keydetails(ks_password=None, new_keystore=False, ks_file=None):
         keydetails = KeyDetails({})
         if "DETAILED" in SetupMode.instance().mode:
-            keydetails.keyfile_path = Prompts.ask_keyfile_path()
+            if ks_file is None:
+                keydetails.keyfile_path = Prompts.ask_keyfile_path()
+            else:
+                keydetails.keyfile_path = ks_file
             keydetails.keyfile_name = Prompts.ask_keyfile_name()
 
         keydetails = Base.generatekey(

@@ -1,7 +1,9 @@
 from argparse import ArgumentParser
 
 from commands.subcommand import get_decorator, argument
+from config.BaseConfig import SetupMode
 from key_interaction.KeyInteraction import KeyInteraction
+from setup.Base import Base
 
 # Setup key subcommand parser
 keycli = ArgumentParser(
@@ -29,6 +31,23 @@ def info(args):
     """
     key = KeyInteraction(keystore_password=str.encode(args.password), keystore_path=args.filelocation)
     print(f"Validator hex public key  {key.get_validator_hex_public_key()}")
+
+
+@keycommand([
+    argument("-p", "--password", required=True,
+             help="Password of the keystore",
+             action="store"),
+    argument("-f", "--filelocation", required=True,
+             help="Location of keystore on the disk",
+             action="store"),
+])
+def generate(args):
+    """
+    Using CLI to generate a new keystore
+    """
+    SetupMode.instance().mode = "DETAILED"
+
+    Base.ask_keydetails(args.password, args.filelocation)
 
 # @keycommand([
 #     argument("-p", "--password", required=True,
