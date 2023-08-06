@@ -287,6 +287,7 @@ def dependencies(args):
 
     if not args.skip:
         Base.dependencies()
+        Base.add_user_docker_group()
     SystemD.install_java()
     SystemD.setup_user()
     SystemD.make_etc_directory()
