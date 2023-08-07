@@ -38,6 +38,15 @@ for subcommand in "${dockersubcommands[@]}"; do
   command_help_doc "docker" "$subcommand" "$filename"
 done
 
+cat <<EOT >> "$filename"
+=== Radix node CLI command reference
+Below are the list of commands supported in cli to setup a core node process as a systemd process
+EOT
+declare -a systemdsubcommands=("dependencies" "config" "install" "restart" "stop")
+for subcommand in "${systemdsubcommands[@]}"
+do
+  command_help_doc "systemd" "$subcommand" "$filename"
+done
 cat <<EOT >>"$filename"
 === Ledger sync using an external S3 bucket
 Below are the list of commands that can be used with cli to sync the ledger with a S3 bucket.
