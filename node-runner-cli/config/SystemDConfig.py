@@ -18,6 +18,7 @@ class SystemDConfig(BaseConfig):
     core_node: CoreSystemdConfig = CoreSystemdConfig({})
     common_config: CommonSystemdConfig = CommonSystemdConfig({})
     gateway: GatewayDockerConfig = GatewayDockerConfig({})
+    test = "test"
 
     def parse_config_from_args(self, args):
         self.core_node.trusted_node = args.trustednode

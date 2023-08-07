@@ -1,10 +1,13 @@
 import os
+import sys
 import unittest
 from io import StringIO
 from pathlib import Path
 from unittest.mock import patch
 
 import urllib3
+import yaml
+from yaml import UnsafeLoader
 
 from babylonnode import main
 from config.KeyDetails import KeyDetails
@@ -55,7 +58,7 @@ class SystemdUnitTests(unittest.TestCase):
         self.assertEqual(new_config.to_yaml(), config.to_yaml())
         self.assertEqual("/somedir/babylon-node", config.core_node.node_dir)
         self.assertEqual(type(config), type(new_config))
-        self.assertEqual("/somedir/babylon-node", new_config.core_node.get("node_dir"))
+        self.assertEqual("/somedir/babylon-node", new_config.core_node.node_dir)
 
     @unittest.skip("Can only be executed on Ubuntu")
     def test_systemd_dependencies(self):
@@ -261,6 +264,19 @@ RADIX_NODE_KEYSTORE_PASSWORD=nowthatyouknowmysecretiwillfollowyouuntilyouforgeti
         new_settings = SystemDConfig(to_dict)
         self.assertEqual(settings.to_dict(), new_settings.to_dict())
         self.assertEqual(settings.to_yaml(), new_settings.to_yaml())
+
+    def test_systemd_settings_load_settings_from_file(self):
+        config_file = "/tmp/config2.yaml"
+        with open(config_file, 'r') as f:
+            dictionary = yaml.load(f, Loader=UnsafeLoader)
+        out = StringIO()
+        sys.stdout = out
+        config = SystemDConfig(dictionary)
+        output = out.getvalue().strip()
+        self.assertEqual("test", config.test)
+        self.assertEqual("false", config.core_node.enable_transaction)
+        self.assertEqual("fullnode", config.core_node.nodetype)
+        self.assertEqual("http://localhost:3332", config.migration.olympia_node_url)
 
 
 def suite():

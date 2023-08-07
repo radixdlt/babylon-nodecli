@@ -3,18 +3,23 @@ import yaml
 
 class BaseConfig:
     def __init__(self, config_dict: dict):
-        if config_dict is not None:
-            for key, value in config_dict.items():
-                setattr(self, key, value)
+        self.from_dict(config_dict)
 
+    def from_dict(self, config_dict):
+        if config_dict is not None:
             class_variables = {key: value
                                for key, value in self.__class__.__dict__.items()
                                if not key.startswith('__') and not callable(value)}
             for attr, value in class_variables.items():
                 if type(self.__getattribute__(attr)) not in (str, int, bool, dict) and self.__getattribute__(
                         attr) is not None:
-                    if (config_dict.get(attr) is not None):
-                        self.__getattribute__(attr).__init__(config_dict[attr])
+                    if config_dict.get(attr) is not None:
+                        setattr(self, attr, self.__getattribute__(attr).from_dict(config_dict[attr]))
+
+                else:
+                    if attr in config_dict.items():
+                        setattr(self, attr, config_dict["attr"])
+        return self
 
     def __repr__(self):
         return repr(vars(self))
