@@ -7,7 +7,6 @@ from unittest.mock import patch
 import urllib3
 
 from babylonnode import main
-from config.DockerConfig import DockerConfig
 from config.KeyDetails import KeyDetails
 from config.Renderer import Renderer
 from config.SystemDConfig import SystemDConfig
@@ -73,43 +72,6 @@ class SystemdUnitTests(unittest.TestCase):
                         "radix://tn1q28eygvxshszxk48jhjxdmyne06m3x6hfyvxg7a45qt8cksffx6z7uu6392@15.236.228.96",
                         "-n", "2", "-k", "radix", "-d", "/tmp", "-dd", "/tmp", "-v", "randomvalidatoraddress", "-nk",
                         "-a"]):
-                main()
-
-    @patch('sys.stdout', new_callable=StringIO)
-    def test_docker_config(self, mockout):
-        urllib3.disable_warnings()
-        # os.environ['PROMPT_FEEDS'] = "test-prompts/individual-prompts/validator_address.yml"
-        # PromptFeeder.prompts_feed = PromptFeeder.instance().load_prompt_feeds()
-        with patch('builtins.input',
-                   side_effect=['S', 'N', 'N', '/home/runner/docker-compose.yml', 'N', 'development-latest']):
-            with patch("sys.argv",
-                       ["main", "docker", "config", "-m", "DETAILED", "-k", "radix", "-nk", "-a"]):
-                main()
-
-    @patch('sys.stdout', new_callable=StringIO)
-    def test_docker_config_all_local(self, mockout):
-        urllib3.disable_warnings()
-        # os.environ['PROMPT_FEEDS'] = "test-prompts/individual-prompts/validator_address.yml"
-        # PromptFeeder.prompts_feed = PromptFeeder.instance().load_prompt_feeds()
-        with patch('builtins.input', side_effect=['34',
-                                                  'Y',
-                                                  'Y',
-                                                  'radix://node_tdx_22_1qvsml9pe32rzcrmw6jx204gjeng09adzkqqfz0ewhxwmjsaas99jzrje4u3@34.243.93.185',
-                                                  'N',
-                                                  'Y',
-                                                  '/tmp/babylon-node-config',
-                                                  'node-keystore.ks',
-                                                  '/tmp/babylon-ledger',
-                                                  'false',
-                                                  'true',
-                                                  'development-latest',
-                                                  '',
-                                                  '',
-                                                  '',
-                                                  '',
-                                                  '']):
-            with patch("sys.argv",
-                       ["main", "docker", "config", "-m", "DETAILED", "-k", "radix", "-nk", "-a"]):
                 main()
 
     @unittest.skip("For verification only")
@@ -297,14 +259,6 @@ RADIX_NODE_KEYSTORE_PASSWORD=nowthatyouknowmysecretiwillfollowyouuntilyouforgeti
         settings = SystemDConfig({})
         to_dict = settings.to_dict()
         new_settings = SystemDConfig(to_dict)
-        self.assertEqual(settings.to_dict(), new_settings.to_dict())
-        self.assertEqual(settings.to_yaml(), new_settings.to_yaml())
-
-    def test_docker_settings_roundtrip(self):
-        self.maxDiff = None
-        settings = DockerConfig({})
-        to_dict = settings.to_dict()
-        new_settings = DockerConfig(to_dict)
         self.assertEqual(settings.to_dict(), new_settings.to_dict())
         self.assertEqual(settings.to_yaml(), new_settings.to_yaml())
 
