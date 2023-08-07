@@ -5,7 +5,7 @@ from api.Api import API
 from api.CustomAPIClient import CustomAPIClient
 from api.SystemApiHelper import SystemApiHelper
 from commands.subcommand import get_decorator
-from setup.Base import Base
+from setup.BaseSetup import BaseSetup
 from utils.utils import Helpers
 
 other_command_cli = ArgumentParser(
@@ -33,7 +33,7 @@ def optimise_node(args):
     . Prompts asking to setup limits
     . Prompts asking to setup swap and size of swap in GB
     """
-    Base.setup_node_optimisation_config(Helpers.cli_version())
+    BaseSetup.setup_node_optimisation_config(Helpers.cli_version())
 
 
 # @othercommands()

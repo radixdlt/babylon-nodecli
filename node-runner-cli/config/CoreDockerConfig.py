@@ -4,7 +4,7 @@ from pathlib import Path
 from config.BaseConfig import BaseConfig, SetupMode
 from config.EnvVars import CORE_DOCKER_REPO_OVERRIDE, MOUNT_LEDGER_VOLUME
 from config.KeyDetails import KeyDetails
-from setup.Base import Base
+from setup.BaseSetup import BaseSetup
 from utils.Prompts import Prompts
 from utils.utils import Helpers
 
@@ -39,7 +39,7 @@ class CoreDockerConfig(BaseConfig):
 
     def ask_data_directory(self):
         if "DETAILED" in SetupMode.instance().mode:
-            self.data_directory = Base.get_data_dir(create_dir=False)
+            self.data_directory = BaseSetup.get_data_dir(create_dir=False)
         if os.environ.get(MOUNT_LEDGER_VOLUME, "true").lower() == "false":
             self.data_directory = None
         if self.data_directory:
@@ -61,7 +61,7 @@ class CoreDockerConfig(BaseConfig):
         self.set_core_release(release)
         self.set_trusted_node(trustednode)
         self.ask_validator_address(validator)
-        self.keydetails = Base.ask_keydetails(ks_password, new_keystore)
+        self.keydetails = BaseSetup.ask_keydetails(ks_password, new_keystore)
         self.ask_data_directory()
         self.ask_enable_transaction()
         return self

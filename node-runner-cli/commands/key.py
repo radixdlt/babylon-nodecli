@@ -3,7 +3,7 @@ from argparse import ArgumentParser
 from commands.subcommand import get_decorator, argument
 from config.BaseConfig import SetupMode
 from key_interaction.KeyInteraction import KeyInteraction
-from setup.Base import Base
+from setup.BaseSetup import BaseSetup
 
 # Setup key subcommand parser
 keycli = ArgumentParser(
@@ -47,7 +47,7 @@ def generate(args):
     """
     SetupMode.instance().mode = "DETAILED"
 
-    Base.ask_keydetails(args.password, args.filelocation)
+    BaseSetup.ask_keydetails(args.password, args.filelocation)
 
 # @keycommand([
 #     argument("-p", "--password", required=True,

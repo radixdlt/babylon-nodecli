@@ -4,7 +4,7 @@ from pathlib import Path
 
 from commands.subcommand import get_decorator, argument
 from config.SystemDConfig import SystemDConfig
-from setup.Base import Base
+from setup.BaseSetup import BaseSetup
 from setup.GatewaySetup import GatewaySetup
 from setup.SystemDCommandArguments import SystemDConfigArguments
 from setup.SystemDSetup import SystemDSetup
@@ -180,7 +180,7 @@ def restart(args):
 
 
 @systemdcommand([
-    argument("-s", "--skip", default="false",
+    argument("-s", "--skip", default=False,
              help="Skip installation of base dependencies",
              action="store_true")
 ])
@@ -191,19 +191,19 @@ def dependencies(args):
     """
 
     if not args.skip:
-        Base.dependencies()
-        Base.add_user_docker_group()
-    SystemD.install_java()
-    SystemD.setup_user()
-    SystemD.make_etc_directory()
-    SystemD.make_data_directory()
-    SystemD.create_service_user_password()
-    SystemD.create_initial_service_file()
-    SystemD.sudoers_instructions()
+        BaseSetup.dependencies()
+    SystemDSetup.install_java()
+    BaseSetup.add_user_docker_group()
+    SystemDSetup.setup_user()
+    SystemDSetup.make_etc_directory()
+    SystemDSetup.make_data_directory()
+    SystemDSetup.create_service_user_password()
+    SystemDSetup.create_initial_service_file()
+    SystemDSetup.sudoers_instructions()
+
 
 def print_questionary_header(config_file):
     Helpers.section_headline("CONFIG FILE")
     print(
         "\nCreating config file using the answers from the questions that would be asked in next steps."
         f"\nLocation of the config file: {bcolors.OKBLUE}{config_file}{bcolors.ENDC}")
-

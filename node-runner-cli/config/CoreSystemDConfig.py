@@ -4,7 +4,7 @@ from pathlib import Path
 from config.BaseConfig import BaseConfig, SetupMode
 from config.EnvVars import MOUNT_LEDGER_VOLUME, NODE_BINARY_OVERIDE
 from config.KeyDetails import KeyDetails
-from setup.Base import Base
+from setup.BaseSetup import BaseSetup
 from utils.Prompts import Prompts
 from utils.utils import Helpers
 
@@ -41,7 +41,7 @@ class CoreSystemdConfig(BaseConfig):
         if data_directory is not None and data_directory != "":
             self.data_directory = data_directory
         if "DETAILED" in SetupMode.instance().mode:
-            self.data_directory = Base.get_data_dir(create_dir=False)
+            self.data_directory = BaseSetup.get_data_dir(create_dir=False)
         if os.environ.get(MOUNT_LEDGER_VOLUME, "true").lower() == "false":
             self.data_directory = None
         if self.data_directory:

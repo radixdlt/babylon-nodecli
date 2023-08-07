@@ -10,17 +10,18 @@ from config.EnvVars import UNZIPPED_NODE_DIST_FOLDER
 from config.MigrationConfig import CommonMigrationConfig
 from config.Renderer import Renderer
 from config.SystemDConfig import SystemDConfig, CoreSystemdConfig, CommonSystemdConfig
-from setup.Base import Base
+from setup.BaseSetup import BaseSetup
 from setup.GatewaySetup import GatewaySetup
 from setup.SystemDCommandArguments import SystemDConfigArguments
 from utils.PromptFeeder import QuestionKeys
 from utils.utils import run_shell_command, Helpers
 
 
-class SystemDSetup(Base):
+class SystemDSetup(BaseSetup):
 
     @staticmethod
     def install_java():
+        run_shell_command('sudo apt update', shell=True)
         run_shell_command('sudo apt install -y openjdk-17-jdk', shell=True)
 
     @staticmethod
@@ -72,7 +73,7 @@ class SystemDSetup(Base):
 
     @staticmethod
     def fetch_universe_json(trustenode, extraction_path):
-        Base.fetch_universe_json(trustenode, extraction_path)
+        BaseSetup.fetch_universe_json(trustenode, extraction_path)
 
     @staticmethod
     def backup_file(filepath, filename, backup_time, auto_approve=False):
@@ -342,8 +343,8 @@ class SystemDSetup(Base):
         systemd_config.core_node.set_core_release(argument_object.release)
         systemd_config.core_node.set_trusted_node(argument_object.trustednode)
         systemd_config.core_node.generate_download_urls()
-        systemd_config.core_node.keydetails = Base.ask_keydetails(argument_object.keystore_password,
-                                                                  argument_object.new_keystore)
+        systemd_config.core_node.keydetails = BaseSetup.ask_keydetails(argument_object.keystore_password,
+                                                                       argument_object.new_keystore)
         systemd_config.core_node.ask_data_directory(argument_object.data_directory)
         systemd_config.core_node.ask_validator_address(argument_object.validator)
         return systemd_config.core_node

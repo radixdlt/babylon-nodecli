@@ -13,7 +13,7 @@ from config.GatewayDockerConfig import GatewayDockerConfig
 from config.Renderer import Renderer
 from github import github
 from setup.AnsibleRunner import AnsibleRunner
-from setup.Base import Base
+from setup.BaseSetup import BaseSetup
 from setup.DockerCommandArguments import DockerConfigArguments, DockerInstallArguments
 from setup.GatewaySetup import GatewaySetup
 from utils.Prompts import Prompts
@@ -27,7 +27,7 @@ def print_questionary_header(config_file):
         f"\nLocation of the config file: {bcolors.OKBLUE}{config_file}{bcolors.ENDC}")
 
 
-class DockerSetup(Base):
+class DockerSetup(BaseSetup):
 
     @staticmethod
     def save_config(config: DockerConfig, config_file: str, autoapprove=False):

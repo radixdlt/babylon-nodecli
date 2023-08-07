@@ -13,7 +13,7 @@ from utils.Prompts import Prompts
 from utils.utils import run_shell_command, Helpers, bcolors
 
 
-class Base:
+class BaseSetup:
     @staticmethod
     def dependencies():
         run_shell_command('sudo apt update', shell=True)
@@ -61,7 +61,6 @@ class Base:
             key_details.keystore_password = keystore_password if keystore_password else getpass.getpass(
                 f"Enter the password of the new file '{key_details.keyfile_name}':")
 
-            run_shell_command(['touch', f'{key_details.keyfile_path}/{key_details.keyfile_name}'])
             run_shell_command(['docker', 'run', '--rm', '-v', key_details.keyfile_path + ':/keygen/key',
                                f'radixdlt/keygen:{key_details.keygen_tag}',
                                f'-k /keygen/key/{key_details.keyfile_name}',
@@ -80,7 +79,7 @@ class Base:
                 keydetails.keyfile_path = ks_file
             keydetails.keyfile_name = Prompts.ask_keyfile_name()
 
-        keydetails = Base.generatekey(
+        keydetails = BaseSetup.generatekey(
             keyfile_path=keydetails.keyfile_path,
             keyfile_name=keydetails.keyfile_name,
             keygen_tag=keydetails.keygen_tag, keystore_password=ks_password, new=new_keystore)
