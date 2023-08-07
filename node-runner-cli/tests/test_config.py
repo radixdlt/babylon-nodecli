@@ -1,12 +1,10 @@
 import os
 import unittest
-from pathlib import Path
 
 import yaml
 from yaml import UnsafeLoader
 
-from config.DockerConfig import DockerConfig
-from config.Nginx import SystemdNginxConfig, DockerNginxConfig
+from config.Nginx import SystemdNginxConfig
 from config.SystemDConfig import SystemDConfig
 from utils.Network import Network
 

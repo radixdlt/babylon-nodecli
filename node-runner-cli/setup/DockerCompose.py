@@ -11,7 +11,7 @@ class DockerCompose:
         docker_compose_file: str = systemd_config.gateway.docker_compose
         Renderer() \
             .load_file_based_template("standalone-gateway-compose.yml.j2") \
-            .render(dict(systemd_config)) \
+            .render(systemd_config.to_dict()) \
             .to_file(docker_compose_file)
         if auto_approve:
             should_start = "Y"

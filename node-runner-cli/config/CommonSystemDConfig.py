@@ -10,12 +10,16 @@ from utils.Prompts import Prompts
 
 
 class CommonSystemdConfig(BaseConfig):
-    nginx_settings: SystemdNginxConfig = SystemdNginxConfig({})
-    network_id: int = 1
-    network_name: str = ""
-    genesis_bin_data_file: str
-    host_ip: str = None
-    service_user: str = "radixdlt"
+    def __init__(self, config_dict: dict):
+        if config_dict is None:
+            config_dict = dict()
+        self.nginx_settings: SystemdNginxConfig = SystemdNginxConfig(config_dict.get("nginx_settings"))
+        self.network_id: int = 1
+        self.network_name: str = ""
+        self.genesis_bin_data_file: str
+        self.host_ip: str = ""
+        self.service_user: str = "radixdlt"
+        super().__init__(config_dict)
 
     def set_network_id(self, network_id: int):
         self.network_id = network_id

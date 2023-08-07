@@ -10,24 +10,23 @@ from utils.utils import Helpers
 
 
 class CoreDockerConfig(BaseConfig):
-    nodetype: str = "fullnode"
-    composefileurl: str = None
-    keydetails: KeyDetails = KeyDetails({})
-    core_release: str = None
-    repo: str = os.getenv(CORE_DOCKER_REPO_OVERRIDE, "radixdlt/babylon-node")
-    data_directory: str = f"{Helpers.get_home_dir()}/babylon-ledger"
-    enable_transaction: str = "false"
-    trusted_node: str = None
-    validator_address: str = None
-    java_opts: str = "--enable-preview -server -Xms8g -Xmx8g  " \
-                     "-XX:MaxDirectMemorySize=2048m " \
-                     "-XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops " \
-                     "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts " \
-                     "-Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom " \
-                     "-DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
-
-    def __init__(self, settings: dict):
-        super().__init__(settings)
+    def __init__(self, config_dict: dict):
+        self.nodetype: str = "fullnode"
+        self.composefileurl: str = None
+        self.keydetails: KeyDetails = KeyDetails(config_dict.get("nginx_settings"))
+        self.core_release: str = None
+        self.repo: str = os.getenv(CORE_DOCKER_REPO_OVERRIDE, "radixdlt/babylon-node")
+        self.data_directory: str = f"{Helpers.get_home_dir()}/babylon-ledger"
+        self.enable_transaction: str = "false"
+        self.trusted_node: str = None
+        self.validator_address: str = None
+        self.java_opts: str = "--enable-preview -server -Xms8g -Xmx8g  " \
+                              "-XX:MaxDirectMemorySize=2048m " \
+                              "-XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops " \
+                              "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts " \
+                              "-Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom " \
+                              "-DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
+        super().__init__(config_dict)
 
     def set_node_type(self, nodetype="fullnode"):
         self.nodetype = nodetype

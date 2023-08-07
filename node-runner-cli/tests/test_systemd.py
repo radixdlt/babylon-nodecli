@@ -1,5 +1,4 @@
 import os
-import sys
 import unittest
 from io import StringIO
 from pathlib import Path
@@ -10,6 +9,8 @@ import yaml
 from yaml import UnsafeLoader
 
 from babylonnode import main
+from config.CommonSystemDConfig import CommonSystemdConfig
+from config.CoreSystemDConfig import CoreSystemdConfig
 from config.KeyDetails import KeyDetails
 from config.Renderer import Renderer
 from config.SystemDConfig import SystemDConfig
@@ -50,8 +51,10 @@ class SystemdUnitTests(unittest.TestCase):
         config.common_config.host_ip = "6.6.6.6"
 
         config_file = f"/tmp/config.yaml"
-        with patch('builtins.input', side_effect=['Y']):
-            SystemDSetup.save_config(config, config_file)
+        # with patch('builtins.input', side_effect=['Y']):
+        config.to_file(config_file)
+        key_details.to_file("/tmp/other")
+        # SystemDSetup.save_config(config, config_file)
 
         self.maxDiff = None
         new_config = SystemDSetup.load_settings(config_file)
@@ -183,7 +186,7 @@ db.location=/home/radixdlt/babylon-ledger
             settings.core_node.validator_address = "validatorAddress"
             settings.migration.use_olympia = False
             render_template = Renderer().load_file_based_template("systemd-default.config.j2").render(
-                dict(settings)).rendered
+                settings.to_dict()).rendered
         fixture = """ntp=false
 ntp.pool=pool.ntp.org
 
@@ -248,15 +251,14 @@ WantedBy=multi-user.target"""
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_systemd_service_file_jinja(self, mockout):
-        settings = SystemDConfig({})
-        settings.core_node.keydetails.keystore_password = "nowthatyouknowmysecretiwillfollowyouuntilyouforgetit"
-
+        key_details = KeyDetails({})
+        key_details.keystore_password = "nowthatyouknowmysecretiwillfollowyouuntilyouforgetit"
         render_template = Renderer().load_file_based_template("systemd-environment.j2").render(
-            dict(settings.core_node.keydetails)).rendered
+            key_details.to_dict()).rendered
         fixture = f"""JAVA_OPTS="--enable-preview -server -Xms8g -Xmx8g  -XX:MaxDirectMemorySize=2048m -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
 RADIX_NODE_KEYSTORE_PASSWORD=nowthatyouknowmysecretiwillfollowyouuntilyouforgetit"""
         self.maxDiff = None
-        self.assertEqual(render_template, fixture)
+        self.assertEqual(fixture, render_template)
 
     def test_systemd_settings_roundtrip(self):
         settings = SystemDConfig({})
@@ -264,20 +266,54 @@ RADIX_NODE_KEYSTORE_PASSWORD=nowthatyouknowmysecretiwillfollowyouuntilyouforgeti
         new_settings = SystemDConfig(to_dict)
         self.assertEqual(settings.to_dict(), new_settings.to_dict())
         self.assertEqual(settings.to_yaml(), new_settings.to_yaml())
+        settings.to_file("/tmp/tmp.config.yml")
+        file_settings = SystemDSetup.load_settings("/tmp/tmp.config.yml")
+        self.assertEqual(settings.to_dict(), file_settings.to_dict())
+        self.assertEqual(settings.to_yaml(), file_settings.to_yaml())
 
     def test_systemd_settings_load_settings_from_file(self):
         config_file = "/tmp/config2.yaml"
         with open(config_file, 'r') as f:
             dictionary = yaml.load(f, Loader=UnsafeLoader)
         out = StringIO()
-        sys.stdout = out
+        # self.assertEqual("", dictionary)
         config = SystemDConfig(dictionary)
-        output = out.getvalue().strip()
-        self.assertEqual("test", config.test)
-        self.assertEqual("false", config.core_node.enable_transaction)
+        to_dict = config.to_dict()
+        new_settings = SystemDConfig(to_dict)
+        self.assertEqual(config.to_dict(), new_settings.to_dict())
+        self.assertEqual(config.to_yaml(), new_settings.to_yaml())
+        # self.assertEqual("1", config.core_node.core_release)
+        self.assertEqual(13, config.common_config.network_id)
+        self.assertEqual("ansharnet", config.common_config.network_name)
         self.assertEqual("fullnode", config.core_node.nodetype)
+        self.assertEqual("1.0.0-rc5", config.common_config.nginx_settings.release)
         self.assertEqual("http://localhost:3332", config.migration.olympia_node_url)
 
+    def test_systemd_settings_random(self):
+        mydict = {'core_node': {'core_release': '3'}}
+        self.assertEqual({'core_release': '3'}, mydict.get("core_node"))
+        mycoreconf = CoreSystemdConfig(mydict.get("core_node"))
+        self.assertEqual('3', mycoreconf.core_release)
+        myconf = SystemDConfig(mydict)
+        self.assertEqual('3', myconf.core_node.core_release)
+
+    def test_systemd_settings_random2(self):
+        test = CommonSystemdConfig({'network_id': 12})
+        self.assertEqual(12, test.network_id)
+
+    def test_systemd_settings_random3(self):
+        test = CommonSystemdConfig({'network_id': 12})
+        self.assertEqual({'host_ip': '',
+                          'network_id': 12,
+                          'network_name': '',
+                          'nginx_settings': {'config_url': '',
+                                             'dir': '/etc/nginx',
+                                             'enable_transaction_api': 'false',
+                                             'mode': 'systemd',
+                                             'protect_core': 'true',
+                                             'release': '',
+                                             'secrets_dir': '/etc/nginx/secrets'},
+                          'service_user': 'radixdlt'}, test.to_dict())
 
 def suite():
     """ This defines all the tests of a module"""

@@ -14,11 +14,15 @@ from utils.utils import run_shell_command
 
 
 class SystemDConfig(BaseConfig):
-    migration: CommonMigrationConfig = CommonMigrationConfig({})
-    core_node: CoreSystemdConfig = CoreSystemdConfig({})
-    common_config: CommonSystemdConfig = CommonSystemdConfig({})
-    gateway: GatewayDockerConfig = GatewayDockerConfig({})
-    test = "test"
+    def __init__(self, config_dict: dict):
+        if config_dict is None:
+            config_dict = dict()
+        self.core_node: CoreSystemdConfig = CoreSystemdConfig(config_dict.get("core_node"))
+        self.common_config: CommonSystemdConfig = CommonSystemdConfig(config_dict.get("common_config"))
+        self.migration: CommonMigrationConfig = CommonMigrationConfig(config_dict.get("migration"))
+        self.gateway: GatewayDockerConfig = GatewayDockerConfig(config_dict.get("gateway"))
+        self.test: str = ""
+        super().__init__(config_dict)
 
     def parse_config_from_args(self, args):
         self.core_node.trusted_node = args.trustednode
@@ -50,7 +54,7 @@ class SystemDConfig(BaseConfig):
     def create_default_config_file(self):
         self.common_config.genesis_bin_data_file = Network.path_to_genesis_binary(self.common_config.network_id)
         Renderer().load_file_based_template("systemd-default.config.j2").render(
-            dict(self)).to_file(f"{self.core_node.node_dir}/default.config")
+            self.to_dict()).to_file(f"{self.core_node.node_dir}/default.config")
 
         if (os.getenv(APPEND_DEFAULT_CONFIG_OVERIDES)) is not None:
             print("Add overides")

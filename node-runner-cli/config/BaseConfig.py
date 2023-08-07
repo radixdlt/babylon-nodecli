@@ -4,24 +4,23 @@ import yaml
 
 
 class BaseConfig:
+
+    def __iter__(self):
+        class_variables = {key: value
+                           for key, value in self.__class__.__dict__.items()
+                           if not key.startswith('__') and not callable(value)}
+        for attr, value in class_variables.items():
+            if self.__getattribute__(attr):
+                yield attr, self.__getattribute__(attr)
+
     def __init__(self, config_dict: dict):
-        self.from_dict(config_dict)
-
-    def from_dict(self, config_dict):
+        class_variables = {key: value
+                           for key, value in self.__class__.__dict__.items()
+                           if not key.startswith('__') and not callable(value)}
         if config_dict is not None:
-            class_variables = {key: value
-                               for key, value in self.__class__.__dict__.items()
-                               if not key.startswith('__') and not callable(value)}
-            for attr, value in class_variables.items():
-                if type(self.__getattribute__(attr)) not in (str, int, bool, dict) and self.__getattribute__(
-                        attr) is not None:
-                    if config_dict.get(attr) is not None:
-                        setattr(self, attr, self.__getattribute__(attr).from_dict(config_dict[attr]))
-
-                else:
-                    if attr in config_dict.items():
-                        setattr(self, attr, config_dict["attr"])
-        return self
+            for key, value in config_dict.items():
+                if type(self.__getattribute__(key)) in [int, str, bool]:
+                    setattr(self, key, value)
 
     def __repr__(self):
         return repr(vars(self))
@@ -36,13 +35,16 @@ class BaseConfig:
 
     def to_dict(self):
         class_variables = {key: value
-                           for key, value in self.__class__.__dict__.items()
+                           for key, value in vars(self).items()
                            if not key.startswith('__') and not callable(value)}
         returning_dict = dict(self)
         for attr, value in class_variables.items():
+            returning_dict[attr] = ""
             if type(self.__getattribute__(attr)) not in (str, int, bool, dict) and self.__getattribute__(
                     attr) is not None:
                 returning_dict[attr] = self.__getattribute__(attr).to_dict()
+            else:
+                returning_dict[attr] = value
         return returning_dict
 
     def to_yaml(self):

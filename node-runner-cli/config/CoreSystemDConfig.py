@@ -11,23 +11,27 @@ from utils.utils import Helpers
 
 
 class CoreSystemdConfig(BaseConfig):
-    nodetype: str = "fullnode"
-    keydetails: KeyDetails = KeyDetails({})
-    core_release: str = None
-    core_binary_url: str = None
-    core_library_url: str = None
-    data_directory: str = f"{Helpers.get_home_dir()}/babylon-ledger"
-    enable_transaction: str = "false"
-    trusted_node: str = None
-    node_dir: str = '/etc/radixdlt/node'
-    node_secrets_dir: str = '/etc/radixdlt/node/secrets'
-    validator_address: str = None
-    java_opts: str = "--enable-preview -server -Xms8g -Xmx8g  " \
-                     "-XX:MaxDirectMemorySize=2048m " \
-                     "-XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops " \
-                     "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts " \
-                     "-Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom " \
-                     "-DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
+    def __init__(self, config_dict: dict):
+        if config_dict is None:
+            config_dict = dict()
+        self.keydetails: KeyDetails = KeyDetails(config_dict.get("nginx_settings"))
+        self.nodetype: str = "fullnode"
+        self.core_release: str = ""
+        self.core_binary_url: str = ""
+        self.core_library_url: str = ""
+        self.data_directory: str = f"{Helpers.get_home_dir()}/babylon-ledger"
+        self.enable_transaction: str = "false"
+        self.trusted_node: str = ""
+        self.node_dir: str = '/etc/radixdlt/node'
+        self.node_secrets_dir: str = '/etc/radixdlt/node/secrets'
+        self.validator_address: str = ""
+        self.java_opts: str = "--enable-preview -server -Xms8g -Xmx8g  " \
+                              "-XX:MaxDirectMemorySize=2048m " \
+                              "-XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops " \
+                              "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts " \
+                              "-Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom " \
+                              "-DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
+        super().__init__(config_dict)
 
     def ask_enable_transaction(self):
         if "DETAILED" in SetupMode.instance().mode:
