@@ -6,11 +6,12 @@ from config.MigrationConfig import CommonMigrationConfig
 
 
 class DockerConfig(BaseConfig):
-    core_node: CoreDockerConfig = CoreDockerConfig({})
-    common_config: CommonDockerConfig = CommonDockerConfig({})
-    gateway: GatewayDockerConfig = GatewayDockerConfig({})
-    migration: CommonMigrationConfig = CommonMigrationConfig({})
 
-    def __init__(self, release: str):
-        super().__init__({})
-        self.core_node.core_release = release
+    def __init__(self, config_dict: dict):
+        if config_dict is None:
+            config_dict = dict()
+        self.core_node: CoreDockerConfig = CoreDockerConfig(config_dict.get("core_node"))
+        self.common_config: CommonDockerConfig = CommonDockerConfig(config_dict.get("common_config"))
+        self.gateway: GatewayDockerConfig = GatewayDockerConfig(config_dict.get("gateway"))
+        self.migration: CommonMigrationConfig = CommonMigrationConfig(config_dict.get("migration"))
+        super().__init__(config_dict)

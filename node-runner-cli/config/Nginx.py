@@ -3,6 +3,8 @@ from config.BaseConfig import BaseConfig
 
 class DockerNginxConfig(BaseConfig):
     def __init__(self, config_dict: dict):
+        if config_dict is None:
+            config_dict = dict()
         self.mode: str = "docker"
         self.protect_gateway: str = "true"
         self.gateway_behind_auth: str = "true"
@@ -16,6 +18,8 @@ class DockerNginxConfig(BaseConfig):
 
 class SystemdNginxConfig(BaseConfig):
     def __init__(self, config_dict: dict):
+        if config_dict is None:
+            config_dict = dict()
         self.mode: str = "systemd"
         self.enable_transaction_api = "false"
         self.protect_core: str = "true"

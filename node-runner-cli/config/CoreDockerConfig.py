@@ -11,15 +11,17 @@ from utils.utils import Helpers
 
 class CoreDockerConfig(BaseConfig):
     def __init__(self, config_dict: dict):
+        if config_dict is None:
+            config_dict = dict()
         self.nodetype: str = "fullnode"
-        self.composefileurl: str = None
+        self.composefileurl: str = ""
         self.keydetails: KeyDetails = KeyDetails(config_dict.get("nginx_settings"))
-        self.core_release: str = None
+        self.core_release: str = ""
         self.repo: str = os.getenv(CORE_DOCKER_REPO_OVERRIDE, "radixdlt/babylon-node")
         self.data_directory: str = f"{Helpers.get_home_dir()}/babylon-ledger"
         self.enable_transaction: str = "false"
-        self.trusted_node: str = None
-        self.validator_address: str = None
+        self.trusted_node: str = ""
+        self.validator_address: str = ""
         self.java_opts: str = "--enable-preview -server -Xms8g -Xmx8g  " \
                               "-XX:MaxDirectMemorySize=2048m " \
                               "-XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops " \

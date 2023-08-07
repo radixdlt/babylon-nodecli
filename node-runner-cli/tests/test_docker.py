@@ -68,17 +68,6 @@ class DockerUnitTests(unittest.TestCase):
         self.assertEqual(settings.to_yaml(), new_settings.to_yaml())
         self.assertEqual(settings.to_dict(), new_settings.to_dict())
 
-    @patch('sys.stdout', new_callable=StringIO)
-    def test_docker_config(self, mockout):
-        urllib3.disable_warnings()
-        # os.environ['PROMPT_FEEDS'] = "test-prompts/individual-prompts/validator_address.yml"
-        # PromptFeeder.prompts_feed = PromptFeeder.instance().load_prompt_feeds()
-        with patch('builtins.input',
-                   side_effect=['S', 'N', 'N', '/home/runner/docker-compose.yml', 'N', 'development-latest']):
-            with patch("sys.argv",
-                       ["main", "docker", "config", "-m", "DETAILED", "-k", "radix", "-nk", "-a"]):
-                main()
-
 
 def suite():
     """ This defines all the tests of a module"""

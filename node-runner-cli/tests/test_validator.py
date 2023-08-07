@@ -57,7 +57,7 @@ class ValidatorUnitTests(unittest.TestCase):
         self.assertFalse("RADIXDLT_CONSENSUS_VALIDATOR_ADDRESS" in compose_yml_str)
 
     def test_validator_address_included_in_dict_from_object(self):
-        config = DockerConfig("1.0.0")
+        config = DockerConfig({})
         config.core_node = CoreDockerConfig({})
         config.core_node.validator_address = "validator_mock"
         # ToDo: This is too looesely coupled. Implement DockerConfig save and load from/to Object and remove this test

@@ -181,7 +181,7 @@ class DockerSetup(BaseSetup):
     @staticmethod
     def load_settings(config_file) -> DockerConfig:
         if not os.path.isfile(config_file):
-            print(f"No configuration found. Execute 'babylonnode systemd config' first.")
+            print(f"No configuration found. Execute 'babylonnode docker config' first.")
             sys.exit(1)
         with open(config_file, 'r') as f:
             dictionary = yaml.load(f, Loader=UnsafeLoader)
@@ -190,7 +190,8 @@ class DockerSetup(BaseSetup):
     @staticmethod
     def questionary(argument_object: DockerConfigArguments) -> DockerConfig:
         print_questionary_header(argument_object.config_file)
-        docker_config = DockerConfig(argument_object.release)
+        docker_config = DockerConfig({})
+        docker_config.core_node.core_release = argument_object.release
         print(
             "\nCreating config file using the answers from the questions that would be asked in next steps."
             f"\nLocation of the config file: {bcolors.OKBLUE}{argument_object.config_file}{bcolors.ENDC}")

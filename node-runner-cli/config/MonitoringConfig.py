@@ -6,8 +6,12 @@ from utils.utils import Helpers
 
 
 class CommonMonitoringConfig(BaseConfig):
-    docker_compose_file = f"{Helpers.get_default_monitoring_config_dir()}/node-monitoring.yml"
-    config_dir = Helpers.get_default_monitoring_config_dir()
+    def __init__(self, config_dict: dict):
+        if config_dict is None:
+            config_dict = dict()
+        self.docker_compose_file = f"{Helpers.get_default_monitoring_config_dir()}/node-monitoring.yml"
+        self.config_dir = Helpers.get_default_monitoring_config_dir()
+        super().__init__(config_dict)
 
 
 class PrometheusConfig(BaseConfig):

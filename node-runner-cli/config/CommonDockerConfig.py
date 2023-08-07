@@ -8,17 +8,15 @@ from utils.Prompts import Prompts, Helpers
 
 
 class CommonDockerConfig(BaseConfig):
-    nginx_settings: DockerNginxConfig = DockerNginxConfig({})
-    network_id: int = None
-    network_name: str = ""
-    genesis_bin_data_file: str = None
-    docker_compose: str = f"{Helpers.get_home_dir()}/docker-compose.yml"
-
     def __init__(self, config_dict: dict):
+        if config_dict is None:
+            config_dict = dict()
+        self.nginx_settings: DockerNginxConfig = DockerNginxConfig(config_dict.get("nginx_settings"))
+        self.network_id: int = ""
+        self.network_name: str = ""
+        self.genesis_bin_data_file: str = ""
+        self.docker_compose: str = f"{Helpers.get_home_dir()}/docker-compose.yml"
         super().__init__(config_dict)
-        for key, value in config_dict.items():
-            setattr(self, key, value)
-
         if self.network_id:
             self.set_network_name()
 
