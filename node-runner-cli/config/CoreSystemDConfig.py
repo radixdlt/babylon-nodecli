@@ -4,6 +4,7 @@ from pathlib import Path
 from config.BaseConfig import BaseConfig, SetupMode
 from config.EnvVars import MOUNT_LEDGER_VOLUME, NODE_BINARY_OVERIDE
 from config.KeyDetails import KeyDetails
+from github.github import latest_release
 from setup.BaseSetup import BaseSetup
 from utils.Prompts import Prompts
 from utils.utils import Helpers
@@ -53,6 +54,8 @@ class CoreSystemdConfig(BaseConfig):
         self.trusted_node = trusted_node
 
     def set_core_release(self, release):
+        if not release:
+            release = latest_release()
         self.core_release = release
         self.keydetails.keygen_tag = "v1.4.1"
 

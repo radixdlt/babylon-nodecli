@@ -329,17 +329,13 @@ class SystemDSetup(BaseSetup):
         systemd_config.common_config.ask_network_id(argument_object.networkid)
         systemd_config.common_config.ask_host_ip(argument_object.hostip)
         systemd_config.common_config.ask_enable_nginx_for_core(argument_object.nginx_on_core)
-
-        if systemd_config.common_config.check_nginx_required():
-            systemd_config.common_config.ask_nginx_release()
-        else:
-            systemd_config.common_config.nginx_settings = None
-
+        systemd_config.common_config.ask_nginx_release()
         return systemd_config.common_config
 
     @staticmethod
     def ask_core_node(argument_object: SystemDConfigArguments) -> CoreSystemdConfig:
         systemd_config = SystemDConfig({})
+
         systemd_config.core_node.set_core_release(argument_object.release)
         systemd_config.core_node.set_trusted_node(argument_object.trustednode)
         systemd_config.core_node.generate_download_urls()
