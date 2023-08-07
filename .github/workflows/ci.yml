@@ -30,7 +30,7 @@ jobs:
           secret_name: ${{ secrets.AWS_SECRET_NAME_SNYK }}
           parse_json: true
       - name: Run Snyk to check for deps vulnerabilities
-        run: docker run --entrypoint=snyk -v $PWD:/source -w /source snyk/snyk:python-3.9 test --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --severity-threshold=critical
+        run: docker run --entrypoint=snyk -v $PWD:/source -w /source snyk/snyk:python-3.9 authi ${{ env.SNYK_TOKEN }} && snyk test --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --severity-threshold=critical
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Run Snyk to check for code vulnerabilities
