@@ -34,7 +34,7 @@ class DockerUnitTests(unittest.TestCase):
                                                   'radix://node_tdx_22_1qvsml9pe32rzcrmw6jx204gjeng09adzkqqfz0ewhxwmjsaas99jzrje4u3@34.243.93.185',
                                                   'N',
                                                   'Y',
-                                                  '/tmp/node-config',
+                                                  '/tmp/babylon-node-config',
                                                   'node-keystore.ks',
                                                   '/tmp/data',
                                                   'true',

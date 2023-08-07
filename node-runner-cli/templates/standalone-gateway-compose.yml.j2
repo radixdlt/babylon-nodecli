@@ -17,6 +17,7 @@ services:
       ConnectionStrings__NetworkGatewayReadOnly: "Host={{gateway.postgres_db.host}};Database={{gateway.postgres_db.dbname}};Username={{gateway.postgres_db.user}};Password={{gateway.postgres_db.password}}"
       ConnectionStrings__NetworkGatewayReadWrite: "Host={{gateway.postgres_db.host}};Database={{gateway.postgres_db.dbname}};Username={{gateway.postgres_db.user}};Password={{gateway.postgres_db.password}}"
       GatewayApi__Endpoints_MaxPageSize: "{{gateway.gateway_api.max_page_size or '30'}}"
+      GatewayApi__Endpoint__GatewayApiVersion: {{gateway.gateway_api.release}}
       # GatewayApi__MaxWaitForDbOnStartupMs: "90" # Wait for PostGres to boot up
       GatewayApi__Network__DisableCoreApiHttpsCertificateChecks: "{{gateway.gateway_api.coreApiNode.disable_core_api_https_certificate_checks or 'false'}}"
       GatewayApi__Network__NetworkName: "{{common_config.network_name}}"
@@ -45,16 +46,16 @@ services:
       ASPNETCORE_URLS: "http://*:80" # Binds to 80 on all interfaces
       ConnectionStrings__NetworkGatewayReadWrite: "Host={{gateway.postgres_db.host}};Database={{gateway.postgres_db.dbname}};Username={{gateway.postgres_db.user}};Password={{gateway.postgres_db.password}}"
       PrometheusMetricsPort: "{{gateway.data_aggregator.prometheusMetricsPortHostBinding or '1234'}}"
-      #DataAggregator__Network__MaxWaitForDbOnStartupMs: "90"
-      DataAggregator__Network__DisableCoreApiHttpsCertificateChecks:  "{{gateway.data_aggregator.coreApiNode.disable_core_api_https_certificate_checks or 'false'}}"
+      DataAggregator__Network__MaxWaitForDbOnStartupMs: "1000"
+      DataAggregator__Network__DisableCoreApiHttpsCertificateChecks: "{{gateway.data_aggregator.coreApiNode.disable_core_api_https_certificate_checks or 'false'}}"
       DataAggregator__Network__NetworkName: "{{common_config.network_name}}"
       DataAggregator__Network__CoreApiNodes__0__Name: "{{gateway.data_aggregator.coreApiNode.Name}}"
       DataAggregator__Network__CoreApiNodes__0__CoreApiAddress: "{{gateway.data_aggregator.coreApiNode.core_api_address}}"
       {% if gateway.data_aggregator.coreApiNode.auth_header is defined %}
       DataAggregator__Network__CoreApiNodes__0__CoreApiAuthorizationHeader: "{{gateway.data_aggregator.coreApiNode.auth_header.Authorization}}"
       {% endif %}
-      DataAggregator__Network__CoreApiNodes__0__TrustWeighting:  "{{gateway.data_aggregator.coreApiNode.trust_weighting or '1'}}"
-      DataAggregator__Network__CoreApiNodes__0__Enabled:  "{{gateway.data_aggregator.coreApiNode.enabled or 'true'}}"
+      DataAggregator__Network__CoreApiNodes__0__TrustWeighting: "{{gateway.data_aggregator.coreApiNode.trust_weighting or '1'}}"
+      DataAggregator__Network__CoreApiNodes__0__Enabled: "{{gateway.data_aggregator.coreApiNode.enabled or 'true'}}"
   database_migrations: # This is the base -- the _image and _built containers are defined below
     image: {{gateway.database_migration.repo}}:{{gateway.database_migration.release}}
     environment:

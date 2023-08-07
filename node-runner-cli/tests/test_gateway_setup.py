@@ -151,11 +151,11 @@ services:
     def test_setup_gateway_compose_file_fixture_test(self, mockout):
         urllib3.disable_warnings()
         # Takes default values
-        questionary_keyboard_input = ["https://localhost:443", "admin", "radix", "false",
+        questionary_keyboard_input = ["https://host.docker.internal:443/core", "admin", "radix", "true",
                                       "CoreNode",
-                                      "1",
-                                      "1",
-                                      "1",
+                                      "rcnet-v2-phase2-r4",
+                                      "rcnet-v2-phase2-r4",
+                                      "rcnet-v2-phase2-r4",
                                       "local",
                                       "radixdlt_ledger",
                                       "postgres"]
@@ -164,23 +164,26 @@ services:
         config = SystemDConfig({})
 
         with patch('builtins.input', side_effect=questionary_keyboard_input):
-            config.gateway = GatewaySetup.ask_gateway_standalone_docker("radix")
+            config.gateway = GatewaySetup.ask_gateway_standalone_docker("postgres")
+
+        self.assertEqual("postgres", config.gateway.postgres_db.password)
+
+        # Have to manually set this because we skipped systemd setup
+        config.common_config.network_name = "ansharnet"
+        config.gateway.enabled = True
 
         self.expect_ask_gateway_inputs_get_inserted_into_object(config, questionary_keyboard_input)
         self.assertEqual("host.docker.internal:5432", config.gateway.postgres_db.host)
 
-        # config.gateway.docker_compose_file = "/tmp/gateway.docker-compose.yml"
-        #
-        # with patch('builtins.input', side_effect=[install_keyboard_input]):
-        #     GatewaySetup.install_standalone_gateway(config)
-        #
-        # fixture_file = "./tests/fixtures/gateway-docker-compose.yaml"
-        # with open(fixture_file) as f1:
-        #     with open(config.gateway.docker_compose_file) as f2:
-        #         self.assertEqual(f1.read(), f2.read())
-        #
-        # self.assertTrue(filecmp.cmp(fixture_file, config.gateway.docker_compose_file,
-        #                             shallow=False))
+        config.gateway.docker_compose = "/tmp/gateway.docker-compose.yml"
+
+        with patch('builtins.input', side_effect=[install_keyboard_input]):
+            GatewaySetup.conditionaly_install_standalone_gateway(config)
+
+        fixture_file = "./tests/fixtures/gateway-docker-compose.yaml"
+        with open(fixture_file) as f1:
+            with open(config.gateway.docker_compose) as f2:
+                self.assertEqual(f1.read(), f2.read())
 
     def expect_ask_gateway_inputs_get_inserted_into_object(self, config, questionary_keyboard_input):
         self.assertEqual(questionary_keyboard_input[0], config.gateway.gateway_api.coreApiNode.core_api_address)

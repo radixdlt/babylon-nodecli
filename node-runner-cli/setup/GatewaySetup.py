@@ -35,7 +35,8 @@ class GatewaySetup():
         gateway_config: GatewayDockerConfig = GatewayDockerConfig({})
         gateway_config.enabled = True
 
-        gateway_config.data_aggregator.coreApiNode = GatewaySetup.ask_core_api_node_settings("http://localhost:3332")
+        gateway_config.data_aggregator.coreApiNode = GatewaySetup.ask_core_api_node_settings(
+            "http://host.docker.internal:443/core")
         gateway_config.gateway_api.coreApiNode = gateway_config.data_aggregator.coreApiNode
 
         gateway_config.gateway_api.release = GatewaySetup.ask_gateway_release("gateway_api")

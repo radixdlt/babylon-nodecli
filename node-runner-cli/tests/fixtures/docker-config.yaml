@@ -22,7 +22,7 @@ core_node:
     -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
   keydetails:
     keyfile_name: node-keystore.ks
-    keyfile_path: /home/radixdlt/node-config
+    keyfile_path: /home/radixdlt/babylon-node-config
     keygen_tag: v1.4.1
     keystore_password: radix
   nodetype: fullnode

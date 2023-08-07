@@ -28,7 +28,7 @@ services:
         soft: 65536
     volumes:
     - core_ledger:/home/radixdlt/RADIXDB
-    - /home/radixdlt/node-config/node-keystore.ks:/home/radixdlt/node-keystore.ks
+    - /home/radixdlt/babylon-node-config/node-keystore.ks:/home/radixdlt/node-keystore.ks
     - /home/radixdlt/genesis_data_file.bin:/home/radixdlt/genesis.json
   data_aggregator:
     cpus: 2.0
