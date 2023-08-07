@@ -5,7 +5,7 @@ name = "pypi"
 
 [packages]
 core_client = {git = "https://github.com/radixdlt/python-core-client", editable = true, ref = "v1.1.1"}
-requests = "==2.26.0"
+requests = "==2.31.0"
 PyYAML = "==6.0.0"
 deepmerge = "==0.3.0"
 bech32 = "==1.2.0"
