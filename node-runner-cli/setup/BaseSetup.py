@@ -63,8 +63,8 @@ class BaseSetup:
 
             run_shell_command(['docker', 'run', '--rm', '-v', key_details.keyfile_path + ':/keygen/key',
                                f'radixdlt/keygen:{key_details.keygen_tag}',
-                               f'-k /keygen/key/{key_details.keyfile_name}',
-                               '-p ' + key_details.keystore_password], quite=False)
+                               '-k', f'/keygen/key/{key_details.keyfile_name}',
+                               '-p', f'{key_details.keystore_password}'], quite=False)
 
             run_shell_command(['sudo', 'chmod', '644', f'{key_details.keyfile_path}/{key_details.keyfile_name}'])
         return key_details

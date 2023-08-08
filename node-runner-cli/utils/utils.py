@@ -37,7 +37,6 @@ def run_shell_command(cmd, env=None, shell=False, fail_on_error=True, quite=Fals
         print("""
             Command failed. Exiting...
         """)
-        sys.exit(1)
     return result
 
 

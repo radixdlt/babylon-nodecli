@@ -6,6 +6,7 @@ from unittest.mock import patch
 import urllib3
 import yaml
 from deepdiff import DeepDiff
+from yaml import UnsafeLoader
 
 from config.DockerConfig import DockerConfig
 from config.SystemDConfig import SystemDConfig
@@ -209,7 +210,7 @@ services:
         self.assertEqual(True, docker_config.gateway.enabled)
         compose_yaml = DockerSetup.render_docker_compose(docker_config)
         with open(compose_fixture_file, 'r') as f:
-            compose_fixture = yaml.load(f)
+            compose_fixture = yaml.load(f, Loader=UnsafeLoader)
         self.maxDiff = None
         ddiff = DeepDiff(compose_yaml, compose_fixture, ignore_order=True)
         # self.assertEqual({}, ddiff)
