@@ -44,6 +44,8 @@ jobs:
           parse-json-secrets: true
       - name: Run Snyk to check for deps vulnerabilities
         run: |
+          cd node-runner-cli/
+          pipenv install --python /usr/local/bin/python
           snyk auth ${{ env.SNYK_TOKEN }}
           snyk test --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --severity-threshold=critical
         env:
