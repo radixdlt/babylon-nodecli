@@ -34,9 +34,17 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_NAME_SNYK_SECRET }}
           aws-region: "eu-west-2"
-          role-session-name: "baylon-nodecli-${{ github.run_id }}-${{ github.run_attempt }}"    
+          role-session-name: "baylon-nodecli-${{ github.run_id }}-${{ github.run_attempt }}"   
+      - name: Fetch AWS secrets
+      uses: aws-actions/aws-secretsmanager-get-secrets@287592d14d9c9c48199db83dc182ae12af3df18e # v1.0.1
+      with:
+        secret-ids: |
+          "SNYK", ${{ secrets.AWS_SECRET_NAME_SNYK }}
+        parse-json-secrets: true
       - name: Run Snyk to check for deps vulnerabilities
-        run: snyk test --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --severity-threshold=critical
+        run: |
+          snyk auth ${{ env.SNYK_TOKEN }}
+          snyk test --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --severity-threshold=critical
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Run Snyk to check for code vulnerabilities
