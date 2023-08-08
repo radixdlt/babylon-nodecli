@@ -174,7 +174,7 @@ jobs:
       - name: Upload cli to asset store
         run: |
           ls */**
-          aws s3 cp radixnode s3://${{secrets.ARTIFACT_AWS_BUCKET }}/radixnode/${{env.BRANCH_WITH_COMMIT}}/radixnode-ubuntu-22.04
+          aws s3 cp babylonnode s3://${{secrets.ARTIFACT_AWS_BUCKET }}/babylonnode/${{env.BRANCH_WITH_COMMIT}}/babylonnode-ubuntu-22.04
 
   upload-release-jammy:
     runs-on: ubuntu-22.04
@@ -193,8 +193,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./radixnode
-          asset_name: radixnode-ubuntu-22.04
+          asset_path: ./babylonnode
+          asset_name: babylonnode-ubuntu-22.04
           asset_content_type: application/octet-stream
         if: ${{ github.event_name == 'release' }}
 
@@ -257,8 +257,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./radixnode
-          asset_name: radixnode-ubuntu-20.04
+          asset_path: ./babylonnode
+          asset_name: babylonnode-ubuntu-20.04
           asset_content_type: application/octet-stream
         if: ${{ github.event_name == 'release' }}
 
@@ -278,48 +278,48 @@ jobs:
           name: ubuntu 22.04
       - name: Get dependencies
         run: |
-          chmod +x ./radixnode
+          chmod +x ./babylonnode
           sudo apt-get update
           sudo apt-get install containerd runc
       - name: Run systemd dependencies
         run: |
           ls -a
-          chmod +x ./radixnode
-          # ./radixnode systemd dependencies
+          chmod +x ./babylonnode
+          # ./babylonnode systemd dependencies
           echo "expecting the dependencies to be already installed"
       - name: Run systemd config
         run: |
           ls -a
-          chmod +x ./radixnode
+          chmod +x ./babylonnode
           echo "HOME=$HOME"
           echo "PATH=$PWD"
-          ./radixnode systemd config -m CORE \
+          ./babylonnode systemd config -m CORE \
             -n 13 \
             -t radix://node_tdx_d_1qwq2nfe6vxqwe3mqmfm9l2xl97as7lkwndval63cymvc3qszn8nqx6g2s3m@3.109.161.178 \
             -i 35.178.142.54 \
             -v "not_a_real_validator_address" \
             -k $KEYSTORE_PASSWORD -nk -a \
             -dd $HOME/babylon-ledger
-          ./radixnode systemd stop && sudo rm -rf $HOME/babylon-ledger
+          ./babylonnode systemd stop && sudo rm -rf $HOME/babylon-ledger
         env:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Run systemd install
         run: |
           ls -a
-          chmod +x ./radixnode
+          chmod +x ./babylonnode
           echo "HOME=$HOME"
           echo "PATH=$PWD"
-          ./radixnode systemd install
+          ./babylonnode systemd install
       - name: Get Logs and Status
         run: |
           sleep 15
           sudo tail /var/log/syslog  -n 100
-          ./radixnode auth set-admin-password --setupmode SYSTEMD -p $NGINX_ADMIN_PASSWORD
-          ./radixnode auth set-superadmin-password --setupmode SYSTEMD -p $NGINX_SUPERADMIN_PASSWORD
-          ./radixnode auth set-metrics-password --setupmode SYSTEMD -p $NGINX_METRICS_PASSWORD
-          NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system health
-          NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system version
+          ./babylonnode auth set-admin-password --setupmode SYSTEMD -p $NGINX_ADMIN_PASSWORD
+          ./babylonnode auth set-superadmin-password --setupmode SYSTEMD -p $NGINX_SUPERADMIN_PASSWORD
+          ./babylonnode auth set-metrics-password --setupmode SYSTEMD -p $NGINX_METRICS_PASSWORD
+          NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./babylonnode api system health
+          NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./babylonnode api system version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
@@ -327,10 +327,10 @@ jobs:
           NGINX_SUPERADMIN_PASSWORD: ${{secrets.NGINX_SUPERADMIN_PASSWORD}}
       - name: Stop systemd 
         run: |
-          chmod +x ./radixnode
+          chmod +x ./babylonnode
           echo "HOME=$HOME"
           echo "PATH=$PWD"
-          ./radixnode systemd stop   
+          ./babylonnode systemd stop   
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # - name: Clean Up
@@ -355,19 +355,19 @@ jobs:
           name: ubuntu 22.04
       - name: Get dependencies
         run: |
-          chmod +x ./radixnode
+          chmod +x ./babylonnode
           sudo apt-get update
           sudo apt-get install containerd runc
-          ./radixnode docker dependencies
+          ./babylonnode docker dependencies
       - name: core-gateway-all-local
         run: |
           ls -a
-          chmod +x ./radixnode
+          chmod +x ./babylonnode
           mkdir -p $HOME/node-config
           echo "HOME=$HOME"
           echo "PATH=$PWD"
           export PROMPT_FEEDS="node-runner-cli/test-prompts/core-gateway-all-local.yml"
-          ./radixnode docker config -m DETAILED \
+          ./babylonnode docker config -m DETAILED \
            -d $HOME/node-config \
            -k $KEYSTORE_PASSWORD -nk -a
         env:
@@ -378,9 +378,9 @@ jobs:
       - name: corenode-01
         run: |
           ls -a
-          chmod +x ./radixnode
+          chmod +x ./babylonnode
           export PROMPT_FEEDS="node-runner-cli/test-prompts/corenode-01.yml"
-          ./radixnode docker config -m DETAILED \
+          ./babylonnode docker config -m DETAILED \
            -d $HOME/node-config \
            -k $KEYSTORE_PASSWORD -nk -a
         env:
@@ -392,7 +392,7 @@ jobs:
         run: |
           ls -a
           export PROMPT_FEEDS="node-runner-cli/test-prompts/corenode-02.yml"
-          ./radixnode docker config -m DETAILED \
+          ./babylonnode docker config -m DETAILED \
            -d $HOME/node-config \
            -k $KEYSTORE_PASSWORD -nk -a
         env:
@@ -405,7 +405,7 @@ jobs:
 #        run: |
 #          ls -a
 #          export PROMPT_FEEDS="node-runner-cli/test-prompts/gateway-remote-core-local-postgress.yml"
-#          ./radixnode docker config -m DETAILED \
+#          ./babylonnode docker config -m DETAILED \
 #           -d $HOME/node-config \
 #           -k $KEYSTORE_PASSWORD -nk -a
 #        env:
@@ -416,7 +416,7 @@ jobs:
 #        run: |
 #          ls -a
 #          export PROMPT_FEEDS="node-runner-cli/test-prompts/gateway-remote-core-remote-postgress.yml"
-#          ./radixnode docker config -m DETAILED \
+#          ./babylonnode docker config -m DETAILED \
 #           -d $HOME/node-config \
 #           -k $KEYSTORE_PASSWORD -nk -a
 #        env:
@@ -444,19 +444,19 @@ jobs:
           name: ubuntu 22.04
       - name: Run configure command
         run: |
-          chmod +x ./radixnode
+          chmod +x ./babylonnode
           sudo apt-get update
           sudo apt-get install containerd runc
-          ./radixnode docker dependencies
+          ./babylonnode docker dependencies
       - name: Setup config
         run: |
-          chmod +x ./radixnode
+          chmod +x ./babylonnode
           mkdir -p $HOME/node-config
           export DISABLE_VERSION_CHECK=true
           export RADIXDLT_APP_VERSION_OVERRIDE="rcnet-v2-phase2-r4"
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
           export PROMPT_FEEDS="node-runner-cli/test-prompts/core-gateway-all-local.yml"
-          ./radixnode docker config -m DETAILED \
+          ./babylonnode docker config -m DETAILED \
            -d $HOME/node-config \
            -k $KEYSTORE_PASSWORD -nk -a
         env:
@@ -466,14 +466,14 @@ jobs:
         run: |
           export DISABLE_VERSION_CHECK=true
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
-          ./radixnode docker install -f $HOME/node-config/config.yaml -a
+          ./babylonnode docker install -f $HOME/node-config/config.yaml -a
           # ToDo: Fix Authorization error export DOCKER_COMPOSE_FOLDER_PREFIX=runner ?
           sleep 60
-          ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
-          ./radixnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
-          ./radixnode auth set-superadmin-password -m DOCKER -p $NGINX_SUPERADMIN_PASSWORD
-          NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system health
-          NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system version
+          ./babylonnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
+          ./babylonnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
+          ./babylonnode auth set-superadmin-password -m DOCKER -p $NGINX_SUPERADMIN_PASSWORD
+          NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./babylonnode api system health
+          NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./babylonnode api system version
         env:
           NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
           NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
@@ -483,13 +483,13 @@ jobs:
       - name: Run Monitoring setup
         run: |
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
-          ./radixnode monitoring config \
+          ./babylonnode monitoring config \
                         -m MONITOR_CORE  \
                         -cm $NGINX_METRICS_PASSWORD  \
                         -gm $NGINX_METRICS_PASSWORD  \
                         -am $NGINX_METRICS_PASSWORD
 
-          ./radixnode monitoring install -a
+          ./babylonnode monitoring install -a
 
         env:
           NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
@@ -578,17 +578,17 @@ jobs:
 #          name: ubuntu 22.04
 #      - name: Get dependencies
 #        run: |
-#          chmod +x ./radixnode
+#          chmod +x ./babylonnode
 #          sudo apt-get update
 #          sudo apt-get install containerd runc
-#          ./radixnode docker dependencies
+#          ./babylonnode docker dependencies
 #      - name: Setup config
 #        run: |
-#          chmod +x ./radixnode
+#          chmod +x ./babylonnode
 #          mkdir -p $HOME/node-config
 #          export DISABLE_VERSION_CHECK=true
 #          rm -rf $HOME/node-config
-#          ./radixnode docker config -d $HOME/node-config \
+#          ./babylonnode docker config -d $HOME/node-config \
 #            -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 \
 #            -m CORE GATEWAY -n 2 -k $KEYSTORE_PASSWORD -nk -p $POSTGRESS_PASSWORD -a
 #          #grep -v "password" $HOME/node-config/config.yaml > temp && mv temp $HOME/node-config/config.yaml
@@ -604,31 +604,31 @@ jobs:
 #          export DISABLE_VERSION_CHECK=true
 #          export COMPOSE_HTTP_TIMEOUT=360
 #
-#          ./radixnode docker stop -f $HOME/node-config/config.yaml
+#          ./babylonnode docker stop -f $HOME/node-config/config.yaml
 #
 #          #Below PATH require when ansible is installed as part of pip
 #          export PATH="$PATH:/home/ubuntu/.local/bin"
 #
-#          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
-#          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
-#          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-gateway-password -m DOCKER -p $NGINX_GATEWAY_PASSWORD
+#          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./babylonnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
+#          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./babylonnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
+#          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./babylonnode auth set-gateway-password -m DOCKER -p $NGINX_GATEWAY_PASSWORD
 #
-#          ./radixnode monitoring stop
-#          ./radixnode monitoring config \
+#          ./babylonnode monitoring stop
+#          ./babylonnode monitoring config \
 #              -m MONITOR_CORE MONITOR_GATEWAY \
 #              -cm $NGINX_METRICS_PASSWORD  \
 #              -gm $NGINX_METRICS_PASSWORD  \
 #              -am $NGINX_METRICS_PASSWORD
 #
-#          ./radixnode monitoring install -a
+#          ./babylonnode monitoring install -a
 #
 #          export POSTGRES_PASSWORD=${{secrets.POSTGRESS_PASSWORD}}
 #          export RADIXDLT_NODE_KEY_PASSWORD=${{secrets.KEYSTORE_PASSWORD}}
 #          # ToDo: Fix Docker Image Pull with Gateway installation
-#          # ./radixnode docker install -f $HOME/node-config/config.yaml -a
+#          # ./babylonnode docker install -f $HOME/node-config/config.yaml -a
 #          # sleep 60
 #
-#          # NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system health
+#          # NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./babylonnode api system health
 #          # curl -f  --request POST --insecure --user "gateway:$NGINX_GATEWAY_PASSWORD" https://localhost/gateway
 #          # curl --insecure --user "gateway:$NGINX_GATEWAY_PASSWORD" https://localhost/token/native --header 'Content-Type: application/json' -d '{ "network_identifier":{"network":"stokenet"}}'
 #          # curl -k -f -u "metrics:$NGINX_METRICS_PASSWORD" https://localhost/gateway/metrics
@@ -653,17 +653,17 @@ jobs:
 #          name: ubuntu 22.04
 #      - name: Get dependencies
 #        run: |
-#          chmod +x ./radixnode
+#          chmod +x ./babylonnode
 #          sudo apt-get update
 #          sudo apt-get install containerd runc
-#          ./radixnode docker dependencies
+#          ./babylonnode docker dependencies
 #      - name: Setup config
 #        run: |
-#          chmod +x ./radixnode
+#          chmod +x ./babylonnode
 #          mkdir -p $HOME/node-config
 #          export DISABLE_VERSION_CHECK=true
 #          export COMPOSE_HTTP_TIMEOUT=360
-#          ./radixnode docker config -d $HOME/node-config \
+#          ./babylonnode docker config -d $HOME/node-config \
 #            -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 \
 #            -m CORE GATEWAY -n 2 -k password -nk -p postgres -xg false -xc false -a
 #        env:
@@ -676,15 +676,15 @@ jobs:
 #        run: |
 #          export DISABLE_VERSION_CHECK=true
 #          export COMPOSE_HTTP_TIMEOUT=360
-#          ./radixnode docker stop -f $HOME/node-config/config.yaml
+#          ./babylonnode docker stop -f $HOME/node-config/config.yaml
 #
 #          #Below PATH require when ansible is installed as part of pip
 #          export PATH="$PATH:/home/ubuntu/.local/bin"
 #          # ToDo: Fix Docker Image Pull with Gateway installation
-#          # ./radixnode docker install -f $HOME/node-config/config.yaml -a -u
+#          # ./babylonnode docker install -f $HOME/node-config/config.yaml -a -u
 #
 #          # sleep 60
-#          # NODE_END_POINT="http://localhost:3333" NGINX=false ./radixnode api system health
+#          # NODE_END_POINT="http://localhost:3333" NGINX=false ./babylonnode api system health
 #          # curl -k -f -u "admin:$NGINX_ADMIN_PASSWORD" http://localhost:5207
 #        env:
 #          CORE_DOCKER_REPO_OVERRIDE: "radixdlt/radixdlt-core"
