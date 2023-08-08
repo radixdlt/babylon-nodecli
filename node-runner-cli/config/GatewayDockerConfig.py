@@ -1,12 +1,13 @@
 import os
 
 from config.BaseConfig import BaseConfig, SetupMode
+from config.CoreApiNodeConfig import CoreApiNodeConfig
 from config.EnvVars import GATEWAY_DOCKER_REPO_OVERRIDE, AGGREGATOR_DOCKER_REPO_OVERRIDE, MIGRATION_DOCKER_REPO_OVERRIDE
 from utils.Prompts import Prompts
 from utils.utils import Helpers
 
 
-class PostGresConfig(BaseConfig):
+class PostgresConfig(BaseConfig):
     def __init__(self, config_dict: dict):
         if config_dict is None:
             config_dict = dict()
@@ -27,25 +28,6 @@ class PostGresConfig(BaseConfig):
             self.password = Prompts.ask_postgress_password()
         else:
             self.password = postgress_password
-
-
-class CoreApiNodeConfig(BaseConfig):
-    def __init__(self, config_dict: dict):
-        if config_dict is None:
-            config_dict = dict()
-        self.Name = "Core"
-        self.core_api_address = "http://core:3333"
-        self.trust_weighting = 1
-        self.request_weighting = 1
-        self.enabled = "true"
-        self.basic_auth_user = ""
-        self.basic_auth_password = ""
-        self.auth_header = ""
-        self.disable_core_api_https_certificate_checks: str = ""
-        super().__init__(config_dict)
-
-    def ask_disablehttpsVerify(self):
-        self.disable_core_api_https_certificate_checks = Prompts.get_disablehttpsVerfiy()
 
 
 class DatabaseMigrationConfig(BaseConfig):
@@ -87,7 +69,7 @@ class GatewayDockerConfig(BaseConfig):
             config_dict = dict()
         self.data_aggregator: DataAggregatorConfig = DataAggregatorConfig(config_dict.get("data_aggregator"))
         self.gateway_api: GatewayAPIDockerConfig = GatewayAPIDockerConfig(config_dict.get("gateway_api"))
-        self.postgres_db: PostGresConfig = PostGresConfig(config_dict.get("postgres_db"))
+        self.postgres_db: PostgresConfig = PostgresConfig(config_dict.get("postgres_db"))
         self.database_migration: DatabaseMigrationConfig = DatabaseMigrationConfig(
             config_dict.get("database_migration"))
         self.enabled: bool = False

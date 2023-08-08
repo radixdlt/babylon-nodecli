@@ -1,7 +1,8 @@
 from urllib.parse import urlparse
 
 from config.BaseConfig import SetupMode
-from config.GatewayDockerConfig import GatewayDockerConfig, CoreApiNodeConfig
+from config.GatewayDockerConfig import GatewayDockerConfig
+from config.CoreApiNodeConfig import CoreApiNodeConfig
 from config.SystemDConfig import SystemDConfig
 from github import github
 from setup.AnsibleRunner import AnsibleRunner
