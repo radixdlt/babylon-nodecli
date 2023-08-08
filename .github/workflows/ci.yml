@@ -39,7 +39,7 @@ jobs:
         uses: aws-actions/aws-secretsmanager-get-secrets@287592d14d9c9c48199db83dc182ae12af3df18e # v1.0.1
         with:
           secret-ids: |
-            "SNYK", ${{ secrets.AWS_SECRET_NAME_SNYK }}
+            'SNYK', ${{ secrets.AWS_SECRET_NAME_SNYK }}
           parse-json-secrets: true
       - name: Run Snyk to check for deps vulnerabilities
         run: |
