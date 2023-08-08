@@ -33,7 +33,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@97271860067ec931c45b8d104fbf0d15954ab85c # branch v1-node16
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_NAME_SNYK_SECRET }}
-          aws-region: ${{ inputs.region }}
+          aws-region: "eu-west-2"
           role-session-name: "baylon-nodecli-${{ github.run_id }}-${{ github.run_attempt }}"    
       - name: Run Snyk to check for deps vulnerabilities
         run: snyk test --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --severity-threshold=critical
