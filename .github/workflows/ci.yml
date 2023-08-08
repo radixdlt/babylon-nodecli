@@ -15,7 +15,7 @@ jobs:
   snyk-scan:
     runs-on: ubuntu-latest
     container:
-      image: snyk/snyk:python-3.9
+      image: radixdlt/snyk-python:sha-e6b1b80
     permissions:
       id-token: write
       pull-requests: read
@@ -23,13 +23,6 @@ jobs:
       deployments: write
     steps:
       - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
-      - name: Install aws-cli
-        run: |
-          apt update && apt install -y sudo
-          curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
-          unzip awscli-bundle.zip
-          sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
-          pip install pipenv
       - name: Configure AWS credentials to fetch secrets
         uses: aws-actions/configure-aws-credentials@97271860067ec931c45b8d104fbf0d15954ab85c # branch v1-node16
         with:
