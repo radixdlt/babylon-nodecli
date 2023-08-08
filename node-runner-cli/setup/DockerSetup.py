@@ -87,7 +87,7 @@ class DockerSetup(BaseSetup):
                 docker_config.core_node.keydetails.keystore_password = keystore_password_from_env
 
         postgres_password = docker_config.gateway.postgres_db.password
-        if docker_config.gateway and not postgres_password:
+        if docker_config.gateway.enabled and not postgres_password:
             postgres_password_from_env = os.getenv(POSTGRES_PASSWORD, None)
 
             if not postgres_password_from_env:
@@ -101,28 +101,29 @@ class DockerSetup(BaseSetup):
 
     @staticmethod
     def conditionally_start_local_postgres(docker_config: DockerConfig):
-        postgres_db = docker_config.gateway.postgres_db
-        if DockerSetup.check_post_db_local(docker_config):
-            ansible_dir = f'https://raw.githubusercontent.com/radixdlt/babylon-nodecli/{Helpers.cli_version()}/node-runner-cli'
-            AnsibleRunner(ansible_dir).run_setup_postgress(
-                postgres_db.get("password"),
-                postgres_db.get("user"),
-                postgres_db.get("dbname"),
-                'ansible/project/provision.yml')
+        if docker_config.gateway.enabled:
+            postgres_db = docker_config.gateway.postgres_db
+            if DockerSetup.check_post_db_local(docker_config):
+                ansible_dir = f'https://raw.githubusercontent.com/radixdlt/babylon-nodecli/{Helpers.cli_version()}/node-runner-cli'
+                AnsibleRunner(ansible_dir).run_setup_postgress(
+                    postgres_db.get("password"),
+                    postgres_db.get("user"),
+                    postgres_db.get("dbname"),
+                    'ansible/project/provision.yml')
 
     @staticmethod
     def check_post_db_local(docker_config: DockerConfig):
         postgres_db = docker_config.gateway.postgres_db
-        if postgres_db and postgres_db.get("setup", None) == "local":
+        if postgres_db and postgres_db.setup == "local":
             return True
         return False
 
     @staticmethod
-    def get_existing_compose_file(docker_config: DockerConfig) -> str:
+    def get_existing_compose_file(docker_config: DockerConfig) -> dict:
         compose_file = docker_config.common_config.docker_compose
         Helpers.section_headline("Checking if you have existing docker compose file")
         if os.path.exists(compose_file):
-            return compose_file
+            return Helpers.yaml_as_dict(compose_file)
         else:
             Helpers.print_info("Seems you are creating docker compose file for first time")
             sys.exit(1)
@@ -140,7 +141,7 @@ class DockerSetup(BaseSetup):
             docker_config.core_node.core_release = Prompts.confirm_version_updates(current_core_release,
                                                                                    latest_core_release, 'CORE',
                                                                                    autoapprove)
-        if docker_config.gateway:
+        if docker_config.gateway.enabled:
             latest_gateway_release = github.latest_release("radixdlt/babylon-gateway")
             current_gateway_release = docker_config.gateway.data_aggregator.release
 
@@ -271,9 +272,9 @@ class DockerSetup(BaseSetup):
         return config_dict
 
     @staticmethod
-    def render_docker_compose(docker_config_updated_versions):
+    def render_docker_compose(docker_config: DockerConfig):
         return Renderer().load_file_based_template("radix-fullnode-compose.yml.j2").render(
-            docker_config_updated_versions).to_yaml()
+            docker_config.to_dict()).to_yaml()
 
     @staticmethod
     def confirm_config_changes(argument_object: DockerInstallArguments, docker_config, docker_config_updated_versions):
@@ -292,7 +293,8 @@ class DockerSetup(BaseSetup):
     def confirm_docker_compose_file_changes(docker_config: DockerConfig, autoapprove: bool):
         docker_compose_yaml: yaml = DockerSetup.render_docker_compose(docker_config)
         backup_time = Helpers.get_current_date_time()
-        compose_file, compose_file_yaml = DockerSetup.get_existing_compose_file(docker_config)
+        compose_file_yaml = DockerSetup.get_existing_compose_file(docker_config)
+        compose_file = docker_config.common_config.docker_compose
         compose_file_difference = dict(DeepDiff(compose_file_yaml, docker_compose_yaml))
         if len(compose_file_difference) != 0:
             print(f"""
@@ -319,7 +321,7 @@ class DockerSetup(BaseSetup):
         username = getpass.getuser()
         run_shell_command(['sudo', 'chown', f'{username}:{username}',
                            f'{docker_config.core_node.keydetails.keyfile_path}/{docker_config.core_node.keydetails.keyfile_name}'])
-        run_shell_command(['sudo', 'chown', '{username}:{username}',
+        run_shell_command(['sudo', 'chown', f'{username}:{username}',
                            f'{docker_config.common_config.genesis_bin_data_file}'])
-        run_shell_command(['sudo', 'chown', '-R', '{username}:{username}',
+        run_shell_command(['sudo', 'chown', '-R', f'{username}:{username}',
                            f'{docker_config.core_node.data_directory}'])

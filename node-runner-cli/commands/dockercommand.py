@@ -8,6 +8,7 @@ from config.DockerConfig import DockerConfig
 from setup.AnsibleRunner import AnsibleRunner
 from setup.BaseSetup import BaseSetup
 from setup.DockerCommandArguments import DockerInstallArguments, DockerConfigArguments
+from setup.DockerCompose import DockerCompose
 from setup.DockerSetup import DockerSetup
 from utils.utils import Helpers, bcolors
 
@@ -142,7 +143,7 @@ def install(args):
     compose_file = DockerSetup.confirm_docker_compose_file_changes(docker_config_updated_versions,
                                                                    argument_object.autoapprove)
 
-    DockerSetup.confirm_run_docker_compose(argument_object, compose_file)
+    DockerCompose.confirm_run_docker_compose(argument_object, compose_file)
 
 
 @dockercommand([
@@ -162,8 +163,8 @@ def start(args):
     docker_config = DockerSetup.check_set_passwords(docker_config)
     ########## Install dependent services
     DockerSetup.conditionally_start_local_postgres(docker_config)
-    compose_file = DockerSetup.get_existing_compose_file(docker_config)
-    DockerSetup.run_docker_compose_up(compose_file)
+    DockerSetup.get_existing_compose_file(docker_config)
+    DockerCompose.run_docker_compose_up(docker_config.common_config.docker_compose)
 
 
 @dockercommand([
@@ -184,8 +185,8 @@ def stop(args):
             Removing volumes including Nginx volume. Nginx password needs to be recreated again when you bring node up
             """)
     docker_config = DockerSetup.load_settings(args.configfile)
-    compose_file = DockerSetup.get_existing_compose_file(docker_config)
-    DockerSetup.run_docker_compose_down(compose_file, args.removevolumes)
+    DockerSetup.get_existing_compose_file(docker_config)
+    DockerCompose.run_docker_compose_down(docker_config.common_config.docker_compose, args.removevolumes)
 
 
 @dockercommand([

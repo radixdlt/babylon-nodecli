@@ -1,3 +1,5 @@
+import os
+
 from config.EnvVars import COMPOSE_HTTP_TIMEOUT
 from config.Renderer import Renderer
 from config.SystemDConfig import SystemDConfig

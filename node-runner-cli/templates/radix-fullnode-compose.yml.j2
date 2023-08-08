@@ -77,7 +77,7 @@ services:
     volumes:
     - nginx_secrets:/etc/nginx/secrets
  {% endif %}
-{% if (gateway is defined and gateway.gateway_api is defined) %}
+{% if (gateway.enabled and gateway.gateway_api is defined) %}
   gateway_api: # This is the base -- the _image and _built containers are defined below
     image: {{gateway.gateway_api.repo}}:{{gateway.gateway_api.release}}
     ports:
@@ -106,7 +106,7 @@ services:
       GatewayApi__Network__CoreApiNodes__0__RequestWeighting: "{{gateway.gateway_api.coreApiNode.request_weighting or '1'}}"
       GatewayApi__Network__CoreApiNodes__0__Enabled: "{{gateway.gateway_api.coreApiNode.enabled or 'true'}}"
 {% endif %}
-{% if (gateway is defined and gateway.data_aggregator is defined) %}
+{% if (gateway.enabled and gateway.data_aggregator is defined) %}
   data_aggregator:
     depends_on:
       - database_migrations
