@@ -137,6 +137,7 @@ def install(args):
     ########## Install dependent services
     DockerSetup.conditionally_start_local_postgres(docker_config_updated_versions)
 
+    DockerSetup.chown_files(docker_config)
     ########## Render Docker Compose
     compose_file = DockerSetup.confirm_docker_compose_file_changes(docker_config_updated_versions,
                                                                    argument_object.autoapprove)

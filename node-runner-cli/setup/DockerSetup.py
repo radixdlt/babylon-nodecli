@@ -312,3 +312,12 @@ class DockerSetup(BaseSetup):
                 DockerSetup.save_compose_file(compose_file, docker_compose_yaml)
         run_shell_command(f"cat {compose_file}", shell=True)
         return compose_file
+
+    @staticmethod
+    def chown_files(docker_config: DockerConfig):
+        run_shell_command(['sudo', 'chown', '$(whoami):$(whoami)',
+                           f'{docker_config.core_node.keydetails.keyfile_path}/{docker_config.core_node.keydetails.keyfile_name}'])
+        run_shell_command(['sudo', 'chown', '$(whoami):$(whoami)',
+                           f'{docker_config.common_config.genesis_bin_data_file}'])
+        run_shell_command(['sudo', 'chown', '-R', '$(whoami):$(whoami)',
+                           f'{docker_config.core_node.data_directory}'])

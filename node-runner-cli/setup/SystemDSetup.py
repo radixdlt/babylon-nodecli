@@ -404,6 +404,8 @@ class SystemDSetup(BaseSetup):
                            f'{settings.common_config.genesis_bin_data_file}'])
         run_shell_command(['sudo', 'chown', '-R', '$(whoami):$(whoami)',
                            f'{settings.core_node.node_secrets_dir}'])
+        run_shell_command(['sudo', 'chown', '-R', '$(whoami):$(whoami)',
+                           f'{settings.core_node.data_directory}'])
         # Nginx
         nginx_configured = SystemDSetup.setup_nginx_service(settings, backup_time, args.auto)
 
