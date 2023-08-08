@@ -122,7 +122,7 @@ jobs:
         uses: actions/upload-artifact@v3.1.2
         with:
           name: ubuntu 22.04
-          path: "${{ github.workspace }}/node-runner-cli/out/ubuntu/jammy/radixnode"
+          path: "${{ github.workspace }}/node-runner-cli/out/ubuntu/jammy/babylonnode"
       - name: Build the binary for ubuntu focal
         run: |
           cd node-runner-cli
@@ -133,7 +133,7 @@ jobs:
         uses: actions/upload-artifact@v3.1.2
         with:
           name: ubuntu 20.04
-          path: "${{ github.workspace }}/node-runner-cli/out/ubuntu/focal/radixnode"
+          path: "${{ github.workspace }}/node-runner-cli/out/ubuntu/focal/babylonnode"
 
   upload-asset-store:
     environment: AWS_ARTIFACT
