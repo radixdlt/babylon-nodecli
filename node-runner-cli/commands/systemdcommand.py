@@ -5,7 +5,7 @@ from pathlib import Path
 from commands.subcommand import get_decorator, argument
 from config.SystemDConfig import SystemDConfig
 from setup.BaseSetup import BaseSetup
-from setup.GatewaySetup import GatewaySetup
+from setup.DockerCompose import DockerCompose
 from setup.SystemDCommandArguments import SystemDConfigArguments
 from setup.SystemDSetup import SystemDSetup
 from utils.utils import Helpers, bcolors
@@ -48,7 +48,7 @@ def systemdcommand(systemdcommand_args=None, parent=systemd_parser):
               \n\nGATEWAY: This mode adds questions regarding the Network Gateway API and enables it for installation
               \n\nMIGRATION: This mode adds questions regarding the migration from an Olympia End-State node to a Babylon node
               """,
-             choices=["CORE", "DETAILED", "GATEWAY", "MIGRATION"], action="store"),
+             choices=["CORE", "DETAILED", "MIGRATION"], action="store"),
     argument("-miu", "--migration_url", help="The url of the olympia node to migrate the ledger from", action="store"),
     argument("-miau", "--migration_auth_user", help="The user to authenticate to the olympia node for migration",
              action="store"),
@@ -90,8 +90,8 @@ def config(args):
 
     systemd_config.common_config = SystemDSetup.ask_common_config(argument_object)
     systemd_config.core_node = SystemDSetup.ask_core_node(argument_object)
-    if "GATEWAY" in argument_object.setupmode.mode:
-        systemd_config.gateway = GatewaySetup.ask_gateway_standalone_docker(argument_object)
+    # if "GATEWAY" in argument_object.setupmode.mode:
+    #     systemd_config.gateway = GatewaySetup.ask_gateway_standalone_docker("")
     systemd_config.migration = SystemDSetup.ask_migration(argument_object)
 
     ################### File comparisson and generation
@@ -129,7 +129,7 @@ def stop(args):
     if args.services == "all":
         SystemDSetup.stop_nginx_service()
         SystemDSetup.stop_node_service()
-        GatewaySetup.stop_gateway_containers()
+        DockerCompose.stop_gateway_containers()
     elif args.services == "nginx":
         SystemDSetup.stop_nginx_service()
     elif args.services == "radixdlt-node":
@@ -149,7 +149,7 @@ def start(args):
     if args.services == "all":
         SystemDSetup.restart_node_service()
         SystemDSetup.restart_nginx_service()
-        GatewaySetup.restart_gateway_containers()
+        DockerCompose.restart_gateway_containers()
     elif args.services == "nginx":
         SystemDSetup.restart_nginx_service()
     elif args.services == "radixdlt-node":
@@ -169,7 +169,7 @@ def restart(args):
     if args.services == "all":
         SystemDSetup.restart_node_service()
         SystemDSetup.restart_nginx_service()
-        GatewaySetup.restart_gateway_containers()
+        DockerCompose.restart_gateway_containers()
     elif args.services == "nginx":
         SystemDSetup.restart_nginx_service()
     elif args.services == "radixdlt-node":

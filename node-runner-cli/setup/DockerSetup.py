@@ -9,7 +9,6 @@ from yaml import UnsafeLoader
 from config.DockerConfig import DockerConfig, CoreDockerConfig
 from config.EnvVars import DOCKER_COMPOSE_FOLDER_PREFIX, RADIXDLT_NODE_KEY_PASSWORD, \
     POSTGRES_PASSWORD
-from config.GatewayDockerConfig import GatewayDockerConfig
 from config.Renderer import Renderer
 from github import github
 from setup.AnsibleRunner import AnsibleRunner
@@ -210,10 +209,8 @@ class DockerSetup(BaseSetup):
             docker_config.common_config.ask_enable_nginx_for_core(argument_object.nginx_on_core)
 
         if "GATEWAY" in argument_object.setupmode.mode:
-            quick_gateway: GatewayDockerConfig = GatewayDockerConfig({}).create_config(
-                argument_object.postgrespassword)
-
-            docker_config.gateway = quick_gateway
+            docker_config.gateway = GatewaySetup.ask_gateway_full_docker(
+                argument_object.postgrespassword, "http://core:3333")
             docker_config.common_config.ask_enable_nginx_for_gateway(argument_object.nginx_on_gateway)
         if "DETAILED" in argument_object.setupmode.mode:
             run_fullnode = Prompts.check_for_fullnode()

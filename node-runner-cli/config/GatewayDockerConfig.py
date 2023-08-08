@@ -17,13 +17,13 @@ class PostGresConfig(BaseConfig):
         self.host: str = "host.docker.internal:5432"
         super().__init__(config_dict)
 
-    def ask_postgress_settings(self, postgress_password):
+    def ask_postgress_settings(self, postgress_password: str):
         Helpers.section_headline("POSTGRES SETTINGS")
         if "DETAILED" in SetupMode.instance().mode:
             self.setup, self.host = Prompts.ask_postgress_location(self.host)
             self.dbname = Prompts.get_postgress_dbname()
             self.user = Prompts.get_postgress_user()
-        if not postgress_password:
+        if not postgress_password and postgress_password != "":
             self.password = Prompts.ask_postgress_password()
         else:
             self.password = postgress_password
@@ -64,7 +64,6 @@ class DataAggregatorConfig(BaseConfig):
         self.release: str = ""
         self.repo: str = os.getenv(AGGREGATOR_DOCKER_REPO_OVERRIDE, "radixdlt/babylon-ng-data-aggregator")
         self.restart: str = "unless-stopped"
-        self.NetworkName: str = ""
         self.coreApiNode: CoreApiNodeConfig = CoreApiNodeConfig(config_dict.get("coreApiNode"))
         super().__init__(config_dict)
 
