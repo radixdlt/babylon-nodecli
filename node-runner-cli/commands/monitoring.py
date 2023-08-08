@@ -90,37 +90,25 @@ def config(args):
         f"\nLocation of the config file: {bcolors.OKBLUE}{config_file}{bcolors.ENDC}")
     monitoring_config: MonitoringConfig = MonitoringConfig({})
 
-    config_to_dump = {
-        "common_config": dict(monitoring_config.common_config),
-        "version": "0.1"
-    }
-
     if "MONITOR_CORE" in setupmode.mode:
         monitoring_config.configure_core_target(coremetricspassword)
-        config_to_dump["monitor_core"] = dict(monitoring_config.core_prometheus_settings)
     if "MONITOR_GATEWAY" in setupmode.mode:
         monitoring_config.configure_aggregator_target(aggregatormetricspassword)
         monitoring_config.configure_gateway_api_target(gatewayapimetricspassword)
-
-        config_to_dump["monitor_aggregator"] = dict(monitoring_config.aggregator_prometheus_settings)
-        config_to_dump["monitor_gateway_api"] = dict(monitoring_config.gateway_api_prometheus_settings)
     if "DETAILED" in setupmode.mode:
         if Prompts.check_for_monitoring_core():
             monitoring_config.configure_core_target(coremetricspassword)
-            config_to_dump["monitor_core"] = dict(monitoring_config.core_prometheus_settings)
         if Prompts.check_for_monitoring_gateway():
             monitoring_config.configure_aggregator_target(aggregatormetricspassword)
             monitoring_config.configure_gateway_api_target(gatewayapimetricspassword)
-            config_to_dump["monitor_aggregator"] = dict(monitoring_config.aggregator_prometheus_settings)
-            config_to_dump["monitor_gateway_api"] = dict(monitoring_config.gateway_api_prometheus_settings)
 
     yaml.add_representer(type(None), Helpers.represent_none)
     Helpers.section_headline("CONFIG is Generated as below")
+    config_to_dump = monitoring_config.to_dict()
     print(f"\n{yaml.dump(config_to_dump)}"
           f"\n\n Saving to file {config_file} ")
 
-    with open(config_file, 'w') as f:
-        yaml.dump(config_to_dump, f, default_flow_style=False, explicit_start=True, allow_unicode=True)
+    monitoring_config.to_file(config_file)
 
 
 @monitoringcommand(

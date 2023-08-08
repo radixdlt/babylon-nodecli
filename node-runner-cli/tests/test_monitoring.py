@@ -5,8 +5,9 @@ from unittest import mock
 
 from jinja2.exceptions import TemplateNotFound
 
-from monitoring import Monitoring
 from babylonnode import main
+from config.MonitoringConfig import MonitoringConfig
+from monitoring import Monitoring
 
 
 class MonitoringTests(unittest.TestCase):
@@ -45,6 +46,13 @@ class MonitoringTests(unittest.TestCase):
             with mock.patch("sys.argv",
                             ["main", "monitoring", "config", "-m", "DETAILED"]):
                 main()
+
+    # def test_monitoring_config_tofile(self):
+    #     config = MonitoringConfig({})
+    #     self.maxDiff = None
+    #     # self.assertEqual("", config.to_dict())
+    #     # self.assertEqual("", config.to_yaml())
+    #     # config.to_file("/tmp/test")
 
 
 if __name__ == '__main__':

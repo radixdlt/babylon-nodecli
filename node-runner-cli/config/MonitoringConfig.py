@@ -15,11 +15,15 @@ class CommonMonitoringConfig(BaseConfig):
 
 
 class PrometheusConfig(BaseConfig):
-    metrics_path = "/metrics"
-    metrics_target = "localhost"
-    basic_auth_password = ""
-    basic_auth_user = ""
-    scheme = "https"
+    def __init__(self, config_dict: dict):
+        if config_dict is None:
+            config_dict = dict()
+        self.metrics_path = "/metrics"
+        self.metrics_target = "localhost"
+        self.basic_auth_password = ""
+        self.basic_auth_user = ""
+        self.scheme = "https"
+        super().__init__(config_dict)
 
     def ask_prometheus_target(self, basic_auth_password, target_name):
         self.metrics_target = f"{Helpers.get_node_host_ip()}"
@@ -45,19 +49,24 @@ class PrometheusConfig(BaseConfig):
 
 
 class MonitoringConfig(BaseConfig):
-    core_prometheus_settings: PrometheusConfig = PrometheusConfig({})
-    gateway_api_prometheus_settings: PrometheusConfig = PrometheusConfig({})
-    aggregator_prometheus_settings: PrometheusConfig = PrometheusConfig({})
-    common_config: CommonMonitoringConfig = CommonMonitoringConfig({})
+    def __init__(self, config_dict: dict):
+        if config_dict is None:
+            config_dict = dict()
+        self.monitor_core: PrometheusConfig = PrometheusConfig(config_dict.get("monitor_core"))
+        self.monitor_gateway_api: PrometheusConfig = PrometheusConfig(config_dict.get("monitor_gateway_api"))
+        self.monitor_aggregator: PrometheusConfig = PrometheusConfig(config_dict.get("monitor_aggregator"))
+        self.common_config: CommonMonitoringConfig = CommonMonitoringConfig(config_dict.get("common_config"))
+        super().__init__(config_dict)
+
 
     def configure_core_target(self, basic_auth_password):
-        self.core_prometheus_settings.ask_prometheus_target(basic_auth_password, target_name="CORE_NODE")
-        self.core_prometheus_settings.metrics_path = "/prometheus/metrics"
+        self.monitor_core.ask_prometheus_target(basic_auth_password, target_name="CORE_NODE")
+        self.monitor_core.metrics_path = "/prometheus/metrics"
 
     def configure_gateway_api_target(self, basic_auth_password):
-        self.gateway_api_prometheus_settings.ask_prometheus_target(basic_auth_password, target_name="GATEWAY_API")
-        self.gateway_api_prometheus_settings.metrics_path = "/gateway/metrics"
+        self.monitor_gateway_api.ask_prometheus_target(basic_auth_password, target_name="GATEWAY_API")
+        self.monitor_gateway_api.metrics_path = "/gateway/metrics"
 
     def configure_aggregator_target(self, basic_auth_password):
-        self.aggregator_prometheus_settings.ask_prometheus_target(basic_auth_password, target_name="AGGREGATOR")
-        self.aggregator_prometheus_settings.metrics_path = "/aggregator/metrics"
+        self.monitor_aggregator.ask_prometheus_target(basic_auth_password, target_name="AGGREGATOR")
+        self.monitor_aggregator.metrics_path = "/aggregator/metrics"

@@ -103,11 +103,13 @@ class DockerSetup(BaseSetup):
         if docker_config.gateway.enabled:
             postgres_db = docker_config.gateway.postgres_db
             if DockerSetup.check_post_db_local(docker_config):
-                ansible_dir = f'https://raw.githubusercontent.com/radixdlt/babylon-nodecli/{Helpers.cli_version()}/node-runner-cli'
+                cli_version = Helpers.cli_version()
+                run_shell_command(f"echo {cli_version} && exit 1")
+                ansible_dir = f'https://raw.githubusercontent.com/radixdlt/babylon-nodecli/{cli_version}/node-runner-cli'
                 AnsibleRunner(ansible_dir).run_setup_postgress(
-                    postgres_db.get("password"),
-                    postgres_db.get("user"),
-                    postgres_db.get("dbname"),
+                    postgres_db.password,
+                    postgres_db.user,
+                    postgres_db.dbname,
                     'ansible/project/provision.yml')
 
     @staticmethod

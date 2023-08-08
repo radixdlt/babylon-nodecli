@@ -74,3 +74,4 @@ class GatewayDockerConfig(BaseConfig):
             config_dict.get("database_migration"))
         self.enabled: bool = False
         self.docker_compose: str = f"{Helpers.get_home_dir()}/gateway.docker-compose.yml"
+        super().__init__(config_dict)

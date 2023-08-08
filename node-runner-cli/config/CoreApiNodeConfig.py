@@ -14,7 +14,7 @@ class CoreApiNodeConfig(BaseConfig):
         self.basic_auth_user = ""
         self.basic_auth_password = ""
         self.auth_header = ""
-        self.disable_core_api_https_certificate_checks: str = ""
+        self.disable_core_api_https_certificate_checks: str = "false"
         super().__init__(config_dict)
 
     def ask_disablehttpsVerify(self):

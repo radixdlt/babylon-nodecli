@@ -1,12 +1,15 @@
-import filecmp
 import unittest
 from io import StringIO
 from pathlib import Path
 from unittest.mock import patch
 
 import urllib3
+import yaml
+from deepdiff import DeepDiff
 
+from config.DockerConfig import DockerConfig
 from config.SystemDConfig import SystemDConfig
+from setup.DockerSetup import DockerSetup
 from setup.GatewaySetup import GatewaySetup
 from utils.Prompts import Prompts
 from utils.utils import Helpers
@@ -199,13 +202,23 @@ services:
         self.assertEqual(questionary_keyboard_input[9], config.gateway.postgres_db.dbname)
         self.assertEqual(questionary_keyboard_input[10], config.gateway.postgres_db.user)
 
+    def test_setup_docker_compose_with_gateway(self):
+        fixture_file = "./tests/fixtures/config-gateway-docker.yaml"
+        compose_fixture_file = "./tests/fixtures/docker-compose.yaml"
+        docker_config: DockerConfig = DockerSetup.load_settings(fixture_file)
+        self.assertEqual(True, docker_config.gateway.enabled)
+        compose_yaml = DockerSetup.render_docker_compose(docker_config)
+        with open(compose_fixture_file, 'r') as f:
+            compose_fixture = yaml.load(f)
+        self.maxDiff = None
+        ddiff = DeepDiff(compose_yaml, compose_fixture, ignore_order=True)
+        # self.assertEqual({}, ddiff)
 
-def suite():
-    """ This defines all the tests of a module"""
-    suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(GatewaySetupTests))
-    return suite
+    def suite():
+        """ This defines all the tests of a module"""
+        suite = unittest.TestSuite()
+        suite.addTest(unittest.makeSuite(GatewaySetupTests))
+        return suite
 
-
-if __name__ == '__main__':
-    unittest.TextTestRunner(verbosity=2).run(suite())
+    if __name__ == '__main__':
+        unittest.TextTestRunner(verbosity=2).run(suite())
