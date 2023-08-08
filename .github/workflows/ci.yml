@@ -29,6 +29,7 @@ jobs:
           curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
           unzip awscli-bundle.zip
           sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+          pip install pipenv
       - name: Configure AWS credentials to fetch secrets
         uses: aws-actions/configure-aws-credentials@97271860067ec931c45b8d104fbf0d15954ab85c # branch v1-node16
         with:
