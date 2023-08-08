@@ -1,4 +1,4 @@
-version: '2.4'
+version: '3.8'
 services:
   gateway_api: # This is the base -- the _image and _built containers are defined below
     image: radixdlt/babylon-ng-gateway-api:rcnet-v2-phase2-r4

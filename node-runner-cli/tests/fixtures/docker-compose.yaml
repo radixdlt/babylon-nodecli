@@ -95,7 +95,7 @@ services:
         soft: 65536
     volumes:
     - nginx_secrets:/etc/nginx/secrets
-version: '2.4'
+version: '3.8'
 volumes:
   core_ledger:
     driver: local
