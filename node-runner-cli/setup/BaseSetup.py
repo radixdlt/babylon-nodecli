@@ -1,4 +1,3 @@
-import getpass
 import os
 import sys
 from pathlib import Path
@@ -67,6 +66,10 @@ class BaseSetup:
                                '-p', f'{key_details.keystore_password}'], quite=False)
 
             run_shell_command(['sudo', 'chmod', '644', f'{key_details.keyfile_path}/{key_details.keyfile_name}'])
+            import getpass
+            username = getpass.getuser()
+            run_shell_command(
+                ['sudo', 'chown', f'{username}:{username}', f'{key_details.keyfile_path}/{key_details.keyfile_name}'])
         return key_details
 
     @staticmethod
