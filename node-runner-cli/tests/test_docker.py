@@ -6,6 +6,7 @@ import urllib3
 
 from babylonnode import main
 from config.DockerConfig import DockerConfig
+from setup.DockerSetup import DockerSetup
 
 
 class DockerUnitTests(unittest.TestCase):
@@ -52,8 +53,12 @@ class DockerUnitTests(unittest.TestCase):
                                                   'Y',
                                                   'nginx-version']):
             with patch("sys.argv",
-                       ["main", "docker", "config", "-m", "DETAILED", "-k", "radix", "-nk", "-a"]):
+                       ["main", "docker", "config", "-m", "DETAILED", "-k", "radix", "-nk", "-a", "-d",
+                        "/tmp"]):
                 main()
+
+            docker_config: DockerConfig = DockerSetup.load_settings("/tmp/config.yaml")
+            self.assertEqual("radix", docker_config.core_node.keydetails.keystore_password)
 
     # @patch('sys.stdout', new_callable=StringIO)
     # def test_docker_config2(self, mockout):

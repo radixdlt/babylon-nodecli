@@ -133,7 +133,7 @@ class DockerSetup(BaseSetup):
         sys.exit(1)
 
     @staticmethod
-    def update_versions(docker_config: DockerConfig, autoapprove=False):
+    def update_versions(docker_config: DockerConfig, autoapprove=False) -> DockerConfig:
         if docker_config.core_node:
             current_core_release = docker_config.core_node.core_release
             latest_core_release = github.latest_release("radixdlt/babylon-node")
@@ -315,9 +315,11 @@ class DockerSetup(BaseSetup):
 
     @staticmethod
     def chown_files(docker_config: DockerConfig):
-        run_shell_command(['sudo', 'chown', '$(whoami):$(whoami)',
+        import getpass
+        username = getpass.getuser()
+        run_shell_command(['sudo', 'chown', f'{username}:{username}',
                            f'{docker_config.core_node.keydetails.keyfile_path}/{docker_config.core_node.keydetails.keyfile_name}'])
-        run_shell_command(['sudo', 'chown', '$(whoami):$(whoami)',
+        run_shell_command(['sudo', 'chown', '{username}:{username}',
                            f'{docker_config.common_config.genesis_bin_data_file}'])
-        run_shell_command(['sudo', 'chown', '-R', '$(whoami):$(whoami)',
+        run_shell_command(['sudo', 'chown', '-R', '{username}:{username}',
                            f'{docker_config.core_node.data_directory}'])

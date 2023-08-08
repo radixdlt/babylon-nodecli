@@ -19,8 +19,12 @@ class BaseConfig:
                            if not key.startswith('__') and not callable(value)}
         if config_dict is not None:
             for key, value in config_dict.items():
-                if type(self.__getattribute__(key)) in [int, str, bool]:
-                    setattr(self, key, value)
+                try:
+                    getattr(self, key)
+                    if type(self.__getattribute__(key)) in [int, str, bool]:
+                        setattr(self, key, value)
+                except AttributeError:
+                    pass
 
     def __repr__(self):
         return repr(vars(self))

@@ -1,2 +1,2 @@
-__version__= "2.0.rcnet-v2-rc2-88-ge854fd1"
+__version__= "2.0.rcnet-v2-rc2-93-g6f3fe98"
 __base_version__= "2.0.rcnet-v2-rc2"

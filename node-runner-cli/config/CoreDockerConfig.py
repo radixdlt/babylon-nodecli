@@ -15,7 +15,7 @@ class CoreDockerConfig(BaseConfig):
             config_dict = dict()
         self.nodetype: str = "fullnode"
         self.composefileurl: str = ""
-        self.keydetails: KeyDetails = KeyDetails(config_dict.get("nginx_settings"))
+        self.keydetails: KeyDetails = KeyDetails(config_dict.get("keydetails"))
         self.core_release: str = ""
         self.repo: str = os.getenv(CORE_DOCKER_REPO_OVERRIDE, "radixdlt/babylon-node")
         self.data_directory: str = f"{Helpers.get_home_dir()}/babylon-ledger"

@@ -11,7 +11,3 @@ class KeyDetails(BaseConfig):
         self.keygen_tag: str = "v1.4.1"
         self.keystore_password: str = ""
         super().__init__(config_dict)
-
-    def __repr__(self):
-        return "%s (keyfile_path=%r, keyfile_name=%r, keygen_tag=%r, keystore_password=%r)" % (
-            self.__class__.__name__, self.keyfile_path, self.keyfile_name, self.keygen_tag, self.keystore_password)
