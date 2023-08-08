@@ -1,16 +1,16 @@
 name: CI
 
 on:
-  #release:
-  #  types: [published]
+  release:
+    types: [published]
   push:
     branches:
-       - chore/snyk-improvements
-         #  tags:
-         #- test-artifacts*
-         #pull_request:
-         #branches:
-         #- main
+       - main
+    tags:
+      - test-artifacts*
+    pull_request:
+      branches:
+        - main
 jobs:
   snyk-scan:
     runs-on: ubuntu-latest
