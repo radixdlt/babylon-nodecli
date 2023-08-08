@@ -16,7 +16,7 @@ class CommonSystemdConfig(BaseConfig):
         self.nginx_settings: SystemdNginxConfig = SystemdNginxConfig(config_dict.get("nginx_settings"))
         self.network_id: int = 1
         self.network_name: str = ""
-        self.genesis_bin_data_file: str
+        self.genesis_bin_data_file: str = ""
         self.host_ip: str = ""
         self.service_user: str = "radixdlt"
         super().__init__(config_dict)

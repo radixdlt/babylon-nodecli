@@ -54,6 +54,7 @@ class DatabaseMigrationConfig(BaseConfig):
             config_dict = dict()
         self.release: str = ""
         self.repo: str = os.getenv(MIGRATION_DOCKER_REPO_OVERRIDE, "radixdlt/babylon-ng-database-migrations")
+        super().__init__(config_dict)
 
 
 class DataAggregatorConfig(BaseConfig):
@@ -65,6 +66,7 @@ class DataAggregatorConfig(BaseConfig):
         self.restart: str = "unless-stopped"
         self.NetworkName: str = ""
         self.coreApiNode: CoreApiNodeConfig = CoreApiNodeConfig(config_dict.get("coreApiNode"))
+        super().__init__(config_dict)
 
 
 class GatewayAPIDockerConfig(BaseConfig):

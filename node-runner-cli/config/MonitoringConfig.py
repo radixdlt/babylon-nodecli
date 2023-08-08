@@ -17,8 +17,8 @@ class CommonMonitoringConfig(BaseConfig):
 class PrometheusConfig(BaseConfig):
     metrics_path = "/metrics"
     metrics_target = "localhost"
-    basic_auth_password = None
-    basic_auth_user = None
+    basic_auth_password = ""
+    basic_auth_user = ""
     scheme = "https"
 
     def ask_prometheus_target(self, basic_auth_password, target_name):

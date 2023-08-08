@@ -40,7 +40,7 @@ class ValidatorUnitTests(unittest.TestCase):
                     'common_config': {'test': 'test'},
                     'migration': {}}
         compose_yml = Renderer().load_file_based_template("radix-fullnode-compose.yml.j2").render(
-            dict(settings)).to_yaml()
+            settings).to_yaml()
         compose_yml_str = str(compose_yml)
         self.assertTrue(validator_address_fixture in compose_yml_str)
 
@@ -52,7 +52,7 @@ class ValidatorUnitTests(unittest.TestCase):
                     'common_config': {'test': 'test'},
                     'migration': {'use_olympia': 'true'}}
         compose_yml = Renderer().load_file_based_template("radix-fullnode-compose.yml.j2").render(
-            dict(settings)).to_yaml()
+            settings).to_yaml()
         compose_yml_str = str(compose_yml)
         self.assertFalse("RADIXDLT_CONSENSUS_VALIDATOR_ADDRESS" in compose_yml_str)
 

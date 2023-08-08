@@ -90,7 +90,7 @@ class SystemDSetup(BaseSetup):
                            service_file_path="/etc/systemd/system/radixdlt-node.service"):
         # This may need to be moved to jinja template
         tmp_service: str = "/tmp/radixdlt-node.service"
-        Renderer().load_file_based_template("systemd.service.j2").render(dict(settings)).to_file(tmp_service)
+        Renderer().load_file_based_template("systemd.service.j2").render(settings.to_dict()).to_file(tmp_service)
         command = f"sudo mv {tmp_service} {service_file_path}"
         run_shell_command(command, shell=True)
 
@@ -398,6 +398,12 @@ class SystemDSetup(BaseSetup):
             service_file_path = "/etc/systemd/system/radixdlt-node.service"
         settings.create_service_file(service_file_path)
 
+        run_shell_command(['sudo', 'chown', '$(whoami):$(whoami)',
+                           f'{settings.core_node.keydetails.keyfile_path}/{settings.core_node.keydetails.keyfile_name}'])
+        run_shell_command(['sudo', 'chown', '$(whoami):$(whoami)',
+                           f'{settings.common_config.genesis_bin_data_file}'])
+        run_shell_command(['sudo', 'chown', '-R', '$(whoami):$(whoami)',
+                           f'{settings.core_node.node_secrets_dir}'])
         # Nginx
         nginx_configured = SystemDSetup.setup_nginx_service(settings, backup_time, args.auto)
 

@@ -21,7 +21,6 @@ class SystemDConfig(BaseConfig):
         self.common_config: CommonSystemdConfig = CommonSystemdConfig(config_dict.get("common_config"))
         self.migration: CommonMigrationConfig = CommonMigrationConfig(config_dict.get("migration"))
         self.gateway: GatewayDockerConfig = GatewayDockerConfig(config_dict.get("gateway"))
-        self.test: str = ""
         super().__init__(config_dict)
 
     def parse_config_from_args(self, args):
@@ -48,7 +47,7 @@ class SystemDConfig(BaseConfig):
     def create_environment_file(self):
         run_shell_command(f'mkdir -p {self.core_node.node_secrets_dir}', shell=True)
         Renderer().load_file_based_template("systemd-environment.j2") \
-            .render(dict(self.core_node.keydetails)) \
+            .render(self.core_node.keydetails.to_dict()) \
             .to_file(f"{self.core_node.node_secrets_dir}/environment")
 
     def create_default_config_file(self):
@@ -72,6 +71,6 @@ class SystemDConfig(BaseConfig):
                             service_file_path="/etc/systemd/system/radixdlt-node.service"):
         # This may need to be moved to jinja template
         tmp_service: str = "/tmp/radixdlt-node.service"
-        Renderer().load_file_based_template("systemd.service.j2").render(dict(self)).to_file(tmp_service)
+        Renderer().load_file_based_template("systemd.service.j2").render(self.to_dict()).to_file(tmp_service)
         command = f"sudo mv {tmp_service} {service_file_path}"
         run_shell_command(command, shell=True)

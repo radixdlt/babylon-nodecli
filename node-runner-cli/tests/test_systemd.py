@@ -5,8 +5,6 @@ from pathlib import Path
 from unittest.mock import patch
 
 import urllib3
-import yaml
-from yaml import UnsafeLoader
 
 from babylonnode import main
 from config.CommonSystemDConfig import CommonSystemdConfig
@@ -222,7 +220,7 @@ consensus.validator_address=validatorAddress
         settings.core_node.node_secrets_dir = "/nodedir/secrets"
         settings.core_node.core_release = "1.1.0"
 
-        render_template = Renderer().load_file_based_template("systemd.service.j2").render(dict(settings)).rendered
+        render_template = Renderer().load_file_based_template("systemd.service.j2").render(settings.to_dict()).rendered
         fixture = f"""[Unit]
 Description=Radix DLT Validator
 After=local-fs.target
@@ -271,24 +269,6 @@ RADIX_NODE_KEYSTORE_PASSWORD=nowthatyouknowmysecretiwillfollowyouuntilyouforgeti
         self.assertEqual(settings.to_dict(), file_settings.to_dict())
         self.assertEqual(settings.to_yaml(), file_settings.to_yaml())
 
-    def test_systemd_settings_load_settings_from_file(self):
-        config_file = "/tmp/config2.yaml"
-        with open(config_file, 'r') as f:
-            dictionary = yaml.load(f, Loader=UnsafeLoader)
-        out = StringIO()
-        # self.assertEqual("", dictionary)
-        config = SystemDConfig(dictionary)
-        to_dict = config.to_dict()
-        new_settings = SystemDConfig(to_dict)
-        self.assertEqual(config.to_dict(), new_settings.to_dict())
-        self.assertEqual(config.to_yaml(), new_settings.to_yaml())
-        # self.assertEqual("1", config.core_node.core_release)
-        self.assertEqual(13, config.common_config.network_id)
-        self.assertEqual("ansharnet", config.common_config.network_name)
-        self.assertEqual("fullnode", config.core_node.nodetype)
-        self.assertEqual("1.0.0-rc5", config.common_config.nginx_settings.release)
-        self.assertEqual("http://localhost:3332", config.migration.olympia_node_url)
-
     def test_systemd_settings_random(self):
         mydict = {'core_node': {'core_release': '3'}}
         self.assertEqual({'core_release': '3'}, mydict.get("core_node"))
@@ -303,7 +283,8 @@ RADIX_NODE_KEYSTORE_PASSWORD=nowthatyouknowmysecretiwillfollowyouuntilyouforgeti
 
     def test_systemd_settings_random3(self):
         test = CommonSystemdConfig({'network_id': 12})
-        self.assertEqual({'host_ip': '',
+        self.assertEqual({'genesis_bin_data_file': "",
+                          'host_ip': '',
                           'network_id': 12,
                           'network_name': '',
                           'nginx_settings': {'config_url': '',
@@ -314,6 +295,7 @@ RADIX_NODE_KEYSTORE_PASSWORD=nowthatyouknowmysecretiwillfollowyouuntilyouforgeti
                                              'release': '',
                                              'secrets_dir': '/etc/nginx/secrets'},
                           'service_user': 'radixdlt'}, test.to_dict())
+
 
 def suite():
     """ This defines all the tests of a module"""
