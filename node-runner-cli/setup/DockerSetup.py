@@ -201,11 +201,11 @@ class DockerSetup(BaseSetup):
         docker_config.common_config.ask_existing_docker_compose_file()
 
         if "CORE" in argument_object.setupmode.mode:
-            quick_node_settings: CoreDockerConfig = CoreDockerConfig({}).create_config(argument_object.release,
-                                                                                       argument_object.trustednode,
-                                                                                       argument_object.keystore_password,
-                                                                                       argument_object.new_keystore,
-                                                                                       argument_object.validator)
+            quick_node_settings: CoreDockerConfig = CoreDockerConfig({}).ask_config(argument_object.release,
+                                                                                    argument_object.trustednode,
+                                                                                    argument_object.keystore_password,
+                                                                                    argument_object.new_keystore,
+                                                                                    argument_object.validator)
             docker_config.core_node = quick_node_settings
             docker_config.common_config.ask_enable_nginx_for_core(argument_object.nginx_on_core)
 
@@ -216,7 +216,7 @@ class DockerSetup(BaseSetup):
         if "DETAILED" in argument_object.setupmode.mode:
             run_fullnode = Prompts.check_for_fullnode()
             if run_fullnode:
-                detailed_node_settings: CoreDockerConfig = CoreDockerConfig({}).create_config(
+                detailed_node_settings: CoreDockerConfig = CoreDockerConfig({}).ask_config(
                     argument_object.release,
                     argument_object.trustednode,
                     argument_object.keystore_password,

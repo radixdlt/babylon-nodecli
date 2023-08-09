@@ -57,7 +57,7 @@ class CoreDockerConfig(BaseConfig):
             trusted_node = Prompts.ask_trusted_node()
         self.trusted_node = trusted_node
 
-    def create_config(self, release, trustednode, ks_password, new_keystore, validator):
+    def ask_config(self, release, trustednode, ks_password, new_keystore, validator):
 
         self.set_core_release(release)
         self.set_trusted_node(trustednode)

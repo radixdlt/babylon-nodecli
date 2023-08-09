@@ -36,6 +36,7 @@ class BaseSetup:
 
     @staticmethod
     def generatekey(keyfile_path, keyfile_name, keygen_tag, keystore_password=None, new=False):
+        import getpass
         key_details = KeyDetails({})
         key_details.keyfile_name = keyfile_name
         key_details.keygen_tag = keygen_tag
@@ -66,7 +67,7 @@ class BaseSetup:
                                '-p', f'{key_details.keystore_password}'], quite=False)
 
             run_shell_command(['sudo', 'chmod', '644', f'{key_details.keyfile_path}/{key_details.keyfile_name}'])
-            import getpass
+
             username = getpass.getuser()
             run_shell_command(
                 ['sudo', 'chown', f'{username}:{username}', f'{key_details.keyfile_path}/{key_details.keyfile_name}'])
