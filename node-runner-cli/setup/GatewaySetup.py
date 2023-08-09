@@ -17,9 +17,9 @@ class GatewaySetup():
         if gateway_config.postgres_db.setup == 'local' and gateway_config.enabled:
             ansible_dir = f'https://raw.githubusercontent.com/radixdlt/babylon-nodecli/{Helpers.cli_version()}/node-runner-cli'
             AnsibleRunner(ansible_dir).run_setup_postgress(
-                gateway_config.postgres_db.get("password"),
-                gateway_config.postgres_db.get("user"),
-                gateway_config.postgres_db.get("dbname"),
+                gateway_config.postgres_db.password,
+                gateway_config.postgres_db.user,
+                gateway_config.postgres_db.dbname,
                 'ansible/project/provision.yml')
 
     # This method asks for these inputs in that order:
