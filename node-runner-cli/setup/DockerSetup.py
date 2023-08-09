@@ -294,10 +294,8 @@ class DockerSetup(BaseSetup):
         backup_time = Helpers.get_current_date_time()
         compose_file_yaml = DockerSetup.get_existing_compose_file(docker_config)
         compose_file = docker_config.common_config.docker_compose
-        if compose_file_yaml is None:
-            print("No existing docker-compose file found.")
-            print("Generating a new one")
-            return compose_file
+        if compose_file_yaml is not None:
+            compose_file_yaml = {}
         compose_file_difference = dict(DeepDiff(compose_file_yaml, docker_compose_yaml))
         if len(compose_file_difference) != 0:
             print(f"""
