@@ -1,8 +1,8 @@
 from urllib.parse import urlparse
 
 from config.BaseConfig import SetupMode
-from config.GatewayDockerConfig import GatewayDockerConfig
 from config.CoreApiNodeConfig import CoreApiNodeConfig
+from config.GatewayDockerConfig import GatewayDockerConfig
 from config.SystemDConfig import SystemDConfig
 from github import github
 from setup.AnsibleRunner import AnsibleRunner
@@ -37,7 +37,9 @@ class GatewaySetup():
         gateway_config.enabled = True
 
         gateway_config.data_aggregator.coreApiNode = GatewaySetup.ask_core_api_node_settings(
-            "http://host.docker.internal:443/core")
+            "https://host.docker.internal:443/core")
+        print("Make sure to set the admin password on your nginx using this command")
+        print("    babylonnode auth set-admin-password -m SYSTEMD")
         gateway_config.gateway_api.coreApiNode = gateway_config.data_aggregator.coreApiNode
 
         gateway_config.gateway_api.release = GatewaySetup.ask_gateway_release("gateway_api")
@@ -79,7 +81,7 @@ class GatewaySetup():
     @staticmethod
     def ask_core_api_node_settings(core_api_address: str):
         coreApiNode = CoreApiNodeConfig({})
-        if "DETAILED" in SetupMode.instance().mode:
+        if "DETAILED" in SetupMode.instance().mode or core_api_address == "https://host.docker.internal:443/core":
             coreApiNode.core_api_address = Prompts.get_CoreApiAddress(core_api_address)
 
             # ask basic auth
