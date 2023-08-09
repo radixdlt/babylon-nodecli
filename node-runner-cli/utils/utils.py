@@ -1,9 +1,11 @@
+import difflib
 import json
 import os
 import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
+from typing import Callable
 
 import requests
 import yaml
@@ -347,6 +349,28 @@ class Helpers:
         if not os.path.exists(file):
             print(f" `{file}` does not exist ")
             sys.exit(1)
+
+    @staticmethod
+    def compare_human_readable(old: str, new: str) -> str:
+        RED: Callable[[str], str] = lambda text: f"\u001b[31m{text}\033\u001b[0m"
+        GREEN: Callable[[str], str] = lambda text: f"\u001b[32m{text}\033\u001b[0m"
+        result = ""
+        json_old = json.dumps(old, indent=4, sort_keys=True)
+        json_nw = json.dumps(new, indent=4, sort_keys=True)
+        lines = difflib.ndiff(json_old.splitlines(keepends=True), json_nw.splitlines(keepends=True))
+
+        for line in lines:
+            line = line.rstrip()
+            if line.startswith("+"):
+                result += GREEN(line) + "\n"
+            elif line.startswith("-"):
+                result += RED(line) + "\n"
+            elif line.startswith("?"):
+                continue
+            else:
+                result += line + "\n"
+
+        return result
 
 
 class bcolors:
