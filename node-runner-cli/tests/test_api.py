@@ -71,6 +71,5 @@ class ApiTests(unittest.TestCase):
         response = self.core_api_helper.key_sign(build_response.unsigned_transaction)
         self.assertIsInstance(response, KeySignResponse)
 
-
 if __name__ == '__main__':
     unittest.main(warnings='ignore')

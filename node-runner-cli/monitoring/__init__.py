@@ -7,7 +7,7 @@ import requests
 import yaml
 
 from config.Renderer import Renderer
-from env_vars import COMPOSE_HTTP_TIMEOUT
+from config.EnvVars import COMPOSE_HTTP_TIMEOUT
 from utils.utils import Helpers, run_shell_command
 
 
@@ -25,7 +25,7 @@ class Monitoring:
             sys.exit(1)
 
         default_prometheus_yaml = yaml.safe_load(resp.content)
-        prometheus_yaml = Monitoring.merge_auth_config(default_prometheus_yaml, Monitoring.get_node_host_ip())
+        prometheus_yaml = Monitoring.merge_auth_config(default_prometheus_yaml, Helpers.get_node_host_ip())
 
         def represent_none(self, _):
             return self.represent_scalar('tag:yaml.org,2002:null', '')
@@ -157,7 +157,7 @@ class Monitoring:
         else:
             print(f"""Exiting the command ..
                      Once you verified the file {composefile}, you can start the monitoring by running
-                     $ radixnode monitoring start -f {composefile}
+                     $ babylonnode monitoring start -f {composefile}
              """)
 
     @staticmethod

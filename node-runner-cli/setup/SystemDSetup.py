@@ -3,20 +3,25 @@ import sys
 from pathlib import Path
 
 import yaml
+from deepdiff import DeepDiff
 from yaml import UnsafeLoader
 
+from config.EnvVars import UNZIPPED_NODE_DIST_FOLDER
+from config.MigrationConfig import CommonMigrationConfig
 from config.Renderer import Renderer
-from config.SystemDConfig import SystemDSettings, from_dict
-from env_vars import UNZIPPED_NODE_DIST_FOLDER
-from setup.Base import Base
+from config.SystemDConfig import SystemDConfig, CoreSystemdConfig, CommonSystemdConfig
+from setup.BaseSetup import BaseSetup
+from setup.GatewaySetup import GatewaySetup
+from setup.SystemDCommandArguments import SystemDConfigArguments
 from utils.PromptFeeder import QuestionKeys
 from utils.utils import run_shell_command, Helpers
 
 
-class SystemD(Base):
+class SystemDSetup(BaseSetup):
 
     @staticmethod
     def install_java():
+        run_shell_command('sudo apt update', shell=True)
         run_shell_command('sudo apt install -y openjdk-17-jdk', shell=True)
 
     @staticmethod
@@ -29,7 +34,6 @@ class SystemD(Base):
 
     @staticmethod
     def create_service_user_password():
-        # TODO AutoApprove
         run_shell_command('sudo passwd radixdlt', shell=True)
 
     @staticmethod
@@ -69,7 +73,7 @@ class SystemD(Base):
 
     @staticmethod
     def fetch_universe_json(trustenode, extraction_path):
-        Base.fetch_universe_json(trustenode, extraction_path)
+        BaseSetup.fetch_universe_json(trustenode, extraction_path)
 
     @staticmethod
     def backup_file(filepath, filename, backup_time, auto_approve=False):
@@ -82,11 +86,11 @@ class SystemD(Base):
                 run_shell_command(f"cp {filepath}/{filename} {backup_time}/{filename}", shell=True)
 
     @staticmethod
-    def setup_service_file(settings: SystemDSettings,
+    def setup_service_file(settings: SystemDConfig,
                            service_file_path="/etc/systemd/system/radixdlt-node.service"):
         # This may need to be moved to jinja template
         tmp_service: str = "/tmp/radixdlt-node.service"
-        Renderer().load_file_based_template("systemd.service.j2").render(dict(settings)).to_file(tmp_service)
+        Renderer().load_file_based_template("systemd.service.j2").render(settings.to_dict()).to_file(tmp_service)
         command = f"sudo mv {tmp_service} {service_file_path}"
         run_shell_command(command, shell=True)
 
@@ -135,7 +139,7 @@ class SystemD(Base):
 
     @staticmethod
     def setup_nginx_config(nginx_config_location_url, node_type, nginx_etc_dir, backup_time, auto_approve=None):
-        SystemD.install_nginx()
+        SystemDSetup.install_nginx()
         if node_type == "archivenode":
             conf_file = 'nginx-archive.conf'
         elif node_type == "fullnode":
@@ -166,7 +170,7 @@ class SystemD(Base):
 
     @staticmethod
     def create_ssl_certs(secrets_dir, auto_approve=None):
-        SystemD.make_nginx_secrets_directory()
+        SystemDSetup.make_nginx_secrets_directory()
         if os.path.isfile(f'{secrets_dir}/server.key') and os.path.isfile(f'{secrets_dir}/server.pem'):
             if auto_approve is None:
                 print(f"Files  {secrets_dir}/server.key and os.path.isfile(f'{secrets_dir}/server.pem already exists")
@@ -262,17 +266,19 @@ class SystemD(Base):
         run_shell_command('sudo systemctl disable radixdlt-node.service', shell=True)
 
     @staticmethod
-    def confirm_config(nodetype, release, node_binary_url, nginx_config_url) -> str:
+    def confirm_config(nodetype: str, release: str, node_binary_url: str, nginx_config_url: str, auto_approve):
+        if auto_approve:
+            return
         answer = Helpers.input_guestion(
             f"\nGoing to setup node type {nodetype} for version {release} from location {node_binary_url} and {nginx_config_url}. \n Do you want to continue Y/n:",
             QuestionKeys.continue_systemd_install)
         if not Helpers.check_Yes(answer):
             print(" Quitting ....")
             sys.exit(1)
-        return answer
+        return
 
     @staticmethod
-    def save_settings(settings: SystemDSettings, config_file: str, autoapprove=False):
+    def save_config(settings: SystemDConfig, config_file: str, autoapprove=False):
         to_update = ""
         if autoapprove:
             print("In Auto mode - Updating the file as suggested in above changes")
@@ -283,10 +289,150 @@ class SystemD(Base):
             settings.to_file(config_file)
 
     @staticmethod
-    def load_settings(config_file) -> SystemDSettings:
+    def load_settings(config_file) -> SystemDConfig:
         if not os.path.isfile(config_file):
-            print(f"No configuration found. Execute 'radixnode systemd config' first.")
+            print(f"No configuration found. Execute 'babylonnode systemd config' first.")
             sys.exit(1)
         with open(config_file, 'r') as f:
             dictionary = yaml.load(f, Loader=UnsafeLoader)
-        return from_dict(dictionary)
+        return SystemDConfig(dictionary)
+
+    @staticmethod
+    def compare_old_and_new_config(config_file: str, systemd_config: SystemDConfig):
+        old_config_object = SystemDSetup.load_settings(config_file)
+        old_config = old_config_object.to_dict()
+        config_to_dump = systemd_config.to_dict()
+        if old_config is not None:
+            if len(old_config) != 0:
+                print(f"""
+                        {Helpers.section_headline("Differences")}
+                        Difference between existing config file and new config that you are creating
+                        {dict(DeepDiff(old_config, config_to_dump))}
+                          """)
+
+    @staticmethod
+    def dump_config_as_yaml(systemd_config: SystemDConfig):
+        config_to_dump = {"version": "0.1", "core_node": systemd_config.core_node.to_dict(),
+                          "common_config": systemd_config.common_config.to_dict(),
+                          "migration": systemd_config.migration.to_dict(),
+                          "gateway": systemd_config.gateway.to_dict()}
+        yaml.add_representer(type(None), Helpers.represent_none)
+        Helpers.section_headline("CONFIG is Generated as below")
+        print(f"\n{yaml.dump(config_to_dump)}")
+        return config_to_dump
+
+    @staticmethod
+    def ask_common_config(argument_object: SystemDConfigArguments) -> CommonSystemdConfig:
+        systemd_config = SystemDConfig({})
+        systemd_config.common_config.ask_network_id(argument_object.networkid)
+        systemd_config.common_config.ask_host_ip(argument_object.hostip)
+        systemd_config.common_config.ask_enable_nginx_for_core(argument_object.nginx_on_core)
+        systemd_config.common_config.ask_nginx_release()
+        return systemd_config.common_config
+
+    @staticmethod
+    def ask_core_node(argument_object: SystemDConfigArguments) -> CoreSystemdConfig:
+        systemd_config = SystemDConfig({})
+
+        systemd_config.core_node.set_core_release(argument_object.release)
+        systemd_config.core_node.set_trusted_node(argument_object.trustednode)
+        systemd_config.core_node.generate_download_urls()
+        systemd_config.core_node.keydetails = BaseSetup.ask_keydetails(argument_object.keystore_password,
+                                                                       argument_object.new_keystore)
+        systemd_config.core_node.ask_data_directory(argument_object.data_directory)
+        systemd_config.core_node.ask_validator_address(argument_object.validator)
+        return systemd_config.core_node
+
+    @staticmethod
+    def ask_migration(argument_object: SystemDConfigArguments) -> CommonMigrationConfig:
+        systemd_config = SystemDConfig({})
+        if "MIGRATION" in argument_object.setupmode.mode:
+            systemd_config.migration.ask_migration_config(argument_object.olympia_node_url,
+                                                          argument_object.olympia_node_auth_user,
+                                                          argument_object.olympia_node_auth_password,
+                                                          argument_object.olympia_node_bech32_address)
+        return systemd_config.migration
+
+    @staticmethod
+    def print_config(settings):
+        print("--------------------------------")
+        print("\nUsing following configuration:")
+        print("\n--------------------------------")
+        print(settings.to_yaml())
+
+    @staticmethod
+    def install_systemd_service(settings: SystemDConfig, args):
+        SystemDSetup.print_config(settings)
+
+        SystemDSetup.confirm_config(settings.core_node.nodetype,
+                                    settings.core_node.core_release,
+                                    settings.core_node.core_binary_url,
+                                    settings.common_config.nginx_settings.config_url,
+                                    args.auto)
+
+        SystemDSetup.checkUser()
+
+        SystemDSetup.download_binaries(binary_location_url=settings.core_node.core_binary_url,
+                                       library_location_url=settings.core_node.core_library_url,
+                                       node_dir=settings.core_node.node_dir,
+                                       node_version=settings.core_node.core_release,
+                                       auto_approve=args.auto)
+
+        # default.conf file
+
+        backup_time = Helpers.get_current_date_time()
+        SystemDSetup.backup_file(settings.core_node.node_dir, f"default.config", backup_time, args.auto)
+        settings.create_default_config_file()
+
+        # environment file
+        SystemDSetup.backup_file(settings.core_node.node_secrets_dir, "environment", backup_time, args.auto)
+        settings.create_environment_file()
+
+        # radixdlt-node.service file
+        SystemDSetup.backup_file("/etc/systemd/system", "radixdlt-node.service", backup_time, args.auto)
+        if args.manual:
+            service_file_path = f"{settings.core_node.node_dir}/radixdlt-node.service"
+        else:
+            service_file_path = "/etc/systemd/system/radixdlt-node.service"
+        settings.create_service_file(service_file_path)
+
+        SystemDSetup.chown_files(settings)
+        # Nginx
+        nginx_configured = SystemDSetup.setup_nginx_service(settings, backup_time, args.auto)
+
+        # Gateway
+        GatewaySetup.conditionally_install_local_postgreSQL(settings.gateway)
+        GatewaySetup.conditionaly_install_standalone_gateway(settings, args.auto)
+
+        if not args.manual:
+            if not args.update:
+                SystemDSetup.start_node_service()
+            else:
+                SystemDSetup.restart_node_service()
+
+            if nginx_configured:
+                SystemDSetup.start_nginx_service()
+            else:
+                print("Nginx not configured or not updated.")
+
+    @staticmethod
+    def chown_files(settings):
+        run_shell_command(['sudo', 'chown', 'radixdlt:radixdlt',
+                           f'{settings.core_node.keydetails.keyfile_path}/{settings.core_node.keydetails.keyfile_name}'])
+        run_shell_command(['sudo', 'chown', 'radixdlt:radixdlt',
+                           f'{settings.common_config.genesis_bin_data_file}'])
+        run_shell_command(['sudo', 'chown', '-R', 'radixdlt:radixdlt',
+                           f'{settings.core_node.node_secrets_dir}'])
+        run_shell_command(['sudo', 'chown', '-R', 'radixdlt:radixdlt',
+                           f'{settings.core_node.data_directory}'])
+
+    @staticmethod
+    def setup_nginx_service(settings: SystemDConfig, backup_time: str, autoapprove: bool):
+        SystemDSetup.backup_file("/lib/systemd/system", "nginx.service", backup_time, autoapprove)
+        SystemDSetup.create_ssl_certs(settings.common_config.nginx_settings.secrets_dir, autoapprove)
+        nginx_configured = SystemDSetup.setup_nginx_config(
+            nginx_config_location_url=settings.common_config.nginx_settings.config_url,
+            node_type=settings.core_node.nodetype,
+            nginx_etc_dir=settings.common_config.nginx_settings.dir, backup_time=backup_time,
+            auto_approve=autoapprove)
+        return nginx_configured

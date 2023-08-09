@@ -7,14 +7,14 @@ import yaml
 
 from commands.subcommand import get_decorator, argument
 from config.BaseConfig import SetupMode
-from config.MonitoringConfig import MonitoringSettings
+from config.MonitoringConfig import MonitoringConfig
 from monitoring import Monitoring
 from utils.Prompts import Prompts
 from utils.utils import Helpers, bcolors
 
 monitoringcli = ArgumentParser(
     description='Subcommand to setup monitoring for CORE or GATEWAY',
-    usage="radixnode monitoring "
+    usage="babylonnode monitoring "
 )
 monitoring_parser = monitoringcli.add_subparsers(dest="monitoringcommand")
 
@@ -88,39 +88,27 @@ def config(args):
     print(
         "\nCreating config file using the answers from the questions that would be asked in next steps."
         f"\nLocation of the config file: {bcolors.OKBLUE}{config_file}{bcolors.ENDC}")
-    monitoring_config: MonitoringSettings = MonitoringSettings({})
-
-    config_to_dump = {
-        "common_config": dict(monitoring_config.common_config),
-        "version": "0.1"
-    }
+    monitoring_config: MonitoringConfig = MonitoringConfig({})
 
     if "MONITOR_CORE" in setupmode.mode:
         monitoring_config.configure_core_target(coremetricspassword)
-        config_to_dump["monitor_core"] = dict(monitoring_config.core_prometheus_settings)
     if "MONITOR_GATEWAY" in setupmode.mode:
         monitoring_config.configure_aggregator_target(aggregatormetricspassword)
         monitoring_config.configure_gateway_api_target(gatewayapimetricspassword)
-
-        config_to_dump["monitor_aggregator"] = dict(monitoring_config.aggregator_prometheus_settings)
-        config_to_dump["monitor_gateway_api"] = dict(monitoring_config.gateway_api_prometheus_settings)
     if "DETAILED" in setupmode.mode:
         if Prompts.check_for_monitoring_core():
             monitoring_config.configure_core_target(coremetricspassword)
-            config_to_dump["monitor_core"] = dict(monitoring_config.core_prometheus_settings)
         if Prompts.check_for_monitoring_gateway():
             monitoring_config.configure_aggregator_target(aggregatormetricspassword)
             monitoring_config.configure_gateway_api_target(gatewayapimetricspassword)
-            config_to_dump["monitor_aggregator"] = dict(monitoring_config.aggregator_prometheus_settings)
-            config_to_dump["monitor_gateway_api"] = dict(monitoring_config.gateway_api_prometheus_settings)
 
     yaml.add_representer(type(None), Helpers.represent_none)
     Helpers.section_headline("CONFIG is Generated as below")
+    config_to_dump = monitoring_config.to_dict()
     print(f"\n{yaml.dump(config_to_dump)}"
           f"\n\n Saving to file {config_file} ")
 
-    with open(config_file, 'w') as f:
-        yaml.dump(config_to_dump, f, default_flow_style=False, explicit_start=True, allow_unicode=True)
+    monitoring_config.to_file(config_file)
 
 
 @monitoringcommand(
@@ -128,7 +116,8 @@ def config(args):
         argument("-f", "--monitoringconfigfile",
                  help=f"Path to config file. Default is '{Helpers.get_default_monitoring_config_dir()}/monitoring_config.yaml'",
                  action="store", default=f"{Helpers.get_default_monitoring_config_dir()}/monitoring_config.yaml"),
-        argument("-a", "--autoapprove", help="Set this to true to run without any prompts", action="store_true")
+        argument("-a", "--autoapprove", help="Set this to true to run without any prompts", action="store_true",
+                 default=False)
     ])
 def install(args):
     """
@@ -158,7 +147,8 @@ def install(args):
         argument("-f", "--monitoringconfigfile",
                  help=f"Path to config file. Default is '{Helpers.get_default_monitoring_config_dir()}/monitoring_config.yaml'",
                  action="store", default=f"{Helpers.get_default_monitoring_config_dir()}/monitoring_config.yaml"),
-        argument("-a", "--autoapprove", help="Set this to true to run without any prompts", action="store_true")
+        argument("-a", "--autoapprove", help="Set this to true to run without any prompts", action="store_true",
+                 default=False)
     ]
 )
 def start(args):

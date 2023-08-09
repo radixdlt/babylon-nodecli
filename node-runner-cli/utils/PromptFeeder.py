@@ -2,7 +2,7 @@ import os
 
 import yaml
 
-from env_vars import PROMPT_FEEDS
+from config.EnvVars import PROMPT_FEEDS
 
 
 class QuestionKeys:

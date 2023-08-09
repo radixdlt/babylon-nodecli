@@ -5,8 +5,8 @@ from unittest import mock
 
 import yaml
 
-from config.CommonDockerSettings import CommonDockerSettings
-from config.DockerConfig import CoreDockerSettings, DockerConfig
+from config.CommonDockerConfig import CommonDockerConfig
+from config.DockerConfig import CoreDockerConfig, DockerConfig
 from config.Renderer import Renderer
 from utils.PromptFeeder import PromptFeeder
 from utils.Prompts import Prompts
@@ -16,7 +16,7 @@ class ValidatorUnitTests(unittest.TestCase):
 
     @mock.patch('sys.stdout', new_callable=StringIO)
     def test_can_set_validator_address(self, mock_stdout):
-        core_settings = CoreDockerSettings({})
+        core_settings = CoreDockerConfig({})
         core_settings.set_validator_address("validator_mock")
         self.assertEqual(core_settings.validator_address, "validator_mock")
 
@@ -38,9 +38,11 @@ class ValidatorUnitTests(unittest.TestCase):
                                   'keydetails': {'something': 'else'}
                                   },
                     'common_config': {'test': 'test'},
-                    'migration': {}}
+                    'migration': {},
+                    'gateway': {'enabled': 'false'}
+                    }
         compose_yml = Renderer().load_file_based_template("radix-fullnode-compose.yml.j2").render(
-            dict(settings)).to_yaml()
+            settings).to_yaml()
         compose_yml_str = str(compose_yml)
         self.assertTrue(validator_address_fixture in compose_yml_str)
 
@@ -50,15 +52,16 @@ class ValidatorUnitTests(unittest.TestCase):
                                   'keydetails': {'something': 'else'}
                                   },
                     'common_config': {'test': 'test'},
-                    'migration': {'use_olympia': 'true'}}
+                    'migration': {'use_olympia': 'true'},
+                    'gateway': {'enabled': 'false'}}
         compose_yml = Renderer().load_file_based_template("radix-fullnode-compose.yml.j2").render(
-            dict(settings)).to_yaml()
+            settings).to_yaml()
         compose_yml_str = str(compose_yml)
         self.assertFalse("RADIXDLT_CONSENSUS_VALIDATOR_ADDRESS" in compose_yml_str)
 
     def test_validator_address_included_in_dict_from_object(self):
-        config = DockerConfig("1.0.0")
-        config.core_node = CoreDockerSettings({})
+        config = DockerConfig({})
+        config.core_node = CoreDockerConfig({})
         config.core_node.validator_address = "validator_mock"
         # ToDo: This is too looesely coupled. Implement DockerConfig save and load from/to Object and remove this test
         yaml_config = yaml.dump(config, default_flow_style=False, explicit_start=True, allow_unicode=True)
@@ -73,7 +76,7 @@ class ValidatorUnitTests(unittest.TestCase):
         self.assertEqual("validator_mock", address)
 
     def test_ask_network_id(self):
-        settings = CommonDockerSettings({})
+        settings = CommonDockerConfig({})
         settings.ask_network_id(1)
         self.assertIn("mainnet", settings.network_name)
 

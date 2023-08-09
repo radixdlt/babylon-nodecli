@@ -1,2 +1,2 @@
-__version__= "2.0.rcnet-v2-rc1-2-gf70af18"
-__base_version__= "test-release-fix"
+__version__= "2.0.rcnet-v2-rc2-112-g002904c"
+__base_version__= "2.0.rcnet-v2-rc2"

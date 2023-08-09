@@ -4,7 +4,7 @@ import sys
 
 import requests
 
-from env_vars import RADIXDLT_APP_VERSION_OVERRIDE, RADIXDLT_NGINX_VERSION_OVERRIDE, RADIXDLT_CLI_VERSION_OVERRIDE, \
+from config.EnvVars import RADIXDLT_APP_VERSION_OVERRIDE, RADIXDLT_NGINX_VERSION_OVERRIDE, RADIXDLT_CLI_VERSION_OVERRIDE, \
     RADIXDLT_GATEWAY_VERSION_OVERRIDE
 from utils.utils import Helpers
 
@@ -32,7 +32,7 @@ def latest_release(repo_name="radixdlt/babylon-node") -> str:
     token = os.getenv('GITHUB_TOKEN')
     prepared = req.prepare()
     prepared.headers['Content-Type'] = 'application/json'
-    prepared.headers['user-agent'] = 'radixnode-cli'
+    prepared.headers['user-agent'] = 'babylonnode-cli'
     if token is not None:
         prepared.headers['Authorization'] = f'token {token}'
     resp = Helpers.send_request(prepared, print_response=False)

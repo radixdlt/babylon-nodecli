@@ -21,7 +21,7 @@
 #
 # corecli = ArgumentParser(
 #     description='Subcommand to aid interaction with core api',
-#     usage="radixnode api core "
+#     usage="babylonnode api core "
 # )
 # core_parser = corecli.add_subparsers(dest="corecommand")
 #
