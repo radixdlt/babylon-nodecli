@@ -163,7 +163,11 @@ def start(args):
     docker_config = DockerSetup.check_set_passwords(docker_config)
     ########## Install dependent services
     DockerSetup.conditionally_start_local_postgres(docker_config)
-    DockerSetup.get_existing_compose_file(docker_config)
+    compose = DockerSetup.get_existing_compose_file(docker_config)
+    if compose is None:
+        print("No docker-compose file found.")
+        print("Execute `babylonnode docker config/install` and try again")
+        sys.exit(404)
     DockerCompose.run_docker_compose_up(docker_config.common_config.docker_compose)
 
 
@@ -185,7 +189,11 @@ def stop(args):
             Removing volumes including Nginx volume. Nginx password needs to be recreated again when you bring node up
             """)
     docker_config = DockerSetup.load_settings(args.configfile)
-    DockerSetup.get_existing_compose_file(docker_config)
+    compose = DockerSetup.get_existing_compose_file(docker_config)
+    if compose is None:
+        print("No docker-compose file found.")
+        print("Execute `babylonnode docker config/install` and try again")
+        sys.exit(404)
     DockerCompose.run_docker_compose_down(docker_config.common_config.docker_compose, args.removevolumes)
 
 

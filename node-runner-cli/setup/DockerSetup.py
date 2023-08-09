@@ -127,7 +127,7 @@ class DockerSetup(BaseSetup):
             return Helpers.yaml_as_dict(compose_file)
         else:
             Helpers.print_info("Seems you are creating docker compose file for first time")
-            sys.exit(1)
+            return None
 
     @staticmethod
     def exit_on_missing_trustednode():
@@ -294,6 +294,10 @@ class DockerSetup(BaseSetup):
         backup_time = Helpers.get_current_date_time()
         compose_file_yaml = DockerSetup.get_existing_compose_file(docker_config)
         compose_file = docker_config.common_config.docker_compose
+        if compose_file_yaml is None:
+            print("No existing docker-compose file found.")
+            print("Generating a new one")
+            return compose_file
         compose_file_difference = dict(DeepDiff(compose_file_yaml, docker_compose_yaml))
         if len(compose_file_difference) != 0:
             print(f"""
