@@ -50,7 +50,7 @@ class DockerSetup(BaseSetup):
         docker_compose_folder_prefix = os.getenv(DOCKER_COMPOSE_FOLDER_PREFIX, os.getcwd().rsplit('/', 1)[-1])
         run_shell_command(['docker', 'run', '--rm', '-v',
                            docker_compose_folder_prefix + '_nginx_secrets:/secrets',
-                           'radixdlt/htpasswd:v1.0.0',
+                           'radixdlt/htpasswd:v1.1.0',
                            'htpasswd', '-bc', f'/secrets/htpasswd.{usertype}', username, nginx_password])
 
         print(
