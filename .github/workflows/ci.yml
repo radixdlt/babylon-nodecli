@@ -310,7 +310,7 @@ jobs:
           chmod +x ./babylonnode
           echo "HOME=$HOME"
           echo "PATH=$PWD"
-          ./babylonnode systemd install
+          ./babylonnode systemd install -a
       - name: Get Logs and Status
         run: |
           sleep 15
@@ -451,13 +451,13 @@ jobs:
       - name: Setup config
         run: |
           chmod +x ./babylonnode
-          mkdir -p $HOME/node-config
+          mkdir -p $HOME/babylon-node-config
           export DISABLE_VERSION_CHECK=true
           export RADIXDLT_APP_VERSION_OVERRIDE="rcnet-v2-phase2-r4"
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
           export PROMPT_FEEDS="node-runner-cli/test-prompts/core-gateway-all-local.yml"
           ./babylonnode docker config -m DETAILED \
-           -d $HOME/node-config \
+           -d $HOME/babylon-node-config \
            -k $KEYSTORE_PASSWORD -nk -a
         env:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
@@ -466,7 +466,7 @@ jobs:
         run: |
           export DISABLE_VERSION_CHECK=true
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
-          ./babylonnode docker install -f $HOME/node-config/config.yaml -a
+          ./babylonnode docker install -f $HOME/babylon-node-config/config.yaml -a
           # ToDo: Fix Authorization error export DOCKER_COMPOSE_FOLDER_PREFIX=runner ?
           sleep 60
           ./babylonnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
