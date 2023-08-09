@@ -1,15 +1,14 @@
 from argparse import ArgumentParser
 from argparse import RawTextHelpFormatter
 
+import boto3
 import botocore
 
 from commands.subcommand import get_decorator, argument
 
-import boto3
-
 ledgercli = ArgumentParser(
     description='Subcommand to help to sync up the ledger from a S3 bucket',
-    usage="radixnode ledger ",
+    usage="babylonnode ledger ",
     formatter_class=RawTextHelpFormatter)
 ledger_parser = ledgercli.add_subparsers(dest="ledgercommand")
 

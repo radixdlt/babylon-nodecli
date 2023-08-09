@@ -12,7 +12,7 @@ cd  radixdlt
 sudo apt  install docker.io
 sudo apt  install docker-compose
 sudo apt install rng-tools
-sudo rngd -r /dev/random
+sudo rngd -r /dev/random 
 ```
 
 ```bash

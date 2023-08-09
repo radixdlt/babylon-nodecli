@@ -4,7 +4,7 @@
 block_cipher = None
 
 
-a = Analysis(['radixnode.py'],
+a = Analysis(['babylonnode.py'],
              pathex=['.'],
              binaries=[],
              datas=[('./templates/*.j2', 'templates'),('./testnet-genesis/*', 'testnet-genesis')],
@@ -24,7 +24,7 @@ exe = EXE(pyz,
           a.zipfiles,
           a.datas,
           [],
-          name='radixnode',
+          name='babylonnode',
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,

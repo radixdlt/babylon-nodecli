@@ -1,7 +1,11 @@
 from argparse import ArgumentParser
+from time import sleep
 
+from api.Api import API
+from api.CustomAPIClient import CustomAPIClient
+from api.SystemApiHelper import SystemApiHelper
 from commands.subcommand import get_decorator
-from setup.Base import Base
+from setup.BaseSetup import BaseSetup
 from utils.utils import Helpers
 
 other_command_cli = ArgumentParser(
@@ -29,4 +33,29 @@ def optimise_node(args):
     . Prompts asking to setup limits
     . Prompts asking to setup swap and size of swap in GB
     """
-    Base.setup_node_optimisation_config(Helpers.cli_version())
+    BaseSetup.setup_node_optimisation_config(Helpers.cli_version())
+
+
+# @othercommands()
+# def sync_status(args):
+#     """
+#     Run this command to see the sync status visualized
+#     """
+#     user_type = "admin"
+#     default_username = "admin"
+#     node_host = API.get_host_info()
+#     api_client: CustomAPIClient = CustomAPIClient(host=node_host, verify_ssl=False)
+#     api_client = SystemApiHelper.set_basic_auth(api_client, user_type, default_username)
+#     api_client.prepare("GET", "/system/network-sync-status")
+#
+#     response_json = Helpers.send_request(api_client.prepared_req, print_request=False, print_response=False)
+#     current = int(response_json["sync_status"]["current_state_version"])
+#     target = int(response_json["sync_status"]["target_state_version"])
+#     pbar = tqdm(total=target)
+#     while current < target:
+#         sleep(1)
+#         response_json = Helpers.send_request(api_client.prepared_req, print_request=False, print_response=False)
+#         current = int(response_json["sync_status"]["current_state_version"])
+#         pbar.update(current)
+#     pbar.close()
+

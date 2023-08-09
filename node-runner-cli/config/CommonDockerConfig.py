@@ -7,41 +7,18 @@ from utils.Network import Network
 from utils.Prompts import Prompts, Helpers
 
 
-class NginxConfig(BaseConfig):
-    # uncomment below when support to gateway is added
-    # protect_gateway: str = "true"
-    # gateway_behind_auth: str = "true"
-    enable_transaction_api = "false"
-    protect_core: str = "true"
-    release = None
-    repo = "radixdlt/babylon-nginx"
-
-
-class CommonDockerSettings(BaseConfig):
-    network_id: int = None
-    network_name: str = None
-    genesis_bin_data_file: str = None
-    nginx_settings: DockerNginxConfig = DockerNginxConfig({})
-    docker_compose: str = f"{Helpers.get_home_dir()}/docker-compose.yml"
-
-    def __init__(self, settings: dict):
-        super().__init__(settings)
-        for key, value in settings.items():
-            setattr(self, key, value)
-
+class CommonDockerConfig(BaseConfig):
+    def __init__(self, config_dict: dict):
+        if config_dict is None:
+            config_dict = dict()
+        self.nginx_settings: DockerNginxConfig = DockerNginxConfig(config_dict.get("nginx_settings"))
+        self.network_id: int = ""
+        self.network_name: str = ""
+        self.genesis_bin_data_file: str = ""
+        self.docker_compose: str = f"{Helpers.get_home_dir()}/docker-compose.yml"
+        super().__init__(config_dict)
         if self.network_id:
             self.set_network_name()
-        self.nginx_settings = DockerNginxConfig({})
-
-    def __iter__(self):
-        class_variables = {key: value
-                           for key, value in self.__class__.__dict__.items()
-                           if not key.startswith('__') and not callable(value)}
-        for attr, value in class_variables.items():
-            if attr in ['nginx_settings'] and self.__getattribute__(attr):
-                yield attr, dict(self.__getattribute__(attr))
-            elif self.__getattribute__(attr):
-                yield attr, self.__getattribute__(attr)
 
     def set_network_id(self, network_id: int):
         self.network_id = network_id

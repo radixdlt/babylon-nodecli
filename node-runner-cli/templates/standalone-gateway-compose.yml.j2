@@ -1,83 +1,5 @@
 version: '3.8'
 services:
-{% if core_node is defined %}
-  core:
-    cap_add:
-    - NET_ADMIN
-    environment:
-      JAVA_OPTS: {{core_node.java_opts or '--enable-preview -server -Xms8g -Xmx8g  -XX:MaxDirectMemorySize=2048m -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector'}}
-      RADIXDLT_API_PORT: 3333
-      RADIXDLT_LOG_LEVEL: {{core_node.log_level or 'info'}}
-      RADIXDLT_NETWORK_ID: {{common_config.network_id}}
-      RADIXDLT_NETWORK_SEEDS_REMOTE: {{core_node.trusted_node}}
-      RADIXDLT_NETWORK_USE_PROXY_PROTOCOL: '{{core_node.use_proxy_protocol or 'false'}}'
-      RADIXDLT_SIGN_ENABLE: 'true'
-      RADIXDLT_TRANSACTIONS_API_ENABLE: '{{core_node.enable_transaction}}'
-      RADIXDLT_VALIDATOR_KEY_LOCATION: /home/radixdlt/node-keystore.ks
-      RADIX_NODE_KEYSTORE_PASSWORD: '{{core_node.keydetails.keystore_password}}'
-      {% if migration.use_olympia is defined %}
-      {% if migration.use_olympia %}
-      RADIXDLT_GENESIS_USE_OLYMPIA: '{{migration.use_olympia}}'
-      RADIXDLT_GENESIS_OLYMPIA_NODE_CORE_API_URL: '{{migration.olympia_node_url}}'
-      RADIXDLT_GENESIS_OLYMPIA_NODE_CORE_API_AUTH_USER: '{{migration.olympia_node_auth_user}}'
-      RADIXDLT_GENESIS_OLYMPIA_NODE_CORE_API_AUTH_PASSWORD: '{{migration.olympia_node_auth_password}}'
-      RADIXDLT_GENESIS_OLYMPIA_NODE_BECH32_ADDRESS: '{{migration.olympia_node_bech32_address}}'
-      {% endif %}
-      {% endif %}
-      {% if common_config.genesis_bin_data_file is defined %}
-      RADIXDLT_GENESIS_DATA_FILE: "/home/radixdlt/genesis_data_file.bin"
-      {% endif %}
-      {% if core_node.validator_address is defined %}
-      RADIXDLT_CONSENSUS_VALIDATOR_ADDRESS: '{{core_node.validator_address}}'
-      {% endif %}
-    image: {{core_node.repo}}:{{core_node.core_release}}
-    init: true
-    mem_limit: {{core_node.memory_limit or '12000m'}}
-    restart: unless-stopped
-    {% if common_config.nginx_settings is not defined or (common_config.nginx_settings.protect_core | lower | trim) == "false" %}
-    ports:
-       - "3333:3333"
-       - "30000:30000"
-    {% endif %}
-    ulimits:
-      memlock: -1
-      nofile:
-        hard: 65536
-        soft: 65536
-    volumes:
-    {% if core_node.data_directory is defined %}
-    - babylon_ledger:/home/radixdlt/RADIXDB
-    {% endif %}
-    - {{core_node.keydetails.keyfile_path ~ '/' ~ core_node.keydetails.keyfile_name }}:/home/radixdlt/node-keystore.ks
-    {% if common_config.genesis_bin_data_file is defined %}
-    - "{{common_config.genesis_bin_data_file}}:/home/radixdlt/genesis_data_file.bin"
-    {% endif %}
- {% endif %}
- {% if common_config.nginx_settings is defined  and  ((common_config.nginx_settings.protect_core | lower | trim) == "true" or (common_config.nginx_settings.protect_gateway | lower | trim) == "true") %}
-  nginx:
-    environment:
-    {% if core_node is defined %}
-      RADIXDLT_NETWORK_USE_PROXY_PROTOCOL: '{{core_node.use_proxy_protocol or 'false'}}'
-    {% endif %}
-    {% if core_node is not defined %}
-      RADIXDLT_ENABLE_TCP_CORE_PROXY: 'false'
-    {% endif %}
-      RADIXDLT_GATEWAY_API_ENABLE: '{{common_config.nginx_settings.protect_gateway or 'false'}}'
-      RADIXDLT_TRANSACTIONS_API_ENABLE: '{{common_config.nginx_settings.enable_transaction_api or 'false'}}'
-      RADIXDLT_GATEWAY_BEHIND_AUTH: '{{common_config.nginx_settings.gateway_behind_auth or 'false'}}'
-    image: {{common_config.nginx_settings.repo}}:{{common_config.nginx_settings.release}}
-    ports:
-    - 443:443
-    - 30000:30000
-    restart: unless-stopped
-    ulimits:
-      nofile:
-        hard: 65536
-        soft: 65536
-    volumes:
-    - nginx_secrets:/etc/nginx/secrets
- {% endif %}
-{% if (gateway.enabled and gateway.gateway_api is defined) %}
   gateway_api: # This is the base -- the _image and _built containers are defined below
     image: {{gateway.gateway_api.repo}}:{{gateway.gateway_api.release}}
     ports:
@@ -95,6 +17,7 @@ services:
       ConnectionStrings__NetworkGatewayReadOnly: "Host={{gateway.postgres_db.host}};Database={{gateway.postgres_db.dbname}};Username={{gateway.postgres_db.user}};Password={{gateway.postgres_db.password}}"
       ConnectionStrings__NetworkGatewayReadWrite: "Host={{gateway.postgres_db.host}};Database={{gateway.postgres_db.dbname}};Username={{gateway.postgres_db.user}};Password={{gateway.postgres_db.password}}"
       GatewayApi__Endpoints_MaxPageSize: "{{gateway.gateway_api.max_page_size or '30'}}"
+      GatewayApi__Endpoint__GatewayApiVersion: {{gateway.gateway_api.release}}
       # GatewayApi__MaxWaitForDbOnStartupMs: "90" # Wait for PostGres to boot up
       GatewayApi__Network__DisableCoreApiHttpsCertificateChecks: "{{gateway.gateway_api.coreApiNode.disable_core_api_https_certificate_checks or 'false'}}"
       GatewayApi__Network__NetworkName: "{{common_config.network_name}}"
@@ -105,8 +28,6 @@ services:
       {% endif %}
       GatewayApi__Network__CoreApiNodes__0__RequestWeighting: "{{gateway.gateway_api.coreApiNode.request_weighting or '1'}}"
       GatewayApi__Network__CoreApiNodes__0__Enabled: "{{gateway.gateway_api.coreApiNode.enabled or 'true'}}"
-{% endif %}
-{% if (gateway.enabled and gateway.data_aggregator is defined) %}
   data_aggregator:
     depends_on:
       - database_migrations
@@ -125,16 +46,16 @@ services:
       ASPNETCORE_URLS: "http://*:80" # Binds to 80 on all interfaces
       ConnectionStrings__NetworkGatewayReadWrite: "Host={{gateway.postgres_db.host}};Database={{gateway.postgres_db.dbname}};Username={{gateway.postgres_db.user}};Password={{gateway.postgres_db.password}}"
       PrometheusMetricsPort: "{{gateway.data_aggregator.prometheusMetricsPortHostBinding or '1234'}}"
-      #DataAggregator__Network__MaxWaitForDbOnStartupMs: "90"
-      DataAggregator__Network__DisableCoreApiHttpsCertificateChecks:  "{{gateway.data_aggregator.coreApiNode.disable_core_api_https_certificate_checks or 'false'}}"
+      DataAggregator__Network__MaxWaitForDbOnStartupMs: "1000"
+      DataAggregator__Network__DisableCoreApiHttpsCertificateChecks: "{{gateway.data_aggregator.coreApiNode.disable_core_api_https_certificate_checks or 'false'}}"
       DataAggregator__Network__NetworkName: "{{common_config.network_name}}"
       DataAggregator__Network__CoreApiNodes__0__Name: "{{gateway.data_aggregator.coreApiNode.Name}}"
       DataAggregator__Network__CoreApiNodes__0__CoreApiAddress: "{{gateway.data_aggregator.coreApiNode.core_api_address}}"
       {% if gateway.data_aggregator.coreApiNode.auth_header is defined %}
       DataAggregator__Network__CoreApiNodes__0__CoreApiAuthorizationHeader: "{{gateway.data_aggregator.coreApiNode.auth_header.Authorization}}"
       {% endif %}
-      DataAggregator__Network__CoreApiNodes__0__TrustWeighting:  "{{gateway.data_aggregator.coreApiNode.trust_weighting or '1'}}"
-      DataAggregator__Network__CoreApiNodes__0__Enabled:  "{{gateway.data_aggregator.coreApiNode.enabled or 'true'}}"
+      DataAggregator__Network__CoreApiNodes__0__TrustWeighting: "{{gateway.data_aggregator.coreApiNode.trust_weighting or '1'}}"
+      DataAggregator__Network__CoreApiNodes__0__Enabled: "{{gateway.data_aggregator.coreApiNode.enabled or 'true'}}"
   database_migrations: # This is the base -- the _image and _built containers are defined below
     image: {{gateway.database_migration.repo}}:{{gateway.database_migration.release}}
     environment:
@@ -143,14 +64,3 @@ services:
     extra_hosts:
     - "host.docker.internal:host-gateway"
     {% endif %}
-{% endif %}
-volumes:
- {% if core_node is defined and core_node.data_directory is defined %}
-  babylon_ledger:
-    driver: local
-    driver_opts:
-      device: {{ core_node.data_directory }}
-      o: bind
-      type: none
- {% endif %}
-  nginx_secrets:

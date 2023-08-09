@@ -1,0 +1,106 @@
+---
+services:
+  core:
+    cap_add:
+    - NET_ADMIN
+    environment:
+      JAVA_OPTS: --enable-preview -server -Xms8g -Xmx8g  -XX:MaxDirectMemorySize=2048m
+        -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts
+        -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
+      RADIXDLT_API_PORT: 3333
+      RADIXDLT_GENESIS_DATA_FILE: /home/radixdlt/genesis_data_file.bin
+      RADIXDLT_LOG_LEVEL: info
+      RADIXDLT_NETWORK_ID: 33
+      RADIXDLT_NETWORK_SEEDS_REMOTE: radix://node_tdx_21_1qfk895krd3l8t8z7z7p9sxpjdszpal24f6y2sjtqe7mdkhdele5az658ak2@13.127.72.193,radix://node_tdx_21_1qvrwd0685a6gfkccevh3hykw9uy7p9dz9zrw8nv5u4twfqmkda8fqrq9yec@52.62.241.248,radix://node_tdx_21_1qfpu6e4xjnjv0anuadnf935kktd2cvycd5evavk9an56y9pzl3rtk0vzdy5@35.170.44.1,radix://node_tdx_21_1qwjql0acg60l7e3yywee99s5znlp4lydg2aenw8eel3uayrcaqcz6zshre4@34.248.128.148
+      RADIXDLT_NETWORK_USE_PROXY_PROTOCOL: 'false'
+      RADIXDLT_SIGN_ENABLE: 'true'
+      RADIXDLT_TRANSACTIONS_API_ENABLE: 'true'
+      RADIXDLT_VALIDATOR_KEY_LOCATION: /home/radixdlt/node-keystore.ks
+      RADIX_NODE_KEYSTORE_PASSWORD: radix
+    image: docker.io/radixdlt/private-babylon-node:release-birch-ffbc9b5273
+    init: true
+    mem_limit: 12000m
+    restart: unless-stopped
+    ulimits:
+      memlock: -1
+      nofile:
+        hard: 65536
+        soft: 65536
+    volumes:
+    - core_ledger:/home/radixdlt/RADIXDB
+    - /home/radixdlt/babylon-node-config/node-keystore.ks:/home/radixdlt/node-keystore.ks
+    - /home/radixdlt/genesis_data_file.bin:/home/radixdlt/genesis.json
+  data_aggregator:
+    cpus: 2.0
+    depends_on:
+    - database_migrations
+    environment:
+      ASPNETCORE_URLS: http://*:80
+      ConnectionStrings__NetworkGatewayReadWrite: Host=host.docker.internal:5432;Database=radixdlt_ledger;Username=postgres;Password=postgres
+      DataAggregator__Network__CoreApiNodes__0__CoreApiAddress: http://core:3333/core
+      DataAggregator__Network__CoreApiNodes__0__Enabled: 'true'
+      DataAggregator__Network__CoreApiNodes__0__Name: Core
+      DataAggregator__Network__CoreApiNodes__0__TrustWeighting: '1'
+      DataAggregator__Network__DisableCoreApiHttpsCertificateChecks: 'false'
+      DataAggregator__Network__NetworkName: enkinet
+      PrometheusMetricsPort: '1234'
+    extra_hosts:
+    - host.docker.internal:host-gateway
+    image: docker.io/radixdlt/private-babylon-ng-data-aggregator:release-birch-1805c10
+    ports:
+    - 127.0.0.1:5208:80
+    - 127.0.0.1:1234:1234
+    restart: unless-stopped
+  database_migrations:
+    environment:
+      ConnectionStrings__NetworkGatewayMigrations: Host=host.docker.internal:5432;Database=radixdlt_ledger;Username=postgres;Password=postgres
+    extra_hosts:
+    - host.docker.internal:host-gateway
+    image: docker.io/radixdlt/private-babylon-ng-database-migrations:release-birch-1805c10
+  gateway_api:
+    environment:
+      ASPNETCORE_URLS: http://*:80
+      ConnectionStrings__NetworkGatewayReadOnly: Host=host.docker.internal:5432;Database=radixdlt_ledger;Username=postgres;Password=postgres
+      ConnectionStrings__NetworkGatewayReadWrite: Host=host.docker.internal:5432;Database=radixdlt_ledger;Username=postgres;Password=postgres
+      EnableSwagger: 'true'
+      GatewayApi__Endpoints_MaxPageSize: '30'
+      GatewayApi__Network__CoreApiNodes__0__CoreApiAddress: http://core:3333/core
+      GatewayApi__Network__CoreApiNodes__0__Enabled: 'true'
+      GatewayApi__Network__CoreApiNodes__0__Name: Core
+      GatewayApi__Network__CoreApiNodes__0__RequestWeighting: '1'
+      GatewayApi__Network__DisableCoreApiHttpsCertificateChecks: 'false'
+      GatewayApi__Network__NetworkName: enkinet
+      PrometheusMetricsPort: '1235'
+    extra_hosts:
+    - host.docker.internal:host-gateway
+    image: docker.io/radixdlt/private-babylon-ng-gateway-api:release-birch-1805c10
+    ports:
+    - 127.0.0.1:5207:80
+    - 127.0.0.1:1235:1235
+    restart: unless-stopped
+  nginx:
+    environment:
+      RADIXDLT_GATEWAY_API_ENABLE: 'true'
+      RADIXDLT_GATEWAY_BEHIND_AUTH: 'true'
+      RADIXDLT_NETWORK_USE_PROXY_PROTOCOL: 'false'
+      RADIXDLT_TRANSACTIONS_API_ENABLE: 'true'
+    image: radixdlt/babylon-nginx:1.0.0-rc2
+    ports:
+    - 443:443
+    - 30000:30000
+    restart: unless-stopped
+    ulimits:
+      nofile:
+        hard: 65536
+        soft: 65536
+    volumes:
+    - nginx_secrets:/etc/nginx/secrets
+version: '3.8'
+volumes:
+  core_ledger:
+    driver: local
+    driver_opts:
+      device: /home/radixdlt/data
+      o: bind
+      type: none
+  nginx_secrets:

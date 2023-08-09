@@ -15,7 +15,7 @@ from commands.monitoring import monitoringcli
 from commands.othercommands import other_command_cli
 from commands.systemapi import handle_systemapi
 from commands.systemdcommand import systemdcli
-from env_vars import DISABLE_VERSION_CHECK
+from config.EnvVars import DISABLE_VERSION_CHECK
 from github.github import latest_release
 from utils.utils import Helpers
 
@@ -40,13 +40,13 @@ def check_latest_cli():
         if Helpers.cli_version() != cli_latest_version:
             os_name = "ubuntu-22.04"
             print(
-                f"Radixnode CLI latest version is {cli_latest_version} and current version of the binary is {Helpers.cli_version()}.\n.")
+                f"babylonnode CLI latest version is {cli_latest_version} and current version of the binary is {Helpers.cli_version()}.\n.")
             print(f"""
                 ---------------------------------------------------------------
                 Update the CLI by running these commands
-                    wget -O radixnode https://github.com/radixdlt/babylon-nodecli/releases/download/{cli_latest_version}/radixnode-{os_name}
-                    chmod +x radixnode
-                    sudo mv radixnode /usr/local/bin
+                    wget -O babylonnode https://github.com/radixdlt/babylon-nodecli/releases/download/{cli_latest_version}/radixnode-{os_name}
+                    chmod +x babylonnode
+                    sudo mv babylonnode /usr/local/bin
                 """)
 
 

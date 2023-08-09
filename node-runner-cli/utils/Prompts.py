@@ -2,7 +2,7 @@ import ipaddress
 import os
 import sys
 
-from env_vars import SUPPRESS_API_COMMAND_WARN
+from config.EnvVars import SUPPRESS_API_COMMAND_WARN
 from utils.PromptFeeder import QuestionKeys
 from utils.utils import Helpers, run_shell_command, bcolors
 
@@ -61,7 +61,7 @@ class Prompts:
         return Prompts.check_default(answer, "radix-ledger")
 
     @staticmethod
-    def get_CoreApiAddress(default) -> str:
+    def get_CoreApiAddress(default: str) -> str:
         Helpers.section_headline("CORE API NODE DETAILS")
         print(
             "\nThis will be node either running locally or remote using which Gateway aggregator will stream ledger data"
@@ -73,7 +73,7 @@ class Prompts:
         return Prompts.check_default(answer, default)
 
     @staticmethod
-    def get_CopeAPINodeName(default) -> str:
+    def ask_CopeAPINodeName(default: str = "Core") -> str:
         print("\nNODE NAME: This can be any string and logs would refer this name on related info/errors")
         answer = Helpers.input_guestion(
             f"Default value is '{default}'. Press ENTER to accept default value or type in new name':",
@@ -101,7 +101,7 @@ class Prompts:
         return Prompts.check_default(answer, "true").lower()
 
     @staticmethod
-    def get_basic_auth(target="CORE_API_NODE", user_type="admin") -> dict:
+    def ask_basic_auth(target="CORE_API_NODE", user_type="admin") -> dict:
         print(
             f"{target} is setup on different machine or behind https protected by basic auth."
             f" It would require Nginx {user_type} user and password.")
@@ -175,15 +175,15 @@ class Prompts:
                 f"{bcolors.WARNING}Enter the absolute path of the folder, just the folder, where the keystore file is located:{bcolors.ENDC}",
                 QuestionKeys.input_path_keystore)
         else:
-            radixnode_dir = f"{Helpers.get_default_node_config_dir()}"
+            babylonnode_dir = f"{Helpers.get_default_node_config_dir()}"
             print(
-                f"\nDefault folder location for Keystore file will be: {bcolors.OKBLUE}{radixnode_dir}{bcolors.ENDC}")
+                f"\nDefault folder location for Keystore file will be: {bcolors.OKBLUE}{babylonnode_dir}{bcolors.ENDC}")
             answer = Helpers.input_guestion(
                 'Press ENTER to accept default. otherwise enter the absolute path of the new folder:',
                 QuestionKeys.input_path_keystore)
             # TODO this needs to moved out of init
-            run_shell_command(f'mkdir -p {radixnode_dir}', shell=True, quite=True)
-            return Prompts.check_default(answer, radixnode_dir)
+            run_shell_command(f'mkdir -p {babylonnode_dir}', shell=True, quite=True)
+            return Prompts.check_default(answer, babylonnode_dir)
 
     @staticmethod
     def ask_keyfile_name() -> str:
@@ -231,7 +231,7 @@ class Prompts:
     @staticmethod
     def ask_enable_nginx(service='CORE') -> str:
         Helpers.section_headline(f"NGINX SETUP FOR {service} NODE")
-        print(f"\n {service} API can be protected by running Nginx infront of it.")
+        print(f"\n {service} API can be protected by running Nginx in front of it.")
         question_key = None
         if service == "CORE":
             question_key = QuestionKeys.core_nginx_setup
@@ -333,12 +333,16 @@ class Prompts:
 
     @classmethod
     def ask_host_ip(cls) -> str:
+        from requests import get
+        ip = get('https://api.ipify.org').content.decode('utf8')
         answer = input(
-            f"\n{bcolors.WARNING}Enter the host ip of this node:{bcolors.ENDC}")
+            f"\n{bcolors.WARNING}Enter the host ip of this node (defaults to {ip}):{bcolors.ENDC}")
+        if answer == "" or answer is None:
+            answer = ip
         try:
             ipaddress.ip_address(answer)
         except ValueError:
-            print(f"'{ip_string}' is not a valid ip address.")
+            print(f"'{answer}' is not a valid ip address.")
             sys.exit(1)
         return answer
 
@@ -349,7 +353,7 @@ class Prompts:
               "you would need to store validator address in the config"
               "\nAfter your node is up and running, you can get you node public key by"
               " sending a request to /system/identity"
-              " or by executing 'radixnode api system identity'. "
+              " or by executing 'babylonnode api system identity'. "
               "Refer this link for more details"
               "\n https://docs-babylon.radixdlt.com/main/node-and-gateway/register-as-validator.html#_gather_your_node_public_key"
               "")
@@ -360,7 +364,7 @@ class Prompts:
             validator_address = Helpers.input_guestion(f"Enter your validator address:",
                                                        QuestionKeys.validator_address)
         else:
-            print("\nYou can find your validator address using 'radixnode api system identity'")
+            print("\nYou can find your validator address using 'babylonnode api system identity'")
         return validator_address
 
     @classmethod

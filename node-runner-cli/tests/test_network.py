@@ -3,7 +3,6 @@ import unittest
 from io import StringIO
 from unittest import mock
 
-from config.CommonDockerSettings import CommonDockerSettings
 from config.Genesis import GenesisConfig
 from utils.Network import Network
 
@@ -34,7 +33,6 @@ class NetworkUtilsUnitTests(unittest.TestCase):
         with self.assertRaises(SystemExit) as cm:
             Network.validate_network_id("enkinet")
         self.assertEqual(cm.exception.code, 1)
-
 
     def test_create_if_not_exists(self):
         genesisfile_txt = "/tmp/genesisfile.txt"

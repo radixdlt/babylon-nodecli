@@ -1,10 +1,9 @@
+import os.path
 import sys
-from pathlib import Path
 
 from config.Genesis import GenesisConfig
 from utils.PromptFeeder import QuestionKeys
-from utils.Prompts import Prompts
-from utils.utils import Helpers, bcolors
+from utils.utils import Helpers, run_shell_command
 
 
 class Network:
@@ -36,6 +35,8 @@ class Network:
     @staticmethod
     def path_to_genesis_binary(network_id: int) -> str:
         if network_id not in [1, 2] and network_id == 13:
+            if os.path.exists("ansharnet_genesis_data_file.bin"):
+                run_shell_command('sudo rm ansharnet_genesis_data_file.bin', shell=True)
             genesis_bin_file = GenesisConfig.copy_genesis_file(
                 "ansharnet_genesis_data_file.bin")
         else:

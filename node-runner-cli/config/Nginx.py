@@ -2,34 +2,30 @@ from config.BaseConfig import BaseConfig
 
 
 class DockerNginxConfig(BaseConfig):
-    mode: str = "docker"
-    protect_gateway: str = "true"
-    gateway_behind_auth: str = "true"
-    enable_transaction_api = "false"
-    protect_core: str = "true"
-    release = None
-    repo = "radixdlt/babylon-nginx"
+    def __init__(self, config_dict: dict):
+        if config_dict is None:
+            config_dict = dict()
+        self.mode: str = "docker"
+        self.protect_gateway: str = "true"
+        self.gateway_behind_auth: str = "true"
+        self.enable_transaction_api = "false"
+        self.protect_core: str = "true"
+        self.release = ""
+        self.repo = "radixdlt/babylon-nginx"
+        self.mode = "docker"
+        super().__init__(config_dict)
 
 
 class SystemdNginxConfig(BaseConfig):
-    mode: str = "systemd"
-    enable_transaction_api = "false"
-    protect_core: str = "true"
-    dir: str = '/etc/nginx'
-    secrets_dir: str = '/etc/nginx/secrets'
-    release: str = None
-    config_url: str = None
-
-    # def __init__(self, nginx_dir='/etc/nginx',
-    #              nginx_secrets_dir='/etc/nginx/secrets',
-    #              nginx_release=None,
-    #              nginx_binary_url=None):
-    #     self.dir = nginx_dir
-    #     self.secrets_dir = nginx_secrets_dir
-    #     self.release = nginx_release
-    #     self.config_url = nginx_binary_url
-
-    def __repr__(self):
-        return "%s (dir=%r, secrets_dir=%r, release=%r, config_url=%r)" % (
-            self.__class__.__name__, self.dir, self.secrets_dir,
-            self.release, self.config_url)
+    def __init__(self, config_dict: dict):
+        if config_dict is None:
+            config_dict = dict()
+        self.mode: str = "systemd"
+        self.enable_transaction_api = "false"
+        self.protect_core: str = "true"
+        self.dir: str = '/etc/nginx'
+        self.secrets_dir: str = '/etc/nginx/secrets'
+        self.release: str = ""
+        self.config_url: str = ""
+        self.mode = "systemd"
+        super().__init__(config_dict)

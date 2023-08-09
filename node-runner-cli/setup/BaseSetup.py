@@ -1,4 +1,3 @@
-import getpass
 import os
 import sys
 from pathlib import Path
@@ -13,12 +12,12 @@ from utils.Prompts import Prompts
 from utils.utils import run_shell_command, Helpers, bcolors
 
 
-class Base:
+class BaseSetup:
     @staticmethod
     def dependencies():
         run_shell_command('sudo apt update', shell=True)
         run_shell_command('sudo apt install -y  docker.io wget unzip docker-compose rng-tools', shell=True)
-        run_shell_command('sudo rngd -r /dev/random', shell=True)
+        run_shell_command('sudo rngd -r /dev/random | true', shell=True)
 
     @staticmethod
     def add_user_docker_group():
@@ -37,6 +36,7 @@ class Base:
 
     @staticmethod
     def generatekey(keyfile_path, keyfile_name, keygen_tag, keystore_password=None, new=False):
+        import getpass
         key_details = KeyDetails({})
         key_details.keyfile_name = keyfile_name
         key_details.keygen_tag = keygen_tag
@@ -60,23 +60,30 @@ class Base:
             """)
             key_details.keystore_password = keystore_password if keystore_password else getpass.getpass(
                 f"Enter the password of the new file '{key_details.keyfile_name}':")
+
             run_shell_command(['docker', 'run', '--rm', '-v', key_details.keyfile_path + ':/keygen/key',
                                f'radixdlt/keygen:{key_details.keygen_tag}',
-                               f'--keystore=/keygen/key/{key_details.keyfile_name}',
-                               '--password=' + key_details.keystore_password], quite=True
-                              )
+                               '-k', f'/keygen/key/{key_details.keyfile_name}',
+                               '-p', f'{key_details.keystore_password}'], quite=False)
+
             run_shell_command(['sudo', 'chmod', '644', f'{key_details.keyfile_path}/{key_details.keyfile_name}'])
 
+            username = getpass.getuser()
+            run_shell_command(
+                ['sudo', 'chown', f'{username}:{username}', f'{key_details.keyfile_path}/{key_details.keyfile_name}'])
         return key_details
 
     @staticmethod
-    def ask_keydetails(ks_password=None, new_keystore=False):
+    def ask_keydetails(ks_password=None, new_keystore=False, ks_file=None):
         keydetails = KeyDetails({})
         if "DETAILED" in SetupMode.instance().mode:
-            keydetails.keyfile_path = Prompts.ask_keyfile_path()
+            if ks_file is None:
+                keydetails.keyfile_path = Prompts.ask_keyfile_path()
+            else:
+                keydetails.keyfile_path = ks_file
             keydetails.keyfile_name = Prompts.ask_keyfile_name()
 
-        keydetails = Base.generatekey(
+        keydetails = BaseSetup.generatekey(
             keyfile_path=keydetails.keyfile_path,
             keyfile_name=keydetails.keyfile_name,
             keygen_tag=keydetails.keygen_tag, keystore_password=ks_password, new=new_keystore)

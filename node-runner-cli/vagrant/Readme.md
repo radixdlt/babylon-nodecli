@@ -24,7 +24,7 @@ Then change the directory to where the cli is synced from host. It would somethi
 Run the command to test cli 
 
 ```
-radixnode -h
+babylonnode -h
 ```
 
 To stop the VM
