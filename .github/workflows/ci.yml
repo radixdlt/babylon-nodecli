@@ -14,6 +14,8 @@ on:
 jobs:
   snyk-scan:
     runs-on: ubuntu-latest
+    container:
+      image: radixdlt/snyk-python:sha-e6b1b80
     permissions:
       id-token: write
       pull-requests: read
@@ -21,33 +23,24 @@ jobs:
       deployments: write
     steps:
       - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
-      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
+      - name: Configure AWS credentials to fetch secrets
+        uses: aws-actions/configure-aws-credentials@97271860067ec931c45b8d104fbf0d15954ab85c # branch v1-node16
         with:
-          role_name: ${{ secrets.AWS_ROLE_NAME_SNYK_SECRET }}
-          app_name: 'babylon-nodecli'
-          step_name: 'snyk-scan-deps-licenses'
-          secret_prefix: 'SNYK'
-          secret_name: ${{ secrets.AWS_SECRET_NAME_SNYK }}
-          parse_json: true
-      - name: Setup python
-        uses: actions/setup-python@v4.5.0
+          role-to-assume: ${{ secrets.AWS_ROLE_NAME_SNYK_SECRET }}
+          aws-region: "eu-west-2"
+          role-session-name: "baylon-nodecli-${{ github.run_id }}-${{ github.run_attempt }}"   
+      - name: Fetch AWS secrets
+        uses: aws-actions/aws-secretsmanager-get-secrets@287592d14d9c9c48199db83dc182ae12af3df18e # v1.0.1
         with:
-          python-version: 3.10.6
-      - name: Install pipenv
-        run: python -m pip install --upgrade pipenv wheel
-      - name: Install dependencies
-        run: |
-          cd ./node-runner-cli
-          pipenv install
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Install Snyk cli
-        run: |
-          npm install snyk -g
-          snyk -v
-          snyk auth ${{ env.SNYK_TOKEN }}
+          secret-ids: |
+            SNYK, ${{ secrets.AWS_SECRET_NAME_SNYK }}
+          parse-json-secrets: true
       - name: Run Snyk to check for deps vulnerabilities
-        run: snyk test --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --severity-threshold=critical
+        run: |
+          cd node-runner-cli/
+          pipenv install --python /usr/local/bin/python
+          snyk auth ${{ env.SNYK_TOKEN }}
+          snyk test --file=Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --severity-threshold=critical
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Run Snyk to check for code vulnerabilities
@@ -56,7 +49,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Test SBOM generation
         run: snyk sbom --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --format=cyclonedx1.4+json --json-file-output sbom.json
-
   package_ubuntu_cli:
     name: "Package cli for Ubuntu"
     runs-on: ubuntu-22.04
@@ -488,7 +480,6 @@ jobs:
                         -cm $NGINX_METRICS_PASSWORD  \
                         -gm $NGINX_METRICS_PASSWORD  \
                         -am $NGINX_METRICS_PASSWORD
-
           ./babylonnode monitoring install -a
 
         env:
