@@ -238,7 +238,7 @@ class Helpers:
     @staticmethod
     def get_basic_auth_header_from_user_and_password(user, password):
         import base64
-        data = f"{user}':{password}"
+        data = f"{user}:{password}"
         encodedBytes = base64.b64encode(data.encode("utf-8"))
         encodedStr = str(encodedBytes, "utf-8")
         headers = {

@@ -14,7 +14,7 @@ class CoreSystemdConfig(BaseConfig):
     def __init__(self, config_dict: dict):
         if config_dict is None:
             config_dict = dict()
-        self.keydetails: KeyDetails = KeyDetails(config_dict.get("nginx_settings"))
+        self.keydetails: KeyDetails = KeyDetails(config_dict.get("keydetails"))
         self.nodetype: str = "fullnode"
         self.core_release: str = ""
         self.core_binary_url: str = ""

@@ -299,11 +299,9 @@ class SystemDSetup(BaseSetup):
 
     @staticmethod
     def compare_old_and_new_config(config_file: str, systemd_config: SystemDConfig):
-        old_config = SystemDSetup.load_all_config(config_file)
-        config_to_dump = {"version": "0.1", "core_node": dict(systemd_config.core_node),
-                          "common_config": dict(systemd_config.common_config),
-                          "migration": dict(systemd_config.migration),
-                          "gateway": dict(systemd_config.gateway)}
+        old_config_object = SystemDSetup.load_settings(config_file)
+        old_config = old_config_object.to_dict()
+        config_to_dump = systemd_config.to_dict()
         if old_config is not None:
             if len(old_config) != 0:
                 print(f"""

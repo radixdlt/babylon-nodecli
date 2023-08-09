@@ -24,7 +24,7 @@ class PostgresConfig(BaseConfig):
             self.setup, self.host = Prompts.ask_postgress_location(self.host)
             self.dbname = Prompts.get_postgress_dbname()
             self.user = Prompts.get_postgress_user()
-        if not postgress_password and postgress_password != "":
+        if not postgress_password or postgress_password == "":
             self.password = Prompts.ask_postgress_password()
         else:
             self.password = postgress_password

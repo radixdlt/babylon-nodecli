@@ -11,6 +11,12 @@ class DockerCompose:
     @staticmethod
     def install_standalone_gateway_in_docker(systemd_config: SystemDConfig, auto_approve: bool = False):
         docker_compose_file: str = systemd_config.gateway.docker_compose
+        systemd_config.gateway.data_aggregator.coreApiNode.auth_header = Helpers.get_basic_auth_header_from_user_and_password(
+            systemd_config.gateway.data_aggregator.coreApiNode.basic_auth_user,
+            systemd_config.gateway.data_aggregator.coreApiNode.basic_auth_password)
+        systemd_config.gateway.gateway_api.coreApiNode.auth_header = Helpers.get_basic_auth_header_from_user_and_password(
+            systemd_config.gateway.gateway_api.coreApiNode.basic_auth_user,
+            systemd_config.gateway.gateway_api.coreApiNode.basic_auth_password)
         Renderer() \
             .load_file_based_template("standalone-gateway-compose.yml.j2") \
             .render(systemd_config.to_dict()) \
