@@ -36,7 +36,7 @@ gateway:
       auth_header: ''
       basic_auth_password: ''
       basic_auth_user: ''
-      core_api_address: http://core:3333
+      core_api_address: http://core:3333/core
       disable_core_api_https_certificate_checks: ''
       enabled: 'true'
       request_weighting: 1
@@ -55,7 +55,7 @@ gateway:
       auth_header: ''
       basic_auth_password: ''
       basic_auth_user: ''
-      core_api_address: http://core:3333
+      core_api_address: http://core:3333/core
       disable_core_api_https_certificate_checks: ''
       enabled: 'true'
       request_weighting: 1

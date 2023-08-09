@@ -37,7 +37,7 @@ services:
     environment:
       ASPNETCORE_URLS: http://*:80
       ConnectionStrings__NetworkGatewayReadWrite: Host=host.docker.internal:5432;Database=radixdlt_ledger;Username=postgres;Password=postgres
-      DataAggregator__Network__CoreApiNodes__0__CoreApiAddress: http://core:3333
+      DataAggregator__Network__CoreApiNodes__0__CoreApiAddress: http://core:3333/core
       DataAggregator__Network__CoreApiNodes__0__Enabled: 'true'
       DataAggregator__Network__CoreApiNodes__0__Name: Core
       DataAggregator__Network__CoreApiNodes__0__TrustWeighting: '1'
@@ -64,7 +64,7 @@ services:
       ConnectionStrings__NetworkGatewayReadWrite: Host=host.docker.internal:5432;Database=radixdlt_ledger;Username=postgres;Password=postgres
       EnableSwagger: 'true'
       GatewayApi__Endpoints_MaxPageSize: '30'
-      GatewayApi__Network__CoreApiNodes__0__CoreApiAddress: http://core:3333
+      GatewayApi__Network__CoreApiNodes__0__CoreApiAddress: http://core:3333/core
       GatewayApi__Network__CoreApiNodes__0__Enabled: 'true'
       GatewayApi__Network__CoreApiNodes__0__Name: Core
       GatewayApi__Network__CoreApiNodes__0__RequestWeighting: '1'

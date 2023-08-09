@@ -7,7 +7,7 @@ class CoreApiNodeConfig(BaseConfig):
         if config_dict is None:
             config_dict = dict()
         self.Name = "Core"
-        self.core_api_address = "http://core:3333"
+        self.core_api_address = "http://core:3333/core"
         self.trust_weighting = 1
         self.request_weighting = 1
         self.enabled = "true"

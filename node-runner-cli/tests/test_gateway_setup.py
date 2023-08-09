@@ -145,7 +145,7 @@ services:
 
         self.assertEqual(default_value, core_api_address)
         # Overrides with input
-        keyboard_input = "http://core:3333"
+        keyboard_input = "http://core:3333/core"
         with patch('builtins.input', side_effect=[keyboard_input]):
             # Core Node Address
             core_api_address = Prompts.get_CoreApiAddress(default_value)

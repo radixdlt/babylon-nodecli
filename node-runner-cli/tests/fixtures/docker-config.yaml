@@ -35,7 +35,7 @@ gateway:
   data_aggregator:
     coreApiNode:
       Name: Core
-      core_api_address: http://core:3333
+      core_api_address: http://core:3333/core
       enabled: 'true'
       request_weighting: 1
       trust_weighting: 1
@@ -45,7 +45,7 @@ gateway:
   gateway_api:
     coreApiNode:
       Name: Core
-      core_api_address: http://core:3333
+      core_api_address: http://core:3333/core
       enabled: 'true'
       request_weighting: 1
       trust_weighting: 1

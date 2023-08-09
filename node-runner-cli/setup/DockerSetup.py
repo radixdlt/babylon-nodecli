@@ -212,7 +212,7 @@ class DockerSetup(BaseSetup):
 
         if "GATEWAY" in argument_object.setupmode.mode:
             docker_config.gateway = GatewaySetup.ask_gateway_full_docker(
-                argument_object.postgrespassword, "http://core:3333")
+                argument_object.postgrespassword, "http://core:3333/core")
             docker_config.common_config.ask_enable_nginx_for_gateway(argument_object.nginx_on_gateway)
         if "DETAILED" in argument_object.setupmode.mode:
             run_fullnode = Prompts.check_for_fullnode()
