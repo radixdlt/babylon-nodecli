@@ -9,10 +9,6 @@ output-ubuntu-focal: install
 output-ubuntu-jammy: install
 	DOCKER_BUILDKIT=1 docker build --platform linux/amd64 --output type=local,dest=out/ubuntu/jammy --progress plain -f Dockerfile.ubuntujammy  .
 
-.PHONY: local
-local: install
-	pip install -r requirements.txt
-
 .PHONEY: cmds-reference
 cmds-reference: local
 	./generate-cmds-help.sh
