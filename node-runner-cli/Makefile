@@ -2,8 +2,6 @@
 install:
 	$(shell chmod +x add-version.sh)
 	$(shell ./add-version.sh)
-	pip install pipenv==2020.11.15
-	pipenv lock -r > requirements.txt
 .PHONY: output
 output-ubuntu-focal: install
 	DOCKER_BUILDKIT=1 docker build --platform linux/amd64 --output type=local,dest=out/ubuntu/focal --progress plain -f Dockerfile.ubuntufocal  .
