@@ -30,7 +30,7 @@ class CoreSystemdConfig(BaseConfig):
                               "-XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops " \
                               "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts " \
                               "-Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom " \
-                              "-DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
+                              "-DLog4jContextSelector=org.apache.log_util.log4j.core.async.AsyncLoggerContextSelector"
         super().__init__(config_dict)
 
     def ask_enable_transaction(self):

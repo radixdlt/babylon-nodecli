@@ -17,6 +17,7 @@ from commands.systemapi import handle_systemapi
 from commands.systemdcommand import systemdcli
 from config.EnvVars import DISABLE_VERSION_CHECK
 from github.github import latest_release
+from log_util.logger import get_logger
 from utils.utils import Helpers
 
 urllib3.disable_warnings()
@@ -31,6 +32,7 @@ api_parser = apicli.add_argument(dest="apicommand",
                                  choices=["system", "core", "metrics"])
 
 cwd = os.getcwd()
+logger = get_logger(__name__)
 
 
 def check_latest_cli():
@@ -39,9 +41,9 @@ def check_latest_cli():
     if os.getenv(DISABLE_VERSION_CHECK, "False").lower() not in ("true", "yes"):
         if Helpers.cli_version() != cli_latest_version:
             os_name = "ubuntu-22.04"
-            print(
+            logger.info(
                 f"babylonnode CLI latest version is {cli_latest_version} and current version of the binary is {Helpers.cli_version()}.\n.")
-            print(f"""
+            logger.info(f"""
                 ---------------------------------------------------------------
                 Update the CLI by running these commands
                     wget -O babylonnode https://github.com/radixdlt/babylon-nodecli/releases/download/{cli_latest_version}/radixnode-{os_name}
@@ -93,10 +95,10 @@ def main():
             ledgercli.print_help()
         else:
             if ledgercli_args.ledgercommand == "sync":
-                print(f"Syncing fullnode ledger {sys.argv[3:]}")
+                logger.info(f"Syncing fullnode ledger {sys.argv[3:]}")
                 ledgercli_args.func(ledgercli_args)
             else:
-                print(f"Invalid ledger command {ledgercli_args.ledgercommand}")
+                logger.info(f"Invalid ledger command {ledgercli_args.ledgercommand}")
 
     elif args.subcommand == "monitoring":
         monitoringcli_args = monitoringcli.parse_args(sys.argv[2:])
@@ -123,7 +125,7 @@ def main():
         other_command_cli_args.func(other_command_cli_args)
 
     else:
-        print(f"Invalid subcommand {args.subcommand}")
+        logger.info(f"Invalid subcommand {args.subcommand}")
 
 
 if __name__ == "__main__":
