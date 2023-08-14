@@ -61,7 +61,7 @@
 #                           '-XX:+UseCompressedOops '
 #                           '-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts '
 #                           '-Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom '
-#                           '-DLog4jContextSelector=org.apache.log_util.log4j.core.async.AsyncLoggerContextSelector",\n'
+#                           '-DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector",\n'
 #                           '          "keydetails": {\n'
 #                           '              "keyfile_name": "node-keystore.ks",\n'
 #                           '              "keyfile_path": "/Users/kim.fehrs/babylon-node-config",\n'
