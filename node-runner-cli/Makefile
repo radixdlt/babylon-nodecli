@@ -2,8 +2,6 @@
 install:
 	$(shell chmod +x add-version.sh)
 	$(shell ./add-version.sh)
-	pip install pipenv==2020.11.15
-	pipenv lock -r > requirements.txt
 .PHONY: output
 output-ubuntu-focal: install
 	DOCKER_BUILDKIT=1 docker build --platform linux/amd64 --output type=local,dest=out/ubuntu/focal --progress plain -f Dockerfile.ubuntufocal  .
@@ -11,15 +9,12 @@ output-ubuntu-focal: install
 output-ubuntu-jammy: install
 	DOCKER_BUILDKIT=1 docker build --platform linux/amd64 --output type=local,dest=out/ubuntu/jammy --progress plain -f Dockerfile.ubuntujammy  .
 
-.PHONY: local
-local: install
-	pip install -r requirements.txt
-
 .PHONEY: cmds-reference
 cmds-reference: local
 	./generate-cmds-help.sh
 
 .PHONEY: test
 test: test
-	#python -m unittest
-	pytest tests/ --doctest-modules --junitxml=junit/test-results.xml --cov=. --cov-report=xml --cov-report=html
+	pipenv install
+	pipenv run pip install pytest pytest-cov
+	pipenv run pytest tests/ --doctest-modules --junitxml=junit/test-results.xml --cov=. --cov-report=xml --cov-report=html
