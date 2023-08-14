@@ -12,18 +12,21 @@ import yaml
 from system_client import ApiException
 
 from config.EnvVars import PRINT_REQUEST, NODE_HOST_IP_OR_NAME, COMPOSE_HTTP_TIMEOUT, RADIXDLT_CLI_VERSION_OVERRIDE
+from log_util.logger import get_logger
 from utils.PromptFeeder import PromptFeeder
 from version import __version__
 
 
+logger = get_logger(__name__)
+
 def printCommand(cmd):
-    print('-----------------------------')
+    logger.info('-----------------------------')
     if type(cmd) is list:
-        print('Running command :' + ' '.join(cmd))
-        print('-----------------------------')
+        logger.info('Running command :' + ' '.join(cmd))
+        logger.info('-----------------------------')
     else:
-        print('Running command ' + cmd)
-        print('-----------------------------')
+        logger.info('Running command ' + cmd)
+        logger.info('-----------------------------')
 
 
 def run_shell_command(cmd, env=None, shell=False, fail_on_error=True, quite=False):
@@ -34,9 +37,9 @@ def run_shell_command(cmd, env=None, shell=False, fail_on_error=True, quite=Fals
     else:
         result = subprocess.run(cmd, shell=shell)
     if result.returncode != 0:
-        print(result)
+        logger.info(result)
     if fail_on_error and result.returncode != 0:
-        print("""
+        logger.info("""
             Command failed. Exiting...
         """)
     return result

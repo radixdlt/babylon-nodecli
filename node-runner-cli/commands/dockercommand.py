@@ -5,12 +5,15 @@ from pathlib import Path
 
 from commands.subcommand import get_decorator, argument
 from config.DockerConfig import DockerConfig
+from log_util.logger import get_logger
 from setup.AnsibleRunner import AnsibleRunner
 from setup.BaseSetup import BaseSetup
 from setup.DockerCommandArguments import DockerInstallArguments, DockerConfigArguments
 from setup.DockerCompose import DockerCompose
 from setup.DockerSetup import DockerSetup
 from utils.utils import Helpers, bcolors
+
+logger = get_logger(__name__)
 
 dockercli = ArgumentParser(
     description='Subcommand to help setup CORE or GATEWAY using Docker containers',
@@ -222,6 +225,7 @@ def dependencies(args):
     This commands installs all necessary software on the Virtual Machine(VM).
     Run this command on fresh VM or on a existing VM  as the command is tested to be idempotent
     """
+    logger.info("Installing docker dependencies")
     BaseSetup.dependencies()
     ansible_dir = f'https://raw.githubusercontent.com/radixdlt/babylon-nodecli/{Helpers.cli_version()}/node-runner-cli'
     AnsibleRunner(ansible_dir).check_install_ansible(False)
