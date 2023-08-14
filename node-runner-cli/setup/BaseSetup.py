@@ -1,5 +1,6 @@
 import os
 import sys
+from os.path import abspath, dirname, join
 from pathlib import Path
 
 import yaml
@@ -15,7 +16,10 @@ from utils.utils import run_shell_command, Helpers, bcolors
 class BaseSetup:
     @staticmethod
     def dependencies():
-        run_shell_command('sudo apt update', shell=True)
+        setup_dir = abspath(__file__)
+        node_runner_dir = dirname(setup_dir)
+        docker_install = join(node_runner_dir, "scripts", "docker_install.sh")
+        run_shell_command(docker_install, shell=True)
         run_shell_command('sudo apt install -y  docker.io wget unzip docker-compose rng-tools', shell=True)
         run_shell_command('sudo rngd -r /dev/random | true', shell=True)
 
