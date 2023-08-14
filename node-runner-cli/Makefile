@@ -15,5 +15,6 @@ cmds-reference: local
 
 .PHONEY: test
 test: test
-	#python -m unittest
-	pytest tests/ --doctest-modules --junitxml=junit/test-results.xml --cov=. --cov-report=xml --cov-report=html
+	pipenv install
+	pipenv run pip install pytest pytest-cov
+	pipenv run pytest tests/ --doctest-modules --junitxml=junit/test-results.xml --cov=. --cov-report=xml --cov-report=html
