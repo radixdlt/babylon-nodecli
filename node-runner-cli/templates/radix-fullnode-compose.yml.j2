@@ -53,7 +53,7 @@ services:
     - "{{common_config.genesis_bin_data_file}}:/home/radixdlt/genesis_data_file.bin"
     {% endif %}
  {% endif %}
- {% if common_config.nginx_settings is defined  and  ((common_config.nginx_settings.protect_core | lower | trim) == "true" or (common_config.nginx_settings.protect_gateway | lower | trim) == "true") %}
+ {% if common_config.nginx_settings is defined  and  ((common_config.nginx_settings.protect_core | lower | trim) == "true" or ((common_config.nginx_settings.protect_gateway | lower | trim) == "true" and (gateway.enabled | lower | trim) == "true")) %}
   nginx:
     environment:
     {% if core_node is defined %}
@@ -153,4 +153,6 @@ volumes:
       o: bind
       type: none
  {% endif %}
+ {% if (gateway.enabled | lower | trim) == "true" %}
   nginx_secrets:
+ {% endif %}
