@@ -99,7 +99,8 @@ class Helpers:
         if print_request or os.getenv(PRINT_REQUEST) is not None:
             Helpers.pretty_print_request(prepared)
         s = requests.Session()
-        resp = s.send(prepared, verify=False)
+        verify_ssl = os.getenv("VERIFY_SSL", False)
+        resp = s.send(prepared, verify=verify_ssl)
         if Helpers.is_json(resp.content):
             response_content = json.dumps(resp.json(), indent=2)
         else:
