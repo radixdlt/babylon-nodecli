@@ -319,7 +319,6 @@ class DockerSetup(BaseSetup):
 
     @staticmethod
     def chown_files(docker_config: DockerConfig):
-        import getpass
         username = getpass.getuser()
         run_shell_command(['sudo', 'chown', f'{username}:{username}',
                            f'{docker_config.core_node.keydetails.keyfile_path}/{docker_config.core_node.keydetails.keyfile_name}'])

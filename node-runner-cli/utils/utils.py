@@ -135,21 +135,6 @@ class Helpers:
             })
 
     @staticmethod
-    def docker_compose_down(composefile, remove_volumes):
-
-        docker_compose_binary = os.getenv("DOCKER_COMPOSE_LOCATION", 'docker-compose')
-        command = [docker_compose_binary, '-f', composefile, 'down']
-        if remove_volumes:
-            command.append('-v')
-        result = run_shell_command(command, env={
-            COMPOSE_HTTP_TIMEOUT: os.getenv(COMPOSE_HTTP_TIMEOUT, "200")
-        }, fail_on_error=False)
-        if result.returncode != 0:
-            run_shell_command(command, env={
-                COMPOSE_HTTP_TIMEOUT: os.getenv(COMPOSE_HTTP_TIMEOUT, "200")
-            })
-
-    @staticmethod
     def get_public_ip():
         return requests.get('https://api.ipify.org').text
 
