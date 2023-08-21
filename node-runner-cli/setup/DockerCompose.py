@@ -35,13 +35,13 @@ class DockerCompose:
     def stop_gateway_containers():
         docker_compose_file: str = f"{Helpers.get_home_dir()}/gateway.docker-compose.yml"
         if os.path.exists(docker_compose_file):
-            DockerCompose.run_docker_compose_down(docker_compose_file)
+            DockerCompose().run_docker_compose_down(docker_compose_file)
 
     @staticmethod
     def restart_gateway_containers():
         docker_compose_file: str = f"{Helpers.get_home_dir()}/gateway.docker-compose.yml"
         if os.path.exists(docker_compose_file):
-            DockerCompose.run_docker_compose_down(docker_compose_file)
+            DockerCompose().run_docker_compose_down(docker_compose_file)
             DockerCompose.run_docker_compose_up(docker_compose_file)
 
     @staticmethod

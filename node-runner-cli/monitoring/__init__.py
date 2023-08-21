@@ -8,6 +8,7 @@ import yaml
 
 from config.Renderer import Renderer
 from config.EnvVars import COMPOSE_HTTP_TIMEOUT
+from setup.DockerCompose import DockerCompose
 from utils.utils import Helpers, run_shell_command
 
 
@@ -162,4 +163,4 @@ class Monitoring:
 
     @staticmethod
     def stop_monitoring(composefile, remove_volumes):
-        Helpers.docker_compose_down(composefile, remove_volumes)
+        DockerCompose().run_docker_compose_down(composefile, remove_volumes)
