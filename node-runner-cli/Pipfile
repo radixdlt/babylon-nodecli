@@ -4,7 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-core-client = {tag = "v1.1.1", git = "https://github.com/radixdlt/python-core-client"}
 requests = "==2.31.0"
 PyYAML = "==6.0.0"
 deepmerge = "==0.3.0"
@@ -16,7 +15,7 @@ Jinja2="==3.1.2"
 boto3="==1.20.33"
 botocore="==1.23.33"
 pytest="==7.4.0"
-
+core-client = {editable = true, ref = "master", git = "https://github.com/radixdlt/python-core-client"}
 
 [requires]
 python_version = "3.10.6"
