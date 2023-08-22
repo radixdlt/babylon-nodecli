@@ -84,5 +84,5 @@ class DockerCompose:
 
     @staticmethod
     def _is_docker_compose_plugin_installed():
-        result = run_shell_command('docker compose version', shell=True)
+        result = run_shell_command('docker compose version', shell=True, fail_on_error=False)
         return result.returncode == 0
