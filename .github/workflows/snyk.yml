@@ -7,6 +7,8 @@ on:
   pull_request:
     branches:
       - main
+  release:
+    types: [published]
 jobs:
 
   snyk-scan:
@@ -45,7 +47,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Test SBOM generation
-        run: snyk sbom --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }}
+        run: snyk sbom --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --format=cyclonedx1.4+json --json-file-output sbom.json
 
   upload-sbom:
     runs-on: ubuntu-latest
