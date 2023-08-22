@@ -1,11 +1,14 @@
 import os
+import sys
 
 from config.EnvVars import COMPOSE_HTTP_TIMEOUT
 from config.Renderer import Renderer
 from config.SystemDConfig import SystemDConfig
+from log_util.logger import get_logger
 from setup.DockerCommandArguments import DockerInstallArguments
 from utils.utils import Helpers, run_shell_command
 
+logger = get_logger(__name__)
 
 class DockerCompose:
     @staticmethod
@@ -32,13 +35,13 @@ class DockerCompose:
     def stop_gateway_containers():
         docker_compose_file: str = f"{Helpers.get_home_dir()}/gateway.docker-compose.yml"
         if os.path.exists(docker_compose_file):
-            DockerCompose.run_docker_compose_down(docker_compose_file)
+            DockerCompose().run_docker_compose_down(docker_compose_file)
 
     @staticmethod
     def restart_gateway_containers():
         docker_compose_file: str = f"{Helpers.get_home_dir()}/gateway.docker-compose.yml"
         if os.path.exists(docker_compose_file):
-            DockerCompose.run_docker_compose_down(docker_compose_file)
+            DockerCompose().run_docker_compose_down(docker_compose_file)
             DockerCompose.run_docker_compose_up(docker_compose_file)
 
     @staticmethod
@@ -49,21 +52,35 @@ class DockerCompose:
         else:
             should_start = input("\nOkay to start the containers [Y/n]?:")
         if Helpers.check_Yes(should_start):
-            DockerCompose.run_docker_compose_up(compose_file)
+            DockerCompose().run_docker_compose_up(compose_file)
 
-    @staticmethod
-    def run_docker_compose_down(composefile, removevolumes=False):
-        Helpers.docker_compose_down(composefile, removevolumes)
-
-    @staticmethod
-    def run_docker_compose_up(composefile):
-        docker_compose_binary = os.getenv("DOCKER_COMPOSE_LOCATION", 'docker-compose')
-        result = run_shell_command([docker_compose_binary, '-f', composefile, 'up', '-d'],
-                                   env={
-                                       COMPOSE_HTTP_TIMEOUT: os.getenv(COMPOSE_HTTP_TIMEOUT, "200")
-                                   }, fail_on_error=False)
+    def run_docker_compose_down(self, composefile, remove_volumes=False):
+        if self._is_docker_compose_plugin_installed():
+            command = f"docker compose -f {composefile} down"
+        else:
+            docker_compose_binary = os.getenv("DOCKER_COMPOSE_LOCATION", 'docker-compose')
+            command = f"{docker_compose_binary} -f {composefile} down"
+        if remove_volumes:
+            command += ' -v'
+        result = run_shell_command(command, shell=True, fail_on_error=False)
         if result.returncode != 0:
-            run_shell_command([docker_compose_binary, '-f', composefile, 'up', '-d'],
-                              env={
-                                  COMPOSE_HTTP_TIMEOUT: os.getenv(COMPOSE_HTTP_TIMEOUT, "200")
-                              }, fail_on_error=True)
+            logger.info(f"Command: {command} failed.")
+            sys.exit(1)
+
+    def run_docker_compose_up(self, composefile):
+        if self._is_docker_compose_plugin_installed():
+            logger.info("Using the docker compose plugin to start the environment")
+            command = f"docker compose -f {composefile} up -d"
+        else:
+            docker_compose_binary = os.getenv("DOCKER_COMPOSE_LOCATION", 'docker-compose')
+            command = f"{docker_compose_binary} -f {composefile} up -d"
+
+        result = run_shell_command(command, shell=True)
+        if result.returncode != 0:
+            logger.info(f"Command: {command} failed.")
+            sys.exit(1)
+
+    @staticmethod
+    def _is_docker_compose_plugin_installed():
+        result = run_shell_command('docker compose version', shell=True, fail_on_error=False)
+        return result.returncode == 0
