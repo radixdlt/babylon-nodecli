@@ -15,7 +15,6 @@ Jinja2="==3.1.2"
 boto3="==1.20.33"
 botocore="==1.23.33"
 pytest="==7.4.0"
-core-client = {editable = true, ref = "master", git = "https://github.com/radixdlt/python-core-client"}
 
 [requires]
 python_version = "3.10.6"
