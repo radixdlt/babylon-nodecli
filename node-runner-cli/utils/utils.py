@@ -9,9 +9,8 @@ from typing import Callable
 
 import requests
 import yaml
-from system_client import ApiException
 
-from config.EnvVars import PRINT_REQUEST, NODE_HOST_IP_OR_NAME, COMPOSE_HTTP_TIMEOUT, RADIXDLT_CLI_VERSION_OVERRIDE
+from config.EnvVars import PRINT_REQUEST, NODE_HOST_IP_OR_NAME, RADIXDLT_CLI_VERSION_OVERRIDE
 from log_util.logger import get_logger
 from utils.PromptFeeder import PromptFeeder
 from version import __version__
@@ -237,8 +236,8 @@ class Helpers:
         return headers
 
     @staticmethod
-    def handleApiException(e: ApiException):
-        print(f"Exception-reason:{e.reason},status:{e.status}.body:{e.body}")
+    def handleApiException(e: Exception):
+        print(f"Exception-reason: {str(e)}")
         sys.exit(1)
 
     @staticmethod

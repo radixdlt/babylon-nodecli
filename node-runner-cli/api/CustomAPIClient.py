@@ -1,11 +1,11 @@
 import requests
-from requests.models import RequestHooksMixin, PreparedRequest
+from requests.models import PreparedRequest
 
 
 class CustomAPIClient:
     prepared_req: PreparedRequest = None
 
-    def __init__(self, host=None, username=None, password=None, verify_ssl=True):
+    def __init__(self, host=None, verify_ssl=True):
         """Default Base url
         """
         self._base_path = "http://localhost:3333" if host is None else host
