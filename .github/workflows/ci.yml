@@ -91,7 +91,6 @@ on:
     if: ${{ github.event_name == 'push' }}
     needs:
       - package_ubuntu_cli
-      - snyk-scan
     permissions:
       id-token: write
       contents: read
@@ -131,7 +130,6 @@ on:
     if: ${{ github.event_name == 'release' }}
     needs:
       - package_ubuntu_cli
-      - snyk-scan
     steps:
       - name: Download packaged cli
         uses: actions/download-artifact@v3
@@ -153,7 +151,6 @@ on:
     if: ${{ github.event_name == 'release' }}
     needs:
       - package_ubuntu_cli
-      - snyk-scan
     steps:
       - name: Download packaged cli
         uses: actions/download-artifact@v3
@@ -174,7 +171,6 @@ on:
     runs-on: [node-only]
     needs:
       - package_ubuntu_cli
-      - snyk-scan
     steps:
       - name: Checkout
         uses: actions/checkout@v3.4.0
@@ -246,7 +242,6 @@ on:
     runs-on: ubuntu-22.04
     needs:
       - package_ubuntu_cli
-      - snyk-scan
     steps:
       - name: Checkout
         uses: actions/checkout@v3.4.0
@@ -335,7 +330,6 @@ on:
       contents: read
     needs:
       - package_ubuntu_cli
-      - snyk-scan
     steps:
       - name: Checkout
         uses: actions/checkout@v3.4.0
