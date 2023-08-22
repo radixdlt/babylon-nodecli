@@ -8,6 +8,7 @@ on:
     branches:
       - main
 jobs:
+
   snyk-scan:
     runs-on: ubuntu-latest
     container:
@@ -51,7 +52,6 @@ jobs:
     if: ${{ github.event_name == 'release' }}
     permissions: write-all
     needs:
-      - package_ubuntu_cli
       - snyk-scan
     steps:
       - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
@@ -88,11 +88,10 @@ jobs:
           files: sbom.json
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
-   snyk-monitor:
+  snyk-monitor:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'release' }}
     needs:
-      - package_ubuntu_cli
       - snyk-scan
     permissions:
       id-token: write
