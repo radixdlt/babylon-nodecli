@@ -1,0 +1,77 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  upload-asset-store:
+    environment: AWS_ARTIFACT
+    runs-on: ubuntu-22.04
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.4.0
+      - name: set branchname with commit
+        run: |
+          ls -l
+          BRANCH_NAME_WITH_HYPENS=$(echo ${GITHUB_REF##*/} | sed 's/\//-/g')
+          COMMIT=$(git log -1 --format=%h )
+          BRANCH_WITH_COMMIT=$BRANCH_NAME_WITH_HYPENS-$COMMIT
+          echo "BRANCH_WITH_COMMIT=$BRANCH_WITH_COMMIT" >> $GITHUB_ENV
+      - name: Configure AWS Region
+        run: echo "AWS_DEFAULT_REGION=eu-west-1" >> $GITHUB_ENV
+      - id: install-aws-cli
+        uses: unfor19/install-aws-cli-action@v1
+        with:
+          version: 2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@e1e17a757e536f70e52b5a12b2e8d1d1c60e04ef
+        with:
+          role-to-assume: arn:aws:iam::${{secrets.ARTIFACT_AWS_ACCOUNT_ID }}:role/gh-asset-store-deployer
+          aws-region: eu-west-1
+      - name: Download packaged cli
+        uses: actions/download-artifact@v3
+        with:
+          name: ubuntu 22.04
+      - name: Upload cli to asset store
+        run: |
+          ls */**
+          aws s3 cp babylonnode s3://${{secrets.ARTIFACT_AWS_BUCKET }}/babylonnode/${{env.BRANCH_WITH_COMMIT}}/babylonnode-ubuntu-22.04
+
+  upload-release-jammy:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Download packaged cli
+        uses: actions/download-artifact@v3
+        with:
+          name: ubuntu 22.04
+      - name: Upload radixcli ubuntu binary
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./babylonnode
+          asset_name: babylonnode-ubuntu-22.04
+          asset_content_type: application/octet-stream
+
+  upload-release-focal:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Download packaged cli
+        uses: actions/download-artifact@v3
+        with:
+          name: ubuntu 20.04
+      - name: Upload radixcli ubuntu binary
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./babylonnode
+          asset_name: babylonnode-ubuntu-20.04
+          asset_content_type: application/octet-stream
