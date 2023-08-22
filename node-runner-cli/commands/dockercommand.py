@@ -82,7 +82,6 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
     argument("-xg", "--disablenginxforgateway", help="GateWay API's end points are protected by Basic auth settings. "
                                                      "Set this to disable to nginx for gateway",
              action="store", default="", choices=["true", "false"])
-
 ])
 def config(args):
     """

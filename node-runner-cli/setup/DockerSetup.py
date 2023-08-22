@@ -11,6 +11,7 @@ from config.EnvVars import DOCKER_COMPOSE_FOLDER_PREFIX, RADIXDLT_NODE_KEY_PASSW
     POSTGRES_PASSWORD
 from config.Renderer import Renderer
 from github import github
+from log_util.logger import get_logger
 from setup.AnsibleRunner import AnsibleRunner
 from setup.BaseSetup import BaseSetup
 from setup.DockerCommandArguments import DockerConfigArguments, DockerInstallArguments
@@ -18,10 +19,11 @@ from setup.GatewaySetup import GatewaySetup
 from utils.Prompts import Prompts
 from utils.utils import run_shell_command, Helpers, bcolors
 
+logger = get_logger(__name__)
 
 def print_questionary_header(config_file):
     Helpers.section_headline("CONFIG FILE")
-    print(
+    logger.info(
         "\nCreating config file using the answers from the questions that would be asked in next steps."
         f"\nLocation of the config file: {bcolors.OKBLUE}{config_file}{bcolors.ENDC}")
 
@@ -32,17 +34,17 @@ class DockerSetup(BaseSetup):
     def save_config(config: DockerConfig, config_file: str, autoapprove=False):
         to_update = ""
         if autoapprove:
-            print("In Auto mode - Updating the file as suggested in above changes")
+            (logger.info("In Auto mode - Updating the file as suggested in above changes"))
         else:
             to_update = input("\nOkay to update the config file [Y/n]?:")
         if Helpers.check_Yes(to_update) or autoapprove:
-            print(f"Saving configuration to {config_file}")
+            logger.info(f"Saving configuration to {config_file}")
             config.to_file(config_file)
 
     @staticmethod
     def setup_nginx_Password(usertype, username, password=None):
-        print('-----------------------------')
-        print(f'Setting up nginx user of type {usertype} with username {username}')
+        logger.info('-----------------------------')
+        logger.info(f'Setting up nginx user of type {usertype} with username {username}')
         if not password:
             nginx_password = getpass.getpass(f"Enter your nginx the password: ")
         else:
@@ -53,14 +55,14 @@ class DockerSetup(BaseSetup):
                            'radixdlt/htpasswd:v1.1.0',
                            'htpasswd', '-bc', f'/secrets/htpasswd.{usertype}', username, nginx_password])
 
-        print(
+        logger.info(
             f"""
             Setup NGINX_{usertype.upper()}_PASSWORD environment variable using below command . Replace the string 'nginx_password_of_your_choice' with your password
 
             echo 'export NGINX_{usertype.upper()}_PASSWORD="nginx_password_of_your_choice"' >> ~/.bashrc
             """)
         if username not in ["admin", "metrics", "superadmin"]:
-            print(
+            logger.info(
                 f"""
             echo 'export NGINX_{usertype.upper()}_USERNAME="{username}"' >> ~/.bashrc
             """
@@ -78,7 +80,7 @@ class DockerSetup(BaseSetup):
         if docker_config.core_node and not keystore_password:
             keystore_password_from_env = os.getenv(RADIXDLT_NODE_KEY_PASSWORD, None)
             if not keystore_password_from_env:
-                print(
+                logger.info(
                     "Cannot find Keystore password either in config "
                     "or as environment variable RADIXDLT_NODE_KEY_PASSWORD")
                 sys.exit(1)
@@ -90,7 +92,7 @@ class DockerSetup(BaseSetup):
             postgres_password_from_env = os.getenv(POSTGRES_PASSWORD, None)
 
             if not postgres_password_from_env:
-                print(
+                logger.info(
                     "Cannot find POSTGRES_PASSWORD either in config"
                     "or as environment variable POSTGRES_PASSWORD")
                 sys.exit(1)
@@ -130,7 +132,7 @@ class DockerSetup(BaseSetup):
 
     @staticmethod
     def exit_on_missing_trustednode():
-        print("-t or --trustednode parameter is mandatory")
+        logger.info("-t or --trustednode parameter is mandatory")
         sys.exit(1)
 
     @staticmethod
@@ -182,7 +184,7 @@ class DockerSetup(BaseSetup):
     @staticmethod
     def load_settings(config_file) -> DockerConfig:
         if not os.path.isfile(config_file):
-            print(f"No configuration found. Execute 'babylonnode docker config' first.")
+            logger.info(f"No configuration found. Execute 'babylonnode docker config' first.")
             sys.exit(1)
         with open(config_file, 'r') as f:
             dictionary = yaml.load(f, Loader=UnsafeLoader)
@@ -193,7 +195,7 @@ class DockerSetup(BaseSetup):
         print_questionary_header(argument_object.config_file)
         docker_config = DockerConfig({})
         docker_config.core_node.core_release = argument_object.release
-        print(
+        logger.info(
             "\nCreating config file using the answers from the questions that would be asked in next steps."
             f"\nLocation of the config file: {bcolors.OKBLUE}{argument_object.config_file}{bcolors.ENDC}")
 
@@ -255,7 +257,7 @@ class DockerSetup(BaseSetup):
         if os.path.exists(config_file):
             old_config: DockerConfig = DockerSetup.load_settings(config_file)
             if old_config is not None:
-                print(f"""
+                logger.info(f"""
                     {Helpers.section_headline("Differences")}
                     Difference between existing config file and new config that you are creating
                     {dict(DeepDiff(old_config, config_object.to_dict()))}
@@ -266,7 +268,7 @@ class DockerSetup(BaseSetup):
         config_dict: dict = configuration.to_dict()
         yaml.add_representer(type(None), Helpers.represent_none)
         Helpers.section_headline("CONFIG is Generated as below")
-        print(f"\n{yaml.dump(config_dict)}")
+        logger.info(f"\n{yaml.dump(config_dict)}")
         return config_dict
 
     @staticmethod
@@ -297,14 +299,14 @@ class DockerSetup(BaseSetup):
             compose_file_yaml = {}
         compose_file_difference = dict(DeepDiff(compose_file_yaml, docker_compose_yaml))
         if len(compose_file_difference) != 0:
-            print(f"""
+            logger.info(f"""
                     {Helpers.section_headline("Differences between existing compose file and new compose file")}
                      Difference between existing compose file and new compose file that you are creating
                     {compose_file_difference}
                       """)
             to_update = ""
             if autoapprove:
-                print("In Auto mode - Updating file as suggested in above changes")
+                logger.info("In Auto mode - Updating file as suggested in above changes")
             else:
                 to_update = input("\nOkay to update the file [Y/n]?:")
 
