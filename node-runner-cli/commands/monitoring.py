@@ -8,7 +8,7 @@ import yaml
 from commands.subcommand import get_decorator, argument
 from config.BaseConfig import SetupMode
 from config.MonitoringConfig import MonitoringConfig
-from monitoring import Monitoring
+from monitoring.monitoring import Monitoring
 from utils.Prompts import Prompts
 from utils.utils import Helpers, bcolors
 

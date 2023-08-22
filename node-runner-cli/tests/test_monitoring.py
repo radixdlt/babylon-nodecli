@@ -6,8 +6,7 @@ from unittest import mock
 from jinja2.exceptions import TemplateNotFound
 
 from babylonnode import main
-from config.MonitoringConfig import MonitoringConfig
-from monitoring import Monitoring
+from monitoring.monitoring import Monitoring
 
 
 class MonitoringTests(unittest.TestCase):
