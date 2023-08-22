@@ -62,9 +62,7 @@ class DockerCompose:
             command = f"{docker_compose_binary} -f {composefile} down"
         if remove_volumes:
             command += ' -v'
-        result = run_shell_command(command, env={
-            COMPOSE_HTTP_TIMEOUT: os.getenv(COMPOSE_HTTP_TIMEOUT, "200")
-        }, fail_on_error=False)
+        result = run_shell_command(command, shell=True, fail_on_error=False)
         if result.returncode != 0:
             logger.info(f"Command: {command} failed.")
             sys.exit(1)
