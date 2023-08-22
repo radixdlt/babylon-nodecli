@@ -49,8 +49,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Test SBOM generation
         run: snyk sbom --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --format=cyclonedx1.4+json --json-file-output sbom.json
-  package_ubuntu_cli:
-    name: "Package cli for Ubuntu"
+  test:
+    name: "Unit tests"
     runs-on: ubuntu-22.04
     steps:
       - name: cancel running workflows
@@ -100,7 +100,17 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build the binary for ubuntu jammy
+
+  build-jammy:
+    needs: [ tests ]
+    name: "Build jammy"
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.4.0
+        with:
+          fetch-depth: 0
+     - name: Build the binary for ubuntu jammy
         run: |
           cd node-runner-cli
           make output-ubuntu-jammy
@@ -111,6 +121,11 @@ jobs:
         with:
           name: ubuntu 22.04
           path: "${{ github.workspace }}/node-runner-cli/out/ubuntu/jammy/babylonnode"
+  build-focal:
+    needs: [ tests ]
+    name: "Build focal"
+    runs-on: ubuntu-22.04
+    steps:
       - name: Build the binary for ubuntu focal
         run: |
           cd node-runner-cli
@@ -253,7 +268,7 @@ jobs:
   test-systemd:
     runs-on: [node-only]
     needs:
-      - package_ubuntu_cli
+      - build-jammy
       - snyk-scan
     steps:
       - name: Checkout
@@ -330,7 +345,7 @@ jobs:
   test-config-command:
     runs-on: ubuntu-22.04
     needs:
-      - package_ubuntu_cli
+      - build-jammy
       - snyk-scan
     steps:
       - name: Checkout
@@ -419,7 +434,7 @@ jobs:
       pull-requests: read
       contents: read
     needs:
-      - package_ubuntu_cli
+      - build-jammy
       - snyk-scan
     steps:
       - name: Checkout
