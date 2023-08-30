@@ -1,6 +1,7 @@
 import sys
 from argparse import ArgumentParser
 from argparse import RawTextHelpFormatter
+from os.path import abspath, dirname, join
 from pathlib import Path
 
 from commands.subcommand import get_decorator, argument
@@ -11,7 +12,7 @@ from setup.BaseSetup import BaseSetup
 from setup.DockerCommandArguments import DockerInstallArguments, DockerConfigArguments
 from setup.DockerCompose import DockerCompose
 from setup.DockerSetup import DockerSetup
-from utils.utils import Helpers, bcolors
+from utils.utils import Helpers, bcolors, run_shell_command, is_sudo_installed
 
 logger = get_logger(__name__)
 
@@ -225,7 +226,17 @@ def dependencies(args):
     Run this command on fresh VM or on a existing VM  as the command is tested to be idempotent
     """
     logger.info("Installing docker dependencies")
-    BaseSetup.dependencies()
-    ansible_dir = f'https://raw.githubusercontent.com/radixdlt/babylon-nodecli/{Helpers.cli_version()}/node-runner-cli'
-    AnsibleRunner(ansible_dir).check_install_ansible(False)
-    BaseSetup.add_user_docker_group()
+    if is_sudo_installed():
+        logger.info("Installing docker")
+        run_shell_command("curl -fsSL https://get.docker.com -o get-docker.sh", shell=True)
+        run_shell_command("sudo sh get-docker.sh", shell=True)
+        run_shell_command("docker run hello-world", shell=True, fail_on_error=True)
+        logger.info("Docker successfully installed")
+        try:
+            ansible_dir = f'https://raw.githubusercontent.com/radixdlt/babylon-nodecli/{Helpers.cli_version()}/node-runner-cli'
+            AnsibleRunner(ansible_dir).check_install_ansible(False)
+        except Exception as e:
+            logger.error(f"An error occurred while installing ansible: {e}")
+
+    else:
+        logger.info("sudo is not installed in the system. You need sudo to install dependencies")

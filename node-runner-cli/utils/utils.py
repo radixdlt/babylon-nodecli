@@ -28,6 +28,16 @@ def printCommand(cmd):
         logger.info('-----------------------------')
 
 
+def is_sudo_installed() -> bool:
+    try:
+        result = subprocess.run(['sudo', '--version'],
+                                     stdout=subprocess.PIPE,
+                                     stderr=subprocess.PIPE,
+                                     text=True)
+        return True if result.returncode == 0 else False
+    except FileNotFoundError:
+        return False
+
 def run_shell_command(cmd, env=None, shell=False, fail_on_error=True, quite=False):
     if not quite:
         printCommand(cmd)
