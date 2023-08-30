@@ -229,10 +229,9 @@ def dependencies(args):
     logger.info("Installing docker dependencies")
     if is_sudo_installed():
         logger.info("Installing docker")
-        commands_dir = dirname(__file__)
-        node_runner_dir = dirname(commands_dir)
-        docker_install = join(node_runner_dir, "scripts", "docker_install.sh")
-        run_shell_command(docker_install, shell=True)
+        run_shell_command("curl -fsSL https://get.docker.com -o get-docker.sh", shell=True)
+        run_shell_command("sudo sh get-docker.sh", shell=True)
+        run_shell_command("docker run hello-world", shell=True, fail_on_error=True)
         logger.info("Docker successfully installed")
         try:
             ansible_dir = f'https://raw.githubusercontent.com/radixdlt/babylon-nodecli/{Helpers.cli_version()}/node-runner-cli'
