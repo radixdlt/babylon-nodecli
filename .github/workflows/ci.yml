@@ -303,9 +303,9 @@ jobs:
           echo "HOME=$HOME"
           echo "PATH=$PWD"
           ./babylonnode systemd config -m CORE \
-            -n 13 \
+            -n 14 \
             -t radix://node_tdx_e_1q0gm3fwqh8ggl09g7l8ru96krzlxdyrc694mqw8cf227v62vjyrmccv8md5@13.126.65.118 \
-            -i 35.178.142.54 \
+            -i 13.126.65.118 \
             -v "not_a_real_validator_address" \
             -k $KEYSTORE_PASSWORD -nk -a \
             -dd $HOME/babylon-ledger

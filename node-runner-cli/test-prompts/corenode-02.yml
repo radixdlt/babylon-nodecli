@@ -1,5 +1,5 @@
 ---
-- select_network: "13"
+- select_network: "14"
 - first_time_config: N
 - have_existing_compose: "/home/runner/docker-compose.yml"
 - setup_fullnode: Y

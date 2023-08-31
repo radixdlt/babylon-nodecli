@@ -1,7 +1,7 @@
 common_config:
   docker_compose: /home/radixdlt/docker-compose.yml
   genesis_bin_data_file: /home/radixdlt/zabanet_genesis_data_file.bin
-  network_id: 13
+  network_id: 14
   network_name: zabanet
   nginx_settings:
     enable_transaction_api: 'true'
