@@ -1,8 +1,8 @@
 common_config:
   docker_compose: /home/radixdlt/docker-compose.yml
-  genesis_bin_data_file: /home/radixdlt/ansharnet_genesis_data_file.bin
+  genesis_bin_data_file: /home/radixdlt/zabanet_genesis_data_file.bin
   network_id: 13
-  network_name: ansharnet
+  network_name: zabanet
   nginx_settings:
     enable_transaction_api: 'true'
     gateway_behind_auth: 'true'
@@ -26,7 +26,7 @@ core_node:
     keystore_password: radix
   nodetype: fullnode
   repo: radixdlt/babylon-node
-  trusted_node: radix://node_tdx_d_1qwq2nfe6vxqwe3mqmfm9l2xl97as7lkwndval63cymvc3qszn8nqx6g2s3m@3.109.161.178
+  trusted_node: radix://node_tdx_e_1q0gm3fwqh8ggl09g7l8ru96krzlxdyrc694mqw8cf227v62vjyrmccv8md5@13.126.65.118
   validator_address: ''
 gateway:
   data_aggregator:

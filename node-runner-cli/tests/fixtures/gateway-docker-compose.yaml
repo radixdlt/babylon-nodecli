@@ -18,7 +18,7 @@ services:
       GatewayApi__Endpoint__GatewayApiVersion: rcnet-v2-phase2-r4
       # GatewayApi__MaxWaitForDbOnStartupMs: "90" # Wait for PostGres to boot up
       GatewayApi__Network__DisableCoreApiHttpsCertificateChecks: "true"
-      GatewayApi__Network__NetworkName: "ansharnet"
+      GatewayApi__Network__NetworkName: "zabanet"
       GatewayApi__Network__CoreApiNodes__0__Name: "CoreNode"
       GatewayApi__Network__CoreApiNodes__0__CoreApiAddress: "https://host.docker.internal:443/core"
       GatewayApi__Network__CoreApiNodes__0__CoreApiAuthorizationHeader: "Basic YWRtaW46cmFkaXg="
@@ -42,7 +42,7 @@ services:
       PrometheusMetricsPort: "1234"
       DataAggregator__Network__MaxWaitForDbOnStartupMs: "1000"
       DataAggregator__Network__DisableCoreApiHttpsCertificateChecks: "true"
-      DataAggregator__Network__NetworkName: "ansharnet"
+      DataAggregator__Network__NetworkName: "zabanet"
       DataAggregator__Network__CoreApiNodes__0__Name: "CoreNode"
       DataAggregator__Network__CoreApiNodes__0__CoreApiAddress: "https://host.docker.internal:443/core"
       DataAggregator__Network__CoreApiNodes__0__CoreApiAuthorizationHeader: "Basic YWRtaW46cmFkaXg="
