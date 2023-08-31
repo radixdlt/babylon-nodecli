@@ -37,7 +37,7 @@ class GatewaySetupTests(unittest.TestCase):
         cls.fixture.gateway.data_aggregator.coreApiNode = cls.fixture.gateway.gateway_api.coreApiNode
         # cls.fixture.gateway.data_aggregator.release = "testrelease"
         # cls.fixture.gateway.data_aggregator.repo = "radixdlt/gateway-test-dummy"
-        cls.fixture.gateway.data_aggregator.NetworkName = "ansharnet"
+        cls.fixture.gateway.data_aggregator.NetworkName = "zabanet"
 
         # cls.fixture.gateway.database_migration.release = "testrelease"
         # cls.fixture.gateway.database_migration.repo = "radixdlt/gateway-test-dummy"
@@ -157,9 +157,9 @@ services:
         # Takes default values
         questionary_keyboard_input = ["https://host.docker.internal:443/core", "admin", "radix", "true",
                                       "CoreNode",
-                                      "rcnet-v2-phase2-r4",
-                                      "rcnet-v2-phase2-r4",
-                                      "rcnet-v2-phase2-r4",
+                                      "rcnet-v3-r2",
+                                      "rcnet-v3-r2",
+                                      "rcnet-v3-r2",
                                       "local",
                                       "radixdlt_ledger",
                                       "postgres"]
@@ -173,7 +173,7 @@ services:
         self.assertEqual("postgres", config.gateway.postgres_db.password)
 
         # Have to manually set this because we skipped systemd setup
-        config.common_config.network_name = "ansharnet"
+        config.common_config.network_name = "zabanet"
         config.gateway.enabled = True
 
         self.expect_ask_gateway_inputs_get_inserted_into_object(config, questionary_keyboard_input)

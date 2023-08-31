@@ -1,8 +1,8 @@
 common_config:
   docker_compose: /home/radixdlt/docker-compose.yml
-  genesis_bin_data_file: /home/radixdlt/ansharnet_genesis_data_file.bin
-  network_id: 13
-  network_name: ansharnet
+  genesis_bin_data_file: /home/radixdlt/zabanet_genesis_data_file.bin
+  network_id: 14
+  network_name: zabanet
   nginx_settings:
     enable_transaction_api: 'true'
     gateway_behind_auth: 'true'
@@ -13,7 +13,7 @@ common_config:
     repo: radixdlt/babylon-nginx
 core_node:
   composefileurl: ''
-  core_release: rcnet-v2-phase2-r4
+  core_release: rcnet-v3-r2
   data_directory: /home/radixdlt/babylon-ledger
   enable_transaction: 'true'
   java_opts: --enable-preview -server -Xms8g -Xmx8g  -XX:MaxDirectMemorySize=2048m
@@ -26,7 +26,7 @@ core_node:
     keystore_password: radix
   nodetype: fullnode
   repo: radixdlt/babylon-node
-  trusted_node: radix://node_tdx_d_1qwq2nfe6vxqwe3mqmfm9l2xl97as7lkwndval63cymvc3qszn8nqx6g2s3m@3.109.161.178
+  trusted_node: radix://node_tdx_e_1q0gm3fwqh8ggl09g7l8ru96krzlxdyrc694mqw8cf227v62vjyrmccv8md5@13.126.65.118
   validator_address: ''
 gateway:
   data_aggregator:
@@ -41,11 +41,11 @@ gateway:
       enabled: 'true'
       request_weighting: 1
       trust_weighting: 1
-    release: rcnet-v2-phase2-r4
+    release: rcnet-v3-r2
     repo: radixdlt/babylon-ng-data-aggregator
     restart: unless-stopped
   database_migration:
-    release: rcnet-v2-phase2-r4
+    release: rcnet-v3-r2
     repo: radixdlt/babylon-ng-database-migrations
   docker_compose: /home/radixdlt/gateway.docker-compose.yml
   enabled: true
@@ -62,7 +62,7 @@ gateway:
       trust_weighting: 1
     enable_swagger: 'true'
     max_page_size: '30'
-    release: rcnet-v2-phase2-r4
+    release: rcnet-v3-r2
     repo: radixdlt/babylon-ng-gateway-api
     restart: unless-stopped
   postgres_db:

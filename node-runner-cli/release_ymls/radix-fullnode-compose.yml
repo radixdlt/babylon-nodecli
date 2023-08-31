@@ -11,14 +11,14 @@ services:
       RADIXDLT_API_PORT: 3333
       RADIXDLT_GENESIS_DATA_FILE: /home/radixdlt/genesis_data_file.bin
       RADIXDLT_LOG_LEVEL: info
-      RADIXDLT_NETWORK_ID: 13
+      RADIXDLT_NETWORK_ID: 14
       RADIXDLT_NETWORK_SEEDS_REMOTE: "${RADIXDLT_NETWORK_NODE}"
       RADIXDLT_NETWORK_USE_PROXY_PROTOCOL: 'false'
       RADIXDLT_SIGN_ENABLE: 'true'
       RADIXDLT_TRANSACTIONS_API_ENABLE: 'false'
       RADIXDLT_VALIDATOR_KEY_LOCATION: /home/radixdlt/node-keystore.ks
       RADIX_NODE_KEYSTORE_PASSWORD: "${RADIXDLT_NODE_KEY_PASSWORD}"
-    image: radixdlt/babylon-node:rcnet-v2-phase2-r4
+    image: radixdlt/babylon-node:rcnet-v3-r2
     init: true
     mem_limit: 12000m
     restart: unless-stopped
@@ -30,7 +30,7 @@ services:
     volumes:
     - babylon_ledger:/home/radixdlt/RADIXDB
     - /home/radixdlt/babylon-node-config/node-keystore.ks:/home/radixdlt/node-keystore.ks
-    - /home/radixdlt/ansharnet_genesis_data_file.bin:/home/radixdlt/genesis_data_file.bin
+    - /home/radixdlt/zabanet_genesis_data_file.bin:/home/radixdlt/genesis_data_file.bin
   nginx:
     environment:
       RADIXDLT_GATEWAY_API_ENABLE: 'true'

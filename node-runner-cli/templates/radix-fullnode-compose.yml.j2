@@ -18,9 +18,9 @@ services:
       {% if migration.use_olympia is defined %}
       {% if migration.use_olympia %}
       RADIXDLT_GENESIS_USE_OLYMPIA: '{{migration.use_olympia}}'
-      RADIXDLT_GENESIS_OLYMPIA_NODE_CORE_API_URL: '{{migration.olympia_node_url}}'
-      RADIXDLT_GENESIS_OLYMPIA_NODE_CORE_API_AUTH_USER: '{{migration.olympia_node_auth_user}}'
-      RADIXDLT_GENESIS_OLYMPIA_NODE_CORE_API_AUTH_PASSWORD: '{{migration.olympia_node_auth_password}}'
+      RADIXDLT_GENESIS_OLYMPIA_NODE_END_STATE_API_URL: '{{migration.olympia_node_url}}'
+      RADIXDLT_GENESIS_OLYMPIA_NODE_END_STATE_API_AUTH_USER: '{{migration.olympia_node_auth_user}}'
+      RADIXDLT_GENESIS_OLYMPIA_NODE_END_STATE_API_AUTH_PASSWORD: '{{migration.olympia_node_auth_password}}'
       RADIXDLT_GENESIS_OLYMPIA_NODE_BECH32_ADDRESS: '{{migration.olympia_node_bech32_address}}'
       {% endif %}
       {% endif %}

@@ -71,7 +71,7 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
              default=""),
     argument("-t", "--trustednode",
              help="Trusted node on radix network."
-                  "Example format: 'radix://node_tdx_d_1qwq2nfe6vxqwe3mqmfm9l2xl97as7lkwndval63cymvc3qszn8nqx6g2s3m@3.109.161.178'."
+                  "Example format: 'radix://node_tdx_e_1q0gm3fwqh8ggl09g7l8ru96krzlxdyrc694mqw8cf227v62vjyrmccv8md5@13.126.65.118'."
                   "This is required only if you are creating config to run a CORE node and "
                   "if not provided you will be prompted to enter a value",
              default="",

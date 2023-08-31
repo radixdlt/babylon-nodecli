@@ -1,9 +1,9 @@
 ---
-- select_network: "13"
+- select_network: "14"
 - first_time_config: N
 - have_existing_compose: "/home/runner/docker-compose.yml"
 - setup_fullnode: Y
-- input_seednode: "radix://node_tdx_d_1qwq2nfe6vxqwe3mqmfm9l2xl97as7lkwndval63cymvc3qszn8nqx6g2s3m@3.109.161.178"
+- input_seednode: "radix://node_tdx_e_1q0gm3fwqh8ggl09g7l8ru96krzlxdyrc694mqw8cf227v62vjyrmccv8md5@13.126.65.118"
 - have_validator_address: "N"
 - have_keystore_file: N
 - input_path_keystore: "/home/runner/babylon-node"

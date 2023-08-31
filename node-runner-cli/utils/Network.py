@@ -14,7 +14,7 @@ class Network:
         Helpers.section_headline(f"Network connection")
         # TODO change this for rcnet launch
         network_prompt = Helpers.input_guestion(
-            "Enter the network_id. The network id for the most recent network (ansharnet / rcnet-v2 phase 2) is 13:",
+            "Enter the network_id. The network id for the most recent network (Zabanet / rcnet-v3 ) is 14:",
             QuestionKeys.select_network)
         network_id = Network.validate_network_id(network_prompt)
         return network_id
@@ -34,11 +34,11 @@ class Network:
 
     @staticmethod
     def path_to_genesis_binary(network_id: int) -> str:
-        if network_id not in [1, 2] and network_id == 13:
-            if os.path.exists("ansharnet_genesis_data_file.bin"):
-                run_shell_command('sudo rm ansharnet_genesis_data_file.bin', shell=True)
+        if network_id not in [1, 2] and network_id == 14:
+            if os.path.exists("zabanet_genesis_data_file.bin"):
+                run_shell_command('sudo rm zabanet_genesis_data_file.bin', shell=True)
             genesis_bin_file = GenesisConfig.copy_genesis_file(
-                "ansharnet_genesis_data_file.bin")
+                "zabanet_genesis_data_file.bin")
         else:
             genesis_bin_file = None
 
@@ -53,6 +53,7 @@ class Network:
             11: "nebunet",
             12: "kisharnet",
             13: "ansharnet",
+            14: "zabanet",
             32: "gilganet",
             33: "enkinet",
             34: "hammunet",
