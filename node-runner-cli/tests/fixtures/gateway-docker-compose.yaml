@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   gateway_api: # This is the base -- the _image and _built containers are defined below
-    image: radixdlt/babylon-ng-gateway-api:rcnet-v2-phase2-r4
+    image: radixdlt/babylon-ng-gateway-api:rcnet-v3-r2
     ports:
       - "127.0.0.1:5207:80" # This allows you to connect to the API at http://localhost:5308
       - "127.0.0.1:1235:1235" # This allows you to connect to the metrics API at http://localhost:1235
@@ -15,7 +15,7 @@ services:
       ConnectionStrings__NetworkGatewayReadOnly: "Host=host.docker.internal:5432;Database=radixdlt_ledger;Username=postgres;Password=postgres"
       ConnectionStrings__NetworkGatewayReadWrite: "Host=host.docker.internal:5432;Database=radixdlt_ledger;Username=postgres;Password=postgres"
       GatewayApi__Endpoints_MaxPageSize: "30"
-      GatewayApi__Endpoint__GatewayApiVersion: rcnet-v2-phase2-r4
+      GatewayApi__Endpoint__GatewayApiVersion: rcnet-v3-r2
       # GatewayApi__MaxWaitForDbOnStartupMs: "90" # Wait for PostGres to boot up
       GatewayApi__Network__DisableCoreApiHttpsCertificateChecks: "true"
       GatewayApi__Network__NetworkName: "zabanet"
@@ -27,7 +27,7 @@ services:
   data_aggregator:
     depends_on:
       - database_migrations
-    image: radixdlt/babylon-ng-data-aggregator:rcnet-v2-phase2-r4
+    image: radixdlt/babylon-ng-data-aggregator:rcnet-v3-r2
     restart: unless-stopped
     cpus: 2.0
     extra_hosts:
@@ -49,7 +49,7 @@ services:
       DataAggregator__Network__CoreApiNodes__0__TrustWeighting: "1"
       DataAggregator__Network__CoreApiNodes__0__Enabled: "true"
   database_migrations: # This is the base -- the _image and _built containers are defined below
-    image: radixdlt/babylon-ng-database-migrations:rcnet-v2-phase2-r4
+    image: radixdlt/babylon-ng-database-migrations:rcnet-v3-r2
     environment:
       ConnectionStrings__NetworkGatewayMigrations: Host=host.docker.internal:5432;Database=radixdlt_ledger;Username=postgres;Password=postgres
     extra_hosts:

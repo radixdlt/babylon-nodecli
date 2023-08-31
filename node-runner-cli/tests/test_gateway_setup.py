@@ -157,9 +157,9 @@ services:
         # Takes default values
         questionary_keyboard_input = ["https://host.docker.internal:443/core", "admin", "radix", "true",
                                       "CoreNode",
-                                      "rcnet-v2-phase2-r4",
-                                      "rcnet-v2-phase2-r4",
-                                      "rcnet-v2-phase2-r4",
+                                      "rcnet-v3-r2",
+                                      "rcnet-v3-r2",
+                                      "rcnet-v3-r2",
                                       "local",
                                       "radixdlt_ledger",
                                       "postgres"]

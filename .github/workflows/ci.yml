@@ -462,7 +462,7 @@ jobs:
           chmod +x ./babylonnode
           mkdir -p $HOME/babylon-node-config
           export DISABLE_VERSION_CHECK=true
-          export RADIXDLT_APP_VERSION_OVERRIDE="rcnet-v2-phase2-r4"
+          export RADIXDLT_APP_VERSION_OVERRIDE="rcnet-v3-r2"
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
           export PROMPT_FEEDS="node-runner-cli/test-prompts/core-gateway-all-local.yml"
           ./babylonnode docker config -m DETAILED \
