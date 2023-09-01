@@ -46,7 +46,7 @@ def check_latest_cli():
             logger.info(f"""
                 ---------------------------------------------------------------
                 Update the CLI by running these commands
-                    wget -O babylonnode https://github.com/radixdlt/babylon-nodecli/releases/download/{cli_latest_version}/radixnode-{os_name}
+                    wget -O babylonnode https://github.com/radixdlt/babylon-nodecli/releases/download/{cli_latest_version}/babylonnode-{os_name}
                     chmod +x babylonnode
                     sudo mv babylonnode /usr/local/bin
                 """)
