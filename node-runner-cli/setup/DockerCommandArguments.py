@@ -1,3 +1,5 @@
+from os import getenv
+
 from config.BaseConfig import SetupMode
 from github.github import latest_release
 
@@ -35,7 +37,7 @@ class DockerConfigArguments:
         self.olympia_node_bech32_address = args.migration_auth_user
         self.olympia_node_auth_user = args.migration_auth_user
         self.olympia_node_auth_password = args.migration_auth_password
-        self.release = latest_release()
+        self.release = getenv("LATEST_RELEASE", latest_release())
         self.config_file = f"{args.configdir}/config.yaml"
         self.networkid = args.networkid
 

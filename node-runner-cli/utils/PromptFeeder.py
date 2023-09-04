@@ -52,6 +52,10 @@ class PromptFeeder:
         raise RuntimeError('Call instance() instead')
 
     @classmethod
+    def __del__(self):
+        self._instance = None
+
+    @classmethod
     def load_prompt_feeds(cls):
         feed_prompts_file = os.getenv(PROMPT_FEEDS, "")
         if feed_prompts_file and os.path.exists(feed_prompts_file):
