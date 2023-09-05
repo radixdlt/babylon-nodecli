@@ -14,7 +14,6 @@ class CommonDockerConfig(BaseConfig):
         self.nginx_settings: DockerNginxConfig = DockerNginxConfig(config_dict.get("nginx_settings"))
         self.network_id: int = ""
         self.network_name: str = ""
-        self.genesis_bin_data_file: str = ""
         self.docker_compose: str = f"{Helpers.get_home_dir()}/docker-compose.yml"
         super().__init__(config_dict)
         if self.network_id:
@@ -25,7 +24,8 @@ class CommonDockerConfig(BaseConfig):
         self.set_network_name()
 
     def set_genesis_bin_data_file_location(self, genesis_bin_data_file: str):
-        self.genesis_bin_data_file = genesis_bin_data_file
+        if genesis_bin_data_file:
+            self.genesis_bin_data_file = genesis_bin_data_file
 
     def set_network_name(self):
         if self.network_id:

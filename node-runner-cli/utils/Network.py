@@ -14,7 +14,8 @@ class Network:
         Helpers.section_headline(f"Network connection")
         # TODO change this for rcnet launch
         network_prompt = Helpers.input_guestion(
-            "Enter the network_id. The network id for the most recent network (Zabanet / rcnet-v3 ) is 14:",
+            "Enter the network_id. The network id for the most recent  babylon network (Zabanet / rcnet-v3 ) is 14 \n"
+            "    To run node for migration  enter 2 for stokenet or 1 for mainnet:",
             QuestionKeys.select_network)
         network_id = Network.validate_network_id(network_prompt)
         return network_id

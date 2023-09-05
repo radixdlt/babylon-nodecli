@@ -206,6 +206,7 @@ class Prompts:
                                        # "\nTo connect to MAINNET or STOKENET details on these node can be found here "
                                        # "- https://docs.radixdlt.com/main/node-and-gateway/seed-nodes.html"
                                        "\nType in the node you want to connect to in format radix://<node-peer-2-peer-address>@<ip>"
+                                       "For Stokenet migration node  type 'radix://node_tdx_2_1qwfh2nn0zx8cut5fqfz6n7pau2f7vdyl89mypldnn4fwlhaeg2tvunp8s8h@54.229.126.97'"
                                        "\n OR press Enter to accept defaults for Zabanet (rcnet-v3):",
                                        QuestionKeys.input_seednode)
         trustednode = Prompts.check_default(value, default_trusted_nodes)
