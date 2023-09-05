@@ -227,6 +227,7 @@ def dependencies(args):
     """
     logger.info("Installing docker dependencies")
     if is_sudo_installed():
+        BaseSetup.add_user_docker_group()
         logger.info("Installing docker")
         run_shell_command("curl -fsSL https://get.docker.com -o get-docker.sh", shell=True)
         run_shell_command("sudo sh get-docker.sh", shell=True)
