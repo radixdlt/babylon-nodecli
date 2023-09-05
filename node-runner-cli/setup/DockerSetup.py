@@ -322,7 +322,7 @@ class DockerSetup(BaseSetup):
         username = getpass.getuser()
         run_shell_command(['sudo', 'chown', f'{username}:{username}',
                            f'{docker_config.core_node.keydetails.keyfile_path}/{docker_config.core_node.keydetails.keyfile_name}'])
-        if docker_config.common_config.genesis_bin_data_file:
+        if hasattr(docker_config.common_config, "genesis_bin_data_file"):
             run_shell_command(['sudo', 'chown', f'{username}:{username}',
                            f'{docker_config.common_config.genesis_bin_data_file}'])
         run_shell_command(['sudo', 'chown', '-R', f'{username}:{username}',
