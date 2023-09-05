@@ -18,7 +18,7 @@ services:
       RADIXDLT_TRANSACTIONS_API_ENABLE: 'false'
       RADIXDLT_VALIDATOR_KEY_LOCATION: /home/radixdlt/node-keystore.ks
       RADIX_NODE_KEYSTORE_PASSWORD: "${RADIXDLT_NODE_KEY_PASSWORD}"
-    image: radixdlt/babylon-node:rcnet-v3-r4
+    image: radixdlt/babylon-node:rcnet-v3.1-r1
     init: true
     mem_limit: 12000m
     restart: unless-stopped
