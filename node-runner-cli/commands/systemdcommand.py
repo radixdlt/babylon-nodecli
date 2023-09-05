@@ -1,5 +1,6 @@
 import sys
 from argparse import ArgumentParser
+from os.path import exists
 from pathlib import Path
 
 from commands.subcommand import get_decorator, argument
@@ -98,7 +99,10 @@ def config(args):
     ################### File comparisson and generation
     Path(f"{args.configdir}").mkdir(parents=True, exist_ok=True)
     SystemDSetup.dump_config_as_yaml(systemd_config)
-    SystemDSetup.compare_old_and_new_config(argument_object.config_file, systemd_config)
+
+    # Compare old and new if and only if there's an old
+    if exists(argument_object.config_file):
+        SystemDSetup.compare_old_and_new_config(argument_object.config_file, systemd_config)
     SystemDSetup.save_config(systemd_config, argument_object.config_file, autoapprove=args.autoapprove)
 
 
