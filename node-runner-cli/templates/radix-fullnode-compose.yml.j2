@@ -24,7 +24,7 @@ services:
       RADIXDLT_GENESIS_OLYMPIA_NODE_BECH32_ADDRESS: '{{migration.olympia_node_bech32_address}}'
       {% endif %}
       {% endif %}
-      {% if common_config.genesis_bin_data_file is defined %}
+      {% if common_config.genesis_bin_data_file is defined and common_config.genesis_bin_data_file|length%}
       RADIXDLT_GENESIS_DATA_FILE: "/home/radixdlt/genesis_data_file.bin"
       {% endif %}
       {% if core_node.validator_address is defined %}
@@ -49,7 +49,7 @@ services:
     - babylon_ledger:/home/radixdlt/RADIXDB
     {% endif %}
     - {{core_node.keydetails.keyfile_path ~ '/' ~ core_node.keydetails.keyfile_name }}:/home/radixdlt/node-keystore.ks
-    {% if common_config.genesis_bin_data_file is defined %}
+    {% if common_config.genesis_bin_data_file is defined and common_config.genesis_bin_data_file|length %}
     - "{{common_config.genesis_bin_data_file}}:/home/radixdlt/genesis_data_file.bin"
     {% endif %}
  {% endif %}
