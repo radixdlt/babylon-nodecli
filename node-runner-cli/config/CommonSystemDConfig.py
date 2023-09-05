@@ -26,7 +26,8 @@ class CommonSystemdConfig(BaseConfig):
         self.set_network_name()
 
     def set_genesis_bin_data_file(self, genesis_bin_data_file: str):
-        self.genesis_bin_data_file = genesis_bin_data_file
+        if genesis_bin_data_file:
+            self.genesis_bin_data_file = genesis_bin_data_file
 
     def set_network_name(self):
         if self.network_id:
