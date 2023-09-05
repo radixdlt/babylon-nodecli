@@ -196,17 +196,17 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ubuntu 22.04
-      - name: Upload radixcli ubuntu binary
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./babylonnode
-          asset_name: babylonnode-ubuntu-22.04
-          asset_content_type: application/octet-stream
-        if: ${{ github.event_name == 'release' }}
 
+      - name: Rename release asset
+        run: |
+          mv ./babylonnode babylonnode-ubuntu-22.04
+      - if: ${{ github.event_name == 'release' }}
+        name: Upload radixcli ubuntu binary
+        uses: softprops/action-gh-release@c9b46fe7aad9f02afd89b12450b780f52dacfb2d
+        with:
+          files: |
+            babylonnode-ubuntu-22.04
+        
   upload-sbom:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'release' }}
@@ -244,10 +244,9 @@ jobs:
       - name: Generate SBOM
         run: snyk sbom --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --format=cyclonedx1.4+json --json-file-output sbom.json
       - name: Upload SBOM
-        uses: AButler/upload-release-assets@c94805dc72e4b20745f543da0f62eaee7722df7a # v2.0.2
+        uses: softprops/action-gh-release@c9b46fe7aad9f02afd89b12450b780f52dacfb2d
         with:
           files: sbom.json
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
   upload-release-focal:
     runs-on: ubuntu-20.04
@@ -260,16 +259,15 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ubuntu 20.04
-      - name: Upload radixcli ubuntu binary
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Rename release asset
+        run: |
+          mv ./babylonnode babylonnode-ubuntu-20.04
+      - if: ${{ github.event_name == 'release' }}
+        name: Upload radixcli ubuntu binary
+        uses: softprops/action-gh-release@c9b46fe7aad9f02afd89b12450b780f52dacfb2d
         with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./babylonnode
-          asset_name: babylonnode-ubuntu-20.04
-          asset_content_type: application/octet-stream
-        if: ${{ github.event_name == 'release' }}
+          files: |
+            babylonnode-ubuntu-20.04
 
   test-systemd:
     runs-on: [node-only]
