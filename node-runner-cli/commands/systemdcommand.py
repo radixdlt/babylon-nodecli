@@ -81,6 +81,8 @@ def config(args):
     settings. Thus, it allows is to decouple the updates from systemd_config. Config is created only once as such and
     if there is a version change in the config file, then it updated by doing a migration to newer version
     """
+    # Systemd configure is setup using radixdlt user. And this user has been added to docker group yet.
+    BaseSetup.add_user_docker_group()
 
     ################### PARSE ARGUMENTS
     argument_object = SystemDConfigArguments(args)

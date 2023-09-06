@@ -206,6 +206,7 @@ class Prompts:
                                        # "\nTo connect to MAINNET or STOKENET details on these node can be found here "
                                        # "- https://docs.radixdlt.com/main/node-and-gateway/seed-nodes.html"
                                        "\nType in the node you want to connect to in format radix://<node-peer-2-peer-address>@<ip>"
+                                       "\nFor Stokenet migration node  type 'radix://node_tdx_2_1qwfh2nn0zx8cut5fqfz6n7pau2f7vdyl89mypldnn4fwlhaeg2tvunp8s8h@54.229.126.97'"
                                        "\n OR press Enter to accept defaults for Zabanet (rcnet-v3):",
                                        QuestionKeys.input_seednode)
         trustednode = Prompts.check_default(value, default_trusted_nodes)
@@ -357,7 +358,7 @@ class Prompts:
               "Refer this link for more details"
               "\n https://docs-babylon.radixdlt.com/main/node-and-gateway/register-as-validator.html#_gather_your_node_public_key"
               "")
-        answer = Helpers.input_guestion(f"\n\n Do you have a validator address? (Y/n): "
+        answer = Helpers.input_guestion(f"\n\n Do you have a validator address. If you are running node for babylon migration, type 'n'? (Y/n): "
                                         , QuestionKeys.have_validator_address)
         validator_address = ""
         if Helpers.check_Yes(Prompts.check_default(answer, "N")):
