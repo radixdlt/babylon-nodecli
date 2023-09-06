@@ -230,6 +230,7 @@ def dependencies(args):
         logger.info("Installing docker")
         run_shell_command("curl -fsSL https://get.docker.com -o get-docker.sh", shell=True)
         run_shell_command("sudo sh get-docker.sh", shell=True)
+        run_shell_command("dockerd-rootless-setuptool.sh install", shell=True)
         run_shell_command("docker run hello-world", shell=True, fail_on_error=True)
         logger.info("Docker successfully installed")
         try:
