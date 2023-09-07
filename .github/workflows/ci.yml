@@ -100,10 +100,39 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  
+
+  e2e-tests:
+    name: "E2E tests"
+    runs-on: ubuntu-22.04
+    steps:
+      - name: cancel running workflows
+        uses: styfle/cancel-workflow-action@0.11.0
+        with:
+          access_token: ${{ github.token }}
+      - name: Checkout
+        uses: actions/checkout@v3.4.0
+        with:
+          fetch-depth: 0
+      - name: Dump context
+        uses: crazy-max/ghaction-dump-context@v1
+      - name: setup python
+        uses: actions/setup-python@v4.5.0
+        with:
+          python-version: 3.10.6
+      - name: Install pipenv
+        run: |
+          pip install pipenv==2023.7.23
+          cd node-runner-cli/
+          pipenv install
+          pipenv run pip install pytest
+          pipenv run pytest tests/e2e
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   build-jammy:
     needs: 
       - tests
+      - e2e-tests
     name: "Build jammy"
     runs-on: ubuntu-22.04
     steps:
