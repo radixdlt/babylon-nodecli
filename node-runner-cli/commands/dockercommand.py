@@ -197,7 +197,7 @@ def stop(args):
         print("No docker-compose file found.")
         print("Execute `babylonnode docker config/install` and try again")
         sys.exit(404)
-    DockerCompose.run_docker_compose_down(docker_config.common_config.docker_compose, args.removevolumes)
+    DockerCompose().run_docker_compose_down(docker_config.common_config.docker_compose, args.removevolumes)
 
 
 @dockercommand([
