@@ -201,13 +201,14 @@ class Prompts:
     @staticmethod
     def ask_trusted_node() -> str:
         Helpers.section_headline("Trusted node settings")
-        default_trusted_nodes = "radix://node_tdx_e_1q0gm3fwqh8ggl09g7l8ru96krzlxdyrc694mqw8cf227v62vjyrmccv8md5@13.126.65.118"
+        # Todo: add a map of trusted nodes for each network and propose defaults for the selected network id only.
+        # Zabanet trusted nodes
+        # default_trusted_nodes = "radix://node_tdx_e_1q0gm3fwqh8ggl09g7l8ru96krzlxdyrc694mqw8cf227v62vjyrmccv8md5@13.126.65.118"
+        # Mainnet trusted nodes
+        default_trusted_nodes = "radix://rn1qgxn3eeldj33kd98ha6wkjgk4k77z6xm0dv7mwnrkefknjcqsvhuufuj2mf@13.236.40.46,radix://rn1q0gnmwv0fmcp7ecq0znff7yzrt7ggwrp47sa9pssgyvrnl75tvxmvw2dv28@54.227.220.85,radix://rn1qf2x63qx4jdaxj83kkw2yytehvvmu6r2xll5gcp6c9rancmrfsgfwncegwc@79.125.3.32,radix://rn1qwrrnhzfu99fg3yqgk3ut9vev2pdssv7hxhff80msjmmcj968487uqujllx@65.2.94.157"
         value = Helpers.input_guestion(f"Fullnode requires another node to connect to network. "
-                                       # "\nTo connect to MAINNET or STOKENET details on these node can be found here "
-                                       # "- https://docs.radixdlt.com/main/node-and-gateway/seed-nodes.html"
                                        "\nType in the node you want to connect to in format radix://<node-peer-2-peer-address>@<ip>"
-                                       "\nFor Stokenet migration node  type 'radix://node_tdx_2_1qwfh2nn0zx8cut5fqfz6n7pau2f7vdyl89mypldnn4fwlhaeg2tvunp8s8h@54.229.126.97'"
-                                       "\n OR press Enter to accept defaults for Zabanet (rcnet-v3):",
+                                       "\n OR press Enter to accept defaults for mainnet:",
                                        QuestionKeys.input_seednode)
         trustednode = Prompts.check_default(value, default_trusted_nodes)
         Helpers.parse_trustednode(trustednode)

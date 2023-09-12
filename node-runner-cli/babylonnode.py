@@ -29,7 +29,7 @@ cli.add_argument('subcommand', help='Subcommand to run',
 apicli = ArgumentParser(
     description='API commands')
 api_parser = apicli.add_argument(dest="apicommand",
-                                 choices=["system", "core", "metrics"])
+                                 choices=["system", "metrics"])
 
 cwd = os.getcwd()
 logger = get_logger(__name__)
