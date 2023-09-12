@@ -34,7 +34,7 @@ class DockerConfigArguments:
         self.new_keystore = args.newkeystore
         self.validator = args.validator
         self.olympia_node_url = args.migration_url
-        self.olympia_node_bech32_address = args.migration_auth_user
+        self.olympia_node_bech32_address = args.migration_bech_address
         self.olympia_node_auth_user = args.migration_auth_user
         self.olympia_node_auth_password = args.migration_auth_password
         self.release = getenv("LATEST_RELEASE", latest_release())

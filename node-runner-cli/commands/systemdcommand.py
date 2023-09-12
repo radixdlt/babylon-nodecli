@@ -51,12 +51,15 @@ def systemdcommand(systemdcommand_args=None, parent=systemd_parser):
               \n\nMIGRATION: This mode adds questions regarding the migration from an Olympia End-State node to a Babylon node
               """,
              choices=["CORE", "DETAILED", "MIGRATION", "GATEWAY"], action="store"),
-    argument("-miu", "--migration_url", help="The url of the olympia node to migrate the ledger from", action="store"),
+    argument("-miu", "--migration_url",
+             help="The root url of the olympia node to migrate the ledger from. Do not add /olympia-end-state.",
+             action="store"),
     argument("-miau", "--migration_auth_user", help="The user to authenticate to the olympia node for migration",
              action="store"),
     argument("-miap", "--migration_auth_password",
              help="The password to authenticate to the olympia node for migration", action="store"),
-    argument("-miba", "--migration_bech_url", help="The bech url of the olympia node to migrate the ledger from",
+    argument("-miba", "--migration_bech_address",
+             help="The bech address of the olympia node to migrate the ledger from",
              action="store"),
     argument("-n", "--networkid",
              help="Network id of network you want to connect.For stokenet it is 2 and for mainnet it is 1."
