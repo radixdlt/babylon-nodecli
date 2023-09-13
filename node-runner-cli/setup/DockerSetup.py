@@ -76,30 +76,28 @@ class DockerSetup(BaseSetup):
 
     @staticmethod
     def check_set_passwords(docker_config: DockerConfig):
+        keystore_password = docker_config.core_node.keydetails.keystore_password
+        if docker_config.core_node and not keystore_password:
+            keystore_password_from_env = os.getenv(RADIXDLT_NODE_KEY_PASSWORD, None)
+            if not keystore_password_from_env:
+                logger.info(
+                    "Cannot find Keystore password either in config "
+                    "or as environment variable RADIXDLT_NODE_KEY_PASSWORD")
+                sys.exit(1)
+            else:
+                docker_config.core_node.keydetails.keystore_password = keystore_password_from_env
 
-        if docker_config.core_node is not None:
-            keystore_password = docker_config.core_node.keydetails.keystore_password
-            if docker_config.core_node and not keystore_password:
-                keystore_password_from_env = os.getenv(RADIXDLT_NODE_KEY_PASSWORD, None)
-                if not keystore_password_from_env:
-                    logger.info(
-                        "Cannot find Keystore password either in config "
-                        "or as environment variable RADIXDLT_NODE_KEY_PASSWORD")
-                    sys.exit(1)
-                else:
-                    docker_config.core_node.keydetails.keystore_password = keystore_password_from_env
-        if docker_config.gateway is not None:
-            postgres_password = docker_config.gateway.postgres_db.password
-            if docker_config.gateway.enabled and not postgres_password:
-                postgres_password_from_env = os.getenv(POSTGRES_PASSWORD, None)
+        postgres_password = docker_config.gateway.postgres_db.password
+        if docker_config.gateway.enabled and not postgres_password:
+            postgres_password_from_env = os.getenv(POSTGRES_PASSWORD, None)
 
-                if not postgres_password_from_env:
-                    logger.info(
-                        "Cannot find POSTGRES_PASSWORD either in config"
-                        "or as environment variable POSTGRES_PASSWORD")
-                    sys.exit(1)
-                else:
-                    docker_config.gateway.postgres_db.password = postgres_password_from_env
+            if not postgres_password_from_env:
+                logger.info(
+                    "Cannot find POSTGRES_PASSWORD either in config"
+                    "or as environment variable POSTGRES_PASSWORD")
+                sys.exit(1)
+            else:
+                docker_config.gateway.postgres_db.password = postgres_password_from_env
         return docker_config
 
     @staticmethod
@@ -190,14 +188,7 @@ class DockerSetup(BaseSetup):
             sys.exit(1)
         with open(config_file, 'r') as f:
             dictionary = yaml.load(f, Loader=UnsafeLoader)
-        default_config = DockerConfig(dictionary)
-        if dictionary.get("core", None) is None:
-            default_config.core_node = None
-        if dictionary.get("gateway", None) is None:
-            default_config.gateway = None
-        if dictionary.get("migration", None) is None:
-            default_config.migration = None
-        return default_config
+        return DockerConfig(dictionary)
 
     @staticmethod
     def questionary(argument_object: DockerConfigArguments) -> DockerConfig:
