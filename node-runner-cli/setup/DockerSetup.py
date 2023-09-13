@@ -191,7 +191,7 @@ class DockerSetup(BaseSetup):
         with open(config_file, 'r') as f:
             dictionary = yaml.load(f, Loader=UnsafeLoader)
         default_config = DockerConfig(dictionary)
-        if dictionary.get("core", None) is None:
+        if dictionary.get("core_node", None) is None:
             default_config.core_node = None
         if dictionary.get("gateway", None) is None:
             default_config.gateway = None
