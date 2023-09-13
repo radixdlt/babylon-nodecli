@@ -1,7 +1,7 @@
 ---
 - first_time_config: N
-- select_network: "14"
 - have_existing_compose: "/home/runner/docker-compose.yml"
+- select_network: "14"
 - setup_fullnode: Y
 - input_seednode: "radix://node_tdx_e_1q0gm3fwqh8ggl09g7l8ru96krzlxdyrc694mqw8cf227v62vjyrmccv8md5@13.126.65.118"
 - have_validator_address: "N"
