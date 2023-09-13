@@ -372,7 +372,7 @@ class Prompts:
     @classmethod
     def ask_olympia_node_url(cls) -> str:
         Helpers.section_headline("Migration: Olympia API Url")
-        answer = Helpers.input_guestion(f"Enter the API Url of your Olympia node with olympia-end-state.: "
+        answer = Helpers.input_guestion(f"Enter the API Url of your Olympia node with olympia-end-state (example https://123.5.6.78): "
                                         , QuestionKeys.olympia_migrations_url)
         return answer
 
