@@ -1,5 +1,6 @@
 import unittest
 from io import StringIO
+from os.path import dirname, join
 from pathlib import Path
 from unittest.mock import patch
 
@@ -204,8 +205,9 @@ services:
         self.assertEqual(questionary_keyboard_input[10], config.gateway.postgres_db.user)
 
     def test_setup_docker_compose_with_gateway(self):
-        fixture_file = "./tests/fixtures/config-gateway-docker.yaml"
-        compose_fixture_file = "./tests/fixtures/docker-compose.yaml"
+        tests_dir = dirname(dirname(__file__))
+        fixture_file = join(tests_dir, "fixtures/config-gateway-docker.yaml")
+        compose_fixture_file = join(tests_dir, "fixtures/docker-compose.yaml")
         docker_config: DockerConfig = DockerSetup.load_settings(fixture_file)
         self.assertEqual(True, docker_config.gateway.enabled)
         compose_yaml = DockerSetup.render_docker_compose(docker_config)

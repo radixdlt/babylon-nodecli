@@ -199,23 +199,10 @@ class DockerSetup(BaseSetup):
             "\nCreating config file using the answers from the questions that would be asked in next steps."
             f"\nLocation of the config file: {bcolors.OKBLUE}{argument_object.config_file}{bcolors.ENDC}")
 
-        docker_config.common_config.ask_network_id(argument_object.networkid)
         docker_config.common_config.ask_existing_docker_compose_file()
-
-        if "CORE" in argument_object.setupmode.mode:
-            quick_node_settings: CoreDockerConfig = CoreDockerConfig({}).ask_config(argument_object.release,
-                                                                                    argument_object.trustednode,
-                                                                                    argument_object.keystore_password,
-                                                                                    argument_object.new_keystore,
-                                                                                    argument_object.validator)
-            docker_config.core_node = quick_node_settings
-            docker_config.common_config.ask_enable_nginx_for_core(argument_object.nginx_on_core)
-
-        if "GATEWAY" in argument_object.setupmode.mode:
-            docker_config.gateway = GatewaySetup.ask_gateway_full_docker(
-                argument_object.postgrespassword, "http://core:3333/core")
-            docker_config.common_config.ask_enable_nginx_for_gateway(argument_object.nginx_on_gateway)
         if "DETAILED" in argument_object.setupmode.mode:
+            logger.info("Running a DETAILED configuration")
+            docker_config.common_config.ask_network_id(argument_object.networkid)
             run_fullnode = Prompts.check_for_fullnode()
             if run_fullnode:
                 detailed_node_settings: CoreDockerConfig = CoreDockerConfig({}).ask_config(
@@ -236,19 +223,41 @@ class DockerSetup(BaseSetup):
                 docker_config.common_config.ask_enable_nginx_for_gateway(argument_object.nginx_on_gateway)
             else:
                 docker_config.common_config.nginx_settings.protect_gateway = "false"
+        else:
+            if "CORE" in argument_object.setupmode.mode:
+                docker_config.common_config.ask_network_id(argument_object.networkid)
+                quick_node_settings: CoreDockerConfig = CoreDockerConfig({}).ask_config(argument_object.release,
+                                                                                        argument_object.trustednode,
+                                                                                        argument_object.keystore_password,
+                                                                                        argument_object.new_keystore,
+                                                                                        argument_object.validator)
+                docker_config.core_node = quick_node_settings
+                docker_config.common_config.ask_enable_nginx_for_core(argument_object.nginx_on_core)
+            else:
+                del docker_config.core_node
+
+            if "GATEWAY" in argument_object.setupmode.mode:
+                docker_config.gateway = GatewaySetup.ask_gateway_full_docker(
+                    argument_object.postgrespassword, "http://core:3333/core")
+                docker_config.common_config.ask_enable_nginx_for_gateway(argument_object.nginx_on_gateway)
+            else:
+                del docker_config.gateway
 
         if "MIGRATION" in argument_object.setupmode.mode:
             docker_config.migration.ask_migration_config(argument_object.olympia_node_url,
                                                          argument_object.olympia_node_auth_user,
                                                          argument_object.olympia_node_auth_password,
                                                          argument_object.olympia_node_bech32_address)
+        else:
+            del docker_config.migration
 
         if docker_config.common_config.check_nginx_required():
             docker_config.common_config.ask_nginx_release()
-            if docker_config.core_node.enable_transaction == "true":
-                docker_config.common_config.nginx_settings.enable_transaction_api = "true"
-            else:
-                docker_config.common_config.nginx_settings.enable_transaction_api = "false"
+            if "CORE" in argument_object.setupmode.mode:
+                if docker_config.core_node.enable_transaction == "true":
+                    docker_config.common_config.nginx_settings.enable_transaction_api = "true"
+                else:
+                    docker_config.common_config.nginx_settings.enable_transaction_api = "false"
 
         return docker_config
 
