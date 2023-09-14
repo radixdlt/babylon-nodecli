@@ -15,9 +15,7 @@ class DockerUnitTests(unittest.TestCase):
     @patch('sys.stdout', new_callable=StringIO)
     def test_docker_config(self, mockout):
         urllib3.disable_warnings()
-        # os.environ['PROMPT_FEEDS'] = "test-prompts/individual-prompts/validator_address.yml"
-        # PromptFeeder.prompts_feed = PromptFeeder.instance().load_prompt_feeds()
-        with patch('builtins.input', side_effect=['S', 'N', 'N', '/home/runner/docker-compose.yml', 'N']):
+        with patch('builtins.input', side_effect=['Y', 'S', 'N', 'N', '/home/runner/docker-compose.yml', 'N']):
             with patch("sys.argv",
                        ["main", "docker", "config", "-m", "DETAILED", "-k", "radix", "-nk", "-a"]):
                 main()
@@ -29,9 +27,9 @@ class DockerUnitTests(unittest.TestCase):
         # PromptFeeder.prompts_feed = PromptFeeder.instance().load_prompt_feeds()
         with open('/tmp/genesis.json', 'w') as fp:
             pass
-        with patch('builtins.input', side_effect=['34',
-                                                  '/tmp/genesis.json',
+        with patch('builtins.input', side_effect=[
                                                   'Y',
+                                                  'S',
                                                   'Y',
                                                   'radix://node_tdx_22_1qvsml9pe32rzcrmw6jx204gjeng09adzkqqfz0ewhxwmjsaas99jzrje4u3@34.243.93.185',
                                                   'N',

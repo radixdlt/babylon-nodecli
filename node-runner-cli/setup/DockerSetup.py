@@ -78,28 +78,30 @@ class DockerSetup(BaseSetup):
 
     @staticmethod
     def check_set_passwords(docker_config: DockerConfig):
-        keystore_password = docker_config.core_node.keydetails.keystore_password
-        if docker_config.core_node and not keystore_password:
-            keystore_password_from_env = os.getenv(RADIXDLT_NODE_KEY_PASSWORD, None)
-            if not keystore_password_from_env:
-                logger.info(
-                    "Cannot find Keystore password either in config "
-                    "or as environment variable RADIXDLT_NODE_KEY_PASSWORD")
-                sys.exit(1)
-            else:
-                docker_config.core_node.keydetails.keystore_password = keystore_password_from_env
 
-        postgres_password = docker_config.gateway.postgres_db.password
-        if docker_config.gateway.enabled and not postgres_password:
-            postgres_password_from_env = os.getenv(POSTGRES_PASSWORD, None)
+        if docker_config.core_node is not None:
+            keystore_password = docker_config.core_node.keydetails.keystore_password
+            if docker_config.core_node and not keystore_password:
+                keystore_password_from_env = os.getenv(RADIXDLT_NODE_KEY_PASSWORD, None)
+                if not keystore_password_from_env:
+                    logger.info(
+                        "Cannot find Keystore password either in config "
+                        "or as environment variable RADIXDLT_NODE_KEY_PASSWORD")
+                    sys.exit(1)
+                else:
+                    docker_config.core_node.keydetails.keystore_password = keystore_password_from_env
+        if docker_config.gateway is not None:
+            postgres_password = docker_config.gateway.postgres_db.password
+            if docker_config.gateway.enabled and not postgres_password:
+                postgres_password_from_env = os.getenv(POSTGRES_PASSWORD, None)
 
-            if not postgres_password_from_env:
-                logger.info(
-                    "Cannot find POSTGRES_PASSWORD either in config"
-                    "or as environment variable POSTGRES_PASSWORD")
-                sys.exit(1)
-            else:
-                docker_config.gateway.postgres_db.password = postgres_password_from_env
+                if not postgres_password_from_env:
+                    logger.info(
+                        "Cannot find POSTGRES_PASSWORD either in config"
+                        "or as environment variable POSTGRES_PASSWORD")
+                    sys.exit(1)
+                else:
+                    docker_config.gateway.postgres_db.password = postgres_password_from_env
         return docker_config
 
     @staticmethod
@@ -190,7 +192,14 @@ class DockerSetup(BaseSetup):
             sys.exit(1)
         with open(config_file, 'r') as f:
             dictionary = yaml.load(f, Loader=UnsafeLoader)
-        return DockerConfig(dictionary)
+        default_config = DockerConfig(dictionary)
+        if dictionary.get("core_node", None) is None:
+            default_config.core_node = None
+        if dictionary.get("gateway", None) is None:
+            default_config.gateway = None
+        if dictionary.get("migration", None) is None:
+            default_config.migration = None
+        return default_config
 
     @staticmethod
     def questionary(argument_object: DockerConfigArguments) -> DockerConfig:
@@ -201,23 +210,10 @@ class DockerSetup(BaseSetup):
             "\nCreating config file using the answers from the questions that would be asked in next steps."
             f"\nLocation of the config file: {bcolors.OKBLUE}{argument_object.config_file}{bcolors.ENDC}")
 
-        docker_config.common_config.ask_network_id(argument_object.networkid)
         docker_config.common_config.ask_existing_docker_compose_file()
-
-        if "CORE" in argument_object.setupmode.mode:
-            quick_node_settings: CoreDockerConfig = CoreDockerConfig({}).ask_config(argument_object.release,
-                                                                                    argument_object.trustednode,
-                                                                                    argument_object.keystore_password,
-                                                                                    argument_object.new_keystore,
-                                                                                    argument_object.validator)
-            docker_config.core_node = quick_node_settings
-            docker_config.common_config.ask_enable_nginx_for_core(argument_object.nginx_on_core)
-
-        if "GATEWAY" in argument_object.setupmode.mode:
-            docker_config.gateway = GatewaySetup.ask_gateway_full_docker(
-                argument_object.postgrespassword, "http://core:3333/core")
-            docker_config.common_config.ask_enable_nginx_for_gateway(argument_object.nginx_on_gateway)
         if "DETAILED" in argument_object.setupmode.mode:
+            logger.info("Running a DETAILED configuration")
+            docker_config.common_config.ask_network_id(argument_object.networkid)
             run_fullnode = Prompts.check_for_fullnode()
             if run_fullnode:
                 detailed_node_settings: CoreDockerConfig = CoreDockerConfig({}).ask_config(
@@ -238,6 +234,25 @@ class DockerSetup(BaseSetup):
                 docker_config.common_config.ask_enable_nginx_for_gateway(argument_object.nginx_on_gateway)
             else:
                 docker_config.common_config.nginx_settings.protect_gateway = "false"
+        else:
+            if "CORE" in argument_object.setupmode.mode:
+                docker_config.common_config.ask_network_id(argument_object.networkid)
+                quick_node_settings: CoreDockerConfig = CoreDockerConfig({}).ask_config(argument_object.release,
+                                                                                        argument_object.trustednode,
+                                                                                        argument_object.keystore_password,
+                                                                                        argument_object.new_keystore,
+                                                                                        argument_object.validator)
+                docker_config.core_node = quick_node_settings
+                docker_config.common_config.ask_enable_nginx_for_core(argument_object.nginx_on_core)
+            else:
+                del docker_config.core_node
+
+            if "GATEWAY" in argument_object.setupmode.mode:
+                docker_config.gateway = GatewaySetup.ask_gateway_full_docker(
+                    argument_object.postgrespassword, "http://core:3333/core")
+                docker_config.common_config.ask_enable_nginx_for_gateway(argument_object.nginx_on_gateway)
+            else:
+                del docker_config.gateway
 
         if "MIGRATION" in argument_object.setupmode.mode:
             docker_config = MigrationSetup.ask_migration_config(docker_config,
@@ -245,13 +260,16 @@ class DockerSetup(BaseSetup):
                                                                 argument_object.olympia_node_auth_user,
                                                                 argument_object.olympia_node_auth_password,
                                                                 argument_object.olympia_node_bech32_address)
+        else:
+            del docker_config.migration
 
         if docker_config.common_config.check_nginx_required():
             docker_config.common_config.ask_nginx_release()
-            if docker_config.core_node.enable_transaction == "true":
-                docker_config.common_config.nginx_settings.enable_transaction_api = "true"
-            else:
-                docker_config.common_config.nginx_settings.enable_transaction_api = "false"
+            if "CORE" in argument_object.setupmode.mode:
+                if docker_config.core_node.enable_transaction == "true":
+                    docker_config.common_config.nginx_settings.enable_transaction_api = "true"
+                else:
+                    docker_config.common_config.nginx_settings.enable_transaction_api = "false"
 
         return docker_config
 
