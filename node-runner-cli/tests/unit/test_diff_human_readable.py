@@ -56,7 +56,7 @@
 #                           '          "core_release": "",\n'
 #                           '          "data_directory": "/Users/kim.fehrs/babylon-ledger",\n'
 #                           '          "enable_transaction": "false",\n'
-#                           '          "java_opts": "--enable-preview -server -Xms8g -Xmx8g  '
+#                           '          "java_opts": "--enable-preview -server -Xms16g -Xmx16g  '
 #                           '-XX:MaxDirectMemorySize=2048m -XX:+HeapDumpOnOutOfMemoryError '
 #                           '-XX:+UseCompressedOops '
 #                           '-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts '

@@ -25,7 +25,7 @@ class CoreSystemdConfig(BaseConfig):
         self.node_dir: str = '/etc/radixdlt/node'
         self.node_secrets_dir: str = '/etc/radixdlt/node/secrets'
         self.validator_address: str = ""
-        self.java_opts: str = "--enable-preview -server -Xms8g -Xmx8g  " \
+        self.java_opts: str = "--enable-preview -server -Xms16g -Xmx16g  " \
                               "-XX:MaxDirectMemorySize=2048m " \
                               "-XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops " \
                               "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts " \
