@@ -2,8 +2,6 @@ import unittest
 
 import urllib3
 
-import github.github
-
 
 class LatestReleaseUnitTests(unittest.TestCase):
 

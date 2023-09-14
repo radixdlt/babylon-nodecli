@@ -1,5 +1,4 @@
 from config.BaseConfig import BaseConfig
-from utils.Prompts import Prompts
 
 
 class CommonMigrationConfig(BaseConfig):

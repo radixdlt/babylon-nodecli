@@ -1,10 +1,10 @@
 import os
 import sys
-from hashlib import md5
 from os import remove
 from os.path import dirname, abspath, join, isfile, exists
 
 import pytest
+
 import babylonnode
 from utils.PromptFeeder import PromptFeeder
 

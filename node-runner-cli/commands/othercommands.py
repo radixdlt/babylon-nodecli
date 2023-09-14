@@ -1,9 +1,5 @@
 from argparse import ArgumentParser
-from time import sleep
 
-from api.Api import API
-from api.CustomAPIClient import CustomAPIClient
-from api.SystemApiHelper import SystemApiHelper
 from commands.subcommand import get_decorator
 from setup.BaseSetup import BaseSetup
 from utils.utils import Helpers
