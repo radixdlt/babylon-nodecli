@@ -12,6 +12,7 @@ from config.Renderer import Renderer
 from config.SystemDConfig import SystemDConfig, CoreSystemdConfig, CommonSystemdConfig
 from setup.BaseSetup import BaseSetup
 from setup.GatewaySetup import GatewaySetup
+from setup.MigrationSetup import MigrationSetup
 from setup.SystemDCommandArguments import SystemDConfigArguments
 from utils.PromptFeeder import QuestionKeys
 from utils.utils import run_shell_command, Helpers
@@ -347,10 +348,10 @@ class SystemDSetup(BaseSetup):
     def ask_migration(argument_object: SystemDConfigArguments) -> CommonMigrationConfig:
         systemd_config = SystemDConfig({})
         if "MIGRATION" in argument_object.setupmode.mode:
-            systemd_config.migration.ask_migration_config(argument_object.olympia_node_url,
-                                                          argument_object.olympia_node_auth_user,
-                                                          argument_object.olympia_node_auth_password,
-                                                          argument_object.olympia_node_bech32_address)
+            systemd_config = MigrationSetup.ask_migration_config(systemd_config, argument_object.olympia_node_url,
+                                                                 argument_object.olympia_node_auth_user,
+                                                                 argument_object.olympia_node_auth_password,
+                                                                 argument_object.olympia_node_bech32_address)
         return systemd_config.migration
 
     @staticmethod

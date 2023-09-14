@@ -12,6 +12,7 @@ from config.CoreSystemDConfig import CoreSystemdConfig
 from config.KeyDetails import KeyDetails
 from config.Renderer import Renderer
 from config.SystemDConfig import SystemDConfig
+from setup.MigrationSetup import MigrationSetup
 from setup.SystemDSetup import SystemDSetup
 from utils.PromptFeeder import PromptFeeder
 
@@ -249,11 +250,12 @@ WantedBy=multi-user.target"""
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_systemd_service_file_jinja(self, mockout):
-        key_details = KeyDetails({})
-        key_details.keystore_password = "nowthatyouknowmysecretiwillfollowyouuntilyouforgetit"
+        settings = SystemDConfig({})
+        settings.core_node.keydetails = KeyDetails({})
+        settings.core_node.keydetails.keystore_password = "nowthatyouknowmysecretiwillfollowyouuntilyouforgetit"
         render_template = Renderer().load_file_based_template("systemd-environment.j2").render(
-            key_details.to_dict()).rendered
-        fixture = f"""JAVA_OPTS="--enable-preview -server -Xms16g -Xmx16g  -XX:MaxDirectMemorySize=2048m -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
+            settings.to_dict()).rendered
+        fixture = f"""JAVA_OPTS="--enable-preview -server -Xms8g -Xmx8g  -XX:MaxDirectMemorySize=2048m -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
 RADIX_NODE_KEYSTORE_PASSWORD=nowthatyouknowmysecretiwillfollowyouuntilyouforgetit"""
         self.maxDiff = None
         self.assertEqual(fixture, render_template)
@@ -295,6 +297,26 @@ RADIX_NODE_KEYSTORE_PASSWORD=nowthatyouknowmysecretiwillfollowyouuntilyouforgeti
                                              'release': '',
                                              'secrets_dir': '/etc/nginx/secrets'},
                           'service_user': 'radixdlt'}, test.to_dict())
+
+    def test_systemd_java_opts_normal_not_on_migration(self):
+        self.maxDiff = None
+        settings = SystemDConfig({})
+        settings.core_node.core_release = "test"
+        settings.common_config.nginx_settings.release = "test"
+        environment_yaml = settings.create_environment_yaml()
+        self.assertTrue("-Xms8g -Xmx8g" in environment_yaml)
+
+    def test_systemd_java_opts_increased_on_migration(self):
+        self.maxDiff = None
+        settings = SystemDConfig({})
+        settings.core_node.core_release = "test"
+        settings.common_config.nginx_settings.release = "test"
+        settings = MigrationSetup.ask_migration_config(settings, "someurl",
+                                                       "someuser",
+                                                       "somepassword",
+                                                       "somebech32address")
+        environment_yaml = settings.create_environment_yaml()
+        self.assertTrue("-Xms16g -Xmx16g" in environment_yaml)
 
 
 def suite():

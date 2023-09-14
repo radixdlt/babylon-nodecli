@@ -1,4 +1,3 @@
-import re
 import unittest
 from io import StringIO
 from unittest.mock import patch
@@ -8,6 +7,7 @@ import urllib3
 from babylonnode import main
 from config.DockerConfig import DockerConfig
 from setup.DockerSetup import DockerSetup
+from setup.MigrationSetup import MigrationSetup
 
 
 class DockerUnitTests(unittest.TestCase):
@@ -85,9 +85,8 @@ class DockerUnitTests(unittest.TestCase):
             '/tmp/genesis.bin:/home/radixdlt/genesis_data_file.bin' in docker_compose_yaml["services"]["core"][
                 "volumes"])
 
-
         self.assertEqual("/home/radixdlt/genesis_data_file.bin", docker_compose_yaml["services"]["core"][
-                "environment"]["RADIXDLT_GENESIS_DATA_FILE"])
+            "environment"]["RADIXDLT_GENESIS_DATA_FILE"])
 
     def test_docker_genesis_file_mount_optional_negative(self):
         self.maxDiff = None
@@ -100,9 +99,32 @@ class DockerUnitTests(unittest.TestCase):
             '/tmp/genesis.bin:/home/radixdlt/genesis_data_file.bin' in docker_compose_yaml["services"]["core"][
                 "volumes"])
         for volume in docker_compose_yaml["services"]["core"]["volumes"]:
-            self.assertNotRegex(volume,'.*:/home/radixdlt/genesis_data_file.bin')
+            self.assertNotRegex(volume, '.*:/home/radixdlt/genesis_data_file.bin')
         self.assertEqual(None, docker_compose_yaml["services"]["core"][
             "environment"].get("RADIXDLT_GENESIS_DATA_FILE"))
+
+    def test_docker_java_opts_normal_not_on_migration(self):
+        self.maxDiff = None
+        settings = DockerConfig({})
+        settings.core_node.core_release = "test"
+        settings.common_config.nginx_settings.release = "test"
+        docker_compose_yaml = DockerSetup.render_docker_compose(settings)
+        java_opts = docker_compose_yaml["services"]["core"]["environment"]["JAVA_OPTS"]
+        self.assertRegex(java_opts, '.*-Xms8g -Xmx8g.*')
+
+    def test_docker_java_opts_increased_on_migration(self):
+        self.maxDiff = None
+        settings = DockerConfig({})
+        settings.core_node.core_release = "test"
+        settings.common_config.nginx_settings.release = "test"
+        settings = MigrationSetup.ask_migration_config(settings, "someurl",
+                                                       "someuser",
+                                                       "somepassword",
+                                                       "somebech32address")
+        docker_compose_yaml = DockerSetup.render_docker_compose(settings)
+        java_opts = docker_compose_yaml["services"]["core"]["environment"]["JAVA_OPTS"]
+        self.assertRegex(java_opts, '.*-Xms16g -Xmx16g.*')
+
 
 def suite():
     """ This defines all the tests of a module"""
