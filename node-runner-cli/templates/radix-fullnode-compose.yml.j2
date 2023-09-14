@@ -1,6 +1,6 @@
 version: '3.8'
 services:
-{% if core_node is defined %}
+{% if core_node is not none %}
   core:
     cap_add:
     - NET_ADMIN

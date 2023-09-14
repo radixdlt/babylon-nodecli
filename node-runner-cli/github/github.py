@@ -49,7 +49,6 @@ def latest_release(repo_name="radixdlt/babylon-node") -> str:
         print(f"https://api.github.com/repos/{repo_name}/releases/latest")
         print(f"HTTP Code: {resp.status_code}")
         print("Exitting the command...")
-        #sys.exit(1)
-    return "pepe"
+        sys.exit(1)
     json_response = json.loads(resp.content)
     return json_response["tag_name"]
