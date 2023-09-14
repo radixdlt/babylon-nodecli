@@ -106,16 +106,17 @@ class DockerSetup(BaseSetup):
 
     @staticmethod
     def conditionally_start_local_postgres(docker_config: DockerConfig):
-        if docker_config.gateway.enabled:
-            postgres_db = docker_config.gateway.postgres_db
-            if DockerSetup.check_post_db_local(docker_config):
-                cli_version = Helpers.cli_version()
-                ansible_dir = f'https://raw.githubusercontent.com/radixdlt/babylon-nodecli/{cli_version}/node-runner-cli'
-                AnsibleRunner(ansible_dir).run_setup_postgress(
-                    postgres_db.password,
-                    postgres_db.user,
-                    postgres_db.dbname,
-                    'ansible/project/provision.yml')
+        if docker_config.gateway is not None:
+            if docker_config.gateway.enabled:
+                postgres_db = docker_config.gateway.postgres_db
+                if DockerSetup.check_post_db_local(docker_config):
+                    cli_version = Helpers.cli_version()
+                    ansible_dir = f'https://raw.githubusercontent.com/radixdlt/babylon-nodecli/{cli_version}/node-runner-cli'
+                    AnsibleRunner(ansible_dir).run_setup_postgress(
+                        postgres_db.password,
+                        postgres_db.user,
+                        postgres_db.dbname,
+                        'ansible/project/provision.yml')
 
     @staticmethod
     def check_post_db_local(docker_config: DockerConfig):
