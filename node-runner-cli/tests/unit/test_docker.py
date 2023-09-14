@@ -1,3 +1,4 @@
+import re
 import unittest
 from io import StringIO
 from unittest.mock import patch
@@ -73,6 +74,35 @@ class DockerUnitTests(unittest.TestCase):
         self.assertEqual(settings.to_yaml(), new_settings.to_yaml())
         self.assertEqual(settings.to_dict(), new_settings.to_dict())
 
+    def test_docker_genesis_file_mount_optional_positive(self):
+        self.maxDiff = None
+        settings = DockerConfig({})
+        settings.core_node.core_release = "test"
+        settings.common_config.nginx_settings.release = "test"
+        settings.common_config.genesis_bin_data_file = '/tmp/genesis.bin'
+        docker_compose_yaml = DockerSetup.render_docker_compose(settings)
+        self.assertTrue(
+            '/tmp/genesis.bin:/home/radixdlt/genesis_data_file.bin' in docker_compose_yaml["services"]["core"][
+                "volumes"])
+
+
+        self.assertEqual("/home/radixdlt/genesis_data_file.bin", docker_compose_yaml["services"]["core"][
+                "environment"]["RADIXDLT_GENESIS_DATA_FILE"])
+
+    def test_docker_genesis_file_mount_optional_negative(self):
+        self.maxDiff = None
+        settings = DockerConfig({})
+        settings.core_node.core_release = "test"
+        settings.common_config.nginx_settings.release = "test"
+        settings.common_config.genesis_bin_data_file = ''
+        docker_compose_yaml = DockerSetup.render_docker_compose(settings)
+        self.assertFalse(
+            '/tmp/genesis.bin:/home/radixdlt/genesis_data_file.bin' in docker_compose_yaml["services"]["core"][
+                "volumes"])
+        for volume in docker_compose_yaml["services"]["core"]["volumes"]:
+            self.assertNotRegex(volume,'.*:/home/radixdlt/genesis_data_file.bin')
+        self.assertEqual(None, docker_compose_yaml["services"]["core"][
+            "environment"].get("RADIXDLT_GENESIS_DATA_FILE"))
 
 def suite():
     """ This defines all the tests of a module"""
