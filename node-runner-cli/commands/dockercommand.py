@@ -139,7 +139,8 @@ def install(args):
     DockerSetup.confirm_config_changes(argument_object, docker_config, docker_config_updated_versions)
 
     ########## Install dependent services
-    DockerSetup.conditionally_start_local_postgres(docker_config_updated_versions)
+    if docker_config.gateway is not None:
+        DockerSetup.conditionally_start_local_postgres(docker_config_updated_versions)
 
     if docker_config.core_node is not None:
         DockerSetup.chown_files(docker_config)
