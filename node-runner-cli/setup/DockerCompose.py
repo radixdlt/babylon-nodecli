@@ -1,7 +1,6 @@
 import os
 import sys
 
-from config.EnvVars import COMPOSE_HTTP_TIMEOUT
 from config.Renderer import Renderer
 from config.SystemDConfig import SystemDConfig
 from log_util.logger import get_logger

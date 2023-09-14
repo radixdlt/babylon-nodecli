@@ -15,7 +15,6 @@ from log_util.logger import get_logger
 from utils.PromptFeeder import PromptFeeder
 from version import __version__
 
-
 logger = get_logger(__name__)
 
 def printCommand(cmd):
