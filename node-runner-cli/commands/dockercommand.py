@@ -97,11 +97,18 @@ def config(args):
     ################### PARSE ARGUMENTS
     argument_object = DockerConfigArguments(args)
     if "DETAILED" in argument_object.setupmode.mode and len(argument_object.setupmode.mode) > 1:
-        print(f"{bcolors.FAIL}You cannot have DETAILED option with other options together."
-              f"\nDETAILED option goes through asking each and every question that to customize setup. "
-              f"Hence cannot be clubbed together with options"
-              f"{bcolors.ENDC}")
-        sys.exit(1)
+        if "CORE" in argument_object.setupmode.mode or "GATEWAY" in argument_object.setupmode.mode:
+            print(f"{bcolors.FAIL}You cannot have DETAILED option with other options together."
+                  f"\nDETAILED option goes through asking each and every question that to customize setup. "
+                  f"Hence cannot be clubbed together with options"
+                  f"{bcolors.ENDC}")
+            sys.exit(1)
+        else:
+            if len(argument_object.setupmode.mode) == 2 and "MIGRATION" in argument_object.setupmode.mode:
+                logger.info(f"Running modes: {argument_object.setupmode.mode}")
+            else:
+                logger.error(f"Mode: {argument_object.setupmode.mode}. Not supported. Exiting")
+                sys.exit(1)
 
     ################### QUESTIONARY
     docker_config = DockerSetup.questionary(argument_object)

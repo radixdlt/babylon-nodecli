@@ -235,6 +235,7 @@ class DockerSetup(BaseSetup):
                 docker_config.common_config.ask_enable_nginx_for_gateway(argument_object.nginx_on_gateway)
             else:
                 docker_config.common_config.nginx_settings.protect_gateway = "false"
+                del docker_config.gateway
         else:
             if "CORE" in argument_object.setupmode.mode:
                 docker_config.common_config.ask_network_id(argument_object.networkid)
