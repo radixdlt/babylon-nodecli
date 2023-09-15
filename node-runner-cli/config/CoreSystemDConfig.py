@@ -22,6 +22,7 @@ class CoreSystemdConfig(BaseConfig):
         self.data_directory: str = f"{Helpers.get_home_dir()}/babylon-ledger"
         self.enable_transaction: str = "false"
         self.trusted_node: str = ""
+        self.memory_limit: str = "12000m"
         self.node_dir: str = '/etc/radixdlt/node'
         self.node_secrets_dir: str = '/etc/radixdlt/node/secrets'
         self.validator_address: str = ""

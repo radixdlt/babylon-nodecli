@@ -8,6 +8,7 @@ class MigrationSetup:
         new_config = current_config
         new_config.migration.use_olympia = True
 
+        new_config.core_node.memory_limit: str = "32000m"
         new_config.core_node.java_opts = "--enable-preview -server -Xms16g -Xmx16g  " \
                                          "-XX:MaxDirectMemorySize=2048m " \
                                          "-XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops " \

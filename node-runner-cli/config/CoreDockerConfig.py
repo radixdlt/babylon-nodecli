@@ -21,6 +21,7 @@ class CoreDockerConfig(BaseConfig):
         self.data_directory: str = f"{Helpers.get_home_dir()}/babylon-ledger"
         self.enable_transaction: str = "false"
         self.trusted_node: str = ""
+        self.memory_limit: str = "12000m"
         self.validator_address: str = ""
         self.java_opts: str = "--enable-preview -server -Xms8g -Xmx8g  " \
                               "-XX:MaxDirectMemorySize=2048m " \
