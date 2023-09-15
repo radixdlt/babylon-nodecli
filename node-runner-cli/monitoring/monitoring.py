@@ -6,8 +6,8 @@ from pathlib import Path
 import requests
 import yaml
 
-from config.Renderer import Renderer
 from config.EnvVars import COMPOSE_HTTP_TIMEOUT
+from config.Renderer import Renderer
 from setup.DockerCompose import DockerCompose
 from utils.utils import Helpers, run_shell_command
 

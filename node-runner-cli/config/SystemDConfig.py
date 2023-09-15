@@ -46,9 +46,15 @@ class SystemDConfig(BaseConfig):
 
     def create_environment_file(self):
         run_shell_command(f'mkdir -p {self.core_node.node_secrets_dir}', shell=True)
-        Renderer().load_file_based_template("systemd-environment.j2") \
-            .render(self.core_node.keydetails.to_dict()) \
+        self.render_environment() \
             .to_file(f"{self.core_node.node_secrets_dir}/environment")
+
+    def create_environment_yaml(self):
+        return self.render_environment().to_yaml()
+
+    def render_environment(self):
+        return Renderer().load_file_based_template("systemd-environment.j2") \
+            .render(self.to_dict())
 
     def create_default_config_file(self):
         self.common_config.genesis_bin_data_file = Network.path_to_genesis_binary(self.common_config.network_id)

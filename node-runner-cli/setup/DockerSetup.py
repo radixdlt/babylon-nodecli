@@ -16,10 +16,12 @@ from setup.AnsibleRunner import AnsibleRunner
 from setup.BaseSetup import BaseSetup
 from setup.DockerCommandArguments import DockerConfigArguments, DockerInstallArguments
 from setup.GatewaySetup import GatewaySetup
+from setup.MigrationSetup import MigrationSetup
 from utils.Prompts import Prompts
 from utils.utils import run_shell_command, Helpers, bcolors
 
 logger = get_logger(__name__)
+
 
 def print_questionary_header(config_file):
     Helpers.section_headline("CONFIG FILE")
@@ -104,16 +106,17 @@ class DockerSetup(BaseSetup):
 
     @staticmethod
     def conditionally_start_local_postgres(docker_config: DockerConfig):
-        if docker_config.gateway.enabled:
-            postgres_db = docker_config.gateway.postgres_db
-            if DockerSetup.check_post_db_local(docker_config):
-                cli_version = Helpers.cli_version()
-                ansible_dir = f'https://raw.githubusercontent.com/radixdlt/babylon-nodecli/{cli_version}/node-runner-cli'
-                AnsibleRunner(ansible_dir).run_setup_postgress(
-                    postgres_db.password,
-                    postgres_db.user,
-                    postgres_db.dbname,
-                    'ansible/project/provision.yml')
+        if docker_config.gateway is not None:
+            if docker_config.gateway.enabled:
+                postgres_db = docker_config.gateway.postgres_db
+                if DockerSetup.check_post_db_local(docker_config):
+                    cli_version = Helpers.cli_version()
+                    ansible_dir = f'https://raw.githubusercontent.com/radixdlt/babylon-nodecli/{cli_version}/node-runner-cli'
+                    AnsibleRunner(ansible_dir).run_setup_postgress(
+                        postgres_db.password,
+                        postgres_db.user,
+                        postgres_db.dbname,
+                        'ansible/project/provision.yml')
 
     @staticmethod
     def check_post_db_local(docker_config: DockerConfig):
@@ -253,10 +256,11 @@ class DockerSetup(BaseSetup):
                 del docker_config.gateway
 
         if "MIGRATION" in argument_object.setupmode.mode:
-            docker_config.migration.ask_migration_config(argument_object.olympia_node_url,
-                                                         argument_object.olympia_node_auth_user,
-                                                         argument_object.olympia_node_auth_password,
-                                                         argument_object.olympia_node_bech32_address)
+            docker_config = MigrationSetup.ask_migration_config(docker_config,
+                                                                argument_object.olympia_node_url,
+                                                                argument_object.olympia_node_auth_user,
+                                                                argument_object.olympia_node_auth_password,
+                                                                argument_object.olympia_node_bech32_address)
         else:
             del docker_config.migration
 
@@ -342,6 +346,6 @@ class DockerSetup(BaseSetup):
                            f'{docker_config.core_node.keydetails.keyfile_path}/{docker_config.core_node.keydetails.keyfile_name}'])
         if hasattr(docker_config.common_config, "genesis_bin_data_file"):
             run_shell_command(['sudo', 'chown', f'{username}:{username}',
-                           f'{docker_config.common_config.genesis_bin_data_file}'])
+                               f'{docker_config.common_config.genesis_bin_data_file}'])
         run_shell_command(['sudo', 'chown', '-R', f'{username}:{username}',
                            f'{docker_config.core_node.data_directory}'])

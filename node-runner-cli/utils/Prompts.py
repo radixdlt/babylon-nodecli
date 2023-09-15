@@ -201,13 +201,14 @@ class Prompts:
     @staticmethod
     def ask_trusted_node() -> str:
         Helpers.section_headline("Trusted node settings")
-        default_trusted_nodes = "radix://node_tdx_e_1q0gm3fwqh8ggl09g7l8ru96krzlxdyrc694mqw8cf227v62vjyrmccv8md5@13.126.65.118"
+        # Todo: add a map of trusted nodes for each network and propose defaults for the selected network id only.
+        # Zabanet trusted nodes
+        # default_trusted_nodes = "radix://node_tdx_e_1q0gm3fwqh8ggl09g7l8ru96krzlxdyrc694mqw8cf227v62vjyrmccv8md5@13.126.65.118"
+        # Mainnet trusted nodes
+        default_trusted_nodes = "radix://node_rdx1qf2x63qx4jdaxj83kkw2yytehvvmu6r2xll5gcp6c9rancmrfsgfw0vnc65@52.212.35.209,radix://node_rdx1qgxn3eeldj33kd98ha6wkjgk4k77z6xm0dv7mwnrkefknjcqsvhuu4gc609@54.79.136.139,radix://node_rdx1qwrrnhzfu99fg3yqgk3ut9vev2pdssv7hxhff80msjmmcj968487uugc0t2@43.204.226.50,radix://node_rdx1q0gnmwv0fmcp7ecq0znff7yzrt7ggwrp47sa9pssgyvrnl75tvxmvj78u7t@52.21.106.232"
         value = Helpers.input_guestion(f"Fullnode requires another node to connect to network. "
-                                       # "\nTo connect to MAINNET or STOKENET details on these node can be found here "
-                                       # "- https://docs.radixdlt.com/main/node-and-gateway/seed-nodes.html"
                                        "\nType in the node you want to connect to in format radix://<node-peer-2-peer-address>@<ip>"
-                                       "\nFor Stokenet migration node  type 'radix://node_tdx_2_1qwfh2nn0zx8cut5fqfz6n7pau2f7vdyl89mypldnn4fwlhaeg2tvunp8s8h@54.229.126.97'"
-                                       "\n OR press Enter to accept defaults for Zabanet (rcnet-v3):",
+                                       "\n OR press Enter to accept defaults for mainnet:",
                                        QuestionKeys.input_seednode)
         trustednode = Prompts.check_default(value, default_trusted_nodes)
         Helpers.parse_trustednode(trustednode)
@@ -371,7 +372,7 @@ class Prompts:
     @classmethod
     def ask_olympia_node_url(cls) -> str:
         Helpers.section_headline("Migration: Olympia API Url")
-        answer = Helpers.input_guestion(f"Enter the API Url of your Olympia node with olympia-end-state.: "
+        answer = Helpers.input_guestion(f"Enter the API Url of your Olympia node with olympia-end-state (example https://123.5.6.78): "
                                         , QuestionKeys.olympia_migrations_url)
         return answer
 
@@ -401,6 +402,6 @@ class Prompts:
     @classmethod
     def ask_olympia_node_bech32_address(cls) -> str:
         answer = Helpers.input_guestion(
-            f"Enter the bech32 address of your olympia node."
+            f"Enter the bech32 address of your olympia node:"
             , QuestionKeys.olympia_migrations_bech32)
         return answer

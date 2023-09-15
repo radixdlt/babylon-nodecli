@@ -1,2 +1,2 @@
-JAVA_OPTS="--enable-preview -server -Xms8g -Xmx8g  -XX:MaxDirectMemorySize=2048m -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
-RADIX_NODE_KEYSTORE_PASSWORD={{keystore_password}}
+JAVA_OPTS="{{core_node.java_opts}}"
+RADIX_NODE_KEYSTORE_PASSWORD={{core_node.keydetails.keystore_password}}

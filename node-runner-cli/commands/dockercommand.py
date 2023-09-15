@@ -1,7 +1,6 @@
 import sys
 from argparse import ArgumentParser
 from argparse import RawTextHelpFormatter
-from os.path import abspath, dirname, join
 from pathlib import Path
 
 from commands.subcommand import get_decorator, argument
@@ -51,12 +50,15 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
                   \n\nDETAILED: Default value if not provided. This mode takes your through series of questions.
                   """,
              choices=["CORE", "GATEWAY", "DETAILED", "MIGRATION"], action="store"),
-    argument("-miu", "--migration_url", help="The url of the olympia node to migrate the ledger from", action="store"),
+    argument("-miu", "--migration_url",
+             help="The root url of the olympia node to migrate the ledger from. Do not add /olympia-end-state.",
+             action="store"),
     argument("-miau", "--migration_auth_user", help="The user to authenticate to the olympia node for migration",
              action="store"),
     argument("-miap", "--migration_auth_password",
              help="The password to authenticate to the olympia node for migration", action="store"),
-    argument("-miba", "--migration_bech_url", help="The bech url of the olympia node to migrate the ledger from",
+    argument("-miba", "--migration_bech_address",
+             help="The bech address of the olympia node to migrate the ledger from",
              action="store"),
     argument("-n", "--networkid",
              help="Network id of network you want to connect.For stokenet it is 2 and for mainnet it is 1."
@@ -139,8 +141,7 @@ def install(args):
     DockerSetup.confirm_config_changes(argument_object, docker_config, docker_config_updated_versions)
 
     ########## Install dependent services
-    if docker_config.gateway is not None:
-        DockerSetup.conditionally_start_local_postgres(docker_config_updated_versions)
+    DockerSetup.conditionally_start_local_postgres(docker_config_updated_versions)
 
     if docker_config.core_node is not None:
         DockerSetup.chown_files(docker_config)
