@@ -402,6 +402,6 @@ class Prompts:
     @classmethod
     def ask_olympia_node_bech32_address(cls) -> str:
         answer = Helpers.input_guestion(
-            f"Enter the bech32 address of your olympia node."
+            f"Enter the bech32 address of your olympia node:"
             , QuestionKeys.olympia_migrations_bech32)
         return answer
