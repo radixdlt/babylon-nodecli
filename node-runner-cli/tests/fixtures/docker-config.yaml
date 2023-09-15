@@ -6,7 +6,6 @@ common_config:
   network_id: 33
   network_name: enkinet
   nginx_settings:
-    enable_transaction_api: 'true'
     gateway_behind_auth: 'true'
     mode: docker
     protect_core: 'true'
@@ -16,7 +15,6 @@ common_config:
 core_node:
   core_release: release-birch-ffbc9b5273
   data_directory: /home/radixdlt/data
-  enable_transaction: 'true'
   java_opts: --enable-preview -server -Xms8g -Xmx8g  -XX:MaxDirectMemorySize=2048m
     -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts
     -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector

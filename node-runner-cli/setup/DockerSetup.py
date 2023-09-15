@@ -267,11 +267,6 @@ class DockerSetup(BaseSetup):
 
         if docker_config.common_config.check_nginx_required():
             docker_config.common_config.ask_nginx_release()
-            if "CORE" in argument_object.setupmode.mode:
-                if docker_config.core_node.enable_transaction == "true":
-                    docker_config.common_config.nginx_settings.enable_transaction_api = "true"
-                else:
-                    docker_config.common_config.nginx_settings.enable_transaction_api = "false"
 
         return docker_config
 

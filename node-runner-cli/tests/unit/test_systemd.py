@@ -291,7 +291,6 @@ RADIX_NODE_KEYSTORE_PASSWORD=nowthatyouknowmysecretiwillfollowyouuntilyouforgeti
                           'network_name': '',
                           'nginx_settings': {'config_url': '',
                                              'dir': '/etc/nginx',
-                                             'enable_transaction_api': 'false',
                                              'mode': 'systemd',
                                              'protect_core': 'true',
                                              'release': '',

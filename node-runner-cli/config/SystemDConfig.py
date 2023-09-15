@@ -26,7 +26,6 @@ class SystemDConfig(BaseConfig):
     def parse_config_from_args(self, args):
         self.core_node.trusted_node = args.trustednode
         self.common_config.host_ip = args.hostip
-        self.core_node.enable_transaction = args.enabletransactions
         self.core_node.data_directory = args.data_directory
         self.common_config.node_dir = args.configdir
         if args.configdir is not None:
