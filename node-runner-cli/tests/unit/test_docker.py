@@ -121,7 +121,20 @@ class DockerUnitTests(unittest.TestCase):
                                                        "somebech32address")
         docker_compose_yaml = DockerSetup.render_docker_compose(settings)
         java_opts = docker_compose_yaml["services"]["core"]["environment"]["JAVA_OPTS"]
-        self.assertRegex(java_opts, '.*-Xms16g -Xmx16g.*')
+        self.assertRegex(java_opts, '.*-Xms8g -Xmx16g.*')
+
+    def test_docker_mem_limits_increased_on_migration(self):
+        self.maxDiff = None
+        settings = DockerConfig({})
+        settings.core_node.core_release = "test"
+        settings.common_config.nginx_settings.release = "test"
+        settings = MigrationSetup.ask_migration_config(settings, "someurl",
+                                                       "someuser",
+                                                       "somepassword",
+                                                       "somebech32address")
+        docker_compose_yaml = DockerSetup.render_docker_compose(settings)
+        mem_limit = docker_compose_yaml["services"]["core"]["mem_limit"]
+        self.assertEqual(mem_limit, '32000m')
 
 
 def suite():
