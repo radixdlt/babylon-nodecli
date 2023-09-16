@@ -134,7 +134,7 @@ class DockerUnitTests(unittest.TestCase):
                                                        "somebech32address")
         docker_compose_yaml = DockerSetup.render_docker_compose(settings)
         mem_limit = docker_compose_yaml["services"]["core"]["mem_limit"]
-        self.assertEqual(mem_limit, '32000m')
+        self.assertEqual(mem_limit, '30000m')
 
 
 def suite():
