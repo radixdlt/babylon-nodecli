@@ -208,7 +208,9 @@ class Prompts:
         default_trusted_nodes = "radix://node_rdx1qf2x63qx4jdaxj83kkw2yytehvvmu6r2xll5gcp6c9rancmrfsgfw0vnc65@52.212.35.209,radix://node_rdx1qgxn3eeldj33kd98ha6wkjgk4k77z6xm0dv7mwnrkefknjcqsvhuu4gc609@54.79.136.139,radix://node_rdx1qwrrnhzfu99fg3yqgk3ut9vev2pdssv7hxhff80msjmmcj968487uugc0t2@43.204.226.50,radix://node_rdx1q0gnmwv0fmcp7ecq0znff7yzrt7ggwrp47sa9pssgyvrnl75tvxmvj78u7t@52.21.106.232"
         value = Helpers.input_guestion(f"Fullnode requires another node to connect to network. "
                                        "\nType in the node you want to connect to in format radix://<node-peer-2-peer-address>@<ip>"
-                                       "\n OR press Enter to accept defaults for mainnet:",
+                                       "\n OR press Enter to accept defaults for mainnet."
+                                       f"The defaults for mainnet are {default_trusted_nodes}"
+                                       f"Enter your choice:",
                                        QuestionKeys.input_seednode)
         trustednode = Prompts.check_default(value, default_trusted_nodes)
         Helpers.parse_trustednode(trustednode)
