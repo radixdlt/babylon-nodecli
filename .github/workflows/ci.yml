@@ -18,7 +18,6 @@ jobs:
       contents: read
       id-token: write
     runs-on: ubuntu-latest
-    environment: release
     name: A test of the oidc debugger
     steps:
       - name: Checkout actions-oidc-debugger
