@@ -1,2 +1,2 @@
-__version__= "test-mainnet-release-4-gecb901b"
-__base_version__= "test-mainnet-release"
+__version__= "2.0.rcnet-v3-rc8"
+__base_version__= "2.0.rcnet-v3-rc8"

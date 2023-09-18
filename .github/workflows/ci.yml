@@ -170,6 +170,29 @@ jobs:
         with:
           name: ubuntu 22.04
           path: "${{ github.workspace }}/node-runner-cli/out/ubuntu/jammy/babylonnode"
+
+  build-jammy-arm:
+    needs: 
+      - tests
+      - e2e-tests
+    name: "Build jammy for ARM"
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.4.0
+        with:
+          fetch-depth: 0
+      - name: Build the binary for ubuntu jammy
+        run: |
+          cd node-runner-cli
+          make output-ubuntu-jammy-arm
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: "Upload generated cli file"
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: ubuntu 22.04 ARM
+          path: "${{ github.workspace }}/node-runner-cli/out/ubuntu/jammy/babylonnode"
   
   build-focal:
     needs: 
@@ -192,6 +215,30 @@ jobs:
         with:
           name: ubuntu 20.04
           path: "${{ github.workspace }}/node-runner-cli/out/ubuntu/focal/babylonnode"
+
+  build-focal-arm:
+    needs: 
+      - tests 
+    name: "Build focal ARM"
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.4.0
+        with:
+          fetch-depth: 0
+      - name: Build the binary for ubuntu focal
+        run: |
+          cd node-runner-cli
+          make output-ubuntu-focal-arm
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: "Upload generated cli file"
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: ubuntu 20.04 ARM
+          path: "${{ github.workspace }}/node-runner-cli/out/ubuntu/focal/babylonnode"
+
+
   upload-asset-store:
     environment: AWS_ARTIFACT
     runs-on: ubuntu-22.04
