@@ -444,7 +444,7 @@ class SystemDSetup(BaseSetup):
         if settings != None:
             if settings.migration != None:
                 if settings.migration.use_olympia:
-                    if "-Xms8g -Xmx8g" in settings.core_node.java_opts:
+                    if "-Xms12g -Xmx12g" in settings.core_node.java_opts:
                         if Prompts.ask_temporary_java_opts_update():
                             settings.core_node.java_opts = "--enable-preview -server -Xms12g -Xmx12g  " \
                                                            "-XX:MaxDirectMemorySize=2048m " \

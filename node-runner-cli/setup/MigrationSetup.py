@@ -8,13 +8,14 @@ class MigrationSetup:
         new_config = current_config
         new_config.migration.use_olympia = True
 
-        new_config.core_node.memory_limit: str = "14000m"
-        new_config.core_node.java_opts = "--enable-preview -server -Xms12g -Xmx12g  " \
-                                         "-XX:MaxDirectMemorySize=2048m " \
-                                         "-XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops " \
-                                         "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts " \
-                                         "-Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom " \
-                                         "-DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
+        # Moved to default values
+        # new_config.core_node.memory_limit: str = "14000m"
+        # new_config.core_node.java_opts = "--enable-preview -server -Xms12g -Xmx12g  " \
+        #                                  "-XX:MaxDirectMemorySize=2048m " \
+        #                                  "-XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops " \
+        #                                  "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts " \
+        #                                  "-Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom " \
+        #                                  "-DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
         if olympia_node_url is None:
             olympia_node_url = Prompts.ask_olympia_node_url()
         new_config.migration.olympia_node_url = olympia_node_url

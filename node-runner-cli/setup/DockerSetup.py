@@ -351,10 +351,10 @@ class DockerSetup(BaseSetup):
         if docker_config != None:
             if docker_config.migration != None:
                 if docker_config.migration.use_olympia:
-                    if docker_config.core_node.memory_limit == "12000m" or docker_config.core_node.memory_limit == None:
+                    if docker_config.core_node.memory_limit == "14000m" or docker_config.core_node.memory_limit == None:
                         if Prompts.ask_temporary_mem_limits_update():
                             docker_config.core_node.memory_limit = "14000m"
-                    if "-Xms8g -Xmx8g" in docker_config.core_node.java_opts:
+                    if "-Xms12g -Xmx12g" in docker_config.core_node.java_opts:
                         if Prompts.ask_temporary_java_opts_update():
                             docker_config.core_node.java_opts = "--enable-preview -server -Xms12g -Xmx12g  " \
                                                                 "-XX:MaxDirectMemorySize=2048m " \
