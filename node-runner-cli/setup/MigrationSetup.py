@@ -9,7 +9,7 @@ class MigrationSetup:
         new_config.migration.use_olympia = True
 
         new_config.core_node.memory_limit: str = "30000m"
-        new_config.core_node.java_opts = "--enable-preview -server -Xms8g -Xmx16g  " \
+        new_config.core_node.java_opts = "--enable-preview -server -Xms12g -Xmx12g  " \
                                          "-XX:MaxDirectMemorySize=2048m " \
                                          "-XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops " \
                                          "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts " \

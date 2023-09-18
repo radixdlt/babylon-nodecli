@@ -316,7 +316,7 @@ RADIX_NODE_KEYSTORE_PASSWORD=nowthatyouknowmysecretiwillfollowyouuntilyouforgeti
                                                        "somepassword",
                                                        "somebech32address")
         environment_yaml = settings.create_environment_yaml()
-        self.assertTrue("-Xms8g -Xmx16g" in environment_yaml)
+        self.assertTrue("-Xms12g -Xmx12g" in environment_yaml)
 
 
 def suite():
