@@ -20,9 +20,9 @@ class CoreDockerConfig(BaseConfig):
         self.repo: str = os.getenv(CORE_DOCKER_REPO_OVERRIDE, "radixdlt/babylon-node")
         self.data_directory: str = f"{Helpers.get_home_dir()}/babylon-ledger"
         self.trusted_node: str = ""
-        self.memory_limit: str = "12000m"
+        self.memory_limit: str = "14000m"
         self.validator_address: str = ""
-        self.java_opts: str = "--enable-preview -server -Xms8g -Xmx8g  " \
+        self.java_opts: str = "--enable-preview -server -Xms12g -Xmx12g  " \
                               "-XX:MaxDirectMemorySize=2048m " \
                               "-XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops " \
                               "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts " \

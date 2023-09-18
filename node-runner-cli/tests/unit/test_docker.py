@@ -101,14 +101,14 @@ class DockerUnitTests(unittest.TestCase):
         self.assertEqual(None, docker_compose_yaml["services"]["core"][
             "environment"].get("RADIXDLT_GENESIS_DATA_FILE"))
 
-    def test_docker_java_opts_normal_not_on_migration(self):
+    def test_docker_java_opts_not_migration_are_same_as_for_migration(self):
         self.maxDiff = None
         settings = DockerConfig({})
         settings.core_node.core_release = "test"
         settings.common_config.nginx_settings.release = "test"
         docker_compose_yaml = DockerSetup.render_docker_compose(settings)
         java_opts = docker_compose_yaml["services"]["core"]["environment"]["JAVA_OPTS"]
-        self.assertRegex(java_opts, '.*-Xms8g -Xmx8g.*')
+        self.assertRegex(java_opts, '.*-Xms12g -Xmx12g.*')
 
     def test_docker_java_opts_increased_on_migration(self):
         self.maxDiff = None
