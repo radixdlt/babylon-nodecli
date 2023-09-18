@@ -8,7 +8,6 @@ class DockerNginxConfig(BaseConfig):
         self.mode: str = "docker"
         self.protect_gateway: str = "true"
         self.gateway_behind_auth: str = "true"
-        self.enable_transaction_api = "false"
         self.protect_core: str = "true"
         self.release = ""
         self.repo = "radixdlt/babylon-nginx"
@@ -21,7 +20,6 @@ class SystemdNginxConfig(BaseConfig):
         if config_dict is None:
             config_dict = dict()
         self.mode: str = "systemd"
-        self.enable_transaction_api = "false"
         self.protect_core: str = "true"
         self.dir: str = '/etc/nginx'
         self.secrets_dir: str = '/etc/nginx/secrets'

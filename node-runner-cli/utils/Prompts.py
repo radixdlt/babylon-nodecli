@@ -152,16 +152,6 @@ class Prompts:
         return Helpers.check_Yes(Prompts.check_default(answer, "Y"))
 
     @staticmethod
-    def ask_enable_transaction() -> str:
-        Helpers.section_headline("TRANSACTION API")
-        print(
-            "\nTransactions API on fullnodes are disabled. For it act as node that can stream transactions to a Gateway, it needs to be enabled."
-            "\nTo enable this, it requires to be set to true,")
-        answer = Helpers.input_guestion("\nPress 'ENTER' to accept 'false'. otherwise type 'true' [true/false]:",
-                                        QuestionKeys.input_transaction_api)
-        return Prompts.check_default(answer, "false").lower()
-
-    @staticmethod
     def ask_keyfile_path() -> str:
         Helpers.section_headline("KEYSTORE FILE")
         print(

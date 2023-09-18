@@ -20,7 +20,6 @@ class CoreSystemdConfig(BaseConfig):
         self.core_binary_url: str = ""
         self.core_library_url: str = ""
         self.data_directory: str = f"{Helpers.get_home_dir()}/babylon-ledger"
-        self.enable_transaction: str = "false"
         self.trusted_node: str = ""
         self.node_dir: str = '/etc/radixdlt/node'
         self.node_secrets_dir: str = '/etc/radixdlt/node/secrets'
@@ -32,10 +31,6 @@ class CoreSystemdConfig(BaseConfig):
                               "-Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom " \
                               "-DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
         super().__init__(config_dict)
-
-    def ask_enable_transaction(self):
-        if "DETAILED" in SetupMode.instance().mode:
-            self.enable_transaction = Prompts.ask_enable_transaction()
 
     def ask_trusted_node(self, trusted_node):
         if not trusted_node:
