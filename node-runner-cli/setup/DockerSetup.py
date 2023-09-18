@@ -350,3 +350,21 @@ class DockerSetup(BaseSetup):
                                f'{docker_config.common_config.genesis_bin_data_file}'])
         run_shell_command(['sudo', 'chown', '-R', f'{username}:{username}',
                            f'{docker_config.core_node.data_directory}'])
+
+    @staticmethod
+    def verify_memory_settings_migration(docker_config: DockerConfig):
+        if docker_config != None:
+            if docker_config.migration != None:
+                if docker_config.migration.use_olympia:
+                    if docker_config.core_node.memory_limit == "12000m" or docker_config.core_node.memory_limit == None:
+                        if Prompts.ask_temporary_mem_limits_update():
+                            docker_config.core_node.memory_limit = "14000m"
+                    if "-Xms8g -Xmx8g" in docker_config.core_node.java_opts:
+                        if Prompts.ask_temporary_java_opts_update():
+                            docker_config.core_node.java_opts = "--enable-preview -server -Xms12g -Xmx12g  " \
+                                                                "-XX:MaxDirectMemorySize=2048m " \
+                                                                "-XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops " \
+                                                                "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts " \
+                                                                "-Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom " \
+                                                                "-DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
+        return docker_config

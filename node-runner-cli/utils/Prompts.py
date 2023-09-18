@@ -361,8 +361,9 @@ class Prompts:
               "Refer this link for more details"
               "\n https://docs-babylon.radixdlt.com/main/node-and-gateway/register-as-validator.html#_gather_your_node_public_key"
               "")
-        answer = Helpers.input_guestion(f"\n\n Do you have a validator address. If you are running node for babylon migration, type 'n'? (Y/n): "
-                                        , QuestionKeys.have_validator_address)
+        answer = Helpers.input_guestion(
+            f"\n\n Do you have a validator address. If you are running node for babylon migration, type 'n'? (Y/n): "
+            , QuestionKeys.have_validator_address)
         validator_address = ""
         if Helpers.check_Yes(Prompts.check_default(answer, "N")):
             validator_address = Helpers.input_guestion(f"Enter your validator address:",
@@ -374,8 +375,9 @@ class Prompts:
     @classmethod
     def ask_olympia_node_url(cls) -> str:
         Helpers.section_headline("Migration: Olympia API Url")
-        answer = Helpers.input_guestion(f"Enter the API Url of your Olympia node with olympia-end-state (example https://123.5.6.78): "
-                                        , QuestionKeys.olympia_migrations_url)
+        answer = Helpers.input_guestion(
+            f"Enter the API Url of your Olympia node with olympia-end-state (example https://123.5.6.78): "
+            , QuestionKeys.olympia_migrations_url)
         return answer
 
     @classmethod
@@ -407,3 +409,27 @@ class Prompts:
             f"Enter the bech32 address of your olympia node:"
             , QuestionKeys.olympia_migrations_bech32)
         return answer
+
+    @classmethod
+    def ask_temporary_mem_limits_update(cls):
+        ask = input("Detected that mem_limits have not been updated for migration.\n"
+                    "Do you want to update them from 12000m to 14000m temporarily?\n"
+                    "The change will not be persisted in the config file.\n"
+                    "The next time you run install with migration.use_olympia set to false, \n"
+                    "this prompt will not appear and the installation will take the values from your config file (Y/n)")
+        if Helpers.check_Yes(ask):
+            return True
+        else:
+            return False
+
+    @classmethod
+    def ask_temporary_java_opts_update(cls):
+        ask = input("Detected that java_opts have not been updated for migration.\n"
+                    "Do you want to update them to -Xms12g -Xmx12g temporarily?\n"
+                    "The change will not be persisted in the config file.\n"
+                    "The next time you run install with migration.use_olympia set to false, \n"
+                    "this prompt will not appear and the installation will take the values from your config file (Y/n)")
+        if Helpers.check_Yes(ask):
+            return True
+        else:
+            return False

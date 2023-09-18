@@ -141,6 +141,7 @@ def install(args):
 
     ########## Update existing Config
     docker_config: DockerConfig = DockerSetup.load_settings(argument_object.config_file)
+    docker_config = DockerSetup.verify_memory_settings_migration(docker_config)
     docker_config_updated_versions = DockerSetup.update_versions(docker_config,
                                                                  argument_object.autoapprove) if argument_object.update else docker_config
 
