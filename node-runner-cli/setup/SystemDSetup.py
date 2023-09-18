@@ -15,6 +15,7 @@ from setup.GatewaySetup import GatewaySetup
 from setup.MigrationSetup import MigrationSetup
 from setup.SystemDCommandArguments import SystemDConfigArguments
 from utils.PromptFeeder import QuestionKeys
+from utils.Prompts import Prompts
 from utils.utils import run_shell_command, Helpers
 
 
@@ -437,3 +438,18 @@ class SystemDSetup(BaseSetup):
             nginx_etc_dir=settings.common_config.nginx_settings.dir, backup_time=backup_time,
             auto_approve=autoapprove)
         return nginx_configured
+
+    @staticmethod
+    def verify_memory_settings_migration(settings: SystemDConfig):
+        if settings != None:
+            if settings.migration != None:
+                if settings.migration.use_olympia:
+                    if "-Xms8g -Xmx8g" in settings.core_node.java_opts:
+                        if Prompts.ask_temporary_java_opts_update():
+                            settings.core_node.java_opts = "--enable-preview -server -Xms12g -Xmx12g  " \
+                                                           "-XX:MaxDirectMemorySize=2048m " \
+                                                           "-XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops " \
+                                                           "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts " \
+                                                           "-Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom " \
+                                                           "-DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
+        return settings
