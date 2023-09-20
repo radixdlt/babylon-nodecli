@@ -75,7 +75,7 @@ for i in {1..10}; do
     if [[ $i == 10 ]]; then
       echo "failed to get ready in time."
       echo "here are the logs of the core node"
-      docker logs $(whoami)_core_1 --tail 100
+      docker logs $(whoami)-core-1 --tail 100
       echo "Exiting..."
       exit 137
     fi

@@ -16,10 +16,6 @@ from utils.utils import run_shell_command, Helpers, bcolors
 class BaseSetup:
     @staticmethod
     def dependencies():
-        setup_dir = abspath(__file__)
-        node_runner_dir = dirname(setup_dir)
-        docker_install = join(node_runner_dir, "scripts", "docker_install.sh")
-        run_shell_command(docker_install, shell=True)
         run_shell_command('sudo apt install -y  docker.io wget unzip docker-compose rng-tools', shell=True)
         run_shell_command('sudo rngd -r /dev/random | true', shell=True)
         run_shell_command("sudo apt install -y ansible", shell=True, fail_on_error=True)
