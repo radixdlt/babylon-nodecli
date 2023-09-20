@@ -587,18 +587,20 @@ jobs:
 
   test-userflow-docker-core-gateway-same-host:
     runs-on: babylon-nodecli-gateway
+    needs:
+      - build-jammy
+      - snyk-scan
     steps:
       - name: Checkout
         uses: actions/checkout@v3.4.0
         with:
           fetch-depth: 0
-      # - name: Download packaged cli
-      #   uses: actions/download-artifact@v3
-      #   with:
-      #     name: ubuntu 22.04
+      - name: Download packaged cli
+        uses: actions/download-artifact@v3
+        with:
+          name: ubuntu 22.04
       - name: Get dependencies
         run: |
-          wget -O babylonnode https://github.com/radixdlt/babylon-nodecli/releases/download/2.0.0/babylonnode-ubuntu-22.04
           chmod +x ./babylonnode
           sudo apt-get update
           sudo apt-get install -y postgresql-client jq
@@ -622,6 +624,10 @@ jobs:
     # Disabled for now
     if: ${{ false }}  
     runs-on: ubuntu-22.04
+    # Removed until the memory requirements can be met
+    # needs:
+    #   - build-jammy
+    #   - snyk-scan
     steps:
       - name: Checkout
         uses: actions/checkout@v3.4.0
@@ -633,6 +639,7 @@ jobs:
       #     name: ubuntu 22.04
       - name: Get dependencies
         run: |
+          # This is a temporary shortcut to speedup ci development circles 
           wget -O babylonnode https://github.com/radixdlt/babylon-nodecli/releases/download/2.0.0/babylonnode-ubuntu-22.04
           chmod +x ./babylonnode
           sudo apt-get update
