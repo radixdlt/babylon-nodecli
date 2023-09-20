@@ -640,6 +640,7 @@ jobs:
           ./babylonnode docker dependencies
       - name: "Execute User Flow: Install Core, Gateway and Monitoring on the same host"
         run: |
+          export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
           chmod +x  ./node-runner-cli/tests/userflows/install-docker-all-same-host.sh
           ./node-runner-cli/tests/userflows/install-docker-all-same-host.sh
         env:
