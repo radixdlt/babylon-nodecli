@@ -22,6 +22,7 @@ class BaseSetup:
         run_shell_command(docker_install, shell=True)
         run_shell_command('sudo apt install -y  docker.io wget unzip docker-compose rng-tools', shell=True)
         run_shell_command('sudo rngd -r /dev/random | true', shell=True)
+        run_shell_command("sudo apt install -y ansible", shell=True, fail_on_error=True)
 
     @staticmethod
     def add_user_docker_group():

@@ -234,6 +234,7 @@ def dependencies(args):
     This commands installs all necessary software on the Virtual Machine(VM).
     Run this command on fresh VM or on a existing VM  as the command is tested to be idempotent
     """
+    BaseSetup.dependencies()
     logger.info("Installing docker dependencies")
     if is_sudo_installed():
         BaseSetup.add_user_docker_group()
