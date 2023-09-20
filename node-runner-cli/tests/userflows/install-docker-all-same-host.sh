@@ -77,7 +77,7 @@ for i in {1..20}; do
        fi
        echo "The result is unsuccessful. Waiting and trying again ($i of 20)"
        echo "Command ./babylonnode api system health resultet in"
-       ./babylonnode api system health
+       NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./babylonnode api system health
    fi
    sleep 10
 done
