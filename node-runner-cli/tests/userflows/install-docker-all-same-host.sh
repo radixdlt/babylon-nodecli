@@ -62,9 +62,17 @@ fi
 
 ./babylonnode docker install -f $HOME/babylon-node-config/config.yaml -a
 
+echo "Checking container health"
+sleep 10
+docker ps
+
+echo "Waiting and checking again"
+sleep 10
+docker ps
+
 echo "Testing Core node comes up"
 set +e
-for i in {1..10}; do
+for i in {1..5}; do
   FULL_OUTPUT=$(NGINX_ADMIN_PASSWORD=${NGINX_ADMIN_PASSWORD} ./babylonnode api system health)
   OUTPUT=$(echo $FULL_OUTPUT | jq -r '.status')
   if [[ $OUTPUT == "SYNCING" || $OUTPUT == "BOOTING_AT_GENESIS" || $OUTPUT == "BOOTING" || $OUTPUT == "UP" ]]; then
@@ -72,18 +80,18 @@ for i in {1..10}; do
     echo "The Node is in status $OUTPUT"
     break
   else
-    if [[ $i == 10 ]]; then
+    if [[ $i == 5 ]]; then
       echo "failed to get ready in time."
       echo "here are the logs of the core node"
       docker logs $(whoami)-core-1 --tail 100
       echo "Exiting..."
       exit 137
     fi
-    echo "The result is unsuccessful. Waiting and trying again ($i of 10)"
+    echo "The result is unsuccessful. Waiting and trying again ($i of 5)"
     echo "Command ./babylonnode api system health resulted in"
     echo "$FULL_OUTPUT"
   fi
-  sleep 20
+  sleep 30
 done
 set -e
 
