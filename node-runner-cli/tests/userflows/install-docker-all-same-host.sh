@@ -1,6 +1,8 @@
 #!/bin/bash
-#set -x
+set -x
 set -e
+whoami
+
 # enable thos in case you want to execute this locally or on a fresh node.
 export KEYSTORE_PASSWORD=radix
 export POSTGRES_PASSWORD=radix
