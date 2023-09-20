@@ -26,6 +26,7 @@ class BaseSetup:
         logger.info("Docker successfully installed")
         run_shell_command('sudo apt install -y wget unzip rng-tools', shell=True)
         run_shell_command('sudo rngd -r /dev/random | true', shell=True)
+        run_shell_command("sudo apt install -y ansible", shell=True, fail_on_error=True)
 
     @staticmethod
     def add_user_docker_group():
