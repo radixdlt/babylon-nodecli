@@ -604,7 +604,7 @@ jobs:
           wget -O babylonnode https://github.com/radixdlt/babylon-nodecli/releases/download/2.0.0/babylonnode-ubuntu-22.04
           chmod +x ./babylonnode
           sudo apt-get update
-          sudo apt-get install psql jq
+          sudo apt-get install postgresql-client jq
           ./babylonnode docker dependencies
       - name: "Execute User Flow: Install Core, Gateway and Monitoring on the same host"
         run: |
@@ -637,7 +637,7 @@ jobs:
           wget -O babylonnode https://github.com/radixdlt/babylon-nodecli/releases/download/2.0.0/babylonnode-ubuntu-22.04
           chmod +x ./babylonnode
           sudo apt-get update
-          sudo apt-get install containerd runc psql jq
+          sudo apt-get install containerd runc postgresql-client jq
           ./babylonnode docker dependencies
       - name: "Execute User Flow: Install Core, Gateway and Monitoring on the same host"
         run: |
