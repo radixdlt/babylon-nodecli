@@ -338,13 +338,11 @@ jobs:
           sudo apt-get install containerd runc
       - name: Run systemd dependencies
         run: |
-          ls -a
           chmod +x ./babylonnode
-          # ./babylonnode systemd dependencies
+          ./babylonnode systemd dependencies
           echo "expecting the dependencies to be already installed"
       - name: Run systemd config
         run: |
-          ls -a
           chmod +x ./babylonnode
           echo "HOME=$HOME"
           echo "PATH=$PWD"
@@ -361,7 +359,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Run systemd install
         run: |
-          ls -a
           chmod +x ./babylonnode
           echo "HOME=$HOME"
           echo "PATH=$PWD"
