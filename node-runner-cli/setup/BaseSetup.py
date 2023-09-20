@@ -1,6 +1,5 @@
 import os
 import sys
-from os.path import abspath, dirname, join
 from pathlib import Path
 
 import yaml
@@ -11,22 +10,32 @@ from log_util.logger import get_logger
 from setup.AnsibleRunner import AnsibleRunner
 from utils.PromptFeeder import QuestionKeys
 from utils.Prompts import Prompts
-from utils.utils import run_shell_command, Helpers, bcolors
+from utils.utils import run_shell_command, Helpers, bcolors, is_sudo_installed
 
 logger = get_logger(__name__)
+
 
 class BaseSetup:
     @staticmethod
     def dependencies():
-        logger.info("Installing docker")
-        run_shell_command("curl -fsSL https://get.docker.com -o get-docker.sh", shell=True)
-        run_shell_command("sudo sh get-docker.sh", shell=True)
-        BaseSetup.add_user_docker_group()
-        run_shell_command("docker run hello-world", shell=True, fail_on_error=True)
-        logger.info("Docker successfully installed")
-        run_shell_command('sudo apt install -y wget unzip rng-tools', shell=True)
-        run_shell_command('sudo rngd -r /dev/random | true', shell=True)
-        run_shell_command("sudo apt install -y ansible", shell=True, fail_on_error=True)
+        if is_sudo_installed():
+            logger.info("Installing docker")
+            run_shell_command("curl -fsSL https://get.docker.com -o get-docker.sh", shell=True)
+            run_shell_command("sudo sh get-docker.sh", shell=True)
+            BaseSetup.add_user_docker_group()
+            run_shell_command("docker run hello-world", shell=True, fail_on_error=True)
+            logger.info("Docker successfully installed")
+            run_shell_command('sudo apt install -y wget unzip rng-tools ansible', shell=True)
+            run_shell_command('sudo rngd -r /dev/random | true', shell=True)
+
+            try:
+                ansible_dir = f'https://raw.githubusercontent.com/radixdlt/babylon-nodecli/{Helpers.cli_version()}/node-runner-cli'
+                AnsibleRunner(ansible_dir).check_install_ansible(False)
+            except Exception as e:
+                logger.error(f"An error occurred while installing ansible: {e}")
+        else:
+            logger.info("sudo is not installed in the system. You need sudo to install dependencies")
+            sys.exit(99)
 
     @staticmethod
     def add_user_docker_group():
