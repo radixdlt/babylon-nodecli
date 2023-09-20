@@ -345,9 +345,9 @@ jobs:
         env:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SEED_NODE: ${{ env.SEED_NODE }}
-          NETWORK_ID: ${{ env.NETWORK_ID }}
-          NETWORK_NAME: ${{ env.NETWORK_NAME }}
+          SEED_NODE: ${{ vars.SEED_NODE }}
+          NETWORK_ID: ${{ vars.NETWORK_ID }}
+          NETWORK_NAME: ${{ vars.NETWORK_NAME }}
       - name: Run systemd install
         run: |
           ls -a
@@ -616,9 +616,9 @@ jobs:
           POSTGRES_PASSWORD: ${{secrets.POSTGRES_PASSWORD}}
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
           RADIXDLT_NGINX_VERSION_OVERRIDE: test6
-          SEED_NODE: ${{ env.SEED_NODE }}
-          NETWORK_ID: ${{ env.NETWORK_ID }}
-          NETWORK_NAME: ${{ env.NETWORK_NAME }}
+          SEED_NODE: ${{ vars.SEED_NODE }}
+          NETWORK_ID: ${{ vars.NETWORK_ID }}
+          NETWORK_NAME: ${{ vars.NETWORK_NAME }}
 
   experiment-userflow-docker-core-gateway-same-host:
     runs-on: ubuntu-22.04
@@ -650,6 +650,6 @@ jobs:
           POSTGRES_PASSWORD: ${{secrets.POSTGRES_PASSWORD}}
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
           RADIXDLT_NGINX_VERSION_OVERRIDE: test6
-          SEED_NODE: ${{ env.SEED_NODE }}
-          NETWORK_ID: ${{ env.NETWORK_ID }}
-          NETWORK_NAME: ${{ env.NETWORK_NAME }}
+          SEED_NODE: ${{ vars.SEED_NODE }}
+          NETWORK_ID: ${{ vars.NETWORK_ID }}
+          NETWORK_NAME: ${{ vars.NETWORK_NAME }}
