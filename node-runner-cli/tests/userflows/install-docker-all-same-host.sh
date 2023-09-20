@@ -73,7 +73,10 @@ for i in {1..10}; do
     break
   else
     if [[ $i == 10 ]]; then
-      echo "failed to get ready in time. Exiting..."
+      echo "failed to get ready in time."
+      echo "here are the logs of the core node"
+      docker logs $(whoami)_core_1 --tail 100
+      echo "Exiting..."
       exit 137
     fi
     echo "The result is unsuccessful. Waiting and trying again ($i of 10)"
