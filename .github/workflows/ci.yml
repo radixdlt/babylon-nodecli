@@ -324,13 +324,11 @@ jobs:
           sudo apt-get update
       - name: Run systemd dependencies
         run: |
-          ls -a
           chmod +x ./babylonnode
-          # ./babylonnode systemd dependencies
+          ./babylonnode systemd dependencies
           echo "expecting the dependencies to be already installed"
       - name: Run systemd config
         run: |
-          ls -a
           chmod +x ./babylonnode
           echo "HOME=$HOME"
           echo "PATH=$PWD"
@@ -350,7 +348,6 @@ jobs:
           NETWORK_NAME: ${{ vars.NETWORK_NAME }}
       - name: Run systemd install
         run: |
-          ls -a
           chmod +x ./babylonnode
           echo "HOME=$HOME"
           echo "PATH=$PWD"

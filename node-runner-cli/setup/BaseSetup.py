@@ -7,16 +7,24 @@ import yaml
 
 from config.BaseConfig import SetupMode
 from config.KeyDetails import KeyDetails
+from log_util.logger import get_logger
 from setup.AnsibleRunner import AnsibleRunner
 from utils.PromptFeeder import QuestionKeys
 from utils.Prompts import Prompts
 from utils.utils import run_shell_command, Helpers, bcolors
 
+logger = get_logger(__name__)
 
 class BaseSetup:
     @staticmethod
     def dependencies():
-        run_shell_command('sudo apt install -y  docker.io wget unzip docker-compose rng-tools', shell=True)
+        logger.info("Installing docker")
+        run_shell_command("curl -fsSL https://get.docker.com -o get-docker.sh", shell=True)
+        run_shell_command("sudo sh get-docker.sh", shell=True)
+        BaseSetup.add_user_docker_group()
+        run_shell_command("docker run hello-world", shell=True, fail_on_error=True)
+        logger.info("Docker successfully installed")
+        run_shell_command('sudo apt install -y wget unzip rng-tools', shell=True)
         run_shell_command('sudo rngd -r /dev/random | true', shell=True)
         run_shell_command("sudo apt install -y ansible", shell=True, fail_on_error=True)
 
