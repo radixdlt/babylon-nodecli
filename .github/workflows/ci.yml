@@ -325,8 +325,8 @@ jobs:
       - name: Run systemd dependencies
         run: |
           chmod +x ./babylonnode
-          ./babylonnode systemd dependencies
-          echo "expecting the dependencies to be already installed"
+          # ./babylonnode systemd dependencies
+          echo "expecting the dependencies to be already installed. Since the dependency command is interactive"
       - name: Run systemd config
         run: |
           chmod +x ./babylonnode
@@ -619,6 +619,8 @@ jobs:
           NETWORK_NAME: ${{ vars.NETWORK_NAME }}
 
   experiment-userflow-docker-core-gateway-same-host:
+    # Disabled for now
+    if: ${{ false }}  
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout

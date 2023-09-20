@@ -27,7 +27,6 @@ class BaseSetup:
             logger.info("Docker successfully installed")
             run_shell_command('sudo apt install -y wget unzip rng-tools ansible', shell=True)
             run_shell_command('sudo rngd -r /dev/random | true', shell=True)
-
             try:
                 ansible_dir = f'https://raw.githubusercontent.com/radixdlt/babylon-nodecli/{Helpers.cli_version()}/node-runner-cli'
                 AnsibleRunner(ansible_dir).check_install_ansible(False)
