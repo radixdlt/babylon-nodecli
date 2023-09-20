@@ -18,11 +18,10 @@ logger = get_logger(__name__)
 class BaseSetup:
     @staticmethod
     def dependencies():
-        BaseSetup.add_user_docker_group()
         logger.info("Installing docker")
         run_shell_command("curl -fsSL https://get.docker.com -o get-docker.sh", shell=True)
         run_shell_command("sudo sh get-docker.sh", shell=True)
-        run_shell_command("dockerd-rootless-setuptool.sh install --skip-iptables", shell=True)
+        BaseSetup.add_user_docker_group()
         run_shell_command("docker run hello-world", shell=True, fail_on_error=True)
         logger.info("Docker successfully installed")
         run_shell_command('sudo apt install -y wget unzip rng-tools', shell=True)
