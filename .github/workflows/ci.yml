@@ -594,107 +594,79 @@ jobs:
       - name: Enable Snyk online monitoring - Network
         run: snyk monitor --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --target-reference=${{ github.ref_name }}
 
-#  These do not run on Babylon
-#  test-core-api:
-#    runs-on: [node-only]
-#    needs:
-#      - test-core-only-node
-#    steps:
-#      - uses: actions/setup-python@v3
-#        with:
-#          python-version: '3.x'
-#          architecture: 'x64'
-#      - name: Checkout
-#        uses: actions/checkout@v3.4.0
-#      - name: setup python modules
-#        run: |
-#          cd node-runner-cli
-#          make local
-#      - name: Run api commands
-#        run: |
-#          export DISABLE_VERSION_CHECK=true
-#          export NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD
-#          export NGINX_METRICS_PASSWORD=$NGINX_METRICS_PASSWORD
-#          export NGINX_SUPERADMIN_PASSWORD=$NGINX_SUPERADMIN_PASSWORD
-#          python node-runner-cli/tests.py
-#        env:
-#          NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
-#          NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
-#          NGINX_SUPERADMIN_PASSWORD: ${{secrets.NGINX_SUPERADMIN_PASSWORD}}
+  test-full-stack:
+    runs-on: ubuntu-22.04
+    needs:
+      - build-jammy
+    steps:
+      - name: Download packaged cli
+        uses: actions/download-artifact@v3
+        with:
+          name: ubuntu 22.04
+      - name: Get dependencies
+        run: |
+          chmod +x ./babylonnode
+          sudo apt-get update
+          sudo apt-get install containerd runc
+          ./babylonnode docker dependencies
+      - name: Setup config
+        run: |
+          chmod +x ./babylonnode
+          mkdir -p $HOME/node-config
+          export DISABLE_VERSION_CHECK=true
+          rm -rf $HOME/node-config
+          ./babylonnode docker config -d $HOME/node-config \
+            -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 \
+            -m CORE GATEWAY -n 2 -k $KEYSTORE_PASSWORD -nk -p $POSTGRESS_PASSWORD -a
+          #grep -v "password" $HOME/node-config/config.yaml > temp && mv temp $HOME/node-config/config.yaml
+          cat $HOME/node-config/config.yaml
+        env:
+          POSTGRESS_PASSWORD: ${{secrets.POSTGRESS_PASSWORD}}
+          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
+          CORE_DOCKER_REPO_OVERRIDE: "radixdlt/babylon-node"
+          RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
+          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
+      - name: Run CLI setup
+        run: |
+          export DISABLE_VERSION_CHECK=true
+          export COMPOSE_HTTP_TIMEOUT=360
 
-#  test-full-stack:
-#    runs-on: ubuntu-22.04
-#    needs:
-#      - package_ubuntu_cli
-#    steps:
-#      - name: Download packaged cli
-#        uses: actions/download-artifact@v3
-#        with:
-#          name: ubuntu 22.04
-#      - name: Get dependencies
-#        run: |
-#          chmod +x ./babylonnode
-#          sudo apt-get update
-#          sudo apt-get install containerd runc
-#          ./babylonnode docker dependencies
-#      - name: Setup config
-#        run: |
-#          chmod +x ./babylonnode
-#          mkdir -p $HOME/node-config
-#          export DISABLE_VERSION_CHECK=true
-#          rm -rf $HOME/node-config
-#          ./babylonnode docker config -d $HOME/node-config \
-#            -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 \
-#            -m CORE GATEWAY -n 2 -k $KEYSTORE_PASSWORD -nk -p $POSTGRESS_PASSWORD -a
-#          #grep -v "password" $HOME/node-config/config.yaml > temp && mv temp $HOME/node-config/config.yaml
-#          cat $HOME/node-config/config.yaml
-#        env:
-#          POSTGRESS_PASSWORD: ${{secrets.POSTGRESS_PASSWORD}}
-#          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
-#          CORE_DOCKER_REPO_OVERRIDE: "radixdlt/radixdlt-core"
-#          RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
-#          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
-#      - name: Run CLI setup
-#        run: |
-#          export DISABLE_VERSION_CHECK=true
-#          export COMPOSE_HTTP_TIMEOUT=360
-#
-#          ./babylonnode docker stop -f $HOME/node-config/config.yaml
-#
-#          #Below PATH require when ansible is installed as part of pip
-#          export PATH="$PATH:/home/ubuntu/.local/bin"
-#
-#          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./babylonnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
-#          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./babylonnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
-#          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./babylonnode auth set-gateway-password -m DOCKER -p $NGINX_GATEWAY_PASSWORD
-#
-#          ./babylonnode monitoring stop
-#          ./babylonnode monitoring config \
-#              -m MONITOR_CORE MONITOR_GATEWAY \
-#              -cm $NGINX_METRICS_PASSWORD  \
-#              -gm $NGINX_METRICS_PASSWORD  \
-#              -am $NGINX_METRICS_PASSWORD
-#
-#          ./babylonnode monitoring install -a
-#
-#          export POSTGRES_PASSWORD=${{secrets.POSTGRESS_PASSWORD}}
-#          export RADIXDLT_NODE_KEY_PASSWORD=${{secrets.KEYSTORE_PASSWORD}}
-#          # ToDo: Fix Docker Image Pull with Gateway installation
-#          # ./babylonnode docker install -f $HOME/node-config/config.yaml -a
-#          # sleep 60
-#
-#          # NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./babylonnode api system health
-#          # curl -f  --request POST --insecure --user "gateway:$NGINX_GATEWAY_PASSWORD" https://localhost/gateway
-#          # curl --insecure --user "gateway:$NGINX_GATEWAY_PASSWORD" https://localhost/token/native --header 'Content-Type: application/json' -d '{ "network_identifier":{"network":"stokenet"}}'
-#          # curl -k -f -u "metrics:$NGINX_METRICS_PASSWORD" https://localhost/gateway/metrics
-#
-#        env:
-#          NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
-#          NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
-#          NGINX_GATEWAY_PASSWORD: ${{secrets.NGINX_GATEWAY_PASSWORD}}
-#          CORE_DOCKER_REPO_OVERRIDE: "radixdlt/radixdlt-core"
-#          RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
-#          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
+          ./babylonnode docker stop -f $HOME/node-config/config.yaml
+
+          #Below PATH require when ansible is installed as part of pip
+          export PATH="$PATH:/home/ubuntu/.local/bin"
+
+          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./babylonnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
+          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./babylonnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
+          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./babylonnode auth set-gateway-password -m DOCKER -p $NGINX_GATEWAY_PASSWORD
+
+          ./babylonnode monitoring stop
+          ./babylonnode monitoring config \
+              -m MONITOR_CORE MONITOR_GATEWAY \
+              -cm $NGINX_METRICS_PASSWORD  \
+              -gm $NGINX_METRICS_PASSWORD  \
+              -am $NGINX_METRICS_PASSWORD
+
+          ./babylonnode monitoring install -a
+
+          export POSTGRES_PASSWORD=${{secrets.POSTGRESS_PASSWORD}}
+          export RADIXDLT_NODE_KEY_PASSWORD=${{secrets.KEYSTORE_PASSWORD}}
+          # ToDo: Fix Docker Image Pull with Gateway installation
+          # ./babylonnode docker install -f $HOME/node-config/config.yaml -a
+          # sleep 60
+
+          # NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./babylonnode api system health
+          # curl -f  --request POST --insecure --user "gateway:$NGINX_GATEWAY_PASSWORD" https://localhost/gateway
+          # curl --insecure --user "gateway:$NGINX_GATEWAY_PASSWORD" https://localhost/token/native --header 'Content-Type: application/json' -d '{ "network_identifier":{"network":"stokenet"}}'
+          # curl -k -f -u "metrics:$NGINX_METRICS_PASSWORD" https://localhost/gateway/metrics
+
+        env:
+          NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
+          NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
+          NGINX_GATEWAY_PASSWORD: ${{secrets.NGINX_GATEWAY_PASSWORD}}
+          CORE_DOCKER_REPO_OVERRIDE: "radixdlt/radixdlt-core"
+          RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
+          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
 
 #
 #  test-full-stack-no-nginx:
