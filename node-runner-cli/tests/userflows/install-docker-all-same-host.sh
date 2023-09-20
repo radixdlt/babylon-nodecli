@@ -64,18 +64,20 @@ fi
 
 echo "Testing Core node comes up"
 set +e
-for i in {1..10}; do
+for i in {1..20}; do
    OUTPUT=$(NGINX_ADMIN_PASSWORD=${NGINX_ADMIN_PASSWORD} ./babylonnode api system health | jq -r '.status')
    if [[ $OUTPUT == "SYNCING" || $OUTPUT == "BOOTING_AT_GENESIS" || $OUTPUT == "BOOTING" || $OUTPUT == "UP" ]]; then
        echo "The result is successful"
        echo "The Node is in status $OUTPUT"
        break
    else
-       if [[ $i == 10 ]]; then
+       if [[ $i == 20 ]]; then
         echo "failed to get ready in time. Exiting..."
         exit 137
        fi
-       echo "The result is unsuccessful. Waiting and trying again ($i of 10)"
+       echo "The result is unsuccessful. Waiting and trying again ($i of 20)"
+       echo "Command ./babylonnode api system health resultet in"
+       ./babylonnode api system health
    fi
    sleep 10
 done
