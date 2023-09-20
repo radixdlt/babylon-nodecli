@@ -322,7 +322,7 @@ jobs:
         run: |
           chmod +x ./babylonnode
           sudo apt-get update
-          sudo apt-get install containerd runc
+          sudo apt-get install containerd runc -y
       - name: Run systemd dependencies
         run: |
           ls -a
@@ -399,7 +399,7 @@ jobs:
         run: |
           chmod +x ./babylonnode
           sudo apt-get update
-          sudo apt-get install containerd runc
+          sudo apt-get install containerd runc -y
           ./babylonnode docker dependencies
       - name: core-gateway-all-local
         run: |
@@ -465,7 +465,7 @@ jobs:
         run: |
           chmod +x ./babylonnode
           sudo apt-get update
-          sudo apt-get install containerd runc
+          sudo apt-get install containerd runc -y
           ./babylonnode docker dependencies
       - name: Setup config
         run: |
@@ -527,7 +527,7 @@ jobs:
         run: |
           chmod +x ./babylonnode
           sudo apt-get update
-          sudo apt-get install containerd runc
+          sudo apt-get install containerd runc -y 
           ./babylonnode docker dependencies
       - name: Setup config
         run: |
@@ -605,7 +605,7 @@ jobs:
         run: |
           chmod +x ./babylonnode
           sudo apt-get update
-          sudo apt-get install containerd runc
+          sudo apt-get install containerd runc -y
           ./babylonnode docker dependencies
       - name: "Execute User Flow: Install Core, Gateway and Monitoring on the same host"
         run: |
