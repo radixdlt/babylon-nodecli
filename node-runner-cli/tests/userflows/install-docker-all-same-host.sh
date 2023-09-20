@@ -4,14 +4,14 @@ set -e
 whoami
 
 # enable thos in case you want to execute this locally or on a fresh node.
-export KEYSTORE_PASSWORD=radix
-export POSTGRES_PASSWORD=radix
-export NGINX_ADMIN_PASSWORD=radix
-export NGINX_METRICS_PASSWORD=radix
-export NGINX_GATEWAY_PASSWORD=radix
-export SEED_NODE=radix://node_tdx_e_1q0gm3fwqh8ggl09g7l8ru96krzlxdyrc694mqw8cf227v62vjyrmccv8md5@13.126.65.118,radix://node_tdx_e_1q0juzf2gnhfhy2aj6x88x4f459tf2a2mdk56jm3ffhzp94fn8k0q5lkse34@52.64.209.45,radix://node_tdx_e_1qdzlwtjn9wcmcyt3mp3g4qaerr6fgrl86ze6t20427tf4rmnu670y0cgszc@54.72.0.65,radix://node_tdx_e_1qfz9r8xp95vuzjq503l856ywukrdnukcz4232tr4nsx7ff2efvfnwvaq080@35.168.132.18
-export NETWORK_ID=14
-export NETWORK_NAME=zabanet
+#export KEYSTORE_PASSWORD=radix
+#export POSTGRES_PASSWORD=radix
+#export NGINX_ADMIN_PASSWORD=radix
+#export NGINX_METRICS_PASSWORD=radix
+#export NGINX_GATEWAY_PASSWORD=radix
+#export SEED_NODE=radix://node_tdx_e_1q0gm3fwqh8ggl09g7l8ru96krzlxdyrc694mqw8cf227v62vjyrmccv8md5@13.126.65.118,radix://node_tdx_e_1q0juzf2gnhfhy2aj6x88x4f459tf2a2mdk56jm3ffhzp94fn8k0q5lkse34@52.64.209.45,radix://node_tdx_e_1qdzlwtjn9wcmcyt3mp3g4qaerr6fgrl86ze6t20427tf4rmnu670y0cgszc@54.72.0.65,radix://node_tdx_e_1qfz9r8xp95vuzjq503l856ywukrdnukcz4232tr4nsx7ff2efvfnwvaq080@35.168.132.18
+#export NETWORK_ID=14
+#export NETWORK_NAME=zabanet
 
 export DISABLE_VERSION_CHECK=true
 export COMPOSE_HTTP_TIMEOUT=360
@@ -34,15 +34,15 @@ cat $HOME/babylon-node-config/config.yaml
 ./babylonnode monitoring stop | true
 
 # Setup passwords details
-DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./babylonnode auth set-admin-password -m DOCKER -p ${NGINX_ADMIN_PASSWORD}
-DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./babylonnode auth set-metrics-password -m DOCKER -p ${NGINX_METRICS_PASSWORD}
-DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./babylonnode auth set-gateway-password -m DOCKER -p ${NGINX_GATEWAY_PASSWORD}
+DOCKER_COMPOSE_FOLDER_PREFIX=$(whoami) ./babylonnode auth set-admin-password -m DOCKER -p ${NGINX_ADMIN_PASSWORD}
+DOCKER_COMPOSE_FOLDER_PREFIX=$(whoami) ./babylonnode auth set-metrics-password -m DOCKER -p ${NGINX_METRICS_PASSWORD}
+DOCKER_COMPOSE_FOLDER_PREFIX=$(whoami) ./babylonnode auth set-gateway-password -m DOCKER -p ${NGINX_GATEWAY_PASSWORD}
 
 ./babylonnode monitoring config \
-    -m MONITOR_CORE MONITOR_GATEWAY \
-    -cm ${NGINX_METRICS_PASSWORD}  \
-    -gm ${NGINX_METRICS_PASSWORD}  \
-    -am ${NGINX_METRICS_PASSWORD}
+  -m MONITOR_CORE MONITOR_GATEWAY \
+  -cm ${NGINX_METRICS_PASSWORD} \
+  -gm ${NGINX_METRICS_PASSWORD} \
+  -am ${NGINX_METRICS_PASSWORD}
 
 ./babylonnode monitoring install -a
 
@@ -64,22 +64,23 @@ fi
 
 echo "Testing Core node comes up"
 set +e
-for i in {1..20}; do
-   OUTPUT=$(NGINX_ADMIN_PASSWORD=${NGINX_ADMIN_PASSWORD} ./babylonnode api system health | jq -r '.status')
-   if [[ $OUTPUT == "SYNCING" || $OUTPUT == "BOOTING_AT_GENESIS" || $OUTPUT == "BOOTING" || $OUTPUT == "UP" ]]; then
-       echo "The result is successful"
-       echo "The Node is in status $OUTPUT"
-       break
-   else
-       if [[ $i == 20 ]]; then
-        echo "failed to get ready in time. Exiting..."
-        exit 137
-       fi
-       echo "The result is unsuccessful. Waiting and trying again ($i of 20)"
-       echo "Command ./babylonnode api system health resultet in"
-       NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./babylonnode api system health
-   fi
-   sleep 10
+for i in {1..10}; do
+  FULL_OUTPUT=$(NGINX_ADMIN_PASSWORD=${NGINX_ADMIN_PASSWORD} ./babylonnode api system health)
+  OUTPUT=$(echo $FULL_OUTPUT | jq -r '.status')
+  if [[ $OUTPUT == "SYNCING" || $OUTPUT == "BOOTING_AT_GENESIS" || $OUTPUT == "BOOTING" || $OUTPUT == "UP" ]]; then
+    echo "The result is successful"
+    echo "The Node is in status $OUTPUT"
+    break
+  else
+    if [[ $i == 10 ]]; then
+      echo "failed to get ready in time. Exiting..."
+      exit 137
+    fi
+    echo "The result is unsuccessful. Waiting and trying again ($i of 10)"
+    echo "Command ./babylonnode api system health resulted in"
+    echo "$FULL_OUTPUT"
+  fi
+  sleep 20
 done
 set -e
 
