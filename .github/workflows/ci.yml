@@ -466,6 +466,7 @@ jobs:
         run: |
           chmod +x ./babylonnode
           sudo apt-get update
+          sudo apt-get install containerd runc
           ./babylonnode docker dependencies
       - name: Setup config
         run: |
