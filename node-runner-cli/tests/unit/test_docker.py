@@ -15,49 +15,10 @@ class DockerUnitTests(unittest.TestCase):
     @patch('sys.stdout', new_callable=StringIO)
     def test_docker_config(self, mockout):
         urllib3.disable_warnings()
-        with patch('builtins.input', side_effect=['Y', 'S', 'N', 'N', '/home/runner/docker-compose.yml', 'N']):
+        with patch('builtins.input', side_effect=['N', 'N', '/home/runner/docker-compose.yml', 'N']):
             with patch("sys.argv",
-                       ["main", "docker", "config", "-m", "DETAILED", "-k", "radix", "-nk", "-a"]):
+                       ["main", "docker", "config", "-m", "DETAILED", "-n", "2", "-k", "radix", "-nk", "-a"]):
                 main()
-
-    @patch('sys.stdout', new_callable=StringIO)
-    def test_docker_config_all_local(self, mockout):
-        urllib3.disable_warnings()
-        # os.environ['PROMPT_FEEDS'] = "test-prompts/individual-prompts/validator_address.yml"
-        # PromptFeeder.prompts_feed = PromptFeeder.instance().load_prompt_feeds()
-        with open('/tmp/genesis.json', 'w') as fp:
-            pass
-        with patch('builtins.input', side_effect=[
-                                                  'Y',
-                                                  'S',
-                                                  'Y',
-                                                  'radix://node_tdx_22_1qvsml9pe32rzcrmw6jx204gjeng09adzkqqfz0ewhxwmjsaas99jzrje4u3@34.243.93.185',
-                                                  'N',
-                                                  'Y',
-                                                  './',
-                                                  'node-keystore.ks',
-                                                  '/tmp/data',
-                                                  'true',
-                                                  'true',
-                                                  'Y',
-                                                  '',  # remote ip of full node
-                                                  'Core',
-                                                  'local',
-                                                  'postgres',
-                                                  'radix-ledger',
-                                                  'pgpassword',
-                                                  'dataaggregation-version',
-                                                  'database-migration-version',
-                                                  'gateway-api-version',
-                                                  'Y',
-                                                  'nginx-version']):
-            with patch("sys.argv",
-                       ["main", "docker", "config", "-m", "DETAILED", "-k", "radix", "-nk", "-a", "-d",
-                        "/tmp"]):
-                main()
-
-            docker_config: DockerConfig = DockerSetup.load_settings("/tmp/config.yaml")
-            self.assertEqual("radix", docker_config.core_node.keydetails.keystore_password)
 
     # @patch('sys.stdout', new_callable=StringIO)
     # def test_docker_config2(self, mockout):

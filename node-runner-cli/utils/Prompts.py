@@ -45,8 +45,9 @@ class Prompts:
             hostname = Helpers.input_guestion(
                 "\nFor the remote managed postgres, Enter the host name of server hosting postgres:",
                 QuestionKeys.postgres_db_host)
-            port = Helpers.input_guestion("\nEnter the port the postgres process is listening on the server:",
+            port = Helpers.input_guestion("\nEnter the port the postgres process is listening on the server. Defaults to 5432:",
                                           QuestionKeys.postgres_db_port)
+            Prompts.check_default(port, "5432")
             return "remote", f"{hostname}:{port}"
 
     @staticmethod
@@ -128,7 +129,13 @@ class Prompts:
         Helpers.section_headline("GATEWAY RELEASE")
 
         print(f"Latest release for {gateway_or_aggregator} is {latest_gateway_release}")
-        question_key = QuestionKeys.gateway_release if gateway_or_aggregator == "gateway_api" else QuestionKeys.aggregator_release
+        question_key = QuestionKeys.gateway_release
+        if gateway_or_aggregator == "gateway_api":
+                question_key = QuestionKeys.gateway_release
+        elif gateway_or_aggregator == "data_aggregator":
+            question_key = QuestionKeys.aggregator_release
+        else:
+            question_key = QuestionKeys.migration_release
         answer = Helpers.input_guestion(
             f"Press Enter to accept the latest or  type in {gateway_or_aggregator} release tag:", question_key)
         return Prompts.check_default(answer, latest_gateway_release)

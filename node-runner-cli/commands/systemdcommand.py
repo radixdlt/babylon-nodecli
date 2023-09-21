@@ -85,7 +85,9 @@ def config(args):
     if there is a version change in the config file, then it updated by doing a migration to newer version
     """
     # Systemd configure is setup using radixdlt user. And this user has been added to docker group yet.
-    BaseSetup.add_user_docker_group()
+    # EDIT: This command is already executed by the dependency command. Running this here prevents us from executing
+    #       tests on the config command from macos.
+    # BaseSetup.add_user_docker_group()
 
     ################### PARSE ARGUMENTS
     argument_object = SystemDConfigArguments(args)
