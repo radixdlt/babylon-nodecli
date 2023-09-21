@@ -437,7 +437,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   test-core-only-node:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-8-cores
     permissions:
       id-token: write
       pull-requests: read
@@ -508,7 +508,7 @@ jobs:
           NGINX_SUPERADMIN_PASSWORD: ${{secrets.NGINX_SUPERADMIN_PASSWORD}}
 
   test-full-stack:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-8-cores
     needs:
       - build-jammy
     steps:
@@ -617,8 +617,8 @@ jobs:
 
   experiment-userflow-docker-core-gateway-same-host:
     # Disabled for now
-    if: ${{ false }}  
-    runs-on: ubuntu-22.04
+#    if: ${{ false }}
+    runs-on: ubuntu-latest-16-cores
     # Removed until the memory requirements can be met
     # needs:
     #   - build-jammy
