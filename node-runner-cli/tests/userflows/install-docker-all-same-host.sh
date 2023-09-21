@@ -138,7 +138,7 @@ PGPASSWORD=$POSTGRES_PASSWORD psql -h localhost -U postgres -d radixdlt_ledger -
 # Wipe database
 PGPASSWORD=$POSTGRES_PASSWORD psql -h localhost -U postgres -d postgres -P pager=off -c "DROP DATABASE IF EXISTS radixdlt_ledger;"
 sudo systemctl stop postgresql@12-main.service --no-pager
-sudo systemctl disable postgresql@12-main.service --no-pager
+#sudo systemctl disable postgresql@12-main.service --no-pager
 
 # Wipe ledger
 sudo rm -rf /home/radixdlt/babylon-ledger/ | true
