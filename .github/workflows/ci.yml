@@ -678,6 +678,8 @@ jobs:
         run: |
           # This is a temporary shortcut to speedup ci development circles 
           wget -O babylonnode https://github.com/radixdlt/babylon-nodecli/releases/download/2.0.0/babylonnode-ubuntu-22.04
+          sudo apt-get update
+          sudo apt-get install -y jq
           chmod +x ./babylonnode
       #          Expect dependencies to be installed before. Since the command is interactive
       #          ./babylonnode systemd dependencies
