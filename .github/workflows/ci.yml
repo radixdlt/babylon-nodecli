@@ -181,7 +181,7 @@ jobs:
             **/junit/test-results.xml
       - if: ${{ github.event_name == 'pull_request' }}
         name: Get Cover
-        uses: orgoro/coverage@v3
+        uses: orgoro/coverage@v3.1
         with:
           coverageFile: node-runner-cli/coverage.xml
           token: ${{ secrets.GITHUB_TOKEN }}
