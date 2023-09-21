@@ -51,7 +51,6 @@ systemctl status nginx.service --no-pager
 
 echo "Set credentials"
 ./babylonnode auth set-admin-password --setupmode SYSTEMD -p ${NGINX_ADMIN_PASSWORD}
-./babylonnode auth set-superadmin-password --setupmode SYSTEMD -p ${NGINX_SUPERADMIN_PASSWORD}
 ./babylonnode auth set-metrics-password --setupmode SYSTEMD -p ${NGINX_METRICS_PASSWORD}
 
 echo "Testing Core node health endpoint"
