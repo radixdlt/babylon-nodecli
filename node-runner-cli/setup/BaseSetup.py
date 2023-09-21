@@ -129,9 +129,9 @@ class BaseSetup:
         data_dir_path = Helpers.input_guestion(
             f"\nRadix node stores all the ledger data on a folder. "
             f"Mounting this location as a docker volume, "
-            f"will allow to restart the node without a need to download ledger"
-            f"\n{bcolors.WARNING}Press Enter to store ledger on \"{Helpers.get_home_dir()}/babylon-ledger\" directory OR "
-            f"Type the absolute path of existing ledger data folder:{bcolors.ENDC}", QuestionKeys.input_ledger_path)
+            f"will allow to restart the node without a need to download the ledger."
+            f"\n{bcolors.WARNING}Press Enter to store ledger in the \"{Helpers.get_home_dir()}/babylon-ledger\" directory OR "
+            f"type the absolute path of an existing ledger data folder:{bcolors.ENDC}", QuestionKeys.input_ledger_path)
         if data_dir_path == "":
             data_dir_path = f"{Helpers.get_home_dir()}/babylon-ledger"
         if create_dir:

@@ -225,6 +225,7 @@ class DockerSetup(BaseSetup):
                 docker_config.common_config.ask_enable_nginx_for_core(argument_object.nginx_on_core)
             else:
                 docker_config.common_config.nginx_settings.protect_core = "false"
+                del docker_config.core_node
 
             run_gateway = Prompts.check_for_gateway()
             if run_gateway:
@@ -254,7 +255,7 @@ class DockerSetup(BaseSetup):
             else:
                 del docker_config.gateway
 
-        if "MIGRATION" in argument_object.setupmode.mode:
+        if "MIGRATION" in argument_object.setupmode.mode and docker_config.core_node is not None:
             docker_config = MigrationSetup.ask_migration_config(docker_config,
                                                                 argument_object.olympia_node_url,
                                                                 argument_object.olympia_node_auth_user,
