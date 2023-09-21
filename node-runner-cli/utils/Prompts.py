@@ -161,9 +161,12 @@ class Prompts:
         y_n = Helpers.input_guestion("\nDo you have a keystore file that you want to use [Y/N]?",
                                      QuestionKeys.have_keystore_file)
         if Helpers.check_Yes(Prompts.check_default(y_n, "N")):
-            return Helpers.input_guestion(
-                f"{bcolors.WARNING}Enter the absolute path of the folder, just the folder, where the keystore file is located:{bcolors.ENDC}",
-                QuestionKeys.input_path_keystore)
+            answer = Helpers.input_guestion(f"{bcolors.WARNING}Default is {Helpers.get_default_node_config_dir()}" \
+                                            f"\nEnter the absolute path of the folder, just the folder, where the keystore file is located:{bcolors.ENDC}",
+                                            QuestionKeys.input_path_keystore)
+            return_value = Prompts.check_default(answer, Helpers.get_default_node_config_dir())
+            return return_value
+
         else:
             babylonnode_dir = f"{Helpers.get_default_node_config_dir()}"
             print(
@@ -171,9 +174,9 @@ class Prompts:
             answer = Helpers.input_guestion(
                 'Press ENTER to accept default. otherwise enter the absolute path of the new folder:',
                 QuestionKeys.input_path_keystore)
-            # TODO this needs to moved out of init
-            run_shell_command(f'mkdir -p {babylonnode_dir}', shell=True, quite=True)
-            return Prompts.check_default(answer, babylonnode_dir)
+            return_value = Prompts.check_default(answer, babylonnode_dir)
+            run_shell_command(f'mkdir -p {return_value}', shell=True, quite=True)
+            return return_value
 
     @staticmethod
     def ask_keyfile_name() -> str:
@@ -199,8 +202,9 @@ class Prompts:
         value = Helpers.input_guestion(f"Fullnode requires another node to connect to network. "
                                        "\nType in the node you want to connect to in format radix://<node-peer-2-peer-address>@<ip>"
                                        "\n OR press Enter to accept defaults for mainnet."
-                                       f"The defaults for mainnet are {default_trusted_nodes}"
-                                       f"Enter your choice:",
+                                       "\nThe defaults are following mainnet nodes:"
+                                       f"\n{default_trusted_nodes}"
+                                       f"\nEnter your choice:",
                                        QuestionKeys.input_seednode)
         trustednode = Prompts.check_default(value, default_trusted_nodes)
         Helpers.parse_trustednode(trustednode)
