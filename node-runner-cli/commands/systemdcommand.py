@@ -103,6 +103,7 @@ def config(args):
 
     ################### File comparisson and generation
     Path(f"{args.configdir}").mkdir(parents=True, exist_ok=True)
+    Path(f"{args.data_directory}").mkdir(parents=True, exist_ok=True)
     SystemDSetup.dump_config_as_yaml(systemd_config)
 
     # Compare old and new if and only if there's an old
