@@ -129,3 +129,5 @@ echo "Stopping systemd service"
 
 df -H
 docker system df
+
+sudo rm -rf ${HOME}/babylon-ledger/
