@@ -616,14 +616,24 @@ jobs:
           NETWORK_ID: ${{ vars.NETWORK_ID }}
           NETWORK_NAME: ${{ vars.NETWORK_NAME }}
 
-  experiment-userflow-docker-core-gateway-same-host:
-    # Disabled for now
-    #    if: ${{ false }}
+  test-userflow-docker-gateway-seperate-postgres:
     runs-on: ubuntu-latest-16-cores
-    # Removed until the memory requirements can be met
-    # needs:
-    #   - build-jammy
-    #   - snyk-scan
+    # Docker Hub image that `container-job` executes in
+    container: ubuntu:22.04
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: ${{secrets.POSTGRES_PASSWORD}}
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+#     Removed until the memory requirements can be met
+#     needs:
+#       - build-jammy
+#       - snyk-scan
     steps:
       - name: Checkout
         uses: actions/checkout@v3.4.0
@@ -644,8 +654,8 @@ jobs:
       - name: "Execute User Flow: Install Core, Gateway and Monitoring on the same host"
         run: |
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
-          chmod +x  ./node-runner-cli/tests/userflows/install-docker-all-same-host.sh
-          ./node-runner-cli/tests/userflows/install-docker-all-same-host.sh
+          chmod +x  ./node-runner-cli/tests/userflows/install-docker-gateway-seperate-postgres.sh
+          ./node-runner-cli/tests/userflows/install-docker-gateway-seperate-postgres.sh
         env:
           NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
           NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
