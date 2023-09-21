@@ -82,7 +82,7 @@ echo "Testing Core node version endpoint"
 NGINX_ADMIN_PASSWORD=${NGINX_ADMIN_PASSWORD} ./babylonnode api system version
 
 echo "Testing Core node metrics endpoint"
-NGINX_METRICS_PASSWORD=${NGINX_METRICS_PASSWORD} ./babylonnode api system metrics
+NGINX_METRICS_PASSWORD=${NGINX_METRICS_PASSWORD} ./babylonnode api metrics
 
 echo "Testing Core node network sync status"
 NGINX_ADMIN_PASSWORD=${NGINX_ADMIN_PASSWORD} ./babylonnode api system network-sync-status
