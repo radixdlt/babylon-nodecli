@@ -338,8 +338,8 @@ jobs:
             -i 13.126.65.118 \
             -v "not_a_real_validator_address" \
             -k $KEYSTORE_PASSWORD -nk -a \
-            -dd $HOME/babylon-ledger
-          ./babylonnode systemd stop && sudo rm -rf $HOME/babylon-ledger
+            -dd /babylon-ledger
+          ./babylonnode systemd stop
         env:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -374,11 +374,6 @@ jobs:
           ./babylonnode systemd stop   
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      # - name: Clean Up
-      #   run: |
-      #     sudo rm -rf /etc/radixdlt/node
-      #     rm -rf node-config/
-      #     rm -rf monitoring
 
   test-config-command:
     runs-on: ubuntu-22.04
