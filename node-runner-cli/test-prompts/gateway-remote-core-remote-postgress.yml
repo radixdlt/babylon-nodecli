@@ -1,8 +1,6 @@
 ---
 - select_network: S
 - have_validator_address: "N"
-- first_time_config: N
-- have_existing_compose: "/home/runner/docker-compose.yml"
 - setup_fullnode: N
 - setup_gateway: Y
 - input_core_api_address: "https://test"
