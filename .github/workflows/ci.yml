@@ -304,78 +304,6 @@ jobs:
           files: |
             babylonnode-ubuntu-20.04
 
-  test-systemd:
-    runs-on: [ node-only ]
-    if: ${{ false }}
-    needs:
-      - build-jammy
-      - snyk-scan
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3.4.0
-        with:
-          fetch-depth: 0
-      - name: Download packaged cli
-        uses: actions/download-artifact@v3
-        with:
-          name: ubuntu 22.04
-      - name: Get dependencies
-        run: |
-          chmod +x ./babylonnode
-          sudo apt-get update
-      - name: Run systemd dependencies
-        run: |
-          chmod +x ./babylonnode
-          # ./babylonnode systemd dependencies
-          echo "expecting the dependencies to be already installed. Since the dependency command is interactive"
-      - name: Run systemd config
-        run: |
-          chmod +x ./babylonnode
-          echo "HOME=$HOME"
-          echo "PATH=$PWD"
-          ./babylonnode systemd config -m CORE \
-            -n $NETWORK_ID \
-            -t $SEED_NODE \
-            -i 13.126.65.118 \
-            -v "" \
-            -k $KEYSTORE_PASSWORD -nk -a \
-            -dd /babylon-ledger
-          ./babylonnode systemd stop
-        env:
-          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SEED_NODE: ${{ vars.SEED_NODE }}
-          NETWORK_ID: ${{ vars.NETWORK_ID }}
-          NETWORK_NAME: ${{ vars.NETWORK_NAME }}
-      - name: Run systemd install
-        run: |
-          chmod +x ./babylonnode
-          echo "HOME=$HOME"
-          echo "PATH=$PWD"
-          ./babylonnode systemd install -a
-      - name: Get Logs and Status
-        run: |
-          sleep 15
-          sudo tail /var/log/syslog  -n 100
-          ./babylonnode auth set-admin-password --setupmode SYSTEMD -p $NGINX_ADMIN_PASSWORD
-          ./babylonnode auth set-superadmin-password --setupmode SYSTEMD -p $NGINX_SUPERADMIN_PASSWORD
-          ./babylonnode auth set-metrics-password --setupmode SYSTEMD -p $NGINX_METRICS_PASSWORD
-          NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./babylonnode api system health
-          NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./babylonnode api system version
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
-          NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
-          NGINX_SUPERADMIN_PASSWORD: ${{secrets.NGINX_SUPERADMIN_PASSWORD}}
-      - name: Stop systemd
-        run: |
-          chmod +x ./babylonnode
-          echo "HOME=$HOME"
-          echo "PATH=$PWD"
-          ./babylonnode systemd stop   
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   test-config-command:
     runs-on: ubuntu-22.04
     needs:
@@ -620,6 +548,9 @@ jobs:
     runs-on: ubuntu-latest-16-cores
     # Docker Hub image that `container-job` executes in
     container: ubuntu:22.04
+    needs:
+      - build-jammy
+      - snyk-scan
     services:
       postgres:
         image: postgres
@@ -630,25 +561,20 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-#     Removed until the memory requirements can be met
-#     needs:
-#       - build-jammy
-#       - snyk-scan
     steps:
       - name: Checkout
         uses: actions/checkout@v3.4.0
         with:
           fetch-depth: 0
-      # - name: Download packaged cli
-      #   uses: actions/download-artifact@v3
-      #   with:
-      #     name: ubuntu 22.04
+      - name: Download packaged cli
+        uses: actions/download-artifact@v3
+        with:
+          name: ubuntu 22.04
       - name: Get dependencies
         run: |
           # This is a temporary shortcut to speedup ci development circles 
           apt-get update
-          apt-get install -y containerd runc postgresql-client jq wget
-          wget -O babylonnode https://github.com/radixdlt/babylon-nodecli/releases/download/2.0.0/babylonnode-ubuntu-22.04
+          apt-get install -y containerd runc postgresql-client jq
           chmod +x ./babylonnode
           ./babylonnode docker dependencies
           apt-get update
@@ -672,26 +598,21 @@ jobs:
           NETWORK_NAME: ${{ vars.NETWORK_NAME }}
 
   test-userflow-systemd-simple:
-    # Disabled for now
-    #    if: ${{ false }}
     runs-on: babylon-nodecli-systemd
-    # Removed until the memory requirements can be met
-    # needs:
-    #   - build-jammy
-    #   - snyk-scan
+    needs:
+      - build-jammy
+      - snyk-scan
     steps:
       - name: Checkout
         uses: actions/checkout@v3.4.0
         with:
           fetch-depth: 0
-      # - name: Download packaged cli
-      #   uses: actions/download-artifact@v3
-      #   with:
-      #     name: ubuntu 22.04
+      - name: Download packaged cli
+        uses: actions/download-artifact@v3
+        with:
+          name: ubuntu 22.04
       - name: Get dependencies
         run: |
-          # This is a temporary shortcut to speedup ci development circles 
-          wget -O babylonnode https://github.com/radixdlt/babylon-nodecli/releases/download/2.0.0/babylonnode-ubuntu-22.04
           sudo apt-get update
           sudo apt-get install -y jq
           chmod +x ./babylonnode
