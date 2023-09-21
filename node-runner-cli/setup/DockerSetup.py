@@ -210,7 +210,6 @@ class DockerSetup(BaseSetup):
             "\nCreating config file using the answers from the questions that would be asked in next steps."
             f"\nLocation of the config file: {bcolors.OKBLUE}{argument_object.config_file}{bcolors.ENDC}")
 
-        docker_config.common_config.ask_existing_docker_compose_file()
         if "DETAILED" in argument_object.setupmode.mode:
             logger.info("Running a DETAILED configuration")
             docker_config.common_config.ask_network_id(argument_object.networkid)
