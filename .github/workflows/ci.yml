@@ -651,6 +651,10 @@ jobs:
           wget -O babylonnode https://github.com/radixdlt/babylon-nodecli/releases/download/2.0.0/babylonnode-ubuntu-22.04
           chmod +x ./babylonnode
           ./babylonnode docker dependencies
+          apt-get update
+          apt-get -qy full-upgrade 
+          apt-get install -qy curl
+          curl -sSL https://get.docker.com/ | sh
       - name: "Execute User Flow: Install Core, Gateway and Monitoring on the same host"
         run: |
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
