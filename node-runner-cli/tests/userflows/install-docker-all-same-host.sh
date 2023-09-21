@@ -70,7 +70,7 @@ echo "Waiting and checking again"
 sleep 10
 docker ps
 
-echo "Testing Core node comes up"
+echo "Testing Core node health endpoint"
 set +e
 for i in {1..5}; do
   FULL_OUTPUT=$(NGINX_ADMIN_PASSWORD=${NGINX_ADMIN_PASSWORD} ./babylonnode api system health)

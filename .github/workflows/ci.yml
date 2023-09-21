@@ -2,10 +2,10 @@ name: CI
 
 on:
   release:
-    types: [published]
+    types: [ published ]
   push:
     branches:
-       - main
+      - main
     tags:
       - test-artifacts*
   pull_request:
@@ -29,7 +29,7 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_NAME_SNYK_SECRET }}
           aws-region: "eu-west-2"
-          role-session-name: "baylon-nodecli-${{ github.run_id }}-${{ github.run_attempt }}"   
+          role-session-name: "baylon-nodecli-${{ github.run_id }}-${{ github.run_attempt }}"
       - name: Fetch AWS secrets
         uses: aws-actions/aws-secretsmanager-get-secrets@287592d14d9c9c48199db83dc182ae12af3df18e # v1.0.1
         with:
@@ -94,7 +94,7 @@ jobs:
         run: snyk monitor --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_DEVOPS_ORG_ID }} --target-reference=${{ github.ref_name }}
       - name: Enable Snyk online monitoring - Network
         run: snyk monitor --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --target-reference=${{ github.ref_name }}
-    
+
   upload-sbom:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'release' }}
@@ -134,7 +134,7 @@ jobs:
       - name: Upload SBOM
         uses: softprops/action-gh-release@c9b46fe7aad9f02afd89b12450b780f52dacfb2d
         with:
-          files: sbom.json   
+          files: sbom.json
 
   tests:
     name: "Unit tests"
@@ -180,7 +180,7 @@ jobs:
             junit/*.xml
             **/junit/test-results.xml
       - if: ${{ github.event_name == 'pull_request' }}
-        name: Get Cover 
+        name: Get Cover
         uses: orgoro/coverage@v3
         with:
           coverageFile: node-runner-cli/coverage.xml
@@ -217,7 +217,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-jammy:
-    needs: 
+    needs:
       - tests
       - e2e-tests
     name: "Build jammy"
@@ -240,8 +240,8 @@ jobs:
           path: "${{ github.workspace }}/node-runner-cli/out/ubuntu/jammy/babylonnode"
   
   build-focal:
-    needs: 
-      - tests 
+    needs:
+      - tests
     name: "Build focal"
     runs-on: ubuntu-22.04
     steps:
@@ -305,7 +305,8 @@ jobs:
             babylonnode-ubuntu-20.04
 
   test-systemd:
-    runs-on: [node-only]
+    runs-on: [ node-only ]
+    if: ${{ false }}
     needs:
       - build-jammy
       - snyk-scan
@@ -336,7 +337,7 @@ jobs:
             -n $NETWORK_ID \
             -t $SEED_NODE \
             -i 13.126.65.118 \
-            -v "not_a_real_validator_address" \
+            -v "" \
             -k $KEYSTORE_PASSWORD -nk -a \
             -dd /babylon-ledger
           ./babylonnode systemd stop
@@ -366,7 +367,7 @@ jobs:
           NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
           NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
           NGINX_SUPERADMIN_PASSWORD: ${{secrets.NGINX_SUPERADMIN_PASSWORD}}
-      - name: Stop systemd 
+      - name: Stop systemd
         run: |
           chmod +x ./babylonnode
           echo "HOME=$HOME"
@@ -617,7 +618,7 @@ jobs:
 
   experiment-userflow-docker-core-gateway-same-host:
     # Disabled for now
-#    if: ${{ false }}
+    #    if: ${{ false }}
     runs-on: ubuntu-latest-16-cores
     # Removed until the memory requirements can be met
     # needs:
@@ -645,6 +646,46 @@ jobs:
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
           chmod +x  ./node-runner-cli/tests/userflows/install-docker-all-same-host.sh
           ./node-runner-cli/tests/userflows/install-docker-all-same-host.sh
+        env:
+          NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
+          NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
+          NGINX_GATEWAY_PASSWORD: ${{secrets.NGINX_GATEWAY_PASSWORD}}
+          POSTGRES_PASSWORD: ${{secrets.POSTGRES_PASSWORD}}
+          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
+          RADIXDLT_NGINX_VERSION_OVERRIDE: test6
+          SEED_NODE: ${{ vars.SEED_NODE }}
+          NETWORK_ID: ${{ vars.NETWORK_ID }}
+          NETWORK_NAME: ${{ vars.NETWORK_NAME }}
+
+  test-userflow-systemd-simple:
+    # Disabled for now
+    #    if: ${{ false }}
+    runs-on: babylon-nodecli-systemd
+    # Removed until the memory requirements can be met
+    # needs:
+    #   - build-jammy
+    #   - snyk-scan
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.4.0
+        with:
+          fetch-depth: 0
+      # - name: Download packaged cli
+      #   uses: actions/download-artifact@v3
+      #   with:
+      #     name: ubuntu 22.04
+      - name: Get dependencies
+        run: |
+          # This is a temporary shortcut to speedup ci development circles 
+          wget -O babylonnode https://github.com/radixdlt/babylon-nodecli/releases/download/2.0.0/babylonnode-ubuntu-22.04
+          chmod +x ./babylonnode
+      #          Expect dependencies to be installed before. Since the command is interactive
+      #          ./babylonnode systemd dependencies
+      - name: "Execute User Flow: Install Core, Gateway and Monitoring on the same host"
+        run: |
+          export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
+          chmod +x  ./node-runner-cli/tests/userflows/install-systemd-simple.sh
+          ./node-runner-cli/tests/userflows/install-systemd-simple.sh
         env:
           NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
           NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
