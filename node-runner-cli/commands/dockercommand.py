@@ -175,7 +175,7 @@ def start(args):
     docker_config = DockerSetup.check_set_passwords(docker_config)
     ########## Install dependent services
     DockerSetup.conditionally_start_local_postgres(docker_config)
-    compose = DockerSetup.get_existing_compose_file(docker_config)
+    compose = DockerSetup.get_existing_compose_file(docker_config.common_config.docker_compose)
     if compose is None:
         print("No docker-compose file found.")
         print("Execute `babylonnode docker config/install` and try again")

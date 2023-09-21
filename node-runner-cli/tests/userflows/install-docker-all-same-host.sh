@@ -3,6 +3,9 @@ set -x
 set -e
 whoami
 
+df -H
+docker system df
+
 # enable thos in case you want to execute this locally or on a fresh node.
 #export KEYSTORE_PASSWORD=radix
 #export POSTGRES_PASSWORD=radix
@@ -96,7 +99,7 @@ done
 set -e
 
 echo "Testing postgres is set up correctly"
-systemctl status postgresql@12-main.service --no-pager
+sudo systemctl status postgresql@12-main.service --no-pager
 PGPASSWORD=$POSTGRES_PASSWORD psql -h localhost -U postgres -d radixdlt_ledger -P pager=off -c "\dt"
 
 echo "Testing gateway endpoints available"
@@ -123,5 +126,13 @@ curl -k -f -u "metrics:${NGINX_METRICS_PASSWORD}" https://localhost/gateway/metr
 echo "Everything seem to work just fine."
 echo "Cleaning up"
 
+df -H
+docker system df
+PGPASSWORD=$POSTGRES_PASSWORD psql -h localhost -U postgres -d radixdlt_ledger -P pager=off -c "\l+"
+PGPASSWORD=$POSTGRES_PASSWORD psql -h localhost -U postgres -d radixdlt_ledger -P pager=off -c "select pg_size_pretty(pg_database_size('radixdlt_ledger'));"
+PGPASSWORD=$POSTGRES_PASSWORD psql -h localhost -U postgres -d radixdlt_ledger -P pager=off -c "select pg_size_pretty(pg_database_size('radixdlt_ledger'));"
+
 ./babylonnode docker stop
 ./babylonnode monitoring stop
+sudo systemctl stop postgresql@12-main.service --no-pager
+sudo systemctl disable postgresql@12-main.service --no-pager

@@ -12,6 +12,9 @@ whoami
 #export NETWORK_ID=14
 #export NETWORK_NAME=zabanet
 
+df -H
+docker system df
+
 export DISABLE_VERSION_CHECK=true
 export COMPOSE_HTTP_TIMEOUT=360
 #Below PATH require when ansible is installed as part of pip
@@ -36,18 +39,18 @@ cat ${HOME}/babylon-node-config/config.yaml
 ./babylonnode systemd install -a
 
 echo "Check radixdlt service status"
-systemctl status radixdlt-node.service --no-pager
+sudo systemctl status radixdlt-node.service --no-pager
 
 echo "Check nginx service status"
-systemctl status nginx.service --no-pager
+sudo systemctl status nginx.service --no-pager
 
 sleep 10
 
 echo "Checking radixdlt service status again"
-systemctl status radixdlt-node.service --no-pager
+sudo systemctl status radixdlt-node.service --no-pager
 
 echo "Checking nginx service status again"
-systemctl status nginx.service --no-pager
+sudo systemctl status nginx.service --no-pager
 
 echo "Set credentials"
 ./babylonnode auth set-admin-password --setupmode SYSTEMD -p ${NGINX_ADMIN_PASSWORD}
@@ -105,10 +108,10 @@ echo "Stopping systemd service"
 sleep 10
 
 echo "Checking radixdlt service status again"
-systemctl status radixdlt-node.service --no-pager | true
+sudo systemctl status radixdlt-node.service --no-pager | true
 
 echo "Checking nginx service status again"
-systemctl status nginx.service --no-pager| true
+sudo systemctl status nginx.service --no-pager| true
 
 echo "Starting systemd service"
 ./babylonnode systemd start
@@ -116,10 +119,13 @@ echo "Starting systemd service"
 sleep 10
 
 echo "Checking radixdlt service status again"
-systemctl status radixdlt-node.service --no-pager
+sudo systemctl status radixdlt-node.service --no-pager
 
 echo "Checking nginx service status again"
-systemctl status nginx.service --no-pager
+sudo systemctl status nginx.service --no-pager
 
 echo "Stopping systemd service"
 ./babylonnode systemd stop
+
+df -H
+docker system df

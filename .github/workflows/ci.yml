@@ -599,7 +599,7 @@ jobs:
         run: |
           chmod +x ./babylonnode
           sudo apt-get update
-          sudo apt-get install -y postgresql-client jq
+          sudo apt-get install -y postgresql-client jq docker-compose
           ./babylonnode docker dependencies
       - name: "Execute User Flow: Install Core, Gateway and Monitoring on the same host"
         run: |

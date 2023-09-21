@@ -126,8 +126,7 @@ class DockerSetup(BaseSetup):
         return False
 
     @staticmethod
-    def get_existing_compose_file(docker_config: DockerConfig) -> dict:
-        compose_file = docker_config.common_config.docker_compose
+    def get_existing_compose_file(compose_file: str) -> dict:
         Helpers.section_headline("Checking if you have existing docker compose file")
         if os.path.exists(compose_file):
             return Helpers.yaml_as_dict(compose_file)
@@ -311,7 +310,7 @@ class DockerSetup(BaseSetup):
     def confirm_docker_compose_file_changes(docker_config: DockerConfig, autoapprove: bool):
         docker_compose_yaml: yaml = DockerSetup.render_docker_compose(docker_config)
         backup_time = Helpers.get_current_date_time()
-        compose_file_yaml = DockerSetup.get_existing_compose_file(docker_config)
+        compose_file_yaml = DockerSetup.get_existing_compose_file(docker_config.common_config.docker_compose)
         compose_file = docker_config.common_config.docker_compose
         if compose_file_yaml is not None:
             compose_file_yaml = {}
