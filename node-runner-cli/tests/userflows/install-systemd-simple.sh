@@ -105,10 +105,10 @@ echo "Stopping systemd service"
 sleep 10
 
 echo "Checking radixdlt service status again"
-systemctl status radixdlt-node.service --no-pager
+systemctl status radixdlt-node.service --no-pager | true
 
 echo "Checking nginx service status again"
-systemctl status nginx.service --no-pager
+systemctl status nginx.service --no-pager| true
 
 echo "Starting systemd service"
 ./babylonnode systemd start
