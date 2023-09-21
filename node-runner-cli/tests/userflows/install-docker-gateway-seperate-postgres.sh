@@ -102,7 +102,7 @@ PGPASSWORD=$POSTGRES_PASSWORD psql -h localhost -U postgres -d radixdlt_ledger -
 PGPASSWORD=$POSTGRES_PASSWORD psql -h localhost -U postgres -d postgres -P pager=off -c "DROP DATABASE IF EXISTS radixdlt_ledger;"
 
 # Wipe ledger
-sudo rm -rf /home/radixdlt/babylon-ledger/ | true
+rm -rf /home/radixdlt/babylon-ledger/ | true
 
 # Wipe docker image store
 docker rmi $(docker image ls -q) | true
