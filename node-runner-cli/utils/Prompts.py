@@ -65,7 +65,7 @@ class Prompts:
         Helpers.section_headline("CORE API NODE DETAILS")
         print(
             "\nThis will be node either running locally or remote using which Gateway aggregator will stream ledger data"
-            f"\nCORE API ADDRESS: Default settings use local node  and the default value is {bcolors.OKBLUE}{default}{bcolors.ENDC}."
+            f"\nCORE API ADDRESS: Default settings use local node and the default value is {bcolors.OKBLUE}{default}{bcolors.ENDC}."
             f"\nExamples for the url in different scenarios:"
             f"\nCore Node and Gateway both in Docker: http://core:3333/core"
             f"\nCore Node as a systemd service behind nginx and Gateway in Docker on the same host: https://host.docker.internal:443/core"
