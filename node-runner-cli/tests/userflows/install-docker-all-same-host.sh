@@ -96,6 +96,7 @@ done
 set -e
 
 echo "Testing postgres is set up correctly"
+systemctl status postgresql@12-main.service --no-pager
 PGPASSWORD=$POSTGRES_PASSWORD psql -h localhost -U postgres -d radixdlt_ledger -P pager=off -c "\dt"
 
 echo "Testing gateway endpoints available"
