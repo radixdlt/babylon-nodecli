@@ -646,10 +646,10 @@ jobs:
       - name: Get dependencies
         run: |
           # This is a temporary shortcut to speedup ci development circles 
-          chmod +x ./babylonnode
           sudo apt-get update
           sudo apt-get install -y containerd runc postgresql-client jq wget
           wget -O babylonnode https://github.com/radixdlt/babylon-nodecli/releases/download/2.0.0/babylonnode-ubuntu-22.04
+          chmod +x ./babylonnode
           ./babylonnode docker dependencies
       - name: "Execute User Flow: Install Core, Gateway and Monitoring on the same host"
         run: |
