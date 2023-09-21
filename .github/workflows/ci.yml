@@ -426,8 +426,6 @@ jobs:
           apt-get update
           apt-get install -y containerd runc postgresql-client jq
           chmod +x ./babylonnode
-#         Not enough permissions in container on hosted runner to execute this
-#          ./babylonnode docker dependencies
           apt install -y wget unzip rng-tools ansible
           apt-get update
           apt-get -qy full-upgrade 
