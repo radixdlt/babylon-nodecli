@@ -230,7 +230,7 @@ class DockerSetup(BaseSetup):
             run_gateway = Prompts.check_for_gateway()
             if run_gateway:
                 docker_config.gateway = GatewaySetup.ask_gateway_full_docker(argument_object.postgrespassword,
-                                                                             argument_object.olympia_node_url)
+                                                                             "http://core:3333/core")
                 docker_config.common_config.ask_enable_nginx_for_gateway(argument_object.nginx_on_gateway)
             else:
                 docker_config.common_config.nginx_settings.protect_gateway = "false"
