@@ -4,6 +4,7 @@ on:
    # branches to consider in the event; optional, defaults to all
    branches:
      - main
+     - EULA
 jobs:
   update_release_draft:
    runs-on: ubuntu-latest
