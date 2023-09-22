@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 
-from commands.subcommand import get_decorator
+from commands.subcommand import get_decorator, argument
 from setup.BaseSetup import BaseSetup
 from utils.utils import Helpers
 
@@ -21,7 +21,11 @@ def version(args):
     print(f"Cli - Version : {Helpers.cli_version()}")
 
 
-@othercommands()
+@othercommands([
+    argument("-u", "--setup_ulimit", help="", action="store_true", default=None),
+    argument("-s", "--setup_swap", help=f"", action="store_true", default=None),
+    argument("-ss", "--swap_space", help=f"", action="store", default="3G", choices=["1G", "3G", "8G"])
+])
 def optimise_node(args):
     """
     Run this command to setup ulimits and swap size on the fresh ubuntu machine
@@ -29,8 +33,7 @@ def optimise_node(args):
     . Prompts asking to setup limits
     . Prompts asking to setup swap and size of swap in GB
     """
-    BaseSetup.setup_node_optimisation_config(Helpers.cli_version())
-
+    BaseSetup.setup_node_optimisation_config(Helpers.cli_version(), args.setup_ulimi, args.setup_swap, args.swap_space)
 
 # @othercommands()
 # def sync_status(args):
@@ -54,4 +57,3 @@ def optimise_node(args):
 #         current = int(response_json["sync_status"]["current_state_version"])
 #         pbar.update(current)
 #     pbar.close()
-

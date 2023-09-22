@@ -113,19 +113,27 @@ class BaseSetup:
         return keydetails
 
     @staticmethod
-    def setup_node_optimisation_config(version):
+    def setup_node_optimisation_config(version, setup_ulimit: bool, setup_swap_space_argument: bool, swap_space: str):
         ansibleRunner = AnsibleRunner(
             f'https://raw.githubusercontent.com/radixdlt/babylon-nodecli/{version}/node-runner-cli')
         file = 'ansible/project/provision.yml'
         ansibleRunner.check_install_ansible()
         ansibleRunner.download_ansible_file(file)
         ansibleRunner.install_ansible_modules()
-        setup_limits = Prompts.ask_ansible_setup_limits()
+        if setup_ulimit is None:
+            setup_limits = Prompts.ask_ansible_setup_limits()
+        else:
+            setup_limits = setup_ulimit
 
         if setup_limits:
             ansibleRunner.run_setup_limits(setup_limits)
 
-        setup_swap, ask_swap_size = Prompts.ask_ansible_swap_setup()
+        if setup_swap_space_argument is None:
+            setup_swap, ask_swap_size = Prompts.ask_ansible_swap_setup()
+        else:
+            setup_swap = setup_swap_space_argument
+            ask_swap_size = swap_space
+
         if setup_swap:
             ansibleRunner.run_swap_size(setup_swap, ask_swap_size)
 
