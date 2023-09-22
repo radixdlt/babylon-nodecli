@@ -5,9 +5,17 @@ on:
    branches:
      - main
 jobs:
- update_release_draft:
+  update_release_draft:
    runs-on: ubuntu-latest
    steps:
-     - uses: release-drafter/release-drafter@v5
-       env:
-         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - uses: release-drafter/release-drafter@v5
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        template: |
+          ## What’s Changed
+          $CHANGES
+
+          ## License
+          Babylon Node CLI code is released under Apache 2.0 license. 
+          The Babylon Node CLI applicaton is licensed under the Radix Software http://www.radixdlt.com/terms/genericEULA[EULA]
