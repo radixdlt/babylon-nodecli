@@ -19,6 +19,18 @@ def version(args):
     Run this command td display the version of CLI been used.
     """
     print(f"Cli - Version : {Helpers.cli_version()}")
+    print(f"The Babylon Node CLI is licensed under the Radix Software EULA. "
+          f"\nBy using this application you agree to the terms and conditions stated here:"
+          f"\nhttp://www.radixdlt.com/terms/genericEULA)")
+
+@othercommands()
+def eula(args):
+    """
+    Run this command td display the EULA.
+    """
+    print(f"The Babylon Node CLI is licensed under the Radix Software EULA. "
+          f"\nBy using this application you agree to the terms and conditions stated here:"
+          f"\nhttp://www.radixdlt.com/terms/genericEULA)")
 
 
 @othercommands()

@@ -24,7 +24,7 @@ urllib3.disable_warnings()
 
 cli = ArgumentParser()
 cli.add_argument('subcommand', help='Subcommand to run',
-                 choices=["docker", "systemd", "api", "monitoring", "version", "optimise-node", "auth", "key", "ledger"])
+                 choices=["docker", "systemd", "api", "monitoring", "version", "optimise-node", "auth", "key", "ledger", "eula"])
 
 apicli = ArgumentParser(
     description='API commands')
