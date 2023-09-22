@@ -407,7 +407,6 @@ jobs:
           NGINX_GATEWAY_PASSWORD: ${{secrets.NGINX_GATEWAY_PASSWORD}}
           POSTGRES_PASSWORD: ${{secrets.POSTGRES_PASSWORD}}
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
-          RADIXDLT_NGINX_VERSION_OVERRIDE: test6
           SEED_NODE: ${{ vars.SEED_NODE }}
           NETWORK_ID: ${{ vars.NETWORK_ID }}
           NETWORK_NAME: ${{ vars.NETWORK_NAME }}
@@ -444,7 +443,6 @@ jobs:
           NGINX_GATEWAY_PASSWORD: ${{secrets.NGINX_GATEWAY_PASSWORD}}
           POSTGRES_PASSWORD: ${{secrets.POSTGRES_PASSWORD}}
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
-          RADIXDLT_NGINX_VERSION_OVERRIDE: test6
           SEED_NODE: ${{ vars.SEED_NODE }}
           NETWORK_ID: ${{ vars.NETWORK_ID }}
           NETWORK_NAME: ${{ vars.NETWORK_NAME }}
