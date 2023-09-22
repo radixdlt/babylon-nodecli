@@ -358,6 +358,24 @@ jobs:
         env:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: gateway-remote-core-local-postgress
+        run: |
+          ls -a
+          export PROMPT_FEEDS="node-runner-cli/test-prompts/gateway-remote-core-local-postgress.yml"
+          ./babylonnode docker config -m DETAILED \
+           -d $HOME/node-config \
+           -k $KEYSTORE_PASSWORD -nk -a
+        env:
+          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
+      - name: gateway-remote-core-remote-postgress
+        run: |
+          ls -a
+          export PROMPT_FEEDS="node-runner-cli/test-prompts/gateway-remote-core-remote-postgress.yml"
+          ./babylonnode docker config -m DETAILED \
+           -d $HOME/node-config \
+           -k $KEYSTORE_PASSWORD -nk -a
+        env:
+          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
 
   test-userflow-docker-core-gateway-same-host:
     runs-on: babylon-nodecli-gateway
