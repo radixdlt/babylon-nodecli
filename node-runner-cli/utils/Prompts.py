@@ -47,7 +47,7 @@ class Prompts:
                 QuestionKeys.postgres_db_host)
             port = Helpers.input_guestion("\nEnter the port the postgres process is listening on the server. Defaults to 5432:",
                                           QuestionKeys.postgres_db_port)
-            Prompts.check_default(port, "5432")
+            port = Prompts.check_default(port, "5432")
             return "remote", f"{hostname}:{port}"
 
     @staticmethod
@@ -73,7 +73,7 @@ class Prompts:
             f"\nCore Node on a different node behind nginx and Gateway in Docker: https://<core-node-ip>:443/core")
         answer = Helpers.input_guestion(
             "Press ENTER to accept default Or Type in remote CoreApi "
-            f"address in format of url like {bcolors.FAIL}http(s)://<host>:<port>/core{bcolors.ENDC}:",
+            f"address in format of url like ({bcolors.FAIL}http(s)://<host>:<port>/core{bcolors.ENDC}):",
             QuestionKeys.input_core_api_address)
         return Prompts.check_default(answer, default)
 
@@ -213,7 +213,7 @@ class Prompts:
         value = Helpers.input_guestion(f"Fullnode requires another node to connect to network. "
                                        "\nType in the node you want to connect to in format radix://<node-peer-2-peer-address>@<ip>"
                                        "\n OR press Enter to accept defaults for mainnet."
-                                       "\nThe defaults are following mainnet nodes:"
+                                       "\nThe default values are the following mainnet nodes:"
                                        f"\n{default_trusted_nodes}"
                                        f"\nEnter your choice:",
                                        QuestionKeys.input_seednode)
