@@ -412,58 +412,59 @@ jobs:
           NETWORK_ID: ${{ vars.NETWORK_ID }}
           NETWORK_NAME: ${{ vars.NETWORK_NAME }}
 
-  test-userflow-docker-gateway-seperate-postgres:
-    runs-on: ubuntu-latest-16-cores
-    # Docker Hub image that `container-job` executes in
-    container: ubuntu:22.04
-    needs:
-      - build-jammy
-      - snyk-scan
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_PASSWORD: ${{secrets.POSTGRES_PASSWORD}}
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3.4.0
-        with:
-          fetch-depth: 0
-      - name: Download packaged cli
-        uses: actions/download-artifact@v3
-        with:
-          name: ubuntu 22.04
-      - name: Get dependencies
-        run: |
-          # This is a temporary shortcut to speedup ci development circles 
-          apt-get update
-          apt-get install -y containerd runc postgresql-client jq
-          chmod +x ./babylonnode
-          apt install -y wget unzip rng-tools ansible
-          apt-get update
-          apt-get -qy full-upgrade 
-          apt-get install -qy curl
-          curl -sSL https://get.docker.com/ | sh
-      - name: "Execute User Flow: Install Core, Gateway and Monitoring on the same host"
-        run: |
-          export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
-          chmod +x  ./node-runner-cli/tests/userflows/install-docker-gateway-seperate-postgres.sh
-          ./node-runner-cli/tests/userflows/install-docker-gateway-seperate-postgres.sh
-        env:
-          NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
-          NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
-          NGINX_GATEWAY_PASSWORD: ${{secrets.NGINX_GATEWAY_PASSWORD}}
-          POSTGRES_PASSWORD: ${{secrets.POSTGRES_PASSWORD}}
-          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
-          RADIXDLT_NGINX_VERSION_OVERRIDE: test6
-          SEED_NODE: ${{ vars.SEED_NODE }}
-          NETWORK_ID: ${{ vars.NETWORK_ID }}
-          NETWORK_NAME: ${{ vars.NETWORK_NAME }}
+# Does not work. Permissions do not suffice to run most commands
+#  test-userflow-docker-gateway-seperate-postgres:
+#    runs-on: ubuntu-latest-16-cores
+#    # Docker Hub image that `container-job` executes in
+#    container: ubuntu:22.04
+#    needs:
+#      - build-jammy
+#      - snyk-scan
+#    services:
+#      postgres:
+#        image: postgres
+#        env:
+#          POSTGRES_PASSWORD: ${{secrets.POSTGRES_PASSWORD}}
+#        options: >-
+#          --health-cmd pg_isready
+#          --health-interval 10s
+#          --health-timeout 5s
+#          --health-retries 5
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v3.4.0
+#        with:
+#          fetch-depth: 0
+#      - name: Download packaged cli
+#        uses: actions/download-artifact@v3
+#        with:
+#          name: ubuntu 22.04
+#      - name: Get dependencies
+#        run: |
+#          # This is a temporary shortcut to speedup ci development circles
+#          apt-get update
+#          apt-get install -y containerd runc postgresql-client jq
+#          chmod +x ./babylonnode
+#          apt install -y wget unzip rng-tools ansible
+#          apt-get update
+#          apt-get -qy full-upgrade
+#          apt-get install -qy curl
+#          curl -sSL https://get.docker.com/ | sh
+#      - name: "Execute User Flow: Install Core, Gateway and Monitoring on the same host"
+#        run: |
+#          export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
+#          chmod +x  ./node-runner-cli/tests/userflows/install-docker-gateway-seperate-postgres.sh
+#          ./node-runner-cli/tests/userflows/install-docker-gateway-seperate-postgres.sh
+#        env:
+#          NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
+#          NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
+#          NGINX_GATEWAY_PASSWORD: ${{secrets.NGINX_GATEWAY_PASSWORD}}
+#          POSTGRES_PASSWORD: ${{secrets.POSTGRES_PASSWORD}}
+#          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
+#          RADIXDLT_NGINX_VERSION_OVERRIDE: test6
+#          SEED_NODE: ${{ vars.SEED_NODE }}
+#          NETWORK_ID: ${{ vars.NETWORK_ID }}
+#          NETWORK_NAME: ${{ vars.NETWORK_NAME }}
 
   test-userflow-systemd-simple:
     runs-on: babylon-nodecli-systemd
