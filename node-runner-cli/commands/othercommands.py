@@ -33,7 +33,7 @@ def optimise_node(args):
     . Prompts asking to setup limits
     . Prompts asking to setup swap and size of swap in GB
     """
-    BaseSetup.setup_node_optimisation_config(Helpers.cli_version(), args.setup_ulimi, args.setup_swap, args.swap_space)
+    BaseSetup.setup_node_optimisation_config(Helpers.cli_version(), args.setup_ulimit, args.setup_swap, args.swap_space)
 
 # @othercommands()
 # def sync_status(args):
