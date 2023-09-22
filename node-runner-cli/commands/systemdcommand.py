@@ -206,8 +206,8 @@ def dependencies(args):
     if not args.skip:
         BaseSetup.dependencies()
     SystemDSetup.install_java()
-    BaseSetup.add_user_docker_group()
     SystemDSetup.setup_user()
+    BaseSetup.add_radixdlt_user_docker_group()
     SystemDSetup.make_etc_directory()
     SystemDSetup.make_data_directory()
     SystemDSetup.create_service_user_password()

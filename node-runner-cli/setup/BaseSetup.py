@@ -37,11 +37,18 @@ class BaseSetup:
 
     @staticmethod
     def add_user_docker_group():
-
         run_shell_command('sudo groupadd docker', shell=True, fail_on_error=False)
         is_in_docker_group = run_shell_command('groups | grep docker', shell=True, fail_on_error=False)
         if is_in_docker_group.returncode != 0:
-            run_shell_command(f"sudo usermod -aG docker  {os.environ.get('USER')}", shell=True)
+            run_shell_command(f"sudo usermod -aG docker {os.environ.get('USER')}", shell=True)
+            print('Exit ssh login and relogin back for user addition to group "docker" to take effect')
+
+    @staticmethod
+    def add_radixdlt_user_docker_group():
+        run_shell_command('sudo groupadd docker', shell=True, fail_on_error=False)
+        is_in_docker_group = run_shell_command('groups | grep docker', shell=True, fail_on_error=False)
+        if is_in_docker_group.returncode != 0:
+            run_shell_command(f"sudo usermod -aG docker radixdlt", shell=True)
             print('Exit ssh login and relogin back for user addition to group "docker" to take effect')
 
     @staticmethod
