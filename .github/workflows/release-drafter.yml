@@ -5,9 +5,9 @@ on:
    branches:
      - main
 jobs:
- update_release_draft:
+  update_release_draft:
    runs-on: ubuntu-latest
    steps:
-     - uses: release-drafter/release-drafter@v5
-       env:
-         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - uses: release-drafter/release-drafter@v5
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

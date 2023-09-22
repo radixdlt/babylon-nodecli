@@ -24,7 +24,7 @@ urllib3.disable_warnings()
 
 cli = ArgumentParser()
 cli.add_argument('subcommand', help='Subcommand to run',
-                 choices=["docker", "systemd", "api", "monitoring", "version", "optimise-node", "auth", "key", "ledger"])
+                 choices=["docker", "systemd", "api", "monitoring", "version", "optimise-node", "auth", "key", "ledger", "eula"])
 
 apicli = ArgumentParser(
     description='API commands')
@@ -118,7 +118,7 @@ def main():
             keycli.print_help()
         else:
             keycli_args.func(keycli_args)
-    elif args.subcommand in ["version", "optimise-node"]:
+    elif args.subcommand in ["version", "optimise-node","eula"]:
         other_command_cli_args = other_command_cli.parse_args(sys.argv[1:])
         if sys.argv[2:] == "-h":
             other_command_cli.print_help()

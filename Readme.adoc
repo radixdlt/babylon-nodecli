@@ -1,12 +1,15 @@
 
 = Node cli
 
+== License
+Babylon Node CLI code is released under Apache 2.0 link:LICENSE[license]. The Babylon Node CLI is licensed under the Radix Software http://www.radixdlt.com/terms/genericEULA[EULA]
+
 :sectnums:
 == Introduction
 
 Executable name - babylonnode
 
-All the below commands can be executed on Ubuntu 22.04 ( supported OS) as below
+All the below commands can be executed on Ubuntu 22.04 (supported OS) as below
 [source, bash]
 ----
 babylonnode <sub command>
