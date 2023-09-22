@@ -123,6 +123,8 @@ curl -k -f -u "metrics:${NGINX_METRICS_PASSWORD}" https://localhost/gateway/metr
 #echo "Transaction endpoint"
 #curl -k --user "gateway:${NGINX_GATEWAY_PASSWORD}" https://localhost/transaction/construction --header 'Content-Type: application/json' -d '{"ledger_state": {"network": "${NETWORK_NAME}","state_version": 0,"proposer_round_timestamp": "string","epoch": 0,"round": 0}}'
 
+./babylonnode optimise-node -s -u -ss 1G
+
 echo "Everything seem to work just fine."
 echo "Cleaning up"
 
