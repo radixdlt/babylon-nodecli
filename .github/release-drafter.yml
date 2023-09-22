@@ -6,7 +6,8 @@ template: |
 
   ## License
   Babylon Node CLI code is released under Apache 2.0 license. 
-  The Babylon Node CLI applicaton is licensed under the Radix Software http://www.radixdlt.com/terms/genericEULA[EULA]
+  The Babylon Node CLI applicaton is licensed under the Radix Software EULA.
+  Read all terms and conditions here: http://www.radixdlt.com/terms/genericEULA
 categories:
   - title: 'node-runner-cli'
     labels:
