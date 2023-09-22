@@ -2,34 +2,16 @@ name: CI
 
 on:
   release:
-    types: [published]
+    types: [ published ]
   push:
     branches:
-       - main
+      - main
     tags:
       - test-artifacts*
   pull_request:
     branches:
       - main
 jobs:
-
-  oidc_debugger:
-    permissions:
-      contents: read
-      id-token: write
-    runs-on: ubuntu-latest
-    name: A test of the oidc debugger
-    steps:
-      - name: Checkout actions-oidc-debugger
-        uses: actions/checkout@v3
-        with:
-          repository: github/actions-oidc-debugger
-          ref: main
-          path: ./.github/actions/actions-oidc-debugger
-      - name: Debug OIDC Claims
-        uses: ./.github/actions/actions-oidc-debugger
-        with:
-          audience: 'https://github.com/github'
 
   snyk-scan:
     runs-on: ubuntu-latest
@@ -47,7 +29,7 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_NAME_SNYK_SECRET }}
           aws-region: "eu-west-2"
-          role-session-name: "baylon-nodecli-${{ github.run_id }}-${{ github.run_attempt }}"   
+          role-session-name: "baylon-nodecli-${{ github.run_id }}-${{ github.run_attempt }}"
       - name: Fetch AWS secrets
         uses: aws-actions/aws-secretsmanager-get-secrets@287592d14d9c9c48199db83dc182ae12af3df18e # v1.0.1
         with:
@@ -68,487 +50,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Test SBOM generation
         run: snyk sbom --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --format=cyclonedx1.4+json --json-file-output sbom.json
-  tests:
-    name: "Unit tests"
-    runs-on: ubuntu-22.04
-    steps:
-      - name: cancel running workflows
-        uses: styfle/cancel-workflow-action@0.11.0
-        with:
-          access_token: ${{ github.token }}
-      - name: Checkout
-        uses: actions/checkout@v3.4.0
-        with:
-          fetch-depth: 0
-      - name: Dump context
-        uses: crazy-max/ghaction-dump-context@v1
-      - name: Install build essentials
-        run: sudo apt-get -y install build-essential
-      - name: setup python
-        uses: actions/setup-python@v4.5.0
-        with:
-          python-version: 3.10.6
-      - name: Install pipenv
-        run: |
-          pip install pipenv==2023.7.23
-          cd node-runner-cli/
-          pipenv install
-          pipenv run pip install pytest pytest-cov
-          pipenv run pytest tests/unit --doctest-modules --junitxml=junit/test-results.xml --cov=. --cov-report=xml --cov-report=html
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2.6.1
-        if: always()
-        with:
-          files: |
-            /home/runner/work/babylon-nodecli/babylon-nodecli/node-runner-cli/junit/test-results.xml 
-            test-results/**/*.xml
-            test-results/**/*.trx
-            test-results/**/*.json
-            junit/**/*.xml
-            junit/*.xml
-            node-runner-cli/junit/**/*.xml
-            junit/*.xml
-            **/junit/test-results.xml
-      - if: ${{ github.event_name == 'pull_request' }}
-        name: Get Cover 
-        uses: orgoro/coverage@v3
-        with:
-          coverageFile: node-runner-cli/coverage.xml
-          token: ${{ secrets.GITHUB_TOKEN }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  e2e-tests:
-    name: "E2E tests"
-    runs-on: ubuntu-22.04
-    steps:
-      - name: cancel running workflows
-        uses: styfle/cancel-workflow-action@0.11.0
-        with:
-          access_token: ${{ github.token }}
-      - name: Checkout
-        uses: actions/checkout@v3.4.0
-        with:
-          fetch-depth: 0
-      - name: Dump context
-        uses: crazy-max/ghaction-dump-context@v1
-      - name: setup python
-        uses: actions/setup-python@v4.5.0
-        with:
-          python-version: 3.10.6
-      - name: Install pipenv
-        run: |
-          pip install pipenv==2023.7.23
-          cd node-runner-cli/
-          pipenv install
-          pipenv run pip install pytest
-          pipenv run pytest tests/e2e
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  build-jammy:
-    needs: 
-      - tests
-      - e2e-tests
-    name: "Build jammy"
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3.4.0
-        with:
-          fetch-depth: 0
-      - name: Build the binary for ubuntu jammy
-        run: |
-          cd node-runner-cli
-          make output-ubuntu-jammy
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: "Upload generated cli file"
-        uses: actions/upload-artifact@v3.1.2
-        with:
-          name: ubuntu 22.04
-          path: "${{ github.workspace }}/node-runner-cli/out/ubuntu/jammy/babylonnode"
-  
-  build-focal:
-    needs: 
-      - tests 
-    name: "Build focal"
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3.4.0
-        with:
-          fetch-depth: 0
-      - name: Build the binary for ubuntu focal
-        run: |
-          cd node-runner-cli
-          make output-ubuntu-focal
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: "Upload generated cli file"
-        uses: actions/upload-artifact@v3.1.2
-        with:
-          name: ubuntu 20.04
-          path: "${{ github.workspace }}/node-runner-cli/out/ubuntu/focal/babylonnode"
-  upload-asset-store:
-    environment: AWS_ARTIFACT
-    runs-on: ubuntu-22.04
-    if: ${{ github.event_name == 'push' }}
-    needs:
-      - build-jammy
-      - snyk-scan
-    permissions:
-      id-token: write
-      contents: read
-      pull-requests: read
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3.4.0
-      - name: set branchname with commit
-        run: |
-          ls -l
-          BRANCH_NAME_WITH_HYPENS=$(echo ${GITHUB_REF##*/} | sed 's/\//-/g')
-          COMMIT=$(git log -1 --format=%h )
-          BRANCH_WITH_COMMIT=$BRANCH_NAME_WITH_HYPENS-$COMMIT
-          echo "BRANCH_WITH_COMMIT=$BRANCH_WITH_COMMIT" >> $GITHUB_ENV
-      - name: Configure AWS Region
-        run: echo "AWS_DEFAULT_REGION=eu-west-1" >> $GITHUB_ENV
-      - id: install-aws-cli
-        uses: unfor19/install-aws-cli-action@v1
-        with:
-          version: 2
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@e1e17a757e536f70e52b5a12b2e8d1d1c60e04ef
-        with:
-          role-to-assume: arn:aws:iam::${{secrets.ARTIFACT_AWS_ACCOUNT_ID }}:role/gh-asset-store-deployer
-          aws-region: eu-west-1
-      - name: Download packaged cli
-        uses: actions/download-artifact@v3
-        with:
-          name: ubuntu 22.04
-      - name: Upload cli to asset store
-        run: |
-          ls */**
-          aws s3 cp babylonnode s3://${{secrets.ARTIFACT_AWS_BUCKET }}/babylonnode/${{env.BRANCH_WITH_COMMIT}}/babylonnode-ubuntu-22.04
-
-  upload-release-jammy:
-    runs-on: ubuntu-22.04
-    if: ${{ github.event_name == 'release' }}
-    needs:
-      - build-jammy
-      - snyk-scan
-    steps:
-      - name: Download packaged cli
-        uses: actions/download-artifact@v3
-        with:
-          name: ubuntu 22.04
-
-      - name: Rename release asset
-        run: |
-          mv ./babylonnode babylonnode-ubuntu-22.04
-      - if: ${{ github.event_name == 'release' }}
-        name: Upload radixcli ubuntu binary
-        uses: softprops/action-gh-release@c9b46fe7aad9f02afd89b12450b780f52dacfb2d
-        with:
-          files: |
-            babylonnode-ubuntu-22.04
-        
-  upload-sbom:
-    runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'release' }}
-    permissions: write-all
-    needs:
-      - build-jammy
-      - snyk-scan
-    steps:
-      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
-      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
-        with:
-          role_name: ${{ secrets.AWS_ROLE_NAME_SNYK_SECRET }}
-          app_name: 'babylon-nodecli'
-          step_name: 'upload-sbom'
-          secret_prefix: 'SNYK'
-          secret_name: ${{ secrets.AWS_SECRET_NAME_SNYK }}
-          parse_json: true
-      - name: Setup python
-        uses: actions/setup-python@v4.5.0
-        with:
-          python-version: 3.10.6
-      - name: Install pipenv
-        run: python -m pip install --upgrade pipenv wheel
-      - name: Install dependencies
-        run: |
-          cd ./node-runner-cli
-          pipenv install
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Install Snyk cli
-        run: |
-          npm install snyk -g
-          snyk -v
-          snyk auth ${{ env.SNYK_TOKEN }}
-      - name: Generate SBOM
-        run: snyk sbom --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --format=cyclonedx1.4+json --json-file-output sbom.json
-      - name: Upload SBOM
-        uses: softprops/action-gh-release@c9b46fe7aad9f02afd89b12450b780f52dacfb2d
-        with:
-          files: sbom.json
-
-  upload-release-focal:
-    runs-on: ubuntu-20.04
-    if: ${{ github.event_name == 'release' }}
-    needs:
-      - build-focal
-      - snyk-scan
-    steps:
-      - name: Download packaged cli
-        uses: actions/download-artifact@v3
-        with:
-          name: ubuntu 20.04
-      - name: Rename release asset
-        run: |
-          mv ./babylonnode babylonnode-ubuntu-20.04
-      - if: ${{ github.event_name == 'release' }}
-        name: Upload radixcli ubuntu binary
-        uses: softprops/action-gh-release@c9b46fe7aad9f02afd89b12450b780f52dacfb2d
-        with:
-          files: |
-            babylonnode-ubuntu-20.04
-
-  test-systemd:
-    runs-on: [node-only]
-    needs:
-      - build-jammy
-      - snyk-scan
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3.4.0
-        with:
-          fetch-depth: 0
-      - name: Download packaged cli
-        uses: actions/download-artifact@v3
-        with:
-          name: ubuntu 22.04
-      - name: Get dependencies
-        run: |
-          chmod +x ./babylonnode
-          sudo apt-get update
-          sudo apt-get install containerd runc
-      - name: Run systemd dependencies
-        run: |
-          ls -a
-          chmod +x ./babylonnode
-          # ./babylonnode systemd dependencies
-          echo "expecting the dependencies to be already installed"
-      - name: Run systemd config
-        run: |
-          ls -a
-          chmod +x ./babylonnode
-          echo "HOME=$HOME"
-          echo "PATH=$PWD"
-          ./babylonnode systemd config -m CORE \
-            -n 14 \
-            -t radix://node_tdx_e_1q0gm3fwqh8ggl09g7l8ru96krzlxdyrc694mqw8cf227v62vjyrmccv8md5@13.126.65.118 \
-            -i 13.126.65.118 \
-            -v "not_a_real_validator_address" \
-            -k $KEYSTORE_PASSWORD -nk -a \
-            -dd $HOME/babylon-ledger
-          ./babylonnode systemd stop && sudo rm -rf $HOME/babylon-ledger
-        env:
-          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Run systemd install
-        run: |
-          ls -a
-          chmod +x ./babylonnode
-          echo "HOME=$HOME"
-          echo "PATH=$PWD"
-          ./babylonnode systemd install -a
-      - name: Get Logs and Status
-        run: |
-          sleep 15
-          sudo tail /var/log/syslog  -n 100
-          ./babylonnode auth set-admin-password --setupmode SYSTEMD -p $NGINX_ADMIN_PASSWORD
-          ./babylonnode auth set-superadmin-password --setupmode SYSTEMD -p $NGINX_SUPERADMIN_PASSWORD
-          ./babylonnode auth set-metrics-password --setupmode SYSTEMD -p $NGINX_METRICS_PASSWORD
-          NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./babylonnode api system health
-          NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./babylonnode api system version
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
-          NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
-          NGINX_SUPERADMIN_PASSWORD: ${{secrets.NGINX_SUPERADMIN_PASSWORD}}
-      - name: Stop systemd 
-        run: |
-          chmod +x ./babylonnode
-          echo "HOME=$HOME"
-          echo "PATH=$PWD"
-          ./babylonnode systemd stop   
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      # - name: Clean Up
-      #   run: |
-      #     sudo rm -rf /etc/radixdlt/node
-      #     rm -rf node-config/
-      #     rm -rf monitoring
-
-  test-config-command:
-    runs-on: ubuntu-22.04
-    needs:
-      - build-jammy
-      - snyk-scan
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3.4.0
-        with:
-          fetch-depth: 0
-      - name: Download packaged cli
-        uses: actions/download-artifact@v3
-        with:
-          name: ubuntu 22.04
-      - name: Get dependencies
-        run: |
-          chmod +x ./babylonnode
-          sudo apt-get update
-          sudo apt-get install containerd runc
-          ./babylonnode docker dependencies
-      - name: core-gateway-all-local
-        run: |
-          ls -a
-          chmod +x ./babylonnode
-          mkdir -p $HOME/node-config
-          echo "HOME=$HOME"
-          echo "PATH=$PWD"
-          export PROMPT_FEEDS="node-runner-cli/test-prompts/core-gateway-all-local.yml"
-          ./babylonnode docker config -m DETAILED \
-           -d $HOME/node-config \
-           -k $KEYSTORE_PASSWORD -nk -a
-        env:
-          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
-          RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
-          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: corenode-01
-        run: |
-          ls -a
-          chmod +x ./babylonnode
-          export PROMPT_FEEDS="node-runner-cli/test-prompts/corenode-01.yml"
-          ./babylonnode docker config -m DETAILED \
-           -d $HOME/node-config \
-           -k $KEYSTORE_PASSWORD -nk -a
-        env:
-          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
-          RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
-          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: corenode-02
-        run: |
-          ls -a
-          export PROMPT_FEEDS="node-runner-cli/test-prompts/corenode-02.yml"
-          ./babylonnode docker config -m DETAILED \
-           -d $HOME/node-config \
-           -k $KEYSTORE_PASSWORD -nk -a
-        env:
-          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
-          RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
-          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#      Enable below tests when gateway support is implemented
-#      - name: gateway-remote-core-local-postgress
-#        run: |
-#          ls -a
-#          export PROMPT_FEEDS="node-runner-cli/test-prompts/gateway-remote-core-local-postgress.yml"
-#          ./babylonnode docker config -m DETAILED \
-#           -d $HOME/node-config \
-#           -k $KEYSTORE_PASSWORD -nk -a
-#        env:
-#          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
-#          RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
-#          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
-#      - name: gateway-remote-core-remote-postgress
-#        run: |
-#          ls -a
-#          export PROMPT_FEEDS="node-runner-cli/test-prompts/gateway-remote-core-remote-postgress.yml"
-#          ./babylonnode docker config -m DETAILED \
-#           -d $HOME/node-config \
-#           -k $KEYSTORE_PASSWORD -nk -a
-#        env:
-#          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
-#          RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
-#          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
-
-  test-core-only-node:
-    runs-on: ubuntu-22.04
-    permissions:
-      id-token: write
-      pull-requests: read
-      contents: read
-    needs:
-      - build-jammy
-      - snyk-scan
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3.4.0
-        with:
-          fetch-depth: 0
-      - name: Download packaged cli
-        uses: actions/download-artifact@v3
-        with:
-          name: ubuntu 22.04
-      - name: Run configure command
-        run: |
-          chmod +x ./babylonnode
-          sudo apt-get update
-          sudo apt-get install containerd runc
-          ./babylonnode docker dependencies
-      - name: Setup config
-        run: |
-          chmod +x ./babylonnode
-          mkdir -p $HOME/babylon-node-config
-          export DISABLE_VERSION_CHECK=true
-          export RADIXDLT_APP_VERSION_OVERRIDE="rcnet-v3.1-r1"
-          export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
-          export PROMPT_FEEDS="node-runner-cli/test-prompts/core-gateway-all-local.yml"
-          ./babylonnode docker config -m DETAILED \
-           -d $HOME/babylon-node-config \
-           -k $KEYSTORE_PASSWORD -nk -a
-        env:
-          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Run CLI setup
-        run: |
-          export DISABLE_VERSION_CHECK=true
-          export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
-          ./babylonnode docker install -f $HOME/babylon-node-config/config.yaml -a
-          # ToDo: Fix Authorization error export DOCKER_COMPOSE_FOLDER_PREFIX=runner ?
-          sleep 60
-          ./babylonnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
-          ./babylonnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
-          ./babylonnode auth set-superadmin-password -m DOCKER -p $NGINX_SUPERADMIN_PASSWORD
-          NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./babylonnode api system health
-          NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./babylonnode api system version
-        env:
-          NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
-          NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
-          NGINX_SUPERADMIN_PASSWORD: ${{secrets.NGINX_SUPERADMIN_PASSWORD}}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Run Monitoring setup
-        run: |
-          export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
-          ./babylonnode monitoring config \
-                        -m MONITOR_CORE  \
-                        -cm $NGINX_METRICS_PASSWORD  \
-                        -gm $NGINX_METRICS_PASSWORD  \
-                        -am $NGINX_METRICS_PASSWORD
-          ./babylonnode monitoring install -a
-
-        env:
-          NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
-          NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
-          NGINX_SUPERADMIN_PASSWORD: ${{secrets.NGINX_SUPERADMIN_PASSWORD}}
 
   snyk-monitor:
     runs-on: ubuntu-latest
@@ -594,154 +95,354 @@ jobs:
       - name: Enable Snyk online monitoring - Network
         run: snyk monitor --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --target-reference=${{ github.ref_name }}
 
-#  These do not run on Babylon
-#  test-core-api:
-#    runs-on: [node-only]
-#    needs:
-#      - test-core-only-node
-#    steps:
-#      - uses: actions/setup-python@v3
-#        with:
-#          python-version: '3.x'
-#          architecture: 'x64'
-#      - name: Checkout
-#        uses: actions/checkout@v3.4.0
-#      - name: setup python modules
-#        run: |
-#          cd node-runner-cli
-#          make local
-#      - name: Run api commands
-#        run: |
-#          export DISABLE_VERSION_CHECK=true
-#          export NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD
-#          export NGINX_METRICS_PASSWORD=$NGINX_METRICS_PASSWORD
-#          export NGINX_SUPERADMIN_PASSWORD=$NGINX_SUPERADMIN_PASSWORD
-#          python node-runner-cli/tests.py
-#        env:
-#          NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
-#          NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
-#          NGINX_SUPERADMIN_PASSWORD: ${{secrets.NGINX_SUPERADMIN_PASSWORD}}
+  upload-sbom:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'release' }}
+    permissions: write-all
+    needs:
+      - build-jammy
+      - snyk-scan
+    steps:
+      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
+      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
+        with:
+          role_name: ${{ secrets.AWS_ROLE_NAME_SNYK_SECRET }}
+          app_name: 'babylon-nodecli'
+          step_name: 'upload-sbom'
+          secret_prefix: 'SNYK'
+          secret_name: ${{ secrets.AWS_SECRET_NAME_SNYK }}
+          parse_json: true
+      - name: Setup python
+        uses: actions/setup-python@v4.5.0
+        with:
+          python-version: 3.10.6
+      - name: Install pipenv
+        run: python -m pip install --upgrade pipenv wheel
+      - name: Install dependencies
+        run: |
+          cd ./node-runner-cli
+          pipenv install
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install Snyk cli
+        run: |
+          npm install snyk -g
+          snyk -v
+          snyk auth ${{ env.SNYK_TOKEN }}
+      - name: Generate SBOM
+        run: snyk sbom --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --format=cyclonedx1.4+json --json-file-output sbom.json
+      - name: Upload SBOM
+        uses: softprops/action-gh-release@c9b46fe7aad9f02afd89b12450b780f52dacfb2d
+        with:
+          files: sbom.json
 
-#  test-full-stack:
-#    runs-on: ubuntu-22.04
-#    needs:
-#      - package_ubuntu_cli
-#    steps:
-#      - name: Download packaged cli
-#        uses: actions/download-artifact@v3
-#        with:
-#          name: ubuntu 22.04
-#      - name: Get dependencies
-#        run: |
-#          chmod +x ./babylonnode
-#          sudo apt-get update
-#          sudo apt-get install containerd runc
-#          ./babylonnode docker dependencies
-#      - name: Setup config
-#        run: |
-#          chmod +x ./babylonnode
-#          mkdir -p $HOME/node-config
-#          export DISABLE_VERSION_CHECK=true
-#          rm -rf $HOME/node-config
-#          ./babylonnode docker config -d $HOME/node-config \
-#            -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 \
-#            -m CORE GATEWAY -n 2 -k $KEYSTORE_PASSWORD -nk -p $POSTGRESS_PASSWORD -a
-#          #grep -v "password" $HOME/node-config/config.yaml > temp && mv temp $HOME/node-config/config.yaml
-#          cat $HOME/node-config/config.yaml
-#        env:
-#          POSTGRESS_PASSWORD: ${{secrets.POSTGRESS_PASSWORD}}
-#          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
-#          CORE_DOCKER_REPO_OVERRIDE: "radixdlt/radixdlt-core"
-#          RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
-#          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
-#      - name: Run CLI setup
-#        run: |
-#          export DISABLE_VERSION_CHECK=true
-#          export COMPOSE_HTTP_TIMEOUT=360
-#
-#          ./babylonnode docker stop -f $HOME/node-config/config.yaml
-#
-#          #Below PATH require when ansible is installed as part of pip
-#          export PATH="$PATH:/home/ubuntu/.local/bin"
-#
-#          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./babylonnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
-#          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./babylonnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
-#          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./babylonnode auth set-gateway-password -m DOCKER -p $NGINX_GATEWAY_PASSWORD
-#
-#          ./babylonnode monitoring stop
-#          ./babylonnode monitoring config \
-#              -m MONITOR_CORE MONITOR_GATEWAY \
-#              -cm $NGINX_METRICS_PASSWORD  \
-#              -gm $NGINX_METRICS_PASSWORD  \
-#              -am $NGINX_METRICS_PASSWORD
-#
-#          ./babylonnode monitoring install -a
-#
-#          export POSTGRES_PASSWORD=${{secrets.POSTGRESS_PASSWORD}}
-#          export RADIXDLT_NODE_KEY_PASSWORD=${{secrets.KEYSTORE_PASSWORD}}
-#          # ToDo: Fix Docker Image Pull with Gateway installation
-#          # ./babylonnode docker install -f $HOME/node-config/config.yaml -a
-#          # sleep 60
-#
-#          # NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./babylonnode api system health
-#          # curl -f  --request POST --insecure --user "gateway:$NGINX_GATEWAY_PASSWORD" https://localhost/gateway
-#          # curl --insecure --user "gateway:$NGINX_GATEWAY_PASSWORD" https://localhost/token/native --header 'Content-Type: application/json' -d '{ "network_identifier":{"network":"stokenet"}}'
-#          # curl -k -f -u "metrics:$NGINX_METRICS_PASSWORD" https://localhost/gateway/metrics
-#
-#        env:
-#          NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
-#          NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
-#          NGINX_GATEWAY_PASSWORD: ${{secrets.NGINX_GATEWAY_PASSWORD}}
-#          CORE_DOCKER_REPO_OVERRIDE: "radixdlt/radixdlt-core"
-#          RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
-#          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
+  tests:
+    name: "Unit tests"
+    runs-on: ubuntu-22.04
+    steps:
+      - name: cancel running workflows
+        uses: styfle/cancel-workflow-action@0.11.0
+        with:
+          access_token: ${{ github.token }}
+      - name: Checkout
+        uses: actions/checkout@v3.4.0
+        with:
+          fetch-depth: 0
+      - name: Dump context
+        uses: crazy-max/ghaction-dump-context@v1
+      - name: Install build essentials
+        run: sudo apt-get -y install build-essential
+      - name: setup python
+        uses: actions/setup-python@v4.5.0
+        with:
+          python-version: 3.10.6
+      - name: Install pipenv
+        run: |
+          pip install pipenv==2023.7.23
+          cd node-runner-cli/
+          pipenv install
+          pipenv run pip install pytest pytest-cov
+          pipenv run pytest tests/unit --doctest-modules --junitxml=junit/test-results.xml --cov=. --cov-report=xml --cov-report=html
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2.6.1
+        if: always()
+        with:
+          files: |
+            /home/runner/work/babylon-nodecli/babylon-nodecli/node-runner-cli/junit/test-results.xml 
+            test-results/**/*.xml
+            test-results/**/*.trx
+            test-results/**/*.json
+            junit/**/*.xml
+            junit/*.xml
+            node-runner-cli/junit/**/*.xml
+            junit/*.xml
+            **/junit/test-results.xml
+      - if: ${{ github.event_name == 'pull_request' }}
+        name: Get Cover
+        uses: orgoro/coverage@v3.1
+        with:
+          coverageFile: node-runner-cli/coverage.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-#
-#  test-full-stack-no-nginx:
-#    runs-on: ubuntu-22.04
-#    needs:
-#      - package_ubuntu_cli
-#    steps:
-#      - name: Download packaged cli
-#        uses: actions/download-artifact@v3
-#        with:
-#          name: ubuntu 22.04
-#      - name: Get dependencies
-#        run: |
-#          chmod +x ./babylonnode
-#          sudo apt-get update
-#          sudo apt-get install containerd runc
-#          ./babylonnode docker dependencies
-#      - name: Setup config
-#        run: |
-#          chmod +x ./babylonnode
-#          mkdir -p $HOME/node-config
-#          export DISABLE_VERSION_CHECK=true
-#          export COMPOSE_HTTP_TIMEOUT=360
-#          ./babylonnode docker config -d $HOME/node-config \
-#            -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 \
-#            -m CORE GATEWAY -n 2 -k password -nk -p postgres -xg false -xc false -a
-#        env:
-#          POSTGRESS_PASSWORD: ${{secrets.POSTGRESS_PASSWORD}}
-#          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
-#          CORE_DOCKER_REPO_OVERRIDE: "radixdlt/radixdlt-core"
-#          RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
-#          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
-#      - name: Run CLI setup
-#        run: |
-#          export DISABLE_VERSION_CHECK=true
-#          export COMPOSE_HTTP_TIMEOUT=360
-#          ./babylonnode docker stop -f $HOME/node-config/config.yaml
-#
-#          #Below PATH require when ansible is installed as part of pip
-#          export PATH="$PATH:/home/ubuntu/.local/bin"
-#          # ToDo: Fix Docker Image Pull with Gateway installation
-#          # ./babylonnode docker install -f $HOME/node-config/config.yaml -a -u
-#
-#          # sleep 60
-#          # NODE_END_POINT="http://localhost:3333" NGINX=false ./babylonnode api system health
-#          # curl -k -f -u "admin:$NGINX_ADMIN_PASSWORD" http://localhost:5207
-#        env:
-#          CORE_DOCKER_REPO_OVERRIDE: "radixdlt/radixdlt-core"
-#          RADIXDLT_APP_VERSION_OVERRIDE: "1.3.2"
-#          RADIXDLT_GATEWAY_VERSION_OVERRIDE: "0.0.1-rc1"
+  e2e-tests:
+    name: "E2E tests"
+    runs-on: ubuntu-22.04
+    steps:
+      - name: cancel running workflows
+        uses: styfle/cancel-workflow-action@0.11.0
+        with:
+          access_token: ${{ github.token }}
+      - name: Checkout
+        uses: actions/checkout@v3.4.0
+        with:
+          fetch-depth: 0
+      - name: Dump context
+        uses: crazy-max/ghaction-dump-context@v1
+      - name: setup python
+        uses: actions/setup-python@v4.5.0
+        with:
+          python-version: 3.10.6
+      - name: Install pipenv
+        run: |
+          pip install pipenv==2023.7.23
+          cd node-runner-cli/
+          pipenv install
+          pipenv run pip install pytest
+          pipenv run pytest tests/e2e
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-jammy:
+    needs:
+      - tests
+      - e2e-tests
+    name: "Build jammy"
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.4.0
+        with:
+          fetch-depth: 0
+      - name: Build the binary for ubuntu jammy
+        run: |
+          cd node-runner-cli
+          make output-ubuntu-jammy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: "Upload generated cli file"
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: ubuntu 22.04
+          path: "${{ github.workspace }}/node-runner-cli/out/ubuntu/jammy/babylonnode"
+  
+  build-focal:
+    needs:
+      - tests
+    name: "Build focal"
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.4.0
+        with:
+          fetch-depth: 0
+      - name: Build the binary for ubuntu focal
+        run: |
+          cd node-runner-cli
+          make output-ubuntu-focal
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: "Upload generated cli file"
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: ubuntu 20.04
+          path: "${{ github.workspace }}/node-runner-cli/out/ubuntu/focal/babylonnode"
+  
+  upload-release-jammy:
+    runs-on: ubuntu-22.04
+    if: ${{ github.event_name == 'release' }}
+    needs:
+      - build-jammy
+      - snyk-scan
+    steps:
+      - name: Download packaged cli
+        uses: actions/download-artifact@v3
+        with:
+          name: ubuntu 22.04
+
+      - name: Rename release asset
+        run: |
+          mv ./babylonnode babylonnode-ubuntu-22.04
+      - if: ${{ github.event_name == 'release' }}
+        name: Upload radixcli ubuntu binary
+        uses: softprops/action-gh-release@c9b46fe7aad9f02afd89b12450b780f52dacfb2d
+        with:
+          files: |
+            babylonnode-ubuntu-22.04
+
+  upload-release-focal:
+    runs-on: ubuntu-20.04
+    if: ${{ github.event_name == 'release' }}
+    needs:
+      - build-focal
+      - snyk-scan
+    steps:
+      - name: Download packaged cli
+        uses: actions/download-artifact@v3
+        with:
+          name: ubuntu 20.04
+      - name: Rename release asset
+        run: |
+          mv ./babylonnode babylonnode-ubuntu-20.04
+      - if: ${{ github.event_name == 'release' }}
+        name: Upload radixcli ubuntu binary
+        uses: softprops/action-gh-release@c9b46fe7aad9f02afd89b12450b780f52dacfb2d
+        with:
+          files: |
+            babylonnode-ubuntu-20.04
+
+  test-config-command:
+    runs-on: ubuntu-22.04
+    needs:
+      - build-jammy
+      - snyk-scan
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.4.0
+        with:
+          fetch-depth: 0
+      - name: Download packaged cli
+        uses: actions/download-artifact@v3
+        with:
+          name: ubuntu 22.04
+      - name: Get dependencies
+        run: |
+          chmod +x ./babylonnode
+          sudo apt-get update
+          ./babylonnode docker dependencies
+      - name: core-gateway-all-local
+        run: |
+          ls -a
+          chmod +x ./babylonnode
+          mkdir -p $HOME/node-config
+          echo "HOME=$HOME"
+          echo "PATH=$PWD"
+          export PROMPT_FEEDS="node-runner-cli/test-prompts/core-gateway-all-local.yml"
+          ./babylonnode docker config -m DETAILED \
+           -d $HOME/node-config \
+           -k $KEYSTORE_PASSWORD -nk -a
+        env:
+          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: corenode-01
+        run: |
+          ls -a
+          chmod +x ./babylonnode
+          export PROMPT_FEEDS="node-runner-cli/test-prompts/corenode-01.yml"
+          ./babylonnode docker config -m DETAILED \
+           -d $HOME/node-config \
+           -k $KEYSTORE_PASSWORD -nk -a
+        env:
+          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: corenode-02
+        run: |
+          ls -a
+          export PROMPT_FEEDS="node-runner-cli/test-prompts/corenode-02.yml"
+          ./babylonnode docker config -m DETAILED \
+           -d $HOME/node-config \
+           -k $KEYSTORE_PASSWORD -nk -a
+        env:
+          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: gateway-remote-core-local-postgress
+        run: |
+          ls -a
+          export PROMPT_FEEDS="node-runner-cli/test-prompts/gateway-remote-core-local-postgress.yml"
+          ./babylonnode docker config -m DETAILED \
+           -d $HOME/node-config \
+           -k $KEYSTORE_PASSWORD -nk -a
+        env:
+          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
+      - name: gateway-remote-core-remote-postgress
+        run: |
+          ls -a
+          export PROMPT_FEEDS="node-runner-cli/test-prompts/gateway-remote-core-remote-postgress.yml"
+          ./babylonnode docker config -m DETAILED \
+           -d $HOME/node-config \
+           -k $KEYSTORE_PASSWORD -nk -a
+        env:
+          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
+
+  test-userflow-docker-core-gateway-same-host:
+    runs-on: babylon-nodecli-gateway
+    needs:
+      - build-jammy
+      - snyk-scan
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.4.0
+        with:
+          fetch-depth: 0
+      - name: Download packaged cli
+        uses: actions/download-artifact@v3
+        with:
+          name: ubuntu 22.04
+      - name: Get dependencies
+        run: |
+          chmod +x ./babylonnode
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client jq docker-compose
+          ./babylonnode docker dependencies
+      - name: "Execute User Flow: Install Core, Gateway and Monitoring on the same host"
+        run: |
+          chmod +x  ./node-runner-cli/tests/userflows/install-docker-all-same-host.sh
+          ./node-runner-cli/tests/userflows/install-docker-all-same-host.sh
+        env:
+          NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
+          NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
+          NGINX_GATEWAY_PASSWORD: ${{secrets.NGINX_GATEWAY_PASSWORD}}
+          POSTGRES_PASSWORD: ${{secrets.POSTGRES_PASSWORD}}
+          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
+          SEED_NODE: ${{ vars.SEED_NODE }}
+          NETWORK_ID: ${{ vars.NETWORK_ID }}
+          NETWORK_NAME: ${{ vars.NETWORK_NAME }}
+
+  test-userflow-systemd-simple:
+    runs-on: babylon-nodecli-systemd
+    needs:
+      - build-jammy
+      - snyk-scan
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.4.0
+        with:
+          fetch-depth: 0
+      - name: Download packaged cli
+        uses: actions/download-artifact@v3
+        with:
+          name: ubuntu 22.04
+      - name: Get dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+          chmod +x ./babylonnode
+      #          Expect dependencies to be installed before. Since the command is interactive
+      #          ./babylonnode systemd dependencies
+      - name: "Execute User Flow: Install Core, Gateway and Monitoring on the same host"
+        run: |
+          export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
+          chmod +x  ./node-runner-cli/tests/userflows/install-systemd-simple.sh
+          ./node-runner-cli/tests/userflows/install-systemd-simple.sh
+        env:
+          NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
+          NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
+          NGINX_GATEWAY_PASSWORD: ${{secrets.NGINX_GATEWAY_PASSWORD}}
+          POSTGRES_PASSWORD: ${{secrets.POSTGRES_PASSWORD}}
+          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
+          SEED_NODE: ${{ vars.SEED_NODE }}
+          NETWORK_ID: ${{ vars.NETWORK_ID }}
+          NETWORK_NAME: ${{ vars.NETWORK_NAME }}

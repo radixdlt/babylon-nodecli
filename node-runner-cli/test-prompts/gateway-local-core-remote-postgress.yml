@@ -1,0 +1,25 @@
+---
+- select_network: 14
+- setup_fullnode: Y
+- have_validator_address: "N"
+- have_keystore_file: Y
+- input_path_keystore: "/home/runner/babylon-node"
+- enter_keystore_name: "node-keystore.ks"
+- input_ledger_path: "/tmp/babylon-ledger"
+- core_nginx_setup: "true"
+- setup_gateway: Y
+- input_core_api_address: "http://core:3333/core"
+- core_api_node_name: "core"
+- postgres_location: "remote"
+- postgres_db_host: "postgres"
+- postgres_db_port: "5432"
+- postgres_db_user: "postgres"
+- postgres_db_name: "radix-ledger"
+- postgres_db_password: "radix"
+- gateway_release: ""
+- aggregator_release: ""
+- migration_release: ""
+- gateway_nginx_setup: "true"
+- input_nginx_release: ""
+
+

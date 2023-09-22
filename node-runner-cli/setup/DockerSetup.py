@@ -126,8 +126,7 @@ class DockerSetup(BaseSetup):
         return False
 
     @staticmethod
-    def get_existing_compose_file(docker_config: DockerConfig) -> dict:
-        compose_file = docker_config.common_config.docker_compose
+    def get_existing_compose_file(compose_file: str) -> dict:
         Helpers.section_headline("Checking if you have existing docker compose file")
         if os.path.exists(compose_file):
             return Helpers.yaml_as_dict(compose_file)
@@ -211,7 +210,6 @@ class DockerSetup(BaseSetup):
             "\nCreating config file using the answers from the questions that would be asked in next steps."
             f"\nLocation of the config file: {bcolors.OKBLUE}{argument_object.config_file}{bcolors.ENDC}")
 
-        docker_config.common_config.ask_existing_docker_compose_file()
         if "DETAILED" in argument_object.setupmode.mode:
             logger.info("Running a DETAILED configuration")
             docker_config.common_config.ask_network_id(argument_object.networkid)
@@ -227,11 +225,12 @@ class DockerSetup(BaseSetup):
                 docker_config.common_config.ask_enable_nginx_for_core(argument_object.nginx_on_core)
             else:
                 docker_config.common_config.nginx_settings.protect_core = "false"
+                del docker_config.core_node
 
             run_gateway = Prompts.check_for_gateway()
             if run_gateway:
                 docker_config.gateway = GatewaySetup.ask_gateway_full_docker(argument_object.postgrespassword,
-                                                                             argument_object.olympia_node_url)
+                                                                             "http://core:3333/core")
                 docker_config.common_config.ask_enable_nginx_for_gateway(argument_object.nginx_on_gateway)
             else:
                 docker_config.common_config.nginx_settings.protect_gateway = "false"
@@ -256,7 +255,7 @@ class DockerSetup(BaseSetup):
             else:
                 del docker_config.gateway
 
-        if "MIGRATION" in argument_object.setupmode.mode:
+        if "MIGRATION" in argument_object.setupmode.mode and docker_config.core_node is not None:
             docker_config = MigrationSetup.ask_migration_config(docker_config,
                                                                 argument_object.olympia_node_url,
                                                                 argument_object.olympia_node_auth_user,
@@ -311,7 +310,7 @@ class DockerSetup(BaseSetup):
     def confirm_docker_compose_file_changes(docker_config: DockerConfig, autoapprove: bool):
         docker_compose_yaml: yaml = DockerSetup.render_docker_compose(docker_config)
         backup_time = Helpers.get_current_date_time()
-        compose_file_yaml = DockerSetup.get_existing_compose_file(docker_config)
+        compose_file_yaml = DockerSetup.get_existing_compose_file(docker_config.common_config.docker_compose)
         compose_file = docker_config.common_config.docker_compose
         if compose_file_yaml is not None:
             compose_file_yaml = {}

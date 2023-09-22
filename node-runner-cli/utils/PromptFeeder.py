@@ -6,6 +6,7 @@ from config.EnvVars import PROMPT_FEEDS
 
 
 class QuestionKeys:
+    migration_release = "migration_release"
     olympia_migrations_bech32 = "olympia_migrations_bech32"
     olympia_migrations_user = "olympia_migrations_user"
     olympia_migrations_password = "olympia_migrations_password"

@@ -45,8 +45,9 @@ class Prompts:
             hostname = Helpers.input_guestion(
                 "\nFor the remote managed postgres, Enter the host name of server hosting postgres:",
                 QuestionKeys.postgres_db_host)
-            port = Helpers.input_guestion("\nEnter the port the postgres process is listening on the server:",
+            port = Helpers.input_guestion("\nEnter the port the postgres process is listening on the server. Defaults to 5432:",
                                           QuestionKeys.postgres_db_port)
+            port = Prompts.check_default(port, "5432")
             return "remote", f"{hostname}:{port}"
 
     @staticmethod
@@ -65,10 +66,14 @@ class Prompts:
         Helpers.section_headline("CORE API NODE DETAILS")
         print(
             "\nThis will be node either running locally or remote using which Gateway aggregator will stream ledger data"
-            f"\nCORE API ADDRESS: Default settings use local node  and the default value is {bcolors.OKBLUE}{default}{bcolors.ENDC} ")
+            f"\nCORE API ADDRESS: Default settings use local node and the default value is {bcolors.OKBLUE}{default}{bcolors.ENDC}."
+            f"\nExamples for the url in different scenarios:"
+            f"\nCore Node and Gateway both in Docker: http://core:3333/core"
+            f"\nCore Node as a systemd service behind nginx and Gateway in Docker on the same host: https://host.docker.internal:443/core"
+            f"\nCore Node on a different node behind nginx and Gateway in Docker: https://<core-node-ip>:443/core")
         answer = Helpers.input_guestion(
             "Press ENTER to accept default Or Type in remote CoreApi "
-            f"address in format of url like {bcolors.FAIL}http(s)://<host and port>:{bcolors.ENDC}",
+            f"address in format of url like ({bcolors.FAIL}http(s)://<host>:<port>/core{bcolors.ENDC}):",
             QuestionKeys.input_core_api_address)
         return Prompts.check_default(answer, default)
 
@@ -124,7 +129,13 @@ class Prompts:
         Helpers.section_headline("GATEWAY RELEASE")
 
         print(f"Latest release for {gateway_or_aggregator} is {latest_gateway_release}")
-        question_key = QuestionKeys.gateway_release if gateway_or_aggregator == "gateway_api" else QuestionKeys.aggregator_release
+        question_key = QuestionKeys.gateway_release
+        if gateway_or_aggregator == "gateway_api":
+                question_key = QuestionKeys.gateway_release
+        elif gateway_or_aggregator == "data_aggregator":
+            question_key = QuestionKeys.aggregator_release
+        else:
+            question_key = QuestionKeys.migration_release
         answer = Helpers.input_guestion(
             f"Press Enter to accept the latest or  type in {gateway_or_aggregator} release tag:", question_key)
         return Prompts.check_default(answer, latest_gateway_release)
@@ -161,9 +172,12 @@ class Prompts:
         y_n = Helpers.input_guestion("\nDo you have a keystore file that you want to use [Y/N]?",
                                      QuestionKeys.have_keystore_file)
         if Helpers.check_Yes(Prompts.check_default(y_n, "N")):
-            return Helpers.input_guestion(
-                f"{bcolors.WARNING}Enter the absolute path of the folder, just the folder, where the keystore file is located:{bcolors.ENDC}",
-                QuestionKeys.input_path_keystore)
+            answer = Helpers.input_guestion(f"{bcolors.WARNING}Default is {Helpers.get_default_node_config_dir()}" \
+                                            f"\nEnter the absolute path of the folder, just the folder, where the keystore file is located:{bcolors.ENDC}",
+                                            QuestionKeys.input_path_keystore)
+            return_value = Prompts.check_default(answer, Helpers.get_default_node_config_dir())
+            return return_value
+
         else:
             babylonnode_dir = f"{Helpers.get_default_node_config_dir()}"
             print(
@@ -171,15 +185,15 @@ class Prompts:
             answer = Helpers.input_guestion(
                 'Press ENTER to accept default. otherwise enter the absolute path of the new folder:',
                 QuestionKeys.input_path_keystore)
-            # TODO this needs to moved out of init
-            run_shell_command(f'mkdir -p {babylonnode_dir}', shell=True, quite=True)
-            return Prompts.check_default(answer, babylonnode_dir)
+            return_value = Prompts.check_default(answer, babylonnode_dir)
+            run_shell_command(f'mkdir -p {return_value}', shell=True, quite=True)
+            return return_value
 
     @staticmethod
     def ask_keyfile_name() -> str:
         default_keyfile_name = "node-keystore.ks"
         value = Helpers.input_guestion(
-            f"\n{bcolors.WARNING}Type in name of keystore file. Otherwise press 'Enter' to use default value '{default_keyfile_name}':{bcolors.ENDC}",
+            f"\n{bcolors.WARNING}Type in name of keystore file. Otherwise press 'Enter' to use the default value '{default_keyfile_name}':{bcolors.ENDC}",
             QuestionKeys.enter_keystore_name).strip()
         if value != "":
             keyfile_name = value
@@ -199,8 +213,9 @@ class Prompts:
         value = Helpers.input_guestion(f"Fullnode requires another node to connect to network. "
                                        "\nType in the node you want to connect to in format radix://<node-peer-2-peer-address>@<ip>"
                                        "\n OR press Enter to accept defaults for mainnet."
-                                       f"The defaults for mainnet are {default_trusted_nodes}"
-                                       f"Enter your choice:",
+                                       "\nThe default values are the following mainnet nodes:"
+                                       f"\n{default_trusted_nodes}"
+                                       f"\nEnter your choice:",
                                        QuestionKeys.input_seednode)
         trustednode = Prompts.check_default(value, default_trusted_nodes)
         Helpers.parse_trustednode(trustednode)

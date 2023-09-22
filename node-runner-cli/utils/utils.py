@@ -50,6 +50,7 @@ def run_shell_command(cmd, env=None, shell=False, fail_on_error=True, quite=Fals
         logger.info("""
             Command failed. Exiting...
         """)
+        sys.exit(result.returncode)
     return result
 
 
