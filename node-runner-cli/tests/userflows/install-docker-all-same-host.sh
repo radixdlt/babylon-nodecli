@@ -132,7 +132,6 @@ df -H
 docker system df
 PGPASSWORD=$POSTGRES_PASSWORD psql -h localhost -U postgres -d radixdlt_ledger -P pager=off -c "\l+"
 PGPASSWORD=$POSTGRES_PASSWORD psql -h localhost -U postgres -d radixdlt_ledger -P pager=off -c "select pg_size_pretty(pg_database_size('radixdlt_ledger'));"
-PGPASSWORD=$POSTGRES_PASSWORD psql -h localhost -U postgres -d radixdlt_ledger -P pager=off -c "select pg_size_pretty(pg_database_size('radixdlt_ledger'));"
 
 ./babylonnode docker stop
 ./babylonnode monitoring stop
