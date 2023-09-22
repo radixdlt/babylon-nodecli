@@ -85,7 +85,9 @@ def config(args):
     if there is a version change in the config file, then it updated by doing a migration to newer version
     """
     # Systemd configure is setup using radixdlt user. And this user has been added to docker group yet.
-    BaseSetup.add_user_docker_group()
+    # EDIT: This command is already executed by the dependency command. Running this here prevents us from executing
+    #       tests on the config command from macos.
+    # BaseSetup.add_user_docker_group()
 
     ################### PARSE ARGUMENTS
     argument_object = SystemDConfigArguments(args)
@@ -103,6 +105,7 @@ def config(args):
 
     ################### File comparisson and generation
     Path(f"{args.configdir}").mkdir(parents=True, exist_ok=True)
+    Path(f"{args.data_directory}").mkdir(parents=True, exist_ok=True)
     SystemDSetup.dump_config_as_yaml(systemd_config)
 
     # Compare old and new if and only if there's an old
@@ -203,8 +206,8 @@ def dependencies(args):
     if not args.skip:
         BaseSetup.dependencies()
     SystemDSetup.install_java()
-    BaseSetup.add_user_docker_group()
     SystemDSetup.setup_user()
+    BaseSetup.add_radixdlt_user_docker_group()
     SystemDSetup.make_etc_directory()
     SystemDSetup.make_data_directory()
     SystemDSetup.create_service_user_password()

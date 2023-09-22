@@ -1,35 +1,54 @@
 import os
 import sys
-from os.path import abspath, dirname, join
 from pathlib import Path
 
 import yaml
 
 from config.BaseConfig import SetupMode
 from config.KeyDetails import KeyDetails
+from log_util.logger import get_logger
 from setup.AnsibleRunner import AnsibleRunner
 from utils.PromptFeeder import QuestionKeys
 from utils.Prompts import Prompts
-from utils.utils import run_shell_command, Helpers, bcolors
+from utils.utils import run_shell_command, Helpers, bcolors, is_sudo_installed
+
+logger = get_logger(__name__)
 
 
 class BaseSetup:
     @staticmethod
     def dependencies():
-        setup_dir = abspath(__file__)
-        node_runner_dir = dirname(setup_dir)
-        docker_install = join(node_runner_dir, "scripts", "docker_install.sh")
-        run_shell_command(docker_install, shell=True)
-        run_shell_command('sudo apt install -y  docker.io wget unzip docker-compose rng-tools', shell=True)
-        run_shell_command('sudo rngd -r /dev/random | true', shell=True)
+        if is_sudo_installed():
+            logger.info("Installing docker")
+            run_shell_command("curl -fsSL https://get.docker.com -o get-docker.sh", shell=True)
+            run_shell_command("sudo sh get-docker.sh", shell=True)
+            BaseSetup.add_user_docker_group()
+            logger.info("Docker successfully installed")
+            run_shell_command('sudo apt install -y wget unzip rng-tools ansible', shell=True)
+            run_shell_command('sudo rngd -r /dev/random | true', shell=True)
+            try:
+                ansible_dir = f'https://raw.githubusercontent.com/radixdlt/babylon-nodecli/{Helpers.cli_version()}/node-runner-cli'
+                AnsibleRunner(ansible_dir).check_install_ansible(False)
+            except Exception as e:
+                logger.error(f"An error occurred while installing ansible: {e}")
+        else:
+            logger.info("sudo is not installed in the system. You need sudo to install dependencies")
+            sys.exit(99)
 
     @staticmethod
     def add_user_docker_group():
-
         run_shell_command('sudo groupadd docker', shell=True, fail_on_error=False)
         is_in_docker_group = run_shell_command('groups | grep docker', shell=True, fail_on_error=False)
         if is_in_docker_group.returncode != 0:
-            run_shell_command(f"sudo usermod -aG docker  {os.environ.get('USER')}", shell=True)
+            run_shell_command(f"sudo usermod -aG docker {os.environ.get('USER')}", shell=True)
+            print('Exit ssh login and relogin back for user addition to group "docker" to take effect')
+
+    @staticmethod
+    def add_radixdlt_user_docker_group():
+        run_shell_command('sudo groupadd docker', shell=True, fail_on_error=False)
+        is_in_docker_group = run_shell_command('groups | grep docker', shell=True, fail_on_error=False)
+        if is_in_docker_group.returncode != 0:
+            run_shell_command(f"sudo usermod -aG docker radixdlt", shell=True)
             print('Exit ssh login and relogin back for user addition to group "docker" to take effect')
 
     @staticmethod
@@ -94,19 +113,27 @@ class BaseSetup:
         return keydetails
 
     @staticmethod
-    def setup_node_optimisation_config(version):
+    def setup_node_optimisation_config(version, setup_ulimit: bool, setup_swap_space_argument: bool, swap_space: str):
         ansibleRunner = AnsibleRunner(
             f'https://raw.githubusercontent.com/radixdlt/babylon-nodecli/{version}/node-runner-cli')
         file = 'ansible/project/provision.yml'
         ansibleRunner.check_install_ansible()
         ansibleRunner.download_ansible_file(file)
         ansibleRunner.install_ansible_modules()
-        setup_limits = Prompts.ask_ansible_setup_limits()
+        if setup_ulimit is None:
+            setup_limits = Prompts.ask_ansible_setup_limits()
+        else:
+            setup_limits = setup_ulimit
 
         if setup_limits:
             ansibleRunner.run_setup_limits(setup_limits)
 
-        setup_swap, ask_swap_size = Prompts.ask_ansible_swap_setup()
+        if setup_swap_space_argument is None:
+            setup_swap, ask_swap_size = Prompts.ask_ansible_swap_setup()
+        else:
+            setup_swap = setup_swap_space_argument
+            ask_swap_size = swap_space
+
         if setup_swap:
             ansibleRunner.run_swap_size(setup_swap, ask_swap_size)
 
@@ -116,9 +143,9 @@ class BaseSetup:
         data_dir_path = Helpers.input_guestion(
             f"\nRadix node stores all the ledger data on a folder. "
             f"Mounting this location as a docker volume, "
-            f"will allow to restart the node without a need to download ledger"
-            f"\n{bcolors.WARNING}Press Enter to store ledger on \"{Helpers.get_home_dir()}/babylon-ledger\" directory OR "
-            f"Type the absolute path of existing ledger data folder:{bcolors.ENDC}", QuestionKeys.input_ledger_path)
+            f"will allow to restart the node without a need to download the ledger."
+            f"\n{bcolors.WARNING}Press Enter to store ledger in the \"{Helpers.get_home_dir()}/babylon-ledger\" directory OR "
+            f"type the absolute path of an existing ledger data folder:{bcolors.ENDC}", QuestionKeys.input_ledger_path)
         if data_dir_path == "":
             data_dir_path = f"{Helpers.get_home_dir()}/babylon-ledger"
         if create_dir:

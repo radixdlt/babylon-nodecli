@@ -82,6 +82,7 @@ class GatewaySetup():
     def ask_core_api_node_settings(core_api_address: str):
         coreApiNode = CoreApiNodeConfig({})
         if "DETAILED" in SetupMode.instance().mode or core_api_address == "https://host.docker.internal:443/core":
+
             coreApiNode.core_api_address = Prompts.get_CoreApiAddress(core_api_address)
 
             # ask basic auth
