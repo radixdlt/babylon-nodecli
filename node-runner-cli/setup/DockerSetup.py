@@ -157,7 +157,7 @@ class DockerSetup(BaseSetup):
                     latest_gateway_release, 'AGGREGATOR', autoapprove)
 
             if docker_config.gateway.gateway_api:
-                docker_config.gatewa.gateway_api.release = Prompts.confirm_version_updates(
+                docker_config.gateway.gateway_api.release = Prompts.confirm_version_updates(
                     current_gateway_release,
                     latest_gateway_release, 'GATEWAY', autoapprove)
 
