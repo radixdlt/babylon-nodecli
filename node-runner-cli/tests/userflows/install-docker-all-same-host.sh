@@ -34,6 +34,7 @@ cat $HOME/babylon-node-config/config.yaml
 
 # Reset everything
 ./babylonnode docker stop -f $HOME/babylon-node-config/config.yaml | true
+rm -rf /home/radixdlt/babylon-ledger/*
 ./babylonnode monitoring stop | true
 
 # Setup passwords details
@@ -78,7 +79,7 @@ set +e
 for i in {1..5}; do
   FULL_OUTPUT=$(NGINX_ADMIN_PASSWORD=${NGINX_ADMIN_PASSWORD} ./babylonnode api system health)
   OUTPUT=$(echo $FULL_OUTPUT | jq -r '.status')
-  if [[ $OUTPUT == "SYNCING" || $OUTPUT == "BOOTING_AT_GENESIS" || $OUTPUT == "BOOTING" || $OUTPUT == "UP" ]]; then
+  if [[ $OUTPUT == "SYNCING" || $OUTPUT == "BOOTING_AT_GENESIS" || $OUTPUT == "OUT_OF_SYNC" || $OUTPUT == "BOOTING" || $OUTPUT == "UP" ]]; then
     echo "The result is successful"
     echo "The Node is in status $OUTPUT"
     break
