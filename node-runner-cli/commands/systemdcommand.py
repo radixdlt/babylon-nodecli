@@ -46,11 +46,10 @@ def systemdcommand(systemdcommand_args=None, parent=systemd_parser):
              required=True,
              help="""Quick config mode with assumed defaults. It supports two quick modes and a detailed config mode.
               \n\nCORE: Use this value to setup CORE using defaults.
-              \n\nDETAILED: Default value if not provided. This mode takes your through series of questions.
               \n\nGATEWAY: This mode adds questions regarding the Network Gateway API and enables it for installation
               \n\nMIGRATION: This mode adds questions regarding the migration from an Olympia End-State node to a Babylon node
               """,
-             choices=["CORE", "DETAILED", "MIGRATION", "GATEWAY"], action="store"),
+             choices=["CORE", "MIGRATION", "GATEWAY"], action="store"),
     argument("-miu", "--migration_url",
              help="The root url of the olympia node to migrate the ledger from. Do not add /olympia-end-state.",
              action="store"),
@@ -101,6 +100,8 @@ def config(args):
     systemd_config.core_node = SystemDSetup.ask_core_node(argument_object)
     if "GATEWAY" in argument_object.setupmode.mode:
         systemd_config.gateway = GatewaySetup.ask_gateway_standalone_docker("")
+    else:
+        del systemd_config.gateway
     systemd_config.migration = SystemDSetup.ask_migration(argument_object)
 
     ################### File comparisson and generation
