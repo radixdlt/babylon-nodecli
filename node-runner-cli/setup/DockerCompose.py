@@ -28,7 +28,6 @@ class DockerCompose:
         else:
             should_start = input("\nOkay to start the containers [Y/n]?:")
         if Helpers.check_Yes(should_start):
-            print(systemd_config.gateway.docker_compose)
             DockerCompose().run_docker_compose_up(docker_compose_file)
 
     @staticmethod
