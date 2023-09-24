@@ -28,7 +28,8 @@ class DockerCompose:
         else:
             should_start = input("\nOkay to start the containers [Y/n]?:")
         if Helpers.check_Yes(should_start):
-            DockerCompose.run_docker_compose_up(docker_compose_file)
+            print(systemd_config.gateway.docker_compose)
+            DockerCompose().run_docker_compose_up(docker_compose_file)
 
     @staticmethod
     def stop_gateway_containers():
@@ -41,7 +42,7 @@ class DockerCompose:
         docker_compose_file: str = f"{Helpers.get_home_dir()}/gateway.docker-compose.yml"
         if os.path.exists(docker_compose_file):
             DockerCompose().run_docker_compose_down(docker_compose_file)
-            DockerCompose.run_docker_compose_up(docker_compose_file)
+            DockerCompose().run_docker_compose_up(docker_compose_file)
 
     @staticmethod
     def confirm_run_docker_compose(argument_object: DockerInstallArguments, compose_file):

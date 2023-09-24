@@ -69,6 +69,6 @@ class CommonSystemdConfig(BaseConfig):
         self.nginx_settings.release = latest_nginx_release
         if "DETAILED" in SetupMode.instance().mode:
             self.nginx_settings.release = Prompts.get_nginx_release(latest_nginx_release)
-        self.nginx_settings.config_url = os.getenv(NGINX_BINARY_OVERIDE,
-                                                   f"https://github.com/radixdlt/babylon-nginx/releases/download/"
-                                                   f"{self.nginx_settings.release}/babylon-nginx-fullnode-conf.zip")
+        self.nginx_settings.generate_nginx_config_url()
+
+
