@@ -314,10 +314,14 @@ class SystemDSetup(BaseSetup):
 
     @staticmethod
     def dump_config_as_yaml(systemd_config: SystemDConfig):
-        config_to_dump = {"version": "0.1", "core_node": systemd_config.core_node.to_dict(),
-                          "common_config": systemd_config.common_config.to_dict(),
-                          "migration": systemd_config.migration.to_dict(),
-                          "gateway": systemd_config.gateway.to_dict()}
+        config_to_dump = {"common_config": systemd_config.common_config.to_dict(), "version": "0.1"}
+        if hasattr(systemd_config, "core_node"):
+            config_to_dump["core_node"] = systemd_config.core_node.to_dict()
+        if hasattr(systemd_config, "gateway"):
+            config_to_dump["gateway"] = systemd_config.gateway.to_dict()
+        if hasattr(systemd_config, "migration"):
+            config_to_dump["migration"] = systemd_config.migration.to_dict()
+
         yaml.add_representer(type(None), Helpers.represent_none)
         Helpers.section_headline("CONFIG is Generated as below")
         print(f"\n{yaml.dump(config_to_dump)}")

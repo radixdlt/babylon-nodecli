@@ -97,12 +97,20 @@ def config(args):
     systemd_config = SystemDConfig({})
 
     systemd_config.common_config = SystemDSetup.ask_common_config(argument_object)
-    systemd_config.core_node = SystemDSetup.ask_core_node(argument_object)
+    if "CORE" in argument_object.setupmode.mode:
+        systemd_config.core_node = SystemDSetup.ask_core_node(argument_object)
+    else:
+        del systemd_config.core_node
+
+    if "MIGRATION" in argument_object.setupmode.mode and systemd_config.core_node is not None:
+        systemd_config.migration = SystemDSetup.ask_migration(argument_object)
+    else:
+        del systemd_config.migration
+
     if "GATEWAY" in argument_object.setupmode.mode:
         systemd_config.gateway = GatewaySetup.ask_gateway_standalone_docker("")
     else:
         del systemd_config.gateway
-    systemd_config.migration = SystemDSetup.ask_migration(argument_object)
 
     ################### File comparisson and generation
     Path(f"{args.configdir}").mkdir(parents=True, exist_ok=True)
