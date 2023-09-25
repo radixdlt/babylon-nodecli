@@ -22,7 +22,7 @@ export COMPOSE_HTTP_TIMEOUT=360
 export PATH="$PATH:/home/ubuntu/.local/bin"
 
 
-echp "set old version"
+echo "set old version"
 RADIXDLT_APP_VERSION_OVERRIDE=rcnet-v3.1-r5
 
 ./babylonnode docker config -d $HOME/babylon-node-config \
@@ -36,7 +36,7 @@ RADIXDLT_APP_VERSION_OVERRIDE=rcnet-v3.1-r5
 
 cat $HOME/babylon-node-config/config.yaml
 
-echp "unset version override"
+echo "unset version override"
 unset RADIXDLT_APP_VERSION_OVERRIDE
 
 # Reset everything
