@@ -180,7 +180,7 @@ def start(args):
         print("No docker-compose file found.")
         print("Execute `babylonnode docker config/install` and try again")
         sys.exit(404)
-    DockerCompose().run_docker_compose_up(docker_config.common_config.docker_compose)
+    DockerCompose.run_docker_compose_up(docker_config.common_config.docker_compose)
 
 
 @dockercommand([
@@ -205,7 +205,7 @@ def stop(args):
         print("No docker-compose file found.")
         print("Execute `babylonnode docker config/install` and try again")
         sys.exit(404)
-    DockerCompose().run_docker_compose_down(args.composefile, args.removevolumes)
+    DockerCompose.run_docker_compose_down(args.composefile, args.removevolumes)
 
 
 @dockercommand([
