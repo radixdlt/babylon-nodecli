@@ -33,8 +33,8 @@ export PATH="$PATH:/home/ubuntu/.local/bin"
 cat $HOME/babylon-node-config/config.yaml
 
 # Reset everything
-./babylonnode docker stop -f $HOME/babylon-node-config/config.yaml | true
-rm -rf /home/radixdlt/babylon-ledger/*
+./babylonnode docker stop | true
+sudo rm -rf /home/radixdlt/babylon-ledger/*
 ./babylonnode monitoring stop | true
 
 # Setup passwords details

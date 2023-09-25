@@ -30,7 +30,7 @@ export PROMPT_FEEDS="node-runner-cli/test-prompts/gateway-local-core-remote-post
 cat $HOME/babylon-node-config/config.yaml
 
 # Reset everything
-./babylonnode docker stop -f $HOME/babylon-node-config/config.yaml | true
+./babylonnode docker stop | true
 
 # Setup passwords details
 DOCKER_COMPOSE_FOLDER_PREFIX=$(whoami) ./babylonnode auth set-admin-password -m DOCKER -p ${NGINX_ADMIN_PASSWORD}
@@ -102,7 +102,7 @@ PGPASSWORD=$POSTGRES_PASSWORD psql -h localhost -U postgres -d radixdlt_ledger -
 PGPASSWORD=$POSTGRES_PASSWORD psql -h localhost -U postgres -d postgres -P pager=off -c "DROP DATABASE IF EXISTS radixdlt_ledger;"
 
 # Wipe ledger
-rm -rf /home/radixdlt/babylon-ledger/ | true
+sudo rm -rf /home/radixdlt/babylon-ledger/ | true
 
 # Wipe docker image store
 docker rmi $(docker image ls -q) | true
