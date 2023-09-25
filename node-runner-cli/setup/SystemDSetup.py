@@ -326,15 +326,20 @@ class SystemDSetup(BaseSetup):
             latest_gateway_release = github.latest_release("radixdlt/babylon-gateway")
             current_gateway_release = systemd_config.gateway.data_aggregator.release
 
-            if systemd_config.gateway.data_aggregator:
+            if hasattr(systemd_config.gateway, "data_aggregator"):
                 systemd_config.gateway.data_aggregator.release = Prompts.confirm_version_updates(
                     current_gateway_release,
                     latest_gateway_release, 'AGGREGATOR', autoapprove)
 
-            if systemd_config.gateway.gateway_api:
+            if hasattr(systemd_config.gateway, "gateway_api"):
                 systemd_config.gateway.gateway_api.release = Prompts.confirm_version_updates(
                     current_gateway_release,
                     latest_gateway_release, 'GATEWAY', autoapprove)
+
+            if hasattr(systemd_config.gateway, "database_migration"):
+                systemd_config.gateway.database_migration.release = Prompts.confirm_version_updates(
+                    current_gateway_release,
+                    latest_gateway_release, 'DATABASE MIGRATION', autoapprove)
 
         if hasattr(systemd_config.common_config, "nginx_settings"):
             latest_nginx_release = github.latest_release("radixdlt/babylon-nginx")

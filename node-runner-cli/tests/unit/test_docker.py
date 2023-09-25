@@ -97,6 +97,32 @@ class DockerUnitTests(unittest.TestCase):
         mem_limit = docker_compose_yaml["services"]["core"]["mem_limit"]
         self.assertEqual(mem_limit, '14000m')
 
+    def test_docker_version_update(self):
+        docker_config = DockerConfig({})
+        docker_config.gateway.enabled = True
+        docker_config.core_node.core_release = "oldversion"
+        docker_config.gateway.gateway_api.release = "oldversion"
+        docker_config.gateway.data_aggregator.release = "oldversion"
+        docker_config.gateway.database_migration.release = "oldversion"
+        docker_config = DockerSetup.update_versions(docker_config, True)
+        self.assertNotEqual("oldversion", docker_config.core_node.core_release)
+        self.assertNotEqual("oldversion", docker_config.gateway.gateway_api.release)
+        self.assertNotEqual("oldversion", docker_config.gateway.data_aggregator.release)
+        self.assertNotEqual("oldversion", docker_config.gateway.database_migration.release)
+
+        del docker_config.gateway.database_migration
+        docker_config.core_node.core_release = "oldversion"
+        docker_config.gateway.gateway_api.release = "oldversion"
+        docker_config.gateway.data_aggregator.release = "oldversion"
+        docker_config = DockerSetup.update_versions(docker_config, True)
+        self.assertNotEqual("oldversion", docker_config.core_node.core_release)
+        self.assertNotEqual("oldversion", docker_config.gateway.gateway_api.release)
+        self.assertNotEqual("oldversion", docker_config.gateway.data_aggregator.release)
+
+        del docker_config.gateway
+        docker_config.core_node.core_release = "oldversion"
+        docker_config = DockerSetup.update_versions(docker_config, True)
+        self.assertNotEqual("oldversion", docker_config.core_node.core_release)
 
 def suite():
     """ This defines all the tests of a module"""

@@ -317,6 +317,33 @@ RADIX_NODE_KEYSTORE_PASSWORD=nowthatyouknowmysecretiwillfollowyouuntilyouforgeti
         environment_yaml = settings.create_environment_yaml()
         self.assertTrue("-Xms12g -Xmx12g" in environment_yaml)
 
+    def test_systemd_version_update(self):
+        systemd_config = SystemDConfig({})
+        systemd_config.gateway.enabled = True
+        systemd_config.core_node.core_release = "oldversion"
+        systemd_config.gateway.gateway_api.release = "oldversion"
+        systemd_config.gateway.data_aggregator.release = "oldversion"
+        systemd_config.gateway.database_migration.release = "oldversion"
+        systemd_config = SystemDSetup.update_versions(systemd_config, True)
+        self.assertNotEqual("oldversion", systemd_config.core_node.core_release)
+        self.assertNotEqual("oldversion", systemd_config.gateway.gateway_api.release)
+        self.assertNotEqual("oldversion", systemd_config.gateway.data_aggregator.release)
+        self.assertNotEqual("oldversion", systemd_config.gateway.database_migration.release)
+
+        del systemd_config.gateway.database_migration
+        systemd_config.core_node.core_release = "oldversion"
+        systemd_config.gateway.gateway_api.release = "oldversion"
+        systemd_config.gateway.data_aggregator.release = "oldversion"
+        systemd_config = SystemDSetup.update_versions(systemd_config, True)
+        self.assertNotEqual("oldversion", systemd_config.core_node.core_release)
+        self.assertNotEqual("oldversion", systemd_config.gateway.gateway_api.release)
+        self.assertNotEqual("oldversion", systemd_config.gateway.data_aggregator.release)
+
+        del systemd_config.gateway
+        systemd_config.core_node.core_release = "oldversion"
+        systemd_config = SystemDSetup.update_versions(systemd_config, True)
+        self.assertNotEqual("oldversion", systemd_config.core_node.core_release)
+
 
 def suite():
     """ This defines all the tests of a module"""
