@@ -41,7 +41,7 @@ unset RADIXDLT_APP_VERSION_OVERRIDE
 
 # Reset everything
 ./babylonnode docker stop -f $HOME/babylon-node-config/config.yaml | true
-rm -rf /home/radixdlt/babylon-ledger/*
+sudo rm -rf /home/radixdlt/babylon-ledger/*
 ./babylonnode monitoring stop | true
 
 # Setup passwords details
