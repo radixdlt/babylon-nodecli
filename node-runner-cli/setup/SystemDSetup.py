@@ -281,6 +281,20 @@ class SystemDSetup(BaseSetup):
         return
 
     @staticmethod
+    def confirm_config_changes(argument_object, systemd_config, systemd_config_updated_versions):
+        config_differences = dict(DeepDiff(systemd_config, systemd_config_updated_versions))
+
+        if len(config_differences) != 0:
+            print(f"""
+                          {Helpers.section_headline("Differences in config file with updated software versions")}
+                          Difference between existing config file and new config that you are creating
+                          {config_differences}
+                            """)
+            SystemDSetup.save_config(systemd_config_updated_versions, argument_object.config_file,
+                                     argument_object.auto)
+
+
+    @staticmethod
     def save_config(settings: SystemDConfig, config_file: str, autoapprove=False):
         to_update = ""
         if autoapprove:
