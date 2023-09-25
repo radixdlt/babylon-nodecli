@@ -21,6 +21,9 @@ export COMPOSE_HTTP_TIMEOUT=360
 #Below PATH require when ansible is installed as part of pip
 export PATH="$PATH:/home/ubuntu/.local/bin"
 
+echo "set old version"
+RADIXDLT_APP_VERSION_OVERRIDE=rcnet-v3.1-r5
+
 ./babylonnode docker config -d $HOME/babylon-node-config \
   -t ${SEED_NODE} \
   -m CORE GATEWAY \
@@ -31,6 +34,9 @@ export PATH="$PATH:/home/ubuntu/.local/bin"
   -a
 
 cat $HOME/babylon-node-config/config.yaml
+
+echo "unset version override"
+unset RADIXDLT_APP_VERSION_OVERRIDE
 
 # Reset everything
 ./babylonnode docker stop | true
@@ -64,7 +70,7 @@ if [[ $prometheus_status_code != "200" ]]; then
   exit $prometheus_status_code
 fi
 
-./babylonnode docker install -f $HOME/babylon-node-config/config.yaml -a
+./babylonnode docker install -u -f $HOME/babylon-node-config/config.yaml -a
 
 echo "Checking container health"
 sleep 10
