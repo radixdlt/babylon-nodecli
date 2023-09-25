@@ -40,7 +40,7 @@ echo "unset version override"
 unset RADIXDLT_APP_VERSION_OVERRIDE
 
 # Reset everything
-./babylonnode docker stop -f $HOME/babylon-node-config/config.yaml | true
+./babylonnode docker stop | true
 sudo rm -rf /home/radixdlt/babylon-ledger/*
 ./babylonnode monitoring stop | true
 

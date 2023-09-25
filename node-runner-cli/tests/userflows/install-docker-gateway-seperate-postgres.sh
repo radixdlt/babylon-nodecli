@@ -30,7 +30,7 @@ export PROMPT_FEEDS="node-runner-cli/test-prompts/gateway-local-core-remote-post
 cat $HOME/babylon-node-config/config.yaml
 
 # Reset everything
-./babylonnode docker stop -f $HOME/babylon-node-config/config.yaml | true
+./babylonnode docker stop | true
 
 # Setup passwords details
 DOCKER_COMPOSE_FOLDER_PREFIX=$(whoami) ./babylonnode auth set-admin-password -m DOCKER -p ${NGINX_ADMIN_PASSWORD}
