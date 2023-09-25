@@ -6,6 +6,7 @@ import yaml
 
 from config.BaseConfig import SetupMode
 from config.KeyDetails import KeyDetails
+from github import github
 from log_util.logger import get_logger
 from setup.AnsibleRunner import AnsibleRunner
 from utils.PromptFeeder import QuestionKeys
@@ -163,3 +164,40 @@ class BaseSetup:
         else:
             print(f"Config file '{configfile}' doesn't exist");
             return {}
+
+    @staticmethod
+    def update_versions(config, autoapprove=False):
+        if config.core_node:
+            current_core_release = config.core_node.core_release
+            latest_core_release = github.latest_release("radixdlt/babylon-node")
+            config.core_node.core_release = Prompts.confirm_version_updates(current_core_release,
+                                                                            latest_core_release, 'CORE',
+                                                                            autoapprove)
+        if config.gateway is not None:
+            if config.gateway.enabled:
+                latest_gateway_release = github.latest_release("radixdlt/babylon-gateway")
+                current_gateway_release = config.gateway.data_aggregator.release
+
+                if config.gateway.data_aggregator:
+                    config.gateway.data_aggregator.release = Prompts.confirm_version_updates(
+                        current_gateway_release,
+                        latest_gateway_release, 'AGGREGATOR', autoapprove)
+
+                if config.gateway.gateway_api:
+                    config.gateway.gateway_api.release = Prompts.confirm_version_updates(
+                        current_gateway_release,
+                        latest_gateway_release, 'GATEWAY', autoapprove)
+
+                if config.gateway.database_migration:
+                    config.gateway.database_migration.release = Prompts.confirm_version_updates(
+                        current_gateway_release,
+                        latest_gateway_release, 'DATABASE MIGRATION', autoapprove)
+
+        if config.common_config.nginx_settings:
+            latest_nginx_release = github.latest_release("radixdlt/babylon-nginx")
+            current_nginx_release = config.common_config.nginx_settings.release
+            config.common_config.nginx_settings.release = Prompts.confirm_version_updates(
+                current_nginx_release, latest_nginx_release, "RADIXDLT NGINX", autoapprove
+            )
+
+        return config

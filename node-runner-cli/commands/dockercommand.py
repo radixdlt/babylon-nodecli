@@ -140,8 +140,8 @@ def install(args):
 
     ########## Update existing Config
     docker_config: DockerConfig = DockerSetup.load_settings(argument_object.config_file)
-    docker_config_updated_versions = DockerSetup.update_versions(docker_config,
-                                                                 argument_object.autoapprove) if argument_object.update else docker_config
+    docker_config_updated_versions = BaseSetup.update_versions(docker_config,
+                                                               argument_object.autoapprove) if argument_object.update else docker_config
 
     docker_config_updated_versions = DockerSetup.check_set_passwords(docker_config_updated_versions)
     DockerSetup.confirm_config_changes(argument_object, docker_config, docker_config_updated_versions)

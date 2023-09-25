@@ -10,6 +10,7 @@ from config.EnvVars import UNZIPPED_NODE_DIST_FOLDER
 from config.MigrationConfig import CommonMigrationConfig
 from config.Renderer import Renderer
 from config.SystemDConfig import SystemDConfig, CoreSystemdConfig, CommonSystemdConfig
+from github import github
 from setup.BaseSetup import BaseSetup
 from setup.GatewaySetup import GatewaySetup
 from setup.MigrationSetup import MigrationSetup

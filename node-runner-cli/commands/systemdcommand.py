@@ -129,6 +129,8 @@ def config(args):
 def install(args):
     """This sets up the systemd service for the core node."""
     settings: SystemDConfig = SystemDSetup.load_settings(args.configfile)
+    if args.update:
+        settings = BaseSetup.update_versions(settings, args.auto)
     SystemDSetup.install_systemd_service(settings, args)
 
 

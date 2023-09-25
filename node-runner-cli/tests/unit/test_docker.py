@@ -6,6 +6,7 @@ import urllib3
 
 from babylonnode import main
 from config.DockerConfig import DockerConfig
+from setup.BaseSetup import BaseSetup
 from setup.DockerSetup import DockerSetup
 from setup.MigrationSetup import MigrationSetup
 
@@ -104,7 +105,7 @@ class DockerUnitTests(unittest.TestCase):
         docker_config.gateway.gateway_api.release = "oldversion"
         docker_config.gateway.data_aggregator.release = "oldversion"
         docker_config.gateway.database_migration.release = "oldversion"
-        docker_config = DockerSetup.update_versions(docker_config, True)
+        docker_config = BaseSetup.update_versions(docker_config, True)
         self.assertNotEqual("oldversion", docker_config.core_node.core_release)
         self.assertNotEqual("oldversion", docker_config.gateway.gateway_api.release)
         self.assertNotEqual("oldversion", docker_config.gateway.data_aggregator.release)
@@ -114,14 +115,14 @@ class DockerUnitTests(unittest.TestCase):
         docker_config.core_node.core_release = "oldversion"
         docker_config.gateway.gateway_api.release = "oldversion"
         docker_config.gateway.data_aggregator.release = "oldversion"
-        docker_config = DockerSetup.update_versions(docker_config, True)
+        docker_config = BaseSetup.update_versions(docker_config, True)
         self.assertNotEqual("oldversion", docker_config.core_node.core_release)
         self.assertNotEqual("oldversion", docker_config.gateway.gateway_api.release)
         self.assertNotEqual("oldversion", docker_config.gateway.data_aggregator.release)
 
         docker_config.gateway = None
         docker_config.core_node.core_release = "oldversion"
-        docker_config = DockerSetup.update_versions(docker_config, True)
+        docker_config = BaseSetup.update_versions(docker_config, True)
         self.assertNotEqual("oldversion", docker_config.core_node.core_release)
 
 

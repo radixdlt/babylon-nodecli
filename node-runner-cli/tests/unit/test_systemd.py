@@ -12,6 +12,7 @@ from config.CoreSystemDConfig import CoreSystemdConfig
 from config.KeyDetails import KeyDetails
 from config.Renderer import Renderer
 from config.SystemDConfig import SystemDConfig
+from setup.BaseSetup import BaseSetup
 from setup.MigrationSetup import MigrationSetup
 from setup.SystemDSetup import SystemDSetup
 from utils.PromptFeeder import PromptFeeder
@@ -316,6 +317,34 @@ RADIX_NODE_KEYSTORE_PASSWORD=nowthatyouknowmysecretiwillfollowyouuntilyouforgeti
                                                        "somebech32address")
         environment_yaml = settings.create_environment_yaml()
         self.assertTrue("-Xms12g -Xmx12g" in environment_yaml)
+
+
+    def test_systemd_version_update(self):
+        systemd_config = SystemDConfig({})
+        systemd_config.gateway.enabled = True
+        systemd_config.core_node.core_release = "oldversion"
+        systemd_config.gateway.gateway_api.release = "oldversion"
+        systemd_config.gateway.data_aggregator.release = "oldversion"
+        systemd_config.gateway.database_migration.release = "oldversion"
+        systemd_config = BaseSetup.update_versions(systemd_config, True)
+        self.assertNotEqual("oldversion", systemd_config.core_node.core_release)
+        self.assertNotEqual("oldversion", systemd_config.gateway.gateway_api.release)
+        self.assertNotEqual("oldversion", systemd_config.gateway.data_aggregator.release)
+        self.assertNotEqual("oldversion", systemd_config.gateway.database_migration.release)
+
+        systemd_config.gateway.database_migration = None
+        systemd_config.core_node.core_release = "oldversion"
+        systemd_config.gateway.gateway_api.release = "oldversion"
+        systemd_config.gateway.data_aggregator.release = "oldversion"
+        systemd_config = BaseSetup.update_versions(systemd_config, True)
+        self.assertNotEqual("oldversion", systemd_config.core_node.core_release)
+        self.assertNotEqual("oldversion", systemd_config.gateway.gateway_api.release)
+        self.assertNotEqual("oldversion", systemd_config.gateway.data_aggregator.release)
+
+        systemd_config.gateway = None
+        systemd_config.core_node.core_release = "oldversion"
+        systemd_config = BaseSetup.update_versions(systemd_config, True)
+        self.assertNotEqual("oldversion", systemd_config.core_node.core_release)
 
 
 def suite():

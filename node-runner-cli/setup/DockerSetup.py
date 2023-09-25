@@ -10,7 +10,6 @@ from config.DockerConfig import DockerConfig, CoreDockerConfig
 from config.EnvVars import DOCKER_COMPOSE_FOLDER_PREFIX, RADIXDLT_NODE_KEY_PASSWORD, \
     POSTGRES_PASSWORD
 from config.Renderer import Renderer
-from github import github
 from log_util.logger import get_logger
 from setup.AnsibleRunner import AnsibleRunner
 from setup.BaseSetup import BaseSetup
@@ -138,43 +137,6 @@ class DockerSetup(BaseSetup):
     def exit_on_missing_trustednode():
         logger.info("-t or --trustednode parameter is mandatory")
         sys.exit(1)
-
-    @staticmethod
-    def update_versions(docker_config: DockerConfig, autoapprove=False) -> DockerConfig:
-        if docker_config.core_node:
-            current_core_release = docker_config.core_node.core_release
-            latest_core_release = github.latest_release("radixdlt/babylon-node")
-            docker_config.core_node.core_release = Prompts.confirm_version_updates(current_core_release,
-                                                                                   latest_core_release, 'CORE',
-                                                                                   autoapprove)
-        if docker_config.gateway is not None:
-            if docker_config.gateway.enabled:
-                latest_gateway_release = github.latest_release("radixdlt/babylon-gateway")
-                current_gateway_release = docker_config.gateway.data_aggregator.release
-
-                if docker_config.gateway.data_aggregator:
-                    docker_config.gateway.data_aggregator.release = Prompts.confirm_version_updates(
-                        current_gateway_release,
-                        latest_gateway_release, 'AGGREGATOR', autoapprove)
-
-                if docker_config.gateway.gateway_api:
-                    docker_config.gateway.gateway_api.release = Prompts.confirm_version_updates(
-                        current_gateway_release,
-                        latest_gateway_release, 'GATEWAY', autoapprove)
-
-                if docker_config.gateway.database_migration:
-                    docker_config.gateway.database_migration.release = Prompts.confirm_version_updates(
-                        current_gateway_release,
-                        latest_gateway_release, 'DATABASE MIGRATION', autoapprove)
-
-        if docker_config.common_config.nginx_settings:
-            latest_nginx_release = github.latest_release("radixdlt/babylon-nginx")
-            current_nginx_release = docker_config.common_config.nginx_settings.release
-            docker_config.common_config.nginx_settings.release = Prompts.confirm_version_updates(
-                current_nginx_release, latest_nginx_release, "RADIXDLT NGINX", autoapprove
-            )
-
-        return docker_config
 
     # @staticmethod
     # def backup_save_config(config_file, new_config, backup_time, autoapprove=False):
