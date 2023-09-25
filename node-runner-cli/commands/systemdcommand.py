@@ -26,7 +26,6 @@ def systemdcommand(systemdcommand_args=None, parent=systemd_parser):
 
 @systemdcommand([
     argument("-a", "--autoapprove", help="Set this to true to run without any prompts and in mode CORE."
-                                         "Prompts still appear if you run in DETAILED mode "
                                          "Use this for automation purpose only", action="store_true", default=False),
     argument("-d", "--configdir",
              help=f"Path to node-config directory where config file will stored. Default value is {Helpers.get_default_node_config_dir()}",
@@ -44,13 +43,12 @@ def systemdcommand(systemdcommand_args=None, parent=systemd_parser):
              default=""),
     argument("-m", "--setupmode", nargs="+",
              required=True,
-             help="""Quick config mode with assumed defaults. It supports two quick modes and a detailed config mode.
+             help="""Quick config mode with assumed defaults. It supports two quick modes and a mode for the switchover from olympia.
               \n\nCORE: Use this value to setup CORE using defaults.
-              \n\nDETAILED: Default value if not provided. This mode takes your through series of questions.
               \n\nGATEWAY: This mode adds questions regarding the Network Gateway API and enables it for installation
               \n\nMIGRATION: This mode adds questions regarding the migration from an Olympia End-State node to a Babylon node
               """,
-             choices=["CORE", "DETAILED", "MIGRATION", "GATEWAY"], action="store"),
+             choices=["CORE", "MIGRATION", "GATEWAY"], action="store"),
     argument("-miu", "--migration_url",
              help="The root url of the olympia node to migrate the ledger from. Do not add /olympia-end-state.",
              action="store"),
