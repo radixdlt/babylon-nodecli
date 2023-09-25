@@ -34,13 +34,13 @@ class DockerCompose:
     def stop_gateway_containers():
         docker_compose_file: str = f"{Helpers.get_home_dir()}/gateway.docker-compose.yml"
         if os.path.exists(docker_compose_file):
-            DockerCompose().run_docker_compose_down(docker_compose_file)
+            DockerCompose.run_docker_compose_down(docker_compose_file)
 
     @staticmethod
     def restart_gateway_containers():
         docker_compose_file: str = f"{Helpers.get_home_dir()}/gateway.docker-compose.yml"
         if os.path.exists(docker_compose_file):
-            DockerCompose().run_docker_compose_down(docker_compose_file)
+            DockerCompose.run_docker_compose_down(docker_compose_file)
             DockerCompose.run_docker_compose_up(docker_compose_file)
 
     @staticmethod
@@ -51,10 +51,11 @@ class DockerCompose:
         else:
             should_start = input("\nOkay to start the containers [Y/n]?:")
         if Helpers.check_Yes(should_start):
-            DockerCompose().run_docker_compose_up(compose_file)
+            DockerCompose.run_docker_compose_up(compose_file)
 
-    def run_docker_compose_down(self, composefile, remove_volumes=False):
-        if self._is_docker_compose_plugin_installed():
+    @staticmethod
+    def run_docker_compose_down(composefile, remove_volumes=False):
+        if DockerCompose._is_docker_compose_plugin_installed():
             command = f"docker compose -f {composefile} down"
         else:
             docker_compose_binary = os.getenv("DOCKER_COMPOSE_LOCATION", 'docker-compose')
@@ -66,8 +67,9 @@ class DockerCompose:
             logger.info(f"Command: {command} failed.")
             sys.exit(1)
 
-    def run_docker_compose_up(self, composefile):
-        if self._is_docker_compose_plugin_installed():
+    @staticmethod
+    def run_docker_compose_up(composefile):
+        if DockerCompose._is_docker_compose_plugin_installed():
             logger.info("Using the docker compose plugin to start the environment")
             command = f"docker compose -f {composefile} up -d"
         else:

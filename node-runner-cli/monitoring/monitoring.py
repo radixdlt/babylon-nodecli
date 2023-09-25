@@ -163,4 +163,4 @@ class Monitoring:
 
     @staticmethod
     def stop_monitoring(composefile, remove_volumes):
-        DockerCompose().run_docker_compose_down(composefile, remove_volumes)
+        DockerCompose.run_docker_compose_down(composefile, remove_volumes)

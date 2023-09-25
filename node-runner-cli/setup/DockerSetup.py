@@ -141,27 +141,32 @@ class DockerSetup(BaseSetup):
 
     @staticmethod
     def update_versions(docker_config: DockerConfig, autoapprove=False) -> DockerConfig:
-        if docker_config.core_node:
+        if hasattr(docker_config, "core_node"):
             current_core_release = docker_config.core_node.core_release
             latest_core_release = github.latest_release("radixdlt/babylon-node")
             docker_config.core_node.core_release = Prompts.confirm_version_updates(current_core_release,
                                                                                    latest_core_release, 'CORE',
                                                                                    autoapprove)
-        if docker_config.gateway is not None and docker_config.gateway.enabled:
+        if hasattr(docker_config, "gateway") and docker_config.gateway.enabled:
             latest_gateway_release = github.latest_release("radixdlt/babylon-gateway")
             current_gateway_release = docker_config.gateway.data_aggregator.release
 
-            if docker_config.gateway.data_aggregator:
+            if hasattr(docker_config.gateway, "data_aggregator"):
                 docker_config.gateway.data_aggregator.release = Prompts.confirm_version_updates(
                     current_gateway_release,
                     latest_gateway_release, 'AGGREGATOR', autoapprove)
 
-            if docker_config.gateway.gateway_api:
+            if hasattr(docker_config.gateway, "gateway_api"):
                 docker_config.gateway.gateway_api.release = Prompts.confirm_version_updates(
                     current_gateway_release,
                     latest_gateway_release, 'GATEWAY', autoapprove)
 
-        if docker_config.common_config.nginx_settings:
+            if hasattr(docker_config.gateway, "database_migration"):
+                docker_config.gateway.database_migration.release = Prompts.confirm_version_updates(
+                    current_gateway_release,
+                    latest_gateway_release, 'DATABASE MIGRATION', autoapprove)
+
+        if hasattr(docker_config.common_config, "nginx_settings"):
             latest_nginx_release = github.latest_release("radixdlt/babylon-nginx")
             current_nginx_release = docker_config.common_config.nginx_settings.release
             docker_config.common_config.nginx_settings.release = Prompts.confirm_version_updates(

@@ -10,6 +10,7 @@ from config.EnvVars import UNZIPPED_NODE_DIST_FOLDER
 from config.MigrationConfig import CommonMigrationConfig
 from config.Renderer import Renderer
 from config.SystemDConfig import SystemDConfig, CoreSystemdConfig, CommonSystemdConfig
+from github import github
 from setup.BaseSetup import BaseSetup
 from setup.GatewaySetup import GatewaySetup
 from setup.MigrationSetup import MigrationSetup
@@ -313,11 +314,53 @@ class SystemDSetup(BaseSetup):
                           """)
 
     @staticmethod
+    def update_versions(systemd_config: SystemDConfig, autoapprove=False) -> SystemDConfig:
+        if hasattr(systemd_config, "core_node"):
+            current_core_release = systemd_config.core_node.core_release
+            latest_core_release = github.latest_release("radixdlt/babylon-node")
+            systemd_config.core_node.core_release = Prompts.confirm_version_updates(current_core_release,
+                                                                                    latest_core_release, 'CORE',
+                                                                                    autoapprove)
+            systemd_config.core_node.generate_download_urls()
+        if hasattr(systemd_config, "gateway") and systemd_config.gateway.enabled:
+            latest_gateway_release = github.latest_release("radixdlt/babylon-gateway")
+            current_gateway_release = systemd_config.gateway.data_aggregator.release
+
+            if hasattr(systemd_config.gateway, "data_aggregator"):
+                systemd_config.gateway.data_aggregator.release = Prompts.confirm_version_updates(
+                    current_gateway_release,
+                    latest_gateway_release, 'AGGREGATOR', autoapprove)
+
+            if hasattr(systemd_config.gateway, "gateway_api"):
+                systemd_config.gateway.gateway_api.release = Prompts.confirm_version_updates(
+                    current_gateway_release,
+                    latest_gateway_release, 'GATEWAY', autoapprove)
+
+            if hasattr(systemd_config.gateway, "database_migration"):
+                systemd_config.gateway.database_migration.release = Prompts.confirm_version_updates(
+                    current_gateway_release,
+                    latest_gateway_release, 'DATABASE MIGRATION', autoapprove)
+
+        if hasattr(systemd_config.common_config, "nginx_settings"):
+            latest_nginx_release = github.latest_release("radixdlt/babylon-nginx")
+            current_nginx_release = systemd_config.common_config.nginx_settings.release
+            systemd_config.common_config.nginx_settings.release = Prompts.confirm_version_updates(
+                current_nginx_release, latest_nginx_release, "RADIXDLT NGINX", autoapprove
+            )
+            systemd_config.common_config.nginx_settings.generate_nginx_config_url()
+
+        return systemd_config
+
+    @staticmethod
     def dump_config_as_yaml(systemd_config: SystemDConfig):
-        config_to_dump = {"version": "0.1", "core_node": systemd_config.core_node.to_dict(),
-                          "common_config": systemd_config.common_config.to_dict(),
-                          "migration": systemd_config.migration.to_dict(),
-                          "gateway": systemd_config.gateway.to_dict()}
+        config_to_dump = {"common_config": systemd_config.common_config.to_dict(), "version": "0.1"}
+        if hasattr(systemd_config, "core_node"):
+            config_to_dump["core_node"] = systemd_config.core_node.to_dict()
+        if hasattr(systemd_config, "gateway"):
+            config_to_dump["gateway"] = systemd_config.gateway.to_dict()
+        if hasattr(systemd_config, "migration"):
+            config_to_dump["migration"] = systemd_config.migration.to_dict()
+
         yaml.add_representer(type(None), Helpers.represent_none)
         Helpers.section_headline("CONFIG is Generated as below")
         print(f"\n{yaml.dump(config_to_dump)}")
