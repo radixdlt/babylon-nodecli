@@ -1,3 +1,4 @@
+import getpass
 import os
 import sys
 from pathlib import Path
@@ -59,14 +60,13 @@ class BaseSetup:
 
     @staticmethod
     def generatekey(keyfile_path, keyfile_name, keygen_tag, keystore_password=None, new=False):
-        import getpass
         key_details = KeyDetails({})
         key_details.keyfile_name = keyfile_name
         key_details.keygen_tag = keygen_tag
         key_details.keyfile_path = keyfile_path
         Path(f"{key_details.keyfile_path}").mkdir(parents=True, exist_ok=True)
         if os.path.isfile(f'{key_details.keyfile_path}/{key_details.keyfile_name}'):
-            print(f"Node Keystore file already exist at location {key_details.keyfile_path}")
+            logger.info(f"Node Keystore file already exist at location {key_details.keyfile_path}")
             key_details.keystore_password = keystore_password if keystore_password else getpass.getpass(
                 f"Enter the password of the existing keystore file '{key_details.keyfile_name}':")
         else:
