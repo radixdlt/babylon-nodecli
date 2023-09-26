@@ -399,7 +399,6 @@ jobs:
           ./babylonnode docker dependencies
       - name: "Execute User Flow: Install Core, Gateway and Monitoring on the same host"
         run: |
-          chmod +x  ./node-runner-cli/tests/userflows/install-docker-all-same-host.sh
           ./node-runner-cli/tests/userflows/install-docker-all-same-host.sh
         env:
           NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
