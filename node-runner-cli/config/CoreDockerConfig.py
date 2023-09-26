@@ -48,7 +48,10 @@ class CoreDockerConfig(BaseConfig):
         if self.data_directory:
             logger.info(f"Creating directory: {self.data_directory}")
             path = Path(self.data_directory)
-            path.mkdir(parents=True, exist_ok=True)
+            try:
+                path.mkdir(parents=True, exist_ok=True)
+            except FileExistsError:
+                logger.info(f"Directory: {self.data_directory} already exist")
 
     def set_trusted_node(self, trusted_node):
         if not trusted_node:
