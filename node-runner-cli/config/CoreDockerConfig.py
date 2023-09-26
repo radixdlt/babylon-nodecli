@@ -7,6 +7,8 @@ from config.KeyDetails import KeyDetails
 from setup.BaseSetup import BaseSetup
 from utils.Prompts import Prompts
 from utils.utils import Helpers
+from log_util.logger import get_logger
+logger = get_logger(__name__)
 
 
 class CoreDockerConfig(BaseConfig):
@@ -44,6 +46,7 @@ class CoreDockerConfig(BaseConfig):
         if os.environ.get(MOUNT_LEDGER_VOLUME, "true").lower() == "false":
             self.data_directory = None
         if self.data_directory:
+            logger.info(f"Creating directory: {self.data_directory}")
             Path(self.data_directory).mkdir(parents=True, exist_ok=True)
 
     def set_trusted_node(self, trusted_node):
