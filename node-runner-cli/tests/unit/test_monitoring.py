@@ -1,6 +1,7 @@
 import os.path
 import unittest
 from io import StringIO
+from json import loads
 from unittest import mock
 
 from jinja2.exceptions import TemplateNotFound
@@ -10,6 +11,11 @@ from monitoring.monitoring import Monitoring
 
 
 class MonitoringTests(unittest.TestCase):
+
+    def test_render_grafana_templates(self):
+        Monitoring.template_dashboards(["babylon-node-dashboard.json"], "/tmp")
+        dashboard = loads(open("/tmp/grafana/provisioning/dashboards/babylon-node-dashboard.json").read())
+        self.assertEqual(dashboard["panels"][0]["targets"][0]["legendFormat"], '{{ health }}')
 
     @mock.patch('sys.stdout', new_callable=StringIO)
     def test_template(self, mock_stdout):
@@ -28,6 +34,7 @@ class MonitoringTests(unittest.TestCase):
             self.assertEqual(mock_stdout.getvalue(),
                              "jinja2.exceptions.TemplateNotFound: this-template-does-not-exist.j2")
             self.assertEqual(cm.exception.code, 1)
+
 
     @unittest.skip("endless loop")
     @mock.patch('sys.stdout', new_callable=StringIO)
