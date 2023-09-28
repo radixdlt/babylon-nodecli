@@ -1,4 +1,3 @@
-import json
 import os
 import os.path
 import sys
@@ -113,6 +112,7 @@ class Monitoring:
             if file.endswith('.yml') or file.endswith('.yaml'):
                 Helpers.dump_rendered_template(render_template, file_location, quiet=True)
             if file.endswith('.json'):
+                import json
                 with open(file_location, 'w') as fp:
                     json.dump(render_template, fp)
 

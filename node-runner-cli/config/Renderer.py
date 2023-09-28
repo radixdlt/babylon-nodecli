@@ -1,15 +1,15 @@
 import os
 import sys
-from os.path import dirname, join
 
 import yaml
 from jinja2 import Environment, FileSystemLoader
 
 
 class Renderer:
-    def load_file_based_template(self, template_file_name: str, templates_dir="templates"):
-        templates_path = join(dirname(dirname(__file__)), templates_dir)
-        self.env = Environment(loader=FileSystemLoader(templates_path), trim_blocks=True,
+    def load_file_based_template(self, template_file_name: str, template_path="templates"):
+        bundle_dir = getattr(sys, '_MEIPASS', os.getcwd())
+        path_to_template = os.path.abspath(os.path.join(bundle_dir, template_path))
+        self.env = Environment(loader=FileSystemLoader(path_to_template), trim_blocks=True,
                                lstrip_blocks=True)
         self.env.filters['bool'] = bool
         self.template = self.env.get_template(template_file_name)
