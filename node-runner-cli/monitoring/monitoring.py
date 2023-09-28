@@ -86,8 +86,8 @@ class Monitoring:
     @staticmethod
     def template_datasource(monitoring_config_dir):
         render_template = Renderer().load_file_based_template("datasource.yml.j2").render({}).to_yaml()
-        Path(f"{monitoring_config_dir}/grafana/provisioning/babylon-ledgersources").mkdir(parents=True, exist_ok=True)
-        file_location = f"{monitoring_config_dir}/grafana/provisioning/babylon-ledgersources/babylon-ledgersource.yml"
+        Path(f"{monitoring_config_dir}/grafana/provisioning/datasources").mkdir(parents=True, exist_ok=True)
+        file_location = f"{monitoring_config_dir}/grafana/provisioning/datasources/datasource.yml"
         Helpers.section_headline("Downloading datasource for grafana")
         Helpers.dump_rendered_template(render_template, file_location)
 
