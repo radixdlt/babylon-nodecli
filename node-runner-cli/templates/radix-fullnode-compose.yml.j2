@@ -1,6 +1,6 @@
 version: '3.8'
 services:
-{% if core_node is not none %}
+{% if core_node is not none and core_node is defined %}
   core:
     cap_add:
     - NET_ADMIN
@@ -57,7 +57,7 @@ services:
     {% if core_node is defined %}
       RADIXDLT_NETWORK_USE_PROXY_PROTOCOL: '{{core_node.use_proxy_protocol or 'false'}}'
     {% endif %}
-    {% if core_node is not defined %}
+    {% if core_node is not defined or core_node is none %}
       RADIXDLT_ENABLE_TCP_CORE_PROXY: 'false'
     {% endif %}
       RADIXDLT_GATEWAY_API_ENABLE: '{{common_config.nginx_settings.protect_gateway or 'false'}}'
