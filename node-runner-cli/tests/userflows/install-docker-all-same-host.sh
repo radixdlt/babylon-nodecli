@@ -7,19 +7,22 @@ df -H
 docker system df
 
 # enable thos in case you want to execute this locally or on a fresh node.
-#export KEYSTORE_PASSWORD=radix
-#export POSTGRES_PASSWORD=radix
-#export NGINX_ADMIN_PASSWORD=radix
-#export NGINX_METRICS_PASSWORD=radix
-#export NGINX_GATEWAY_PASSWORD=radix
-#export SEED_NODE=radix://node_rdx1qf2x63qx4jdaxj83kkw2yytehvvmu6r2xll5gcp6c9rancmrfsgfw0vnc65@52.212.35.209,radix://node_rdx1qgxn3eeldj33kd98ha6wkjgk4k77z6xm0dv7mw    nrkefknjcqsvhuu4gc609@54.79.136.139,radix://node_rdx1qwrrnhzfu99fg3yqgk3ut9vev2pdssv7hxhff80msjmmcj968487uugc0t2@43.204.226.50,radix://node_rdx1q0gnmwv0fmcp7ecq0znff7yzrt7ggwrp47sa9pssgyvrnl75tvxmvj78u7t@52.21.106.232
-#export NETWORK_ID=1
-#export NETWORK_NAME=mainnet
+export KEYSTORE_PASSWORD=radix
+export POSTGRES_PASSWORD=radix
+export NGINX_ADMIN_PASSWORD=radix
+export NGINX_METRICS_PASSWORD=radix
+export NGINX_GATEWAY_PASSWORD=radix
+export SEED_NODE=radix://node_rdx1qf2x63qx4jdaxj83kkw2yytehvvmu6r2xll5gcp6c9rancmrfsgfw0vnc65@52.212.35.209,radix://node_rdx1qgxn3eeldj33kd98ha6wkjgk4k77z6xm0dv7mwnrkefknjcqsvhuu4gc609@54.79.136.139,radix://node_rdx1qwrrnhzfu99fg3yqgk3ut9vev2pdssv7hxhff80msjmmcj968487uugc0t2@43.204.226.50,radix://node_rdx1q0gnmwv0fmcp7ecq0znff7yzrt7ggwrp47sa9pssgyvrnl75tvxmvj78u7t@52.21.106.232
+export NETWORK_ID=1
+export NETWORK_NAME=mainnet
 
 export DISABLE_VERSION_CHECK=true
 export COMPOSE_HTTP_TIMEOUT=360
 #Below PATH require when ansible is installed as part of pip
 export PATH="$PATH:/home/ubuntu/.local/bin"
+
+echo "set old version"
+#RADIXDLT_APP_VERSION_OVERRIDE=rcnet-v3.1-r5
 
 ./babylonnode docker config -d $HOME/babylon-node-config \
   -t ${SEED_NODE} \
@@ -31,6 +34,9 @@ export PATH="$PATH:/home/ubuntu/.local/bin"
   -a
 
 cat $HOME/babylon-node-config/config.yaml
+
+echo "unset version override"
+unset RADIXDLT_APP_VERSION_OVERRIDE
 
 # Reset everything
 ./babylonnode docker stop | true
