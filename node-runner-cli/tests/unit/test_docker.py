@@ -124,6 +124,17 @@ class DockerUnitTests(unittest.TestCase):
         docker_config = DockerSetup.update_versions(docker_config, True)
         self.assertNotEqual("oldversion", docker_config.core_node.core_release)
 
+    def test_docker_compose_template_without_core_node(self):
+        docker_config = DockerConfig({})
+        docker_config.core_node.core_release = "1.2.3"
+        docker_config.common_config.nginx_settings.release = "1.2.3"
+        compose = DockerSetup.render_docker_compose(docker_config)
+        self.assertEqual(False, hasattr(compose["services"]["nginx"]["environment"], "RADIXDLT_ENABLE_TCP_CORE_PROXY"))
+        del docker_config.core_node
+        compose = DockerSetup.render_docker_compose(docker_config)
+        self.assertEqual("false", compose["services"]["nginx"]["environment"]["RADIXDLT_ENABLE_TCP_CORE_PROXY"])
+
+
 def suite():
     """ This defines all the tests of a module"""
     suite = unittest.TestSuite()
