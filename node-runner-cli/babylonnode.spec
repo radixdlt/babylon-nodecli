@@ -6,7 +6,7 @@ block_cipher = None
 
 a = Analysis(['babylonnode.py'],
              pathex=['.'],
-             binaries=[],
+             binaries=[(".venv/lib/python3.10/site-packages/radix_engine_toolkit/x86_64-unknown-linux-gnu", ".")],
              datas=[('./templates/*.j2', 'templates'),('./testnet-genesis/*', 'testnet-genesis')],
              hiddenimports=[],
              hookspath=[],
