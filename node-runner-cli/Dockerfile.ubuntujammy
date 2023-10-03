@@ -28,7 +28,7 @@ ENV PYTHONPATH "/app/.venv/lib/python3.10/site-packages/:${PYTHONPATH}"
 RUN PIPENV_VENV_IN_PROJECT=1 pipenv install --python /root/.pyenv/shims/python
 
 COPY . /app
-RUN pyinstaller --onefile --windowed babylonnode.spec
+RUN pyinstaller --onefile --add-binary "/app/.venv/lib/python3.10/site-packages/radix_engine_toolkit/x86_64-unknown-linux-gnu:."  --windowed babylonnode.spec
 
 RUN DISABLE_VERSION_CHECK=true /app/dist/babylonnode version
 
