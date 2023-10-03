@@ -8,21 +8,24 @@ RUN apt-get update \
     curl \
     git \
     python3-pip \
-    python3-dev
+    python3-dev \
+    libssl-dev \
+    libffi-dev
 
 # Install pyenv
 RUN set -ex \
     && curl https://pyenv.run | bash
 
+RUN /root/.pyenv/bin/pyenv install -v 3.10.6
 RUN pip install pipenv
 
 WORKDIR /app
 COPY Pipfile Pipfile.lock /app/
-RUN PIPENV_VENV_IN_PROJECT=1 pipenv run pipenv install
-RUN pipenv run pip install pyinstaller==4.10
+RUN PIPENV_VENV_IN_PROJECT=1 pipenv --python=/root/.pyenv/versions/3.10.6/bin/python run pipenv install
+RUN pipenv --python=/root/.pyenv/versions/3.10.6/bin/python run pip install pyinstaller==4.10
 
 COPY . /app
-RUN pipenv run pyinstaller --onefile --windowed babylonnode.spec
+RUN pipenv run --python=/root/.pyenv/versions/3.10.6/bin/python pyinstaller --onefile --windowed babylonnode.spec
 
 RUN DISABLE_VERSION_CHECK=true /app/dist/babylonnode version
 
