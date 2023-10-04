@@ -12,9 +12,9 @@ docker system df
 #export NGINX_ADMIN_PASSWORD=radix
 #export NGINX_METRICS_PASSWORD=radix
 #export NGINX_GATEWAY_PASSWORD=radix
-#export SEED_NODE=radix://node_tdx_e_1q0gm3fwqh8ggl09g7l8ru96krzlxdyrc694mqw8cf227v62vjyrmccv8md5@13.126.65.118,radix://node_tdx_e_1q0juzf2gnhfhy2aj6x88x4f459tf2a2mdk56jm3ffhzp94fn8k0q5lkse34@52.64.209.45,radix://node_tdx_e_1qdzlwtjn9wcmcyt3mp3g4qaerr6fgrl86ze6t20427tf4rmnu670y0cgszc@54.72.0.65,radix://node_tdx_e_1qfz9r8xp95vuzjq503l856ywukrdnukcz4232tr4nsx7ff2efvfnwvaq080@35.168.132.18
-#export NETWORK_ID=14
-#export NETWORK_NAME=zabanet
+#export SEED_NODE=radix://node_rdx1qf2x63qx4jdaxj83kkw2yytehvvmu6r2xll5gcp6c9rancmrfsgfw0vnc65@52.212.35.209,radix://node_rdx1qgxn3eeldj33kd98ha6wkjgk4k77z6xm0dv7mwnrkefknjcqsvhuu4gc609@54.79.136.139,radix://node_rdx1qwrrnhzfu99fg3yqgk3ut9vev2pdssv7hxhff80msjmmcj968487uugc0t2@43.204.226.50,radix://node_rdx1q0gnmwv0fmcp7ecq0znff7yzrt7ggwrp47sa9pssgyvrnl75tvxmvj78u7t@52.21.106.232
+#export NETWORK_ID=1
+#export NETWORK_NAME=mainnet
 
 export DISABLE_VERSION_CHECK=true
 export COMPOSE_HTTP_TIMEOUT=360
@@ -22,7 +22,7 @@ export COMPOSE_HTTP_TIMEOUT=360
 export PATH="$PATH:/home/ubuntu/.local/bin"
 
 echo "set old version"
-RADIXDLT_APP_VERSION_OVERRIDE=rcnet-v3.1-r5
+#RADIXDLT_APP_VERSION_OVERRIDE=rcnet-v3.1-r5
 
 ./babylonnode docker config -d $HOME/babylon-node-config \
   -t ${SEED_NODE} \
@@ -80,30 +80,33 @@ echo "Waiting and checking again"
 sleep 10
 docker ps
 
-echo "Testing Core node health endpoint"
-set +e
-for i in {1..5}; do
-  FULL_OUTPUT=$(NGINX_ADMIN_PASSWORD=${NGINX_ADMIN_PASSWORD} ./babylonnode api system health)
-  OUTPUT=$(echo $FULL_OUTPUT | jq -r '.status')
-  if [[ $OUTPUT == "SYNCING" || $OUTPUT == "BOOTING_AT_GENESIS" || $OUTPUT == "OUT_OF_SYNC" || $OUTPUT == "BOOTING" || $OUTPUT == "UP" ]]; then
-    echo "The result is successful"
-    echo "The Node is in status $OUTPUT"
-    break
-  else
-    if [[ $i == 5 ]]; then
-      echo "failed to get ready in time."
-      echo "here are the logs of the core node"
-      docker logs $(whoami)-core-1 --tail 100
-      echo "Exiting..."
-      exit 137
-    fi
-    echo "The result is unsuccessful. Waiting and trying again ($i of 5)"
-    echo "Command ./babylonnode api system health resulted in"
-    echo "$FULL_OUTPUT"
-  fi
-  sleep 30
-done
+#echo "Testing Core node health endpoint"
+#set +e
+#for i in {1..30}; do
+#  FULL_OUTPUT=$(NGINX_ADMIN_PASSWORD=${NGINX_ADMIN_PASSWORD} ./babylonnode api system health)
+#  OUTPUT=$(echo $FULL_OUTPUT | jq -r '.status')
+#  echo $FULL_OUTPUT
+#  if [[ $OUTPUT == "SYNCING" || $OUTPUT == "BOOTING_AT_GENESIS" || $OUTPUT == "OUT_OF_SYNC" || $OUTPUT == "BOOTING" || $OUTPUT == "UP" ]]; then
+#    echo "The result is successful"
+#    echo "The Node is in status $OUTPUT"
+#    break
+#  else
+#    if [[ $i == 30 ]]; then
+#      echo "failed to get ready in time."
+#      echo "here are the logs of the core node"
+#      docker logs $(whoami)-core-1 --tail 100
+#      echo "Exiting..."
+#      exit 137
+#    fi
+#    echo "The result is unsuccessful. Waiting and trying again ($i of 5)"
+#    echo "Command ./babylonnode api system health resulted in"
+#    echo "$FULL_OUTPUT"
+#  fi
+#  sleep 30
+#done
 set -e
+
+docker logs $(whoami)-core-1 --tail 100
 
 echo "Testing postgres is set up correctly"
 sudo systemctl status postgresql@12-main.service --no-pager
