@@ -90,7 +90,7 @@ for i in {1..30}; do
     echo "The Node is in status $OUTPUT"
     break
   else
-    if [[ $i == 5 ]]; then
+    if [[ $i == 30 ]]; then
       echo "failed to get ready in time."
       echo "here are the logs of the core node"
       docker logs $(whoami)-core-1 --tail 100
