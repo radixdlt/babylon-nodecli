@@ -464,8 +464,9 @@ class SystemDSetup(BaseSetup):
     def chown_files(settings):
         run_shell_command(['sudo', 'chown', 'radixdlt:radixdlt',
                            f'{settings.core_node.keydetails.keyfile_path}/{settings.core_node.keydetails.keyfile_name}'])
-        # run_shell_command(['sudo', 'chown', 'radixdlt:radixdlt',
-        #                    f'{settings.common_config.genesis_bin_data_file}'])
+        if settings.common_config.genesis_bin_data_file is not None:
+            run_shell_command(['sudo', 'chown', 'radixdlt:radixdlt',
+                               f'{settings.common_config.genesis_bin_data_file}'])
         run_shell_command(['sudo', 'chown', '-R', 'radixdlt:radixdlt',
                            f'{settings.core_node.node_secrets_dir}'])
         run_shell_command(['sudo', 'chown', '-R', 'radixdlt:radixdlt',
