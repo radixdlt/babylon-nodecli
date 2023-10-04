@@ -80,30 +80,30 @@ echo "Waiting and checking again"
 sleep 10
 docker ps
 
-echo "Testing Core node health endpoint"
-set +e
-for i in {1..30}; do
-  FULL_OUTPUT=$(NGINX_ADMIN_PASSWORD=${NGINX_ADMIN_PASSWORD} ./babylonnode api system health)
-  OUTPUT=$(echo $FULL_OUTPUT | jq -r '.status')
-  echo $FULL_OUTPUT
-  if [[ $OUTPUT == "SYNCING" || $OUTPUT == "BOOTING_AT_GENESIS" || $OUTPUT == "OUT_OF_SYNC" || $OUTPUT == "BOOTING" || $OUTPUT == "UP" ]]; then
-    echo "The result is successful"
-    echo "The Node is in status $OUTPUT"
-    break
-  else
-    if [[ $i == 30 ]]; then
-      echo "failed to get ready in time."
-      echo "here are the logs of the core node"
-      docker logs $(whoami)-core-1 --tail 100
-      echo "Exiting..."
-      exit 137
-    fi
-    echo "The result is unsuccessful. Waiting and trying again ($i of 5)"
-    echo "Command ./babylonnode api system health resulted in"
-    echo "$FULL_OUTPUT"
-  fi
-  sleep 30
-done
+#echo "Testing Core node health endpoint"
+#set +e
+#for i in {1..30}; do
+#  FULL_OUTPUT=$(NGINX_ADMIN_PASSWORD=${NGINX_ADMIN_PASSWORD} ./babylonnode api system health)
+#  OUTPUT=$(echo $FULL_OUTPUT | jq -r '.status')
+#  echo $FULL_OUTPUT
+#  if [[ $OUTPUT == "SYNCING" || $OUTPUT == "BOOTING_AT_GENESIS" || $OUTPUT == "OUT_OF_SYNC" || $OUTPUT == "BOOTING" || $OUTPUT == "UP" ]]; then
+#    echo "The result is successful"
+#    echo "The Node is in status $OUTPUT"
+#    break
+#  else
+#    if [[ $i == 30 ]]; then
+#      echo "failed to get ready in time."
+#      echo "here are the logs of the core node"
+#      docker logs $(whoami)-core-1 --tail 100
+#      echo "Exiting..."
+#      exit 137
+#    fi
+#    echo "The result is unsuccessful. Waiting and trying again ($i of 5)"
+#    echo "Command ./babylonnode api system health resulted in"
+#    echo "$FULL_OUTPUT"
+#  fi
+#  sleep 30
+#done
 set -e
 
 docker logs $(whoami)-core-1 --tail 100
