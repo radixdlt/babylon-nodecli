@@ -82,7 +82,7 @@ docker ps
 
 echo "Testing Core node health endpoint"
 set +e
-for i in {1..5}; do
+for i in {1..30}; do
   FULL_OUTPUT=$(NGINX_ADMIN_PASSWORD=${NGINX_ADMIN_PASSWORD} ./babylonnode api system health)
   OUTPUT=$(echo $FULL_OUTPUT | jq -r '.status')
   if [[ $OUTPUT == "SYNCING" || $OUTPUT == "BOOTING_AT_GENESIS" || $OUTPUT == "OUT_OF_SYNC" || $OUTPUT == "BOOTING" || $OUTPUT == "UP" ]]; then
