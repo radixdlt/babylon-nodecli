@@ -7,7 +7,8 @@ from cryptography.hazmat.primitives._serialization import Encoding, PrivateForma
 from radix_engine_toolkit import (
     PrivateKey,
     Address,
-    derive_virtual_account_address_from_public_key
+    derive_virtual_account_address_from_public_key, derive_virtual_account_address_from_olympia_account_address,
+    OlympiaAddress
 )
 
 
@@ -26,3 +27,10 @@ def derive_address(keystore: str, password: str, network_id: int) -> Address:
 
     return derive_virtual_account_address_from_public_key(
         public_key=private_key.public_key(), network_id=network_id)
+
+
+def derive_babylon_address_from_olympia_account_address(address: str, network: int):
+    address = OlympiaAddress(address)
+    babylon_address = derive_virtual_account_address_from_olympia_account_address(
+        address, network_id=network)
+    return babylon_address.as_str()
