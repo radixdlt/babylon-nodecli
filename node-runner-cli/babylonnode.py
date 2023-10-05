@@ -13,6 +13,7 @@ from commands.ledgercommand import ledgercli
 from commands.key import keycli
 from commands.monitoring import monitoringcli
 from commands.othercommands import other_command_cli
+from commands.retcommand import ret_cli
 from commands.systemapi import handle_systemapi
 from commands.systemdcommand import systemdcli
 from config.EnvVars import DISABLE_VERSION_CHECK
@@ -24,7 +25,17 @@ urllib3.disable_warnings()
 
 cli = ArgumentParser()
 cli.add_argument('subcommand', help='Subcommand to run',
-                 choices=["docker", "systemd", "api", "monitoring", "version", "optimise-node", "auth", "key", "ledger", "eula"])
+                 choices=["docker",
+                          "systemd",
+                          "api",
+                          "monitoring",
+                          "version",
+                          "optimise-node",
+                          "auth",
+                          "key",
+                          "ledger",
+                          "eula",
+                          "ret"])
 
 apicli = ArgumentParser(
     description='API commands')
@@ -123,7 +134,12 @@ def main():
         if sys.argv[2:] == "-h":
             other_command_cli.print_help()
         other_command_cli_args.func(other_command_cli_args)
-
+    elif args.subcommand == "ret":
+        ret_args = ret_cli.parse_args(sys.argv[2:])
+        if ret_args.retcommand is None:
+            ret_cli.print_help()
+        else:
+            ret_args.func(ret_args)
     else:
         logger.info(f"Invalid subcommand {args.subcommand}")
 
