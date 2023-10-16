@@ -48,10 +48,6 @@ class Network:
         network_id_names = {
             1: "mainnet",
             2: "stokenet",
-            10: "adapanet",
-            11: "nebunet",
-            12: "kisharnet",
-            13: "ansharnet",
             14: "zabanet",
             32: "gilganet",
             33: "enkinet",
