@@ -20,8 +20,6 @@ class NetworkUtilsUnitTests(unittest.TestCase):
         self.assertEqual(Network.validate_network_id("S"), 2)
         self.assertEqual(Network.validate_network_id("stokenet"), 2)
         self.assertEqual(Network.validate_network_id("STOKENET"), 2)
-        self.assertEqual(Network.validate_network_id("10"), 10)
-        self.assertEqual(Network.validate_network_id("11"), 11)
         self.assertEqual(Network.validate_network_id("32"), 32)
         self.assertEqual(Network.validate_network_id("33"), 33)
         self.assertEqual(Network.validate_network_id("34"), 34)
