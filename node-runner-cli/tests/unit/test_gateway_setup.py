@@ -9,6 +9,7 @@ import yaml
 from deepdiff import DeepDiff
 from yaml import UnsafeLoader
 
+from config.BaseConfig import SetupMode
 from config.DockerConfig import DockerConfig
 from config.SystemDConfig import SystemDConfig
 from setup.DockerSetup import DockerSetup
@@ -125,6 +126,8 @@ services:
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_setup_gateway_ask_core_api(self, mockout):
+        SetupMode.instance()
+        SetupMode.mode = "DETAILED"
         urllib3.disable_warnings()
         keyboard_input = ["", "CoreNodeName"]
         default_value = "http://localhost:3332"
@@ -185,7 +188,8 @@ services:
         with patch('builtins.input', side_effect=[install_keyboard_input]):
             GatewaySetup.conditionaly_install_standalone_gateway(config)
 
-        fixture_file = "./tests/fixtures/gateway-docker-compose.yaml"
+        tests_dir = dirname(dirname(__file__))
+        fixture_file = join(tests_dir, "fixtures/gateway-docker-compose.yaml")
         with open(fixture_file) as f1:
             with open(config.gateway.docker_compose) as f2:
                 self.assertEqual(f1.read(), f2.read())
