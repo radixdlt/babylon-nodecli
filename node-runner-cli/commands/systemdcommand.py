@@ -140,7 +140,7 @@ def install(args):
     settings: SystemDConfig = SystemDSetup.load_settings(args.configfile)
     settings_updated_versions = SystemDSetup.update_versions(settings,
                                                              args.auto) if args.update else settings
-    SystemDSetup.install_systemd_service(settings, args)
+    SystemDSetup.install_systemd_service(settings_updated_versions, args)
 
 
 @systemdcommand([
