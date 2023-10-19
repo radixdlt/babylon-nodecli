@@ -35,18 +35,15 @@ def latest_release(repo_name="radixdlt/babylon-node") -> str:
             return version_override
 
     req = requests.Request('GET',
-                           f'https://api.github.com/repos/{repo_name}/releases/latest')
+                           f'https://ghproxy.radixdlt.com/{repo_name}')
 
-    token = getenv('GITHUB_TOKEN')
     prepared = req.prepare()
     prepared.headers['Content-Type'] = 'application/json'
     prepared.headers['user-agent'] = 'babylonnode-cli'
-    if token is not None:
-        prepared.headers['Authorization'] = f'token {token}'
     resp = Helpers.send_request(prepared, print_response=False)
     if not resp.ok:
         print("Failed to get latest release from github. The response was:")
-        print(f"https://api.github.com/repos/{repo_name}/releases/latest")
+        print(f"https://ghproxy.radixdlt.com/{repo_name}")
         print(f"HTTP Code: {resp.status_code}")
         print("Exitting the command...")
         sys.exit(1)
