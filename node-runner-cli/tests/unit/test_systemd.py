@@ -75,7 +75,7 @@ class SystemdUnitTests(unittest.TestCase):
         urllib3.disable_warnings()
         responses.add(
             responses.GET,
-            f'https://api.github.com/repos/radixdlt/babylon-nginx/releases/latest',
+            f'https://ghproxy.radixdlt.com/radixdlt/babylon-nginx',
             json={'tag_name': "v1"},
             status=200)
         with patch('builtins.input', side_effect=['Y']):
@@ -343,19 +343,19 @@ RADIX_NODE_KEYSTORE_PASSWORD=nowthatyouknowmysecretiwillfollowyouuntilyouforgeti
     def test_systemd_version_update(self):
         responses.add(
             responses.GET,
-            f'https://api.github.com/repos/radixdlt/babylon-node/releases/latest',
+            f'https://ghproxy.radixdlt.com/radixdlt/babylon-node',
             json={'tag_name': "v1"},
             status=200)
 
         responses.add(
             responses.GET,
-            f'https://api.github.com/repos/radixdlt/babylon-gateway/releases/latest',
+            f'https://ghproxy.radixdlt.com/radixdlt/babylon-gateway',
             json={'tag_name': "v1"},
             status=200)
 
         responses.add(
             responses.GET,
-            f'https://api.github.com/repos/radixdlt/babylon-nginx/releases/latest',
+            f'https://ghproxy.radixdlt.com/radixdlt/babylon-nginx',
             json={'tag_name': "v1"},
             status=200)
 
