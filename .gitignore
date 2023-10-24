@@ -140,3 +140,4 @@ node-runner-cli/systemd.settings.yml
 
 .DS_Store
 node-runner-cli/out/
+requirements.txt
