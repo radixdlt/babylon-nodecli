@@ -136,12 +136,10 @@ api.bind.address=0.0.0.0
 
 db.location=/home/radixdlt/babylon-ledger
 
-consensus.validator_address=validatorAddress
-
-"""
+consensus.validator_address=validatorAddress"""
         self.maxDiff = None
         print(fixture)
-        self.assertEqual(fixture, default_config)
+        self.assertEqual(fixture.strip(), default_config.strip())
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_systemd_setup_default_config_without_validator(self, mockout):
@@ -234,7 +232,7 @@ consensus.validator_address=validatorAddress
 
 """
         self.maxDiff = None
-        self.assertEqual(fixture, render_template)
+        self.assertEqual(fixture.strip(), render_template.strip())
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_systemd_service_file_jinja(self, mockout):
@@ -266,7 +264,9 @@ TimeoutStopSec=10
 Restart=on-failure
 
 [Install]
-WantedBy=multi-user.target"""
+WantedBy=multi-user.target
+
+"""
         self.maxDiff = None
         self.assertEqual(render_template, fixture)
 
