@@ -55,10 +55,13 @@ class SystemDConfig(BaseConfig):
         return Renderer().load_file_based_template("systemd-environment.j2") \
             .render(self.to_dict())
 
-    def create_default_config_file(self):
+    def create_default_config_file(self, advanceduserconfig: str):
         self.common_config.genesis_bin_data_file = Network.path_to_genesis_binary(self.common_config.network_id)
         Renderer().load_file_based_template("systemd-default.config.j2").render(
             self.to_dict()).to_file(f"{self.core_node.node_dir}/default.config")
+
+        if os.path.exists(f"{advanceduserconfig}"):
+            self.append_advanced_user_config()
 
         if (os.getenv(APPEND_DEFAULT_CONFIG_OVERIDES)) is not None:
             print("Add overides")
@@ -71,6 +74,12 @@ class SystemDConfig(BaseConfig):
                     break
             for text in lines:
                 run_shell_command(f"echo {text} >> {self.core_node.node_dir}/default.config", shell=True)
+
+    def append_advanced_user_config(self):
+        f1 = open(f"{self.core_node.node_dir}/default.config", 'a+')
+        f2 = open(f"{self.core_node.node_dir}/advanced-user.default.config", 'r')
+        # appending the contents of the second file to the first file
+        f1.write(f2.read())
 
     def create_service_file(self,
                             service_file_path="/etc/systemd/system/radixdlt-node.service"):

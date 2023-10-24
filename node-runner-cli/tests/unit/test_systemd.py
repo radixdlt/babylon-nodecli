@@ -1,11 +1,13 @@
 import os
+import re
 import unittest
 from io import StringIO
+from os.path import dirname, join
 from pathlib import Path
 from unittest.mock import patch
 
-import urllib3
 import responses
+import urllib3
 
 from babylonnode import main
 from config.CommonSystemDConfig import CommonSystemdConfig
@@ -16,6 +18,16 @@ from config.SystemDConfig import SystemDConfig
 from setup.MigrationSetup import MigrationSetup
 from setup.SystemDSetup import SystemDSetup
 from utils.PromptFeeder import PromptFeeder
+
+
+def file_contains_regular_expression(re_str: str, file: str) -> bool:
+    reg = re.compile(re_str)
+    with open(file) as f:
+        for num, line in enumerate(f, 1):
+            regular_expression_find = re.search(reg, line)
+            if regular_expression_find:
+                return True
+    return False
 
 
 class SystemdUnitTests(unittest.TestCase):
@@ -104,7 +116,7 @@ class SystemdUnitTests(unittest.TestCase):
             config.core_node.validator_address = "validatorAddress"
             config.core_node.node_dir = "/tmp"
             config.migration.use_olympia = False
-            config.create_default_config_file()
+            config.create_default_config_file("")
         self.assertTrue(os.path.isfile("/tmp/default.config"))
 
         f = open("/tmp/default.config", "r")
@@ -152,7 +164,7 @@ consensus.validator_address=validatorAddress"""
             settings.core_node.trusted_node = "someNode"
             settings.core_node.validator_address = None
             settings.core_node.node_dir = "/tmp"
-            settings.create_default_config_file()
+            settings.create_default_config_file("")
         self.assertTrue(os.path.isfile("/tmp/default.config"))
 
         f = open("/tmp/default.config", "r")
@@ -384,6 +396,16 @@ RADIX_NODE_KEYSTORE_PASSWORD=nowthatyouknowmysecretiwillfollowyouuntilyouforgeti
         systemd_config.core_node.core_release = "oldversion"
         systemd_config = SystemDSetup.update_versions(systemd_config, True)
         self.assertNotEqual("oldversion", systemd_config.core_node.core_release)
+
+    def test_advanced_config_is_added(self):
+        settings = SystemDConfig({})
+        settings.core_node.node_dir = "/tmp/"
+        tests_dir = dirname(dirname(__file__))
+        fixture_file = join(tests_dir, "fixtures/advanced-user.default.config")
+        settings.create_default_config_file(fixture_file)
+        self.assertTrue(os.path.exists("/tmp/default.config"))
+        self.assertTrue(
+            file_contains_regular_expression("random.other.config=thisconfigdoesnotexist", "/tmp/default.config"))
 
 
 def suite():
