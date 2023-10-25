@@ -19,7 +19,7 @@ from commands.systemdcommand import systemdcli
 from config.EnvVars import DISABLE_VERSION_CHECK
 from github.github import latest_release
 from log_util.logger import get_logger
-from utils.utils import Helpers
+from utils.utils import Helpers, run_shell_command
 
 urllib3.disable_warnings()
 
@@ -46,7 +46,7 @@ cwd = os.getcwd()
 logger = get_logger(__name__)
 
 
-def check_latest_cli():
+def check_latest_cli(prompt=False):
     cli_latest_version = latest_release("radixdlt/babylon-nodecli")
 
     if os.getenv(DISABLE_VERSION_CHECK, "False").lower() not in ("true", "yes"):
@@ -61,7 +61,12 @@ def check_latest_cli():
                     chmod +x babylonnode
                     sudo mv babylonnode /usr/local/bin
                 """)
-
+            if (prompt):
+                ask = input("Do you want to update the CLI with these commands? (Y/n)")
+                if Helpers.check_Yes(ask):
+                    run_shell_command(f'wget -O babylonnode https://github.com/radixdlt/babylon-nodecli/releases/download/{cli_latest_version}/babylonnode-{os_name}')
+                    run_shell_command(f'chmod +x babylonnode')
+                    run_shell_command(f'sudo mv babylonnode /usr/local/bin')
 
 def main():
     args = cli.parse_args(sys.argv[1:2])
@@ -69,8 +74,7 @@ def main():
     if args.subcommand is None:
         cli.print_help()
     else:
-        if args.subcommand == "version":
-            check_latest_cli()
+        check_latest_cli(False)
 
     if args.subcommand == "docker":
         dockercli_args = dockercli.parse_args(sys.argv[2:])
