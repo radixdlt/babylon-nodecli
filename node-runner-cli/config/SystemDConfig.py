@@ -61,7 +61,7 @@ class SystemDConfig(BaseConfig):
             self.to_dict()).to_file(f"{self.core_node.node_dir}/default.config")
 
         if os.path.exists(f"{advanceduserconfig}"):
-            self.append_advanced_user_config()
+            self.append_advanced_user_config(f"{self.core_node.node_dir}/default.config", advanceduserconfig)
 
         if (os.getenv(APPEND_DEFAULT_CONFIG_OVERIDES)) is not None:
             print("Add overides")
@@ -75,9 +75,9 @@ class SystemDConfig(BaseConfig):
             for text in lines:
                 run_shell_command(f"echo {text} >> {self.core_node.node_dir}/default.config", shell=True)
 
-    def append_advanced_user_config(self):
-        f1 = open(f"{self.core_node.node_dir}/default.config", 'a+')
-        f2 = open(f"{self.core_node.node_dir}/advanced-user.default.config", 'r')
+    def append_advanced_user_config(self, config_file: str, advanced_config_file: str):
+        f1 = open(f"{config_file}", 'a+')
+        f2 = open(f"{advanced_config_file}", 'r')
         # appending the contents of the second file to the first file
         f1.write(f2.read())
 

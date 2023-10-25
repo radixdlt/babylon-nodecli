@@ -402,7 +402,9 @@ RADIX_NODE_KEYSTORE_PASSWORD=nowthatyouknowmysecretiwillfollowyouuntilyouforgeti
         settings.core_node.node_dir = "/tmp/"
         tests_dir = dirname(dirname(__file__))
         fixture_file = join(tests_dir, "fixtures/advanced-user.default.config")
+
         settings.create_default_config_file(fixture_file)
+
         self.assertTrue(os.path.exists("/tmp/default.config"))
         self.assertTrue(
             file_contains_regular_expression("random.other.config=thisconfigdoesnotexist", "/tmp/default.config"))
