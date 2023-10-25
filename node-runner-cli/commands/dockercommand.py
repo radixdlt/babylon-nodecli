@@ -160,9 +160,8 @@ def install(args):
         DockerSetup.chown_files(docker_config)
 
     ########## Render Docker Compose
-    if args.advanceduserenvs != "":
-        if os.path.exists(args.advanceduserenvs):
-            docker_config_updated_versions.advanced_user_envs = args.advanceduserenvs
+    if os.path.exists(args.advanceduserenvs):
+        docker_config_updated_versions.advanced_user_envs = args.advanceduserenvs
     compose_file = DockerSetup.confirm_docker_compose_file_changes(docker_config_updated_versions,
                                                                    argument_object.autoapprove)
 
