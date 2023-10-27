@@ -75,6 +75,11 @@ class SystemdUnitTests(unittest.TestCase):
         urllib3.disable_warnings()
         responses.add(
             responses.GET,
+            f'https://ghproxy.radixdlt.com/radixdlt/babylon-nodecli',
+            json={'tag_name': "v1"},
+            status=200)
+        responses.add(
+            responses.GET,
             f'https://ghproxy.radixdlt.com/radixdlt/babylon-nginx',
             json={'tag_name': "v1"},
             status=200)
