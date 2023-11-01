@@ -134,6 +134,21 @@ class DockerUnitTests(unittest.TestCase):
         compose = DockerSetup.render_docker_compose(docker_config)
         self.assertEqual("false", compose["services"]["nginx"]["environment"]["RADIXDLT_ENABLE_TCP_CORE_PROXY"])
 
+    def test_docker_compose_template_with_advanced_user_config(self):
+        docker_config = DockerConfig({})
+        docker_config.core_node.core_release = "1.2.3"
+        docker_config.common_config.nginx_settings.release = "1.2.3"
+        docker_config.core_node.advanced_user_envs = "./somefile"
+        compose = DockerSetup.render_docker_compose(docker_config)
+        self.assertEqual([docker_config.core_node.advanced_user_envs], compose["services"]["core"]["env_file"])
+
+    def test_docker_compose_template_without_advanced_user_config(self):
+        docker_config = DockerConfig({})
+        docker_config.core_node.core_release = "1.2.3"
+        docker_config.common_config.nginx_settings.release = "1.2.3"
+        # docker_config.core_node.advanced_user_config = "./somefile"
+        compose = DockerSetup.render_docker_compose(docker_config)
+        self.assertFalse(hasattr(compose["services"]["core"], "env_file"))
 
 def suite():
     """ This defines all the tests of a module"""

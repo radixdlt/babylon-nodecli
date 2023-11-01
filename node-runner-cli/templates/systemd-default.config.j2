@@ -16,7 +16,7 @@ node.key.path={{core_node.keydetails.keyfile_path ~ '/' ~ core_node.keydetails.k
 network.p2p.broadcast_port=30000
 network.p2p.listen_port=30001
 network.p2p.seed_nodes={{core_node.trusted_node}}
-network.p2p.use_proxy_protocol=false
+network.p2p.use_proxy_protocol={{core_node.use_proxy_protocol or 'false'}}
 network.host_ip={{common_config.host_ip}}
 
 log.level=debug

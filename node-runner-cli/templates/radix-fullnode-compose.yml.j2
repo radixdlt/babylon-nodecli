@@ -9,6 +9,10 @@ services:
   core:
     cap_add:
     - NET_ADMIN
+    {% if core_node.advanced_user_envs is defined and core_node.advanced_user_envs is not none %}
+    env_file:
+      - {{core_node.advanced_user_envs}}
+    {% endif %}
     environment:
       JAVA_OPTS: {{core_node.java_opts or '--enable-preview -server -Xms12g -Xmx12g  -XX:MaxDirectMemorySize=2048m -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector'}}
       RADIXDLT_API_PORT: 3333

@@ -427,7 +427,7 @@ class SystemDSetup(BaseSetup):
 
         backup_time = Helpers.get_current_date_time()
         SystemDSetup.backup_file(settings.core_node.node_dir, f"default.config", backup_time, args.auto)
-        settings.create_default_config_file()
+        settings.create_default_config_file(args.advanceduserconfig)
 
         # environment file
         SystemDSetup.backup_file(settings.core_node.node_secrets_dir, "environment", backup_time, args.auto)

@@ -131,6 +131,12 @@ def config(args):
                   f"The default value is `{Helpers.get_default_node_config_dir()}/config.yaml` if not provided",
              default=f"{Helpers.get_default_node_config_dir()}/config.yaml",
              action="store"),
+    argument("-auc", "--advanceduserconfig",
+             help="Path to advanced config file. This file can directly configure the core node. "
+                  "It is templated into default.config and acts as custom configuration that is not overwritten on install. "
+                  f"The default value is `{Helpers.get_default_node_config_dir()}/advanced-user.default.config` if not provided",
+             default=f"{Helpers.get_default_node_config_dir()}/advanced-user.default.config",
+             action="store"),
     argument("-m", "--manual", help="Only generate systemd file but not put it into systemd folder."
                                     "This is mainly used for automation in unprivileged environments.",
              action="store_true"),
