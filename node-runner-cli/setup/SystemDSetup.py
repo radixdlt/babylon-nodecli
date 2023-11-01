@@ -383,8 +383,6 @@ class SystemDSetup(BaseSetup):
         systemd_config.core_node.set_core_release(argument_object.release)
         systemd_config.core_node.set_trusted_node(argument_object.trustednode)
         systemd_config.core_node.generate_download_urls()
-        # systemd_config.core_node.keydetails = BaseSetup.ask_keydetails(argument_object.keystore_password,
-        #                                                                argument_object.new_keystore)
         systemd_config.core_node.ask_data_directory(argument_object.data_directory)
         systemd_config.core_node.ask_validator_address(argument_object.validator)
         return systemd_config.core_node

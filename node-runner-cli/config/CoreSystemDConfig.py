@@ -3,7 +3,6 @@ from pathlib import Path
 
 from config.BaseConfig import BaseConfig, SetupMode
 from config.EnvVars import MOUNT_LEDGER_VOLUME, NODE_BINARY_OVERIDE
-from config.KeyDetails import KeyDetails
 from github.github import latest_release
 from setup.BaseSetup import BaseSetup
 from utils.Prompts import Prompts
@@ -14,7 +13,6 @@ class CoreSystemdConfig(BaseConfig):
     def __init__(self, config_dict: dict):
         if config_dict is None:
             config_dict = dict()
-        self.keydetails: KeyDetails = KeyDetails(config_dict.get("keydetails"))
         self.nodetype: str = "fullnode"
         self.core_release: str = ""
         self.core_binary_url: str = ""
