@@ -17,13 +17,14 @@ logger = get_logger(__name__)
 
 class BaseSetup:
     @staticmethod
-    def dependencies():
+    def dependencies(install_docker=True):
         if is_sudo_installed():
-            logger.info("Installing docker")
-            run_shell_command("curl -fsSL https://get.docker.com -o get-docker.sh", shell=True)
-            run_shell_command("sudo sh get-docker.sh", shell=True)
-            BaseSetup.add_user_docker_group()
-            logger.info("Docker successfully installed")
+            if install_docker:
+                logger.info("Installing docker")
+                run_shell_command("curl -fsSL https://get.docker.com -o get-docker.sh", shell=True)
+                run_shell_command("sudo sh get-docker.sh", shell=True)
+                BaseSetup.add_user_docker_group()
+                logger.info("Docker successfully installed")
             run_shell_command('sudo apt install -y wget unzip rng-tools ansible', shell=True)
             run_shell_command('sudo rngd -r /dev/random | true', shell=True)
             try:
