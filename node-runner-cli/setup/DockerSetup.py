@@ -342,8 +342,6 @@ class DockerSetup(BaseSetup):
     @staticmethod
     def chown_files(docker_config: DockerConfig):
         username = getpass.getuser()
-        run_shell_command(['sudo', 'chown', f'{username}:{username}',
-                           f'{docker_config.core_node.keydetails.keyfile_path}/{docker_config.core_node.keydetails.keyfile_name}'])
         if docker_config.common_config.genesis_bin_data_file != "":
             run_shell_command(['sudo', 'chown', f'{username}:{username}',
                                f'{docker_config.common_config.genesis_bin_data_file}'])
