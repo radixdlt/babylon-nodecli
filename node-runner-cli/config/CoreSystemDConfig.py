@@ -54,7 +54,6 @@ class CoreSystemdConfig(BaseConfig):
         if not release:
             release = latest_release()
         self.core_release = release
-        self.keydetails.keygen_tag = "v1.4.1"
 
     def generate_download_urls(self):
         self.core_binary_url = os.getenv(NODE_BINARY_OVERIDE,
