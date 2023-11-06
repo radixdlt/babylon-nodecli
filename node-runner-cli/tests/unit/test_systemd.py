@@ -103,7 +103,7 @@ class SystemdUnitTests(unittest.TestCase):
             config = SystemDConfig({})
             config.common_config.host_ip = "1.1.1.1"
             config.common_config.network_id = 1
-            config.core_node.keydetails.keyfile_path = "/tmp/babylon-node"
+            config.core_node.keydetails.keyfile_path = "/home/radixdlt/babylon-node-config"
             config.core_node.keydetails.keyfile_name = "node-keystore.ks"
             config.core_node.trusted_node = "someNode"
             config.core_node.validator_address = "validatorAddress"
@@ -124,7 +124,8 @@ ntp.pool=pool.ntp.org
 
 network.id=1
 
-node.key.path=/tmp/babylon-node/node-keystore.ks
+node.key.path=/home/radixdlt/babylon-node-config/node-keystore.ks
+node.key.create_if_missing=true
 
 network.p2p.broadcast_port=30000
 network.p2p.listen_port=30001
@@ -154,7 +155,7 @@ consensus.validator_address=validatorAddress
             settings = SystemDConfig({})
             settings.common_config.host_ip = "1.1.1.1"
             settings.common_config.network_id = 1
-            settings.core_node.keydetails.keyfile_path = "/tmp/babylon-node"
+            settings.core_node.keydetails.keyfile_path = "/home/radixdlt/babylon-node-config"
             settings.core_node.keydetails.keyfile_name = "node-keystore.ks"
             settings.core_node.trusted_node = "someNode"
             settings.core_node.validator_address = None
@@ -174,7 +175,8 @@ ntp.pool=pool.ntp.org
 
 network.id=1
 
-node.key.path=/tmp/babylon-node/node-keystore.ks
+node.key.path=/home/radixdlt/babylon-node-config/node-keystore.ks
+node.key.create_if_missing=true
 
 network.p2p.broadcast_port=30000
 network.p2p.listen_port=30001
@@ -199,7 +201,7 @@ db.location=/home/radixdlt/babylon-ledger
         with patch('builtins.input', side_effect=[]):
             settings = SystemDConfig({})
             settings.common_config.genesis_bin_data_file = None
-            settings.core_node.keydetails.keyfile_path = "/tmp/babylon-node"
+            settings.core_node.keydetails.keyfile_path = "/home/radixdlt/babylon-node-config"
             settings.core_node.keydetails.keyfile_name = "node-keystore.ks"
             settings.core_node.trusted_node = "someNode"
             settings.common_config.host_ip = "1.1.1.1"
@@ -218,7 +220,8 @@ ntp.pool=pool.ntp.org
 
 network.id=1
 
-node.key.path=/tmp/babylon-node/node-keystore.ks
+node.key.path=/home/radixdlt/babylon-node-config/node-keystore.ks
+node.key.create_if_missing=true
 
 network.p2p.broadcast_port=30000
 network.p2p.listen_port=30001
