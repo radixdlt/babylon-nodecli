@@ -385,6 +385,8 @@ class SystemDSetup(BaseSetup):
         systemd_config.core_node.generate_download_urls()
         systemd_config.core_node.ask_data_directory(argument_object.data_directory)
         systemd_config.core_node.ask_validator_address(argument_object.validator)
+        if argument_object.keystore_password is not None:
+            systemd_config.core_node.keydetails.keystore_password = argument_object.keystore_password
         return systemd_config.core_node
 
     @staticmethod
