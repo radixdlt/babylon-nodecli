@@ -26,6 +26,7 @@ echo "set old version"
 
 ls -la $HOME/babylon-node-config
 sudo rm $HOME/babylon-node-config/config.yaml
+ls -la $HOME/babylon-node-config
 
 ./babylonnode docker config -d $HOME/babylon-node-config \
   -t ${SEED_NODE} \
