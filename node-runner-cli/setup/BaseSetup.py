@@ -1,3 +1,4 @@
+import getpass
 import os
 import sys
 from pathlib import Path
@@ -60,7 +61,6 @@ class BaseSetup:
 
     @staticmethod
     def generatekey(keyfile_path, keyfile_name, keygen_tag, keystore_password=None, new=False):
-        import getpass
         key_details = KeyDetails({})
         key_details.keyfile_name = keyfile_name
         key_details.keygen_tag = keygen_tag
