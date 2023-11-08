@@ -24,9 +24,10 @@ export PATH="$PATH:/home/ubuntu/.local/bin"
 echo "set old version"
 #RADIXDLT_APP_VERSION_OVERRIDE=rcnet-v3.1-r5
 
-ls -la /home/radixdlt/babylon-node-config/
+sudo chown -r radixdlt:radixdlt /home/radixdlt/
+ls -la /home/radixdlt/
 sudo rm -f $HOME/babylon-node-config/config.yaml
-ls -la /home/radixdlt/babylon-node-config/
+ls -la /home/radixdlt/
 
 ./babylonnode docker config -d $HOME/babylon-node-config \
   -t ${SEED_NODE} \
