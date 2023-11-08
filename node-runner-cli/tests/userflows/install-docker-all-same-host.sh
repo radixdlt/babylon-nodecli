@@ -24,6 +24,9 @@ export PATH="$PATH:/home/ubuntu/.local/bin"
 echo "set old version"
 #RADIXDLT_APP_VERSION_OVERRIDE=rcnet-v3.1-r5
 
+ls -la $HOME/babylon-node-config
+rm $HOME/babylon-node-config/config.yaml
+
 ./babylonnode docker config -d $HOME/babylon-node-config \
   -t ${SEED_NODE} \
   -m CORE GATEWAY \
@@ -32,7 +35,7 @@ echo "set old version"
   -p ${POSTGRES_PASSWORD} \
   -v "" \
   -a
-
+ls -la $HOME/babylon-node-config
 cat $HOME/babylon-node-config/config.yaml
 
 echo "unset version override"
