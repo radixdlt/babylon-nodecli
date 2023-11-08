@@ -25,7 +25,7 @@ echo "set old version"
 #RADIXDLT_APP_VERSION_OVERRIDE=rcnet-v3.1-r5
 
 ls -la $HOME/babylon-node-config
-rm $HOME/babylon-node-config/config.yaml
+sudo rm $HOME/babylon-node-config/config.yaml
 
 ./babylonnode docker config -d $HOME/babylon-node-config \
   -t ${SEED_NODE} \
