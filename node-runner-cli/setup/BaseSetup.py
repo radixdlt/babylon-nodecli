@@ -1,3 +1,4 @@
+import getpass
 import os
 import sys
 from pathlib import Path
@@ -17,13 +18,14 @@ logger = get_logger(__name__)
 
 class BaseSetup:
     @staticmethod
-    def dependencies():
+    def dependencies(install_docker=True):
         if is_sudo_installed():
-            logger.info("Installing docker")
-            run_shell_command("curl -fsSL https://get.docker.com -o get-docker.sh", shell=True)
-            run_shell_command("sudo sh get-docker.sh", shell=True)
-            BaseSetup.add_user_docker_group()
-            logger.info("Docker successfully installed")
+            if install_docker:
+                logger.info("Installing docker")
+                run_shell_command("curl -fsSL https://get.docker.com -o get-docker.sh", shell=True)
+                run_shell_command("sudo sh get-docker.sh", shell=True)
+                BaseSetup.add_user_docker_group()
+                logger.info("Docker successfully installed")
             run_shell_command('sudo apt install -y wget unzip rng-tools ansible', shell=True)
             run_shell_command('sudo rngd -r /dev/random | true', shell=True)
             try:
@@ -58,8 +60,7 @@ class BaseSetup:
             shell=True)
 
     @staticmethod
-    def generatekey(keyfile_path, keyfile_name, keygen_tag, keystore_password=None, new=False):
-        import getpass
+    def get_key_details(keyfile_path, keyfile_name, keygen_tag, keystore_password=None, new=False):
         key_details = KeyDetails({})
         key_details.keyfile_name = keyfile_name
         key_details.keygen_tag = keygen_tag
@@ -83,17 +84,6 @@ class BaseSetup:
             """)
             key_details.keystore_password = keystore_password if keystore_password else getpass.getpass(
                 f"Enter the password of the new file '{key_details.keyfile_name}':")
-
-            run_shell_command(['docker', 'run', '--rm', '-v', key_details.keyfile_path + ':/keygen/key',
-                               f'radixdlt/keygen:{key_details.keygen_tag}',
-                               '-k', f'/keygen/key/{key_details.keyfile_name}',
-                               '-p', f'{key_details.keystore_password}'], quite=False)
-
-            run_shell_command(['sudo', 'chmod', '644', f'{key_details.keyfile_path}/{key_details.keyfile_name}'])
-
-            username = getpass.getuser()
-            run_shell_command(
-                ['sudo', 'chown', f'{username}:{username}', f'{key_details.keyfile_path}/{key_details.keyfile_name}'])
         return key_details
 
     @staticmethod
@@ -106,7 +96,7 @@ class BaseSetup:
                 keydetails.keyfile_path = ks_file
             keydetails.keyfile_name = Prompts.ask_keyfile_name()
 
-        keydetails = BaseSetup.generatekey(
+        keydetails = BaseSetup.get_key_details(
             keyfile_path=keydetails.keyfile_path,
             keyfile_name=keydetails.keyfile_name,
             keygen_tag=keydetails.keygen_tag, keystore_password=ks_password, new=new_keystore)

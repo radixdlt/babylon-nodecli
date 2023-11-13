@@ -20,7 +20,8 @@ services:
       RADIXDLT_NETWORK_ID: {{common_config.network_id}}
       RADIXDLT_NETWORK_SEEDS_REMOTE: {{core_node.trusted_node}}
       RADIXDLT_NETWORK_USE_PROXY_PROTOCOL: '{{core_node.use_proxy_protocol or 'false'}}'
-      RADIXDLT_VALIDATOR_KEY_LOCATION: /home/radixdlt/node-keystore.ks
+      RADIXDLT_VALIDATOR_KEY_LOCATION: /home/radixdlt/babylon-node-config/node-keystore.ks
+      RADIXDLT_NODE_KEY_CREATE_IF_MISSING: true
       RADIX_NODE_KEYSTORE_PASSWORD: '{{core_node.keydetails.keystore_password}}'
       {% if migration.use_olympia is defined %}
       {% if migration.use_olympia %}
@@ -55,7 +56,7 @@ services:
     {% if core_node.data_directory is defined %}
     - babylon_ledger:/home/radixdlt/RADIXDB
     {% endif %}
-    - {{core_node.keydetails.keyfile_path ~ '/' ~ core_node.keydetails.keyfile_name }}:/home/radixdlt/node-keystore.ks
+    - {{core_node.keydetails.keyfile_path ~ '/' }}:/home/radixdlt/babylon-node-config/
     {% if common_config.genesis_bin_data_file is defined and common_config.genesis_bin_data_file|length %}
     - "{{common_config.genesis_bin_data_file}}:/home/radixdlt/genesis_data_file.bin"
     {% endif %}

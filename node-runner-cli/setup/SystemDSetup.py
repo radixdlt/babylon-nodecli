@@ -28,12 +28,13 @@ class SystemDSetup(BaseSetup):
         run_shell_command('sudo apt install -y openjdk-17-jdk', shell=True)
 
     @staticmethod
-    def setup_user():
+    def setup_user(add_to_docker=True):
         print("Checking if user radixdlt already exists")
         user_exists = run_shell_command("cat /etc/passwd | grep radixdlt", shell=True, fail_on_error=False)
         if user_exists.returncode != 0:
             run_shell_command('sudo useradd -m -s /bin/bash radixdlt', shell=True)
-        run_shell_command(['sudo', 'usermod', '-aG', 'docker', 'radixdlt'])
+        if add_to_docker:
+            run_shell_command(['sudo', 'usermod', '-aG', 'docker', 'radixdlt'])
 
     @staticmethod
     def create_service_user_password():
@@ -382,10 +383,10 @@ class SystemDSetup(BaseSetup):
         systemd_config.core_node.set_core_release(argument_object.release)
         systemd_config.core_node.set_trusted_node(argument_object.trustednode)
         systemd_config.core_node.generate_download_urls()
-        systemd_config.core_node.keydetails = BaseSetup.ask_keydetails(argument_object.keystore_password,
-                                                                       argument_object.new_keystore)
         systemd_config.core_node.ask_data_directory(argument_object.data_directory)
         systemd_config.core_node.ask_validator_address(argument_object.validator)
+        systemd_config.core_node.keydetails = BaseSetup.ask_keydetails(argument_object.keystore_password,
+                                                                       argument_object.new_keystore)
         return systemd_config.core_node
 
     @staticmethod
@@ -462,8 +463,12 @@ class SystemDSetup(BaseSetup):
 
     @staticmethod
     def chown_files(settings):
-        run_shell_command(['sudo', 'chown', 'radixdlt:radixdlt',
-                           f'{settings.core_node.keydetails.keyfile_path}/{settings.core_node.keydetails.keyfile_name}'])
+        key_path = f'{settings.core_node.keydetails.keyfile_path}/{settings.core_node.keydetails.keyfile_name}'
+        run_shell_command(['sudo',
+                           'chown',
+                           'radixdlt:radixdlt',
+                           key_path],
+                          fail_on_error=False)
         if settings.common_config.genesis_bin_data_file is not None:
             run_shell_command(['sudo', 'chown', 'radixdlt:radixdlt',
                                f'{settings.common_config.genesis_bin_data_file}'])
