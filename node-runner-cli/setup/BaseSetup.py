@@ -60,7 +60,7 @@ class BaseSetup:
             shell=True)
 
     @staticmethod
-    def generatekey(keyfile_path, keyfile_name, keygen_tag, keystore_password=None, new=False):
+    def get_key_details(keyfile_path, keyfile_name, keygen_tag, keystore_password=None, new=False):
         key_details = KeyDetails({})
         key_details.keyfile_name = keyfile_name
         key_details.keygen_tag = keygen_tag
@@ -96,7 +96,7 @@ class BaseSetup:
                 keydetails.keyfile_path = ks_file
             keydetails.keyfile_name = Prompts.ask_keyfile_name()
 
-        keydetails = BaseSetup.generatekey(
+        keydetails = BaseSetup.get_key_details(
             keyfile_path=keydetails.keyfile_path,
             keyfile_name=keydetails.keyfile_name,
             keygen_tag=keydetails.keygen_tag, keystore_password=ks_password, new=new_keystore)

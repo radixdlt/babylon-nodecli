@@ -11,7 +11,7 @@ network.id={{common_config.network_id}}
 network.genesis_data_file={{common_config.genesis_bin_data_file}}
 {% endif %}
 
-node.key.path=/home/radixdlt/babylon-node-config/node-keystore.ks
+node.key.path={{core_node.keydetails.keyfile_path ~ '/' ~ core_node.keydetails.keyfile_name }}
 node.key.create_if_missing=true
 
 network.p2p.broadcast_port=30000
