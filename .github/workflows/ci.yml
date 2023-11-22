@@ -378,7 +378,7 @@ jobs:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
 
   test-userflow-docker-core-gateway-same-host:
-    runs-on: babylon-nodecli-gateway
+    runs-on: gh-ephemeral-nodecli-docker-runner
     needs:
       - build-jammy
       - snyk-scan
@@ -412,7 +412,7 @@ jobs:
           NETWORK_NAME: ${{ vars.NETWORK_NAME }}
 
   test-userflow-systemd-simple:
-    runs-on: babylon-nodecli-systemd
+    runs-on: gh-ephemeral-nodecli-systemd-runner
     needs:
       - build-jammy
       - snyk-scan
