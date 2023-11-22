@@ -24,10 +24,10 @@ export PATH="$PATH:/home/ubuntu/.local/bin"
 echo "set old version"
 #RADIXDLT_APP_VERSION_OVERRIDE=rcnet-v3.1-r5
 
-sudo chown -R radixdlt:radixdlt /home/radixdlt/
-ls -la /home/radixdlt/
+sudo chown -R ubuntu:ubuntu /home/ubuntu/
+ls -la /home/ubuntu/
 sudo rm -f $HOME/babylon-node-config/config.yaml
-ls -la /home/radixdlt/
+ls -la /home/ubuntu/
 
 ./babylonnode docker config -d $HOME/babylon-node-config \
   -t ${SEED_NODE} \
@@ -45,7 +45,7 @@ unset RADIXDLT_APP_VERSION_OVERRIDE
 
 # Reset everything
 ./babylonnode docker stop | true
-sudo rm -rf /home/radixdlt/babylon-ledger/*
+sudo rm -rf /home/ubuntu/babylon-ledger/*
 ./babylonnode monitoring stop | true
 
 # Setup passwords details
@@ -155,7 +155,7 @@ PGPASSWORD=$POSTGRES_PASSWORD psql -h localhost -U postgres -d radixdlt_ledger -
 PGPASSWORD=$POSTGRES_PASSWORD psql -h localhost -U postgres -d postgres -P pager=off -c "DROP DATABASE IF EXISTS radixdlt_ledger;"
 
 # Wipe ledger
-sudo rm -rf /home/radixdlt/babylon-ledger/ | true
+sudo rm -rf /home/ubuntu/babylon-ledger/ | true
 
 # Wipe docker image store
 docker rmi $(docker image ls -q) | true
