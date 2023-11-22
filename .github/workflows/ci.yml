@@ -377,40 +377,6 @@ jobs:
         env:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
 
-  test-userflow-will-not-work:
-    runs-on: gh-ephemeral-runner
-    needs:
-      - build-jammy
-      - snyk-scan
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3.4.0
-        with:
-          fetch-depth: 0
-      - name: Download packaged cli
-        uses: actions/download-artifact@v3
-        with:
-          name: ubuntu 22.04
-      - name: Get dependencies
-        run: |
-          chmod +x ./babylonnode
-          sudo apt-get update
-          sudo apt-get install -y postgresql-client jq docker-compose
-          ./babylonnode docker dependencies
-      - name: "Execute User Flow: Install Core, Gateway and Monitoring on the same host"
-        run: |
-          chmod +x  ./node-runner-cli/tests/userflows/install-docker-all-same-host.sh
-          ./node-runner-cli/tests/userflows/install-docker-all-same-host.sh
-        env:
-          NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
-          NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
-          NGINX_GATEWAY_PASSWORD: ${{secrets.NGINX_GATEWAY_PASSWORD}}
-          POSTGRES_PASSWORD: ${{secrets.POSTGRES_PASSWORD}}
-          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
-          SEED_NODE: ${{ vars.SEED_NODE }}
-          NETWORK_ID: ${{ vars.NETWORK_ID }}
-          NETWORK_NAME: ${{ vars.NETWORK_NAME }}
-
   test-userflow-docker-core-gateway-same-host:
     runs-on: gh-ephemeral-nodecli-docker-runner
     needs:
