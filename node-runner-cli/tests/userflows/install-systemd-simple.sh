@@ -56,11 +56,6 @@ echo "Set credentials"
 ./babylonnode auth set-admin-password --setupmode SYSTEMD -p ${NGINX_ADMIN_PASSWORD}
 ./babylonnode auth set-metrics-password --setupmode SYSTEMD -p ${NGINX_METRICS_PASSWORD}
 
-# This is skipped since the node starts, but needs time to generate the ledger migration before starting the health check
-# We can not determine when the health check is available. A waiting time of 10 minutes could work to fix this.
-# Can this be related to a backed in genesis file?
-# ToDo: Understand why this only happens on systemd
-# Renabled: Testing against stokenet
 echo "Testing Core node health endpoint"
 set +e
 for i in {1..5}; do
