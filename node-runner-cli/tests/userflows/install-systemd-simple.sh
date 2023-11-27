@@ -60,49 +60,50 @@ echo "Set credentials"
 # We can not determine when the health check is available. A waiting time of 10 minutes could work to fix this.
 # Can this be related to a backed in genesis file?
 # ToDo: Understand why this only happens on systemd
-#echo "Testing Core node health endpoint"
-#set +e
-#for i in {1..5}; do
-#  FULL_OUTPUT=$(NGINX_ADMIN_PASSWORD=${NGINX_ADMIN_PASSWORD} ./babylonnode api system health)
-#  OUTPUT=$(echo $FULL_OUTPUT | jq -r '.status')
-#  if [[ $OUTPUT == "SYNCING" || $OUTPUT == "BOOTING_AT_GENESIS" || $OUTPUT == "OUT_OF_SYNC" || $OUTPUT == "BOOTING" || $OUTPUT == "UP" ]]; then
-#    echo "The result is successful"
-#    echo "The Node is in status $OUTPUT"
-#    break
-#  else
-#    if [[ $i == 5 ]]; then
-#      echo "failed to get ready in time."
-#      echo "here are the logs of the core node"
-#      journalctl --no-pager
-##      docker logs $(whoami)-core-1 --tail 100
-#      echo "Exiting..."
-#      exit 137
-#    fi
-#    echo "The result is unsuccessful. Waiting and trying again ($i of 5)"
-#    echo "Command ./babylonnode api system health resulted in"
-#    echo "$FULL_OUTPUT"
-#  fi
-#  sleep 30
-#done
-#set -e
-#
-#echo "Testing Core node version endpoint"
-#NGINX_ADMIN_PASSWORD=${NGINX_ADMIN_PASSWORD} ./babylonnode api system version
-#
-#echo "Testing Core node metrics endpoint"
-#NGINX_METRICS_PASSWORD=${NGINX_METRICS_PASSWORD} ./babylonnode api metrics
-#
-#echo "Testing Core node network sync status"
-#NGINX_ADMIN_PASSWORD=${NGINX_ADMIN_PASSWORD} ./babylonnode api system network-sync-status
-#
-#echo "Testing Core node configuration"
-#NGINX_ADMIN_PASSWORD=${NGINX_ADMIN_PASSWORD} ./babylonnode api system configuration
-#
-#echo "Testing Core node peers"
-#NGINX_ADMIN_PASSWORD=${NGINX_ADMIN_PASSWORD} ./babylonnode api system peers
-#
-#echo "Testing Core node identity"
-#NGINX_ADMIN_PASSWORD=${NGINX_ADMIN_PASSWORD} ./babylonnode api system identity
+# Renabled: Testing against stokenet
+echo "Testing Core node health endpoint"
+set +e
+for i in {1..5}; do
+  FULL_OUTPUT=$(NGINX_ADMIN_PASSWORD=${NGINX_ADMIN_PASSWORD} ./babylonnode api system health)
+  OUTPUT=$(echo $FULL_OUTPUT | jq -r '.status')
+  if [[ $OUTPUT == "SYNCING" || $OUTPUT == "BOOTING_AT_GENESIS" || $OUTPUT == "OUT_OF_SYNC" || $OUTPUT == "BOOTING" || $OUTPUT == "UP" ]]; then
+    echo "The result is successful"
+    echo "The Node is in status $OUTPUT"
+    break
+  else
+    if [[ $i == 5 ]]; then
+      echo "failed to get ready in time."
+      echo "here are the logs of the core node"
+      journalctl --no-pager
+#      docker logs $(whoami)-core-1 --tail 100
+      echo "Exiting..."
+      exit 137
+    fi
+    echo "The result is unsuccessful. Waiting and trying again ($i of 5)"
+    echo "Command ./babylonnode api system health resulted in"
+    echo "$FULL_OUTPUT"
+  fi
+  sleep 30
+done
+set -e
+
+echo "Testing Core node version endpoint"
+NGINX_ADMIN_PASSWORD=${NGINX_ADMIN_PASSWORD} ./babylonnode api system version
+
+echo "Testing Core node metrics endpoint"
+NGINX_METRICS_PASSWORD=${NGINX_METRICS_PASSWORD} ./babylonnode api metrics
+
+echo "Testing Core node network sync status"
+NGINX_ADMIN_PASSWORD=${NGINX_ADMIN_PASSWORD} ./babylonnode api system network-sync-status
+
+echo "Testing Core node configuration"
+NGINX_ADMIN_PASSWORD=${NGINX_ADMIN_PASSWORD} ./babylonnode api system configuration
+
+echo "Testing Core node peers"
+NGINX_ADMIN_PASSWORD=${NGINX_ADMIN_PASSWORD} ./babylonnode api system peers
+
+echo "Testing Core node identity"
+NGINX_ADMIN_PASSWORD=${NGINX_ADMIN_PASSWORD} ./babylonnode api system identity
 
 echo "Restarting systemd service"
 ./babylonnode systemd restart
