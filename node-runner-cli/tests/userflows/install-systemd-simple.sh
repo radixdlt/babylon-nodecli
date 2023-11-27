@@ -69,8 +69,7 @@ for i in {1..5}; do
     if [[ $i == 5 ]]; then
       echo "failed to get ready in time."
       echo "here are the logs of the core node"
-      journalctl --no-pager
-#      docker logs $(whoami)-core-1 --tail 100
+      journalctl -u radixdlt-node.service --no-pager --lines 100
       echo "Exiting..."
       exit 137
     fi
