@@ -132,7 +132,7 @@ jobs:
       - name: Generate SBOM
         run: snyk sbom --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --format=cyclonedx1.4+json --json-file-output sbom.json
       - name: Upload SBOM
-        uses: softprops/action-gh-release@c9b46fe7aad9f02afd89b12450b780f52dacfb2d
+        uses: RDXWorks-actions/action-gh-release@master
         with:
           files: sbom.json
 
@@ -141,7 +141,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: cancel running workflows
-        uses: styfle/cancel-workflow-action@0.11.0
+        uses: RDXWorks-actions/cancel-workflow-action@main
         with:
           access_token: ${{ github.token }}
       - name: Checkout
@@ -149,7 +149,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Dump context
-        uses: crazy-max/ghaction-dump-context@v1
+        uses: RDXWorks-actions/ghaction-dump-context@master
       - name: Install build essentials
         run: sudo apt-get -y install build-essential
       - name: setup python
@@ -166,7 +166,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2.6.1
+        uses: RDXWorks-actions/publish-unit-test-result-action@master
         if: always()
         with:
           files: |
@@ -181,7 +181,7 @@ jobs:
             **/junit/test-results.xml
       - if: ${{ github.event_name == 'pull_request' }}
         name: Get Cover
-        uses: orgoro/coverage@v3.1
+        uses: RDXWorks-actions/coverage@main
         with:
           coverageFile: node-runner-cli/coverage.xml
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -193,7 +193,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: cancel running workflows
-        uses: styfle/cancel-workflow-action@0.11.0
+        uses: RDXWorks-actions/cancel-workflow-action@main
         with:
           access_token: ${{ github.token }}
       - name: Checkout
@@ -201,7 +201,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Dump context
-        uses: crazy-max/ghaction-dump-context@v1
+        uses: RDXWorks-actions/ghaction-dump-context@master
       - name: setup python
         uses: actions/setup-python@v4.5.0
         with:
@@ -278,7 +278,7 @@ jobs:
           mv ./babylonnode babylonnode-ubuntu-22.04
       - if: ${{ github.event_name == 'release' }}
         name: Upload radixcli ubuntu binary
-        uses: softprops/action-gh-release@c9b46fe7aad9f02afd89b12450b780f52dacfb2d
+        uses: RDXWorks-actions/action-gh-release@master
         with:
           files: |
             babylonnode-ubuntu-22.04
@@ -299,7 +299,7 @@ jobs:
           mv ./babylonnode babylonnode-ubuntu-20.04
       - if: ${{ github.event_name == 'release' }}
         name: Upload radixcli ubuntu binary
-        uses: softprops/action-gh-release@c9b46fe7aad9f02afd89b12450b780f52dacfb2d
+        uses: RDXWorks-actions/action-gh-release@master
         with:
           files: |
             babylonnode-ubuntu-20.04
