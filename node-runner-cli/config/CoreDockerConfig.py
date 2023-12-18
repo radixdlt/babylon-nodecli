@@ -22,12 +22,14 @@ class CoreDockerConfig(BaseConfig):
         self.trusted_node: str = ""
         self.memory_limit: str = "14000m"
         self.validator_address: str = ""
-        self.java_opts: str = "--enable-preview -server -Xms12g -Xmx12g  " \
-                              "-XX:MaxDirectMemorySize=2048m " \
-                              "-XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops " \
-                              "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts " \
-                              "-Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom " \
-                              "-DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
+        self.java_opts: str = (
+            "--enable-preview -server -Xms12g -Xmx12g  "
+            "-XX:MaxDirectMemorySize=2048m "
+            "-XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops "
+            "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts "
+            "-Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom "
+            "-DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
+        )
         super().__init__(config_dict)
 
     def set_node_type(self, nodetype="fullnode"):
@@ -52,7 +54,6 @@ class CoreDockerConfig(BaseConfig):
         self.trusted_node = trusted_node
 
     def ask_config(self, release, trustednode, ks_password, new_keystore, validator):
-
         self.set_core_release(release)
         self.set_trusted_node(trustednode)
         self.ask_validator_address(validator)

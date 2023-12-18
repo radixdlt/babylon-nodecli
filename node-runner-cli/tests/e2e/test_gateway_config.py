@@ -12,7 +12,18 @@ from utils.PromptFeeder import PromptFeeder
 @pytest.fixture
 def docker_config_gateway():
     original_argv = sys.argv.copy()
-    sys.argv = ["placeholder", "docker", "config", "-m", "GATEWAY", "-d" "/tmp", "-k", "test", "-nk", "-a"]
+    sys.argv = [
+        "placeholder",
+        "docker",
+        "config",
+        "-m",
+        "GATEWAY",
+        "-d" "/tmp",
+        "-k",
+        "test",
+        "-nk",
+        "-a",
+    ]
     yield
     sys.argv = original_argv
 
@@ -21,7 +32,9 @@ def docker_config_gateway():
 def set_gateway_responses():
     root_dir = dirname(dirname(dirname(abspath(__file__))))
     os.environ["PROMPT_FEEDS"] = join(root_dir, "test-prompts/gateway.yml")
-    os.environ["GENESIS_SOURCE_PATH"] = join(root_dir, "testnet-genesis", "zabanet_genesis_data_file.bin")
+    os.environ["GENESIS_SOURCE_PATH"] = join(
+        root_dir, "testnet-genesis", "zabanet_genesis_data_file.bin"
+    )
     os.environ["GENESIS_PATH"] = join("/tmp", "genesis.bin")
     os.environ["FORCE_LOAD_FEEDS"] = "true"
     yield

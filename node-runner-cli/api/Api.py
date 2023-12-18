@@ -1,4 +1,4 @@
-#TODO this needs updating when a new python client is created
+# TODO this needs updating when a new python client is created
 import os
 
 from config.EnvVars import PRINT_RESPONSE, NGINX, NODE_END_POINT
@@ -6,16 +6,15 @@ from utils.utils import Helpers
 
 
 class API:
-
     @staticmethod
     def get_host_info():
         scheme = os.getenv("API_SCHEME", "https")
-        node_host = os.getenv(NODE_END_POINT, f'{scheme}://localhost')
+        node_host = os.getenv(NODE_END_POINT, f"{scheme}://localhost")
         return node_host
 
     @staticmethod
     def set_basic_auth(api_client, usertype: str, username: str):
-        if os.getenv(NGINX,"true") == "true":
+        if os.getenv(NGINX, "true") == "true":
             user = Helpers.get_nginx_user(usertype=usertype, default_username=username)
             headers = Helpers.get_basic_auth_header(user)
             api_client.set_default_header("Authorization", headers["Authorization"])

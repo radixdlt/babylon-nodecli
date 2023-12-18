@@ -24,23 +24,26 @@ from utils.utils import Helpers, run_shell_command
 urllib3.disable_warnings()
 
 cli = ArgumentParser()
-cli.add_argument('subcommand', help='Subcommand to run',
-                 choices=["docker",
-                          "systemd",
-                          "api",
-                          "monitoring",
-                          "version",
-                          "optimise-node",
-                          "auth",
-                          "key",
-                          "ledger",
-                          "eula",
-                          "ret"])
+cli.add_argument(
+    "subcommand",
+    help="Subcommand to run",
+    choices=[
+        "docker",
+        "systemd",
+        "api",
+        "monitoring",
+        "version",
+        "optimise-node",
+        "auth",
+        "key",
+        "ledger",
+        "eula",
+        "ret",
+    ],
+)
 
-apicli = ArgumentParser(
-    description='API commands')
-api_parser = apicli.add_argument(dest="apicommand",
-                                 choices=["system", "metrics"])
+apicli = ArgumentParser(description="API commands")
+api_parser = apicli.add_argument(dest="apicommand", choices=["system", "metrics"])
 
 cwd = os.getcwd()
 logger = get_logger(__name__)
@@ -53,20 +56,26 @@ def check_latest_cli(prompt=False):
         if Helpers.cli_version() != cli_latest_version:
             os_name = "ubuntu-22.04"
             logger.info(
-                f"babylonnode CLI latest version is {cli_latest_version} and current version of the binary is {Helpers.cli_version()}.\n.")
-            logger.info(f"""
+                f"babylonnode CLI latest version is {cli_latest_version} and current version of the binary is {Helpers.cli_version()}.\n."
+            )
+            logger.info(
+                f"""
                 ---------------------------------------------------------------
                 Update the CLI by running these commands
                     wget -O babylonnode https://github.com/radixdlt/babylon-nodecli/releases/download/{cli_latest_version}/babylonnode-{os_name}
                     chmod +x babylonnode
                     sudo mv babylonnode /usr/local/bin
-                """)
-            if (prompt):
+                """
+            )
+            if prompt:
                 ask = input("Do you want to update the CLI with these commands? (Y/n)")
                 if Helpers.check_Yes(ask):
-                    run_shell_command(f'wget -O babylonnode https://github.com/radixdlt/babylon-nodecli/releases/download/{cli_latest_version}/babylonnode-{os_name}')
-                    run_shell_command(f'chmod +x babylonnode')
-                    run_shell_command(f'sudo mv babylonnode /usr/local/bin')
+                    run_shell_command(
+                        f"wget -O babylonnode https://github.com/radixdlt/babylon-nodecli/releases/download/{cli_latest_version}/babylonnode-{os_name}"
+                    )
+                    run_shell_command(f"chmod +x babylonnode")
+                    run_shell_command(f"sudo mv babylonnode /usr/local/bin")
+
 
 def main():
     args = cli.parse_args(sys.argv[1:2])
@@ -96,7 +105,9 @@ def main():
             apicli.print_help()
         else:
             if apicli_args.apicommand == "metrics":
-                systemApiHelper = SystemApiHelper(user_type="metrics", default_username="metrics")
+                systemApiHelper = SystemApiHelper(
+                    user_type="metrics", default_username="metrics"
+                )
                 systemApiHelper.prometheus_metrics(print_response=True)
             elif apicli_args.apicommand == "system":
                 handle_systemapi()
@@ -133,7 +144,7 @@ def main():
             keycli.print_help()
         else:
             keycli_args.func(keycli_args)
-    elif args.subcommand in ["version", "optimise-node","eula"]:
+    elif args.subcommand in ["version", "optimise-node", "eula"]:
         other_command_cli_args = other_command_cli.parse_args(sys.argv[1:])
         if sys.argv[2:] == "-h":
             other_command_cli.print_help()

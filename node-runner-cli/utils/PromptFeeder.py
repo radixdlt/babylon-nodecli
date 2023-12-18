@@ -49,7 +49,7 @@ class PromptFeeder:
     prompts_feed = []
 
     def __init__(self):
-        raise RuntimeError('Call instance() instead')
+        raise RuntimeError("Call instance() instead")
 
     @classmethod
     def __del__(self):

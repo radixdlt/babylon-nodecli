@@ -11,7 +11,9 @@ class CommonDockerConfig(BaseConfig):
     def __init__(self, config_dict: dict):
         if config_dict is None:
             config_dict = dict()
-        self.nginx_settings: DockerNginxConfig = DockerNginxConfig(config_dict.get("nginx_settings"))
+        self.nginx_settings: DockerNginxConfig = DockerNginxConfig(
+            config_dict.get("nginx_settings")
+        )
         self.network_id: int = ""
         self.network_name: str = ""
         self.genesis_bin_data_file: str = ""
@@ -38,25 +40,33 @@ class CommonDockerConfig(BaseConfig):
         if not network_id:
             network_id = Network.get_network_id()
         self.set_network_id(int(network_id))
-        self.set_genesis_bin_data_file_location(Network.path_to_genesis_binary(self.network_id))
+        self.set_genesis_bin_data_file_location(
+            Network.path_to_genesis_binary(self.network_id)
+        )
 
     def ask_nginx_release(self):
         latest_nginx_release = github.latest_release("radixdlt/babylon-nginx")
         self.nginx_settings.release = latest_nginx_release
         if "DETAILED" in SetupMode.instance().mode:
-            self.nginx_settings.release = Prompts.get_nginx_release(latest_nginx_release)
+            self.nginx_settings.release = Prompts.get_nginx_release(
+                latest_nginx_release
+            )
 
     def ask_enable_nginx_for_core(self, nginx_on_core):
         if nginx_on_core:
             self.nginx_settings.protect_core = nginx_on_core
         if "DETAILED" in SetupMode.instance().mode:
-            self.nginx_settings.protect_core = Prompts.ask_enable_nginx(service="CORE").lower()
+            self.nginx_settings.protect_core = Prompts.ask_enable_nginx(
+                service="CORE"
+            ).lower()
 
     def ask_enable_nginx_for_gateway(self, nginx_on_gateway):
         if nginx_on_gateway:
             self.nginx_settings.protect_gateway = nginx_on_gateway
         if "DETAILED" in SetupMode.instance().mode:
-            self.nginx_settings.protect_gateway = Prompts.ask_enable_nginx(service="GATEWAY").lower()
+            self.nginx_settings.protect_gateway = Prompts.ask_enable_nginx(
+                service="GATEWAY"
+            ).lower()
 
     def check_nginx_required(self):
         # When gateway is supported add back the condition to check gateway
@@ -69,4 +79,4 @@ class CommonDockerConfig(BaseConfig):
         if "DETAILED" in SetupMode.instance().mode:
             self.docker_compose = Prompts.ask_existing_compose_file()
         else:
-            open(self.docker_compose, mode='a').close()
+            open(self.docker_compose, mode="a").close()

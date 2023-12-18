@@ -3,7 +3,11 @@ import hashlib
 import bech32
 import ecdsa
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.serialization import Encoding, PrivateFormat, NoEncryption
+from cryptography.hazmat.primitives.serialization import (
+    Encoding,
+    PrivateFormat,
+    NoEncryption,
+)
 from cryptography.hazmat.primitives.serialization import pkcs12
 from ecdsa import SigningKey
 from ecdsa.util import sigencode_der
@@ -17,11 +21,19 @@ class KeyInteraction:
 
     def set_private_signing_key(self, keystore_path: bytes, keystore_password):
         with open(keystore_path, "rb") as f:
-            private_key, certificate, additional_certificates = pkcs12.load_key_and_certificates(f.read(),
-                                                                                                 keystore_password,
-                                                                                                 default_backend())
-            private_key_bytes = private_key.private_bytes(Encoding.DER, PrivateFormat.PKCS8, NoEncryption())
-            self.private_signing_key: SigningKey = ecdsa.SigningKey.from_der(private_key_bytes, hashfunc=hashlib.sha256)
+            (
+                private_key,
+                certificate,
+                additional_certificates,
+            ) = pkcs12.load_key_and_certificates(
+                f.read(), keystore_password, default_backend()
+            )
+            private_key_bytes = private_key.private_bytes(
+                Encoding.DER, PrivateFormat.PKCS8, NoEncryption()
+            )
+            self.private_signing_key: SigningKey = ecdsa.SigningKey.from_der(
+                private_key_bytes, hashfunc=hashlib.sha256
+            )
 
     def get_verifying_key(self):
         return self.private_signing_key.get_verifying_key()
@@ -43,5 +55,6 @@ class KeyInteraction:
         return validator_wallet_address
 
     def sign_payload(self, payload_to_sign):
-        return self.private_signing_key.sign_digest(bytearray.fromhex(payload_to_sign),
-                                                    sigencode=sigencode_der).hex()
+        return self.private_signing_key.sign_digest(
+            bytearray.fromhex(payload_to_sign), sigencode=sigencode_der
+        ).hex()

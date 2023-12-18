@@ -24,19 +24,26 @@ class GatewaySetupTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.fixture.gateway.enabled = True
-        cls.fixture.gateway.gateway_api.coreApiNode.core_api_address = "https://localhost:3332"
+        cls.fixture.gateway.gateway_api.coreApiNode.core_api_address = (
+            "https://localhost:3332"
+        )
         cls.fixture.gateway.gateway_api.coreApiNode.Name = "CoreNode"
         cls.fixture.gateway.gateway_api.coreApiNode.enabled = "True"
         cls.fixture.gateway.gateway_api.coreApiNode.basic_auth_user = "admin"
         cls.fixture.gateway.gateway_api.coreApiNode.basic_auth_password = "radix"
-        cls.fixture.gateway.gateway_api.coreApiNode.auth_header = Helpers.get_basic_auth_header_from_user_and_password(
-            "admin", "radix")
-        cls.fixture.gateway.gateway_api.coreApiNode.disable_core_api_https_certificate_checks = "true"
+        cls.fixture.gateway.gateway_api.coreApiNode.auth_header = (
+            Helpers.get_basic_auth_header_from_user_and_password("admin", "radix")
+        )
+        cls.fixture.gateway.gateway_api.coreApiNode.disable_core_api_https_certificate_checks = (
+            "true"
+        )
 
         cls.fixture.gateway.gateway_api.release = ""
         # cls.fixture.gateway.gateway_api.repo = "radixdlt/gateway-test-dummy"
 
-        cls.fixture.gateway.data_aggregator.coreApiNode = cls.fixture.gateway.gateway_api.coreApiNode
+        cls.fixture.gateway.data_aggregator.coreApiNode = (
+            cls.fixture.gateway.gateway_api.coreApiNode
+        )
         # cls.fixture.gateway.data_aggregator.release = "testrelease"
         # cls.fixture.gateway.data_aggregator.repo = "radixdlt/gateway-test-dummy"
         cls.fixture.gateway.data_aggregator.NetworkName = "zabanet"
@@ -124,54 +131,59 @@ services:
     extra_hosts:
     - "host.docker.internal:host-gateway" """.strip()
 
-    @patch('sys.stdout', new_callable=StringIO)
+    @patch("sys.stdout", new_callable=StringIO)
     def test_setup_gateway_ask_core_api(self, mockout):
         SetupMode.instance()
         SetupMode.mode = "DETAILED"
         urllib3.disable_warnings()
         keyboard_input = ["", "CoreNodeName"]
         default_value = "http://localhost:3332"
-        with patch('builtins.input', side_effect=keyboard_input):
+        with patch("builtins.input", side_effect=keyboard_input):
             core_api = GatewaySetup.ask_core_api_node_settings(default_value)
 
         self.assertEqual(default_value, core_api.core_api_address)
         self.assertEqual("CoreNodeName", core_api.Name)
 
-    @patch('sys.stdout', new_callable=StringIO)
+    @patch("sys.stdout", new_callable=StringIO)
     def test_setup_gateway_get_CoreApiAddress(self, mockout):
         urllib3.disable_warnings()
         # Takes default value
         keyboard_input = ""
         default_value = "http://localhost:3332"
-        with patch('builtins.input', side_effect=[keyboard_input]):
+        with patch("builtins.input", side_effect=[keyboard_input]):
             # Core Node Address
             core_api_address = Prompts.get_CoreApiAddress(default_value)
 
         self.assertEqual(default_value, core_api_address)
         # Overrides with input
         keyboard_input = "http://core:3333/core"
-        with patch('builtins.input', side_effect=[keyboard_input]):
+        with patch("builtins.input", side_effect=[keyboard_input]):
             # Core Node Address
             core_api_address = Prompts.get_CoreApiAddress(default_value)
         self.assertEqual(keyboard_input, core_api_address)
 
-    @patch('sys.stdout', new_callable=StringIO)
+    @patch("sys.stdout", new_callable=StringIO)
     def test_setup_gateway_compose_file_fixture_test(self, mockout):
         urllib3.disable_warnings()
         # Takes default values
-        questionary_keyboard_input = ["https://host.docker.internal:443/core", "admin", "radix", "true",
-                                      "CoreNode",
-                                      "rcnet-v3-r1",
-                                      "rcnet-v3-r1",
-                                      "rcnet-v3-r1",
-                                      "local",
-                                      "radixdlt_ledger",
-                                      "postgres"]
+        questionary_keyboard_input = [
+            "https://host.docker.internal:443/core",
+            "admin",
+            "radix",
+            "true",
+            "CoreNode",
+            "rcnet-v3-r1",
+            "rcnet-v3-r1",
+            "rcnet-v3-r1",
+            "local",
+            "radixdlt_ledger",
+            "postgres",
+        ]
         # Does not start the docker compose file, just generates it
         install_keyboard_input = "n"
         config = SystemDConfig({})
 
-        with patch('builtins.input', side_effect=questionary_keyboard_input):
+        with patch("builtins.input", side_effect=questionary_keyboard_input):
             config.gateway = GatewaySetup.ask_gateway_standalone_docker("postgres")
 
         self.assertEqual("postgres", config.gateway.postgres_db.password)
@@ -180,12 +192,14 @@ services:
         config.common_config.network_name = "zabanet"
         config.gateway.enabled = True
 
-        self.expect_ask_gateway_inputs_get_inserted_into_object(config, questionary_keyboard_input)
+        self.expect_ask_gateway_inputs_get_inserted_into_object(
+            config, questionary_keyboard_input
+        )
         self.assertEqual("host.docker.internal:5432", config.gateway.postgres_db.host)
 
         config.gateway.docker_compose = "/tmp/gateway.docker-compose.yml"
 
-        with patch('builtins.input', side_effect=[install_keyboard_input]):
+        with patch("builtins.input", side_effect=[install_keyboard_input]):
             GatewaySetup.conditionaly_install_standalone_gateway(config)
 
         tests_dir = dirname(dirname(__file__))
@@ -194,19 +208,46 @@ services:
             with open(config.gateway.docker_compose) as f2:
                 self.assertEqual(f1.read(), f2.read())
 
-    def expect_ask_gateway_inputs_get_inserted_into_object(self, config, questionary_keyboard_input):
-        self.assertEqual(questionary_keyboard_input[0], config.gateway.gateway_api.coreApiNode.core_api_address)
-        self.assertEqual(questionary_keyboard_input[1], config.gateway.gateway_api.coreApiNode.basic_auth_user)
-        self.assertEqual(questionary_keyboard_input[2], config.gateway.gateway_api.coreApiNode.basic_auth_password)
-        self.assertEqual(questionary_keyboard_input[3],
-                         config.gateway.gateway_api.coreApiNode.disable_core_api_https_certificate_checks)
-        self.assertEqual(questionary_keyboard_input[4], config.gateway.gateway_api.coreApiNode.Name)
-        self.assertEqual(questionary_keyboard_input[5], config.gateway.gateway_api.release)
-        self.assertEqual(questionary_keyboard_input[6], config.gateway.data_aggregator.release)
-        self.assertEqual(questionary_keyboard_input[7], config.gateway.database_migration.release)
-        self.assertEqual(questionary_keyboard_input[8], config.gateway.postgres_db.setup)
-        self.assertEqual(questionary_keyboard_input[9], config.gateway.postgres_db.dbname)
-        self.assertEqual(questionary_keyboard_input[10], config.gateway.postgres_db.user)
+    def expect_ask_gateway_inputs_get_inserted_into_object(
+        self, config, questionary_keyboard_input
+    ):
+        self.assertEqual(
+            questionary_keyboard_input[0],
+            config.gateway.gateway_api.coreApiNode.core_api_address,
+        )
+        self.assertEqual(
+            questionary_keyboard_input[1],
+            config.gateway.gateway_api.coreApiNode.basic_auth_user,
+        )
+        self.assertEqual(
+            questionary_keyboard_input[2],
+            config.gateway.gateway_api.coreApiNode.basic_auth_password,
+        )
+        self.assertEqual(
+            questionary_keyboard_input[3],
+            config.gateway.gateway_api.coreApiNode.disable_core_api_https_certificate_checks,
+        )
+        self.assertEqual(
+            questionary_keyboard_input[4], config.gateway.gateway_api.coreApiNode.Name
+        )
+        self.assertEqual(
+            questionary_keyboard_input[5], config.gateway.gateway_api.release
+        )
+        self.assertEqual(
+            questionary_keyboard_input[6], config.gateway.data_aggregator.release
+        )
+        self.assertEqual(
+            questionary_keyboard_input[7], config.gateway.database_migration.release
+        )
+        self.assertEqual(
+            questionary_keyboard_input[8], config.gateway.postgres_db.setup
+        )
+        self.assertEqual(
+            questionary_keyboard_input[9], config.gateway.postgres_db.dbname
+        )
+        self.assertEqual(
+            questionary_keyboard_input[10], config.gateway.postgres_db.user
+        )
 
     def test_setup_docker_compose_with_gateway(self):
         tests_dir = dirname(dirname(__file__))
@@ -215,17 +256,17 @@ services:
         docker_config: DockerConfig = DockerSetup.load_settings(fixture_file)
         self.assertEqual(True, docker_config.gateway.enabled)
         compose_yaml = DockerSetup.render_docker_compose(docker_config)
-        with open(compose_fixture_file, 'r') as f:
+        with open(compose_fixture_file, "r") as f:
             compose_fixture = yaml.load(f, Loader=UnsafeLoader)
         self.maxDiff = None
         ddiff = DeepDiff(compose_yaml, compose_fixture, ignore_order=True)
         # self.assertEqual({}, ddiff)
 
     def suite():
-        """ This defines all the tests of a module"""
+        """This defines all the tests of a module"""
         suite = unittest.TestSuite()
         suite.addTest(unittest.makeSuite(GatewaySetupTests))
         return suite
 
-    if __name__ == '__main__':
+    if __name__ == "__main__":
         unittest.TextTestRunner(verbosity=2).run(suite())

@@ -21,15 +21,17 @@ class CoreSystemdConfig(BaseConfig):
         self.core_library_url: str = ""
         self.data_directory: str = f"{Helpers.get_home_dir()}/babylon-ledger"
         self.trusted_node: str = ""
-        self.node_dir: str = '/etc/radixdlt/node'
-        self.node_secrets_dir: str = '/etc/radixdlt/node/secrets'
+        self.node_dir: str = "/etc/radixdlt/node"
+        self.node_secrets_dir: str = "/etc/radixdlt/node/secrets"
         self.validator_address: str = ""
-        self.java_opts: str = "--enable-preview -server -Xms12g -Xmx12g  " \
-                              "-XX:MaxDirectMemorySize=2048m " \
-                              "-XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops " \
-                              "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts " \
-                              "-Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom " \
-                              "-DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
+        self.java_opts: str = (
+            "--enable-preview -server -Xms12g -Xmx12g  "
+            "-XX:MaxDirectMemorySize=2048m "
+            "-XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops "
+            "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts "
+            "-Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom "
+            "-DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
+        )
         super().__init__(config_dict)
 
     def ask_trusted_node(self, trusted_node):
@@ -59,8 +61,10 @@ class CoreSystemdConfig(BaseConfig):
         self.keydetails.keygen_tag = "v1.4.1"
 
     def generate_download_urls(self):
-        self.core_binary_url = os.getenv(NODE_BINARY_OVERIDE,
-                                         f"https://github.com/radixdlt/babylon-node/releases/download/{self.core_release}/babylon-node-{self.core_release}.zip")
+        self.core_binary_url = os.getenv(
+            NODE_BINARY_OVERIDE,
+            f"https://github.com/radixdlt/babylon-node/releases/download/{self.core_release}/babylon-node-{self.core_release}.zip",
+        )
         self.core_library_url = f"https://github.com/radixdlt/babylon-node/releases/download/{self.core_release}/babylon-node-rust-arch-linux-x86_64-release-{self.core_release}.zip"
         return self
 

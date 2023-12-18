@@ -8,7 +8,7 @@ from config.EnvVars import (
     RADIXDLT_APP_VERSION_OVERRIDE,
     RADIXDLT_NGINX_VERSION_OVERRIDE,
     RADIXDLT_CLI_VERSION_OVERRIDE,
-    RADIXDLT_GATEWAY_VERSION_OVERRIDE
+    RADIXDLT_GATEWAY_VERSION_OVERRIDE,
 )
 from utils.utils import Helpers
 
@@ -19,7 +19,7 @@ REPOS_ENV_VARS = {
     "radixdlt/node-runner": RADIXDLT_CLI_VERSION_OVERRIDE,
     "radixdlt/babylon-nodecli": RADIXDLT_CLI_VERSION_OVERRIDE,
     "radixdlt/babylon-gateway": RADIXDLT_GATEWAY_VERSION_OVERRIDE,
-    "radixdlt/radixdlt-network-gateway": RADIXDLT_GATEWAY_VERSION_OVERRIDE
+    "radixdlt/radixdlt-network-gateway": RADIXDLT_GATEWAY_VERSION_OVERRIDE,
 }
 
 
@@ -34,12 +34,11 @@ def latest_release(repo_name="radixdlt/babylon-node") -> str:
         if version_override is not None:
             return version_override
 
-    req = requests.Request('GET',
-                           f'https://ghproxy.radixdlt.com/{repo_name}')
+    req = requests.Request("GET", f"https://ghproxy.radixdlt.com/{repo_name}")
 
     prepared = req.prepare()
-    prepared.headers['Content-Type'] = 'application/json'
-    prepared.headers['user-agent'] = 'babylonnode-cli'
+    prepared.headers["Content-Type"] = "application/json"
+    prepared.headers["user-agent"] = "babylonnode-cli"
     resp = Helpers.send_request(prepared, print_response=False)
     if not resp.ok:
         print("Failed to get latest release from github. The response was:")

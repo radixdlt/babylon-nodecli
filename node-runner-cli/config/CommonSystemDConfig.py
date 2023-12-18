@@ -13,7 +13,9 @@ class CommonSystemdConfig(BaseConfig):
     def __init__(self, config_dict: dict):
         if config_dict is None:
             config_dict = dict()
-        self.nginx_settings: SystemdNginxConfig = SystemdNginxConfig(config_dict.get("nginx_settings"))
+        self.nginx_settings: SystemdNginxConfig = SystemdNginxConfig(
+            config_dict.get("nginx_settings")
+        )
         self.network_id: int = 1
         self.network_name: str = ""
         self.genesis_bin_data_file: str = ""
@@ -55,11 +57,12 @@ class CommonSystemdConfig(BaseConfig):
         if nginx_on_core:
             self.nginx_settings.protect_core = nginx_on_core
         if "DETAILED" in SetupMode.instance().mode:
-            self.nginx_settings.protect_core = Prompts.ask_enable_nginx(service="CORE").lower()
+            self.nginx_settings.protect_core = Prompts.ask_enable_nginx(
+                service="CORE"
+            ).lower()
 
     def check_nginx_required(self):
-        if json.loads(
-                self.nginx_settings.protect_core.lower()):
+        if json.loads(self.nginx_settings.protect_core.lower()):
             return True
         else:
             return False
@@ -68,7 +71,7 @@ class CommonSystemdConfig(BaseConfig):
         latest_nginx_release = github.latest_release("radixdlt/babylon-nginx")
         self.nginx_settings.release = latest_nginx_release
         if "DETAILED" in SetupMode.instance().mode:
-            self.nginx_settings.release = Prompts.get_nginx_release(latest_nginx_release)
+            self.nginx_settings.release = Prompts.get_nginx_release(
+                latest_nginx_release
+            )
         self.nginx_settings.generate_nginx_config_url()
-
-

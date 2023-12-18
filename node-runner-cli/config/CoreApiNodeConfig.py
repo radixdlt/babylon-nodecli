@@ -18,4 +18,6 @@ class CoreApiNodeConfig(BaseConfig):
         super().__init__(config_dict)
 
     def ask_disablehttpsVerify(self):
-        self.disable_core_api_https_certificate_checks = Prompts.get_disablehttpsVerfiy()
+        self.disable_core_api_https_certificate_checks = (
+            Prompts.get_disablehttpsVerfiy()
+        )

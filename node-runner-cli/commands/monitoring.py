@@ -13,8 +13,8 @@ from utils.Prompts import Prompts
 from utils.utils import Helpers, bcolors
 
 monitoringcli = ArgumentParser(
-    description='Subcommand to setup monitoring for CORE or GATEWAY',
-    usage="babylonnode monitoring "
+    description="Subcommand to setup monitoring for CORE or GATEWAY",
+    usage="babylonnode monitoring ",
 )
 monitoring_parser = monitoringcli.add_subparsers(dest="monitoringcommand")
 
@@ -28,39 +28,60 @@ def read_monitoring_config(args):
     if not exists(args.monitoringconfigfile):
         print(
             f"The monitoring config file {args.monitoringconfigfile} does not exist. It seems like monitoring was not set up. "
-            "Please run the config command first.")
+            "Please run the config command first."
+        )
         sys.exit(1)
-    with open(args.monitoringconfigfile, 'r') as file:
+    with open(args.monitoringconfigfile, "r") as file:
         all_config = yaml.safe_load(file)
     return all_config
 
 
-@monitoringcommand([
-    argument("-m", "--setupmode", nargs="+",
-             help="""Quick setup with assumed defaults. It supports three quick setup mode and a detailed setup mode.
+@monitoringcommand(
+    [
+        argument(
+            "-m",
+            "--setupmode",
+            nargs="+",
+            help="""Quick setup with assumed defaults. It supports three quick setup mode and a detailed setup mode.
               \n\nMONITOR_CORE: Use this value to monitor Core using defaults which assume core is run on same machine
                as monitoring.
               \n\nMONITOR_GATEWAY: Use this value to monitor GATEWAY using defaults which assume network gateway is run on same machine.
               \n\nDETAILED: Default value if not provided. This mode takes your through series of questions.
               """,
-             choices=["MONITOR_CORE", "MONITOR_GATEWAY", "DETAILED"], default="DETAILED", action="store"),
-    argument("-cm", "--coremetricspassword",
-             help="Password for core metrics basic auth user",
-             action="store",
-             default=""),
-    argument("-gm", "--gatewayapimetricspassword",
-             help="Password for gateway api metrics basic auth user",
-             action="store",
-             default=""),
-    argument("-am", "--aggregatormetricspassword",
-             help="Password for aggregator metrics basic auth user",
-             action="store",
-             default=""),
-    argument("-d", "--monitoringconfigdir",
-             help="Path to monitoring directory where config file will stored",
-             action="store",
-             default=f"{Helpers.get_default_monitoring_config_dir()}")
-])
+            choices=["MONITOR_CORE", "MONITOR_GATEWAY", "DETAILED"],
+            default="DETAILED",
+            action="store",
+        ),
+        argument(
+            "-cm",
+            "--coremetricspassword",
+            help="Password for core metrics basic auth user",
+            action="store",
+            default="",
+        ),
+        argument(
+            "-gm",
+            "--gatewayapimetricspassword",
+            help="Password for gateway api metrics basic auth user",
+            action="store",
+            default="",
+        ),
+        argument(
+            "-am",
+            "--aggregatormetricspassword",
+            help="Password for aggregator metrics basic auth user",
+            action="store",
+            default="",
+        ),
+        argument(
+            "-d",
+            "--monitoringconfigdir",
+            help="Path to monitoring directory where config file will stored",
+            action="store",
+            default=f"{Helpers.get_default_monitoring_config_dir()}",
+        ),
+    ]
+)
 def config(args):
     """
     This commands allows to create a config file, which can persist custom settings for monitoring.
@@ -70,16 +91,24 @@ def config(args):
     """
     setupmode = SetupMode.instance()
     setupmode.mode = args.setupmode
-    coremetricspassword = args.coremetricspassword if args.coremetricspassword != "" else None
-    gatewayapimetricspassword = args.gatewayapimetricspassword if args.gatewayapimetricspassword != "" else None
-    aggregatormetricspassword = args.aggregatormetricspassword if args.aggregatormetricspassword != "" else None
+    coremetricspassword = (
+        args.coremetricspassword if args.coremetricspassword != "" else None
+    )
+    gatewayapimetricspassword = (
+        args.gatewayapimetricspassword if args.gatewayapimetricspassword != "" else None
+    )
+    aggregatormetricspassword = (
+        args.aggregatormetricspassword if args.aggregatormetricspassword != "" else None
+    )
 
     print(f"{len(setupmode.mode)} and {setupmode.mode}")
     if "DETAILED" in setupmode.mode and len(setupmode.mode) > 8:
-        print(f"{bcolors.FAIL}You cannot have DETAILED option with other options together."
-              f"\nDETAILED option goes through asking each and every question that to customize setup. "
-              f"Hence cannot be clubbed together with options"
-              f"{bcolors.ENDC}")
+        print(
+            f"{bcolors.FAIL}You cannot have DETAILED option with other options together."
+            f"\nDETAILED option goes through asking each and every question that to customize setup. "
+            f"Hence cannot be clubbed together with options"
+            f"{bcolors.ENDC}"
+        )
         sys.exit(1)
 
     config_file = f"{args.monitoringconfigdir}/monitoring_config.yaml"
@@ -87,7 +116,8 @@ def config(args):
     Helpers.section_headline("MONITORING CONFIG FILE")
     print(
         "\nCreating config file using the answers from the questions that would be asked in next steps."
-        f"\nLocation of the config file: {bcolors.OKBLUE}{config_file}{bcolors.ENDC}")
+        f"\nLocation of the config file: {bcolors.OKBLUE}{config_file}{bcolors.ENDC}"
+    )
     monitoring_config: MonitoringConfig = MonitoringConfig({})
 
     if "MONITOR_CORE" in setupmode.mode:
@@ -105,26 +135,35 @@ def config(args):
     yaml.add_representer(type(None), Helpers.represent_none)
     Helpers.section_headline("CONFIG is Generated as below")
     config_to_dump = monitoring_config.to_dict()
-    print(f"\n{yaml.dump(config_to_dump)}"
-          f"\n\n Saving to file {config_file} ")
+    print(f"\n{yaml.dump(config_to_dump)}" f"\n\n Saving to file {config_file} ")
 
     monitoring_config.to_file(config_file)
 
 
 @monitoringcommand(
     [
-        argument("-f", "--monitoringconfigfile",
-                 help=f"Path to config file. Default is '{Helpers.get_default_monitoring_config_dir()}/monitoring_config.yaml'",
-                 action="store", default=f"{Helpers.get_default_monitoring_config_dir()}/monitoring_config.yaml"),
-        argument("-a", "--autoapprove", help="Set this to true to run without any prompts", action="store_true",
-                 default=False)
-    ])
+        argument(
+            "-f",
+            "--monitoringconfigfile",
+            help=f"Path to config file. Default is '{Helpers.get_default_monitoring_config_dir()}/monitoring_config.yaml'",
+            action="store",
+            default=f"{Helpers.get_default_monitoring_config_dir()}/monitoring_config.yaml",
+        ),
+        argument(
+            "-a",
+            "--autoapprove",
+            help="Set this to true to run without any prompts",
+            action="store_true",
+            default=False,
+        ),
+    ]
+)
 def install(args):
     """
     This commands setups up the software and deploys it based on what is stored in the config.yaml file.
     To update software versions, most of the time it is required to update the versions in config file and run this command
     """
-    monitor_url_dir = f'https://raw.githubusercontent.com/radixdlt/babylon-nodecli/{Helpers.cli_version()}/monitoring'
+    monitor_url_dir = f"https://raw.githubusercontent.com/radixdlt/babylon-nodecli/{Helpers.cli_version()}/monitoring"
     print(f"Downloading artifacts from {monitor_url_dir}\n==")
     autoapprove = args.autoapprove
     all_config = read_monitoring_config(args)
@@ -132,8 +171,15 @@ def install(args):
     monitoring_config_dir = all_config["common_config"]["config_dir"]
     Monitoring.template_prometheus_yml(all_config, monitoring_config_dir)
     Monitoring.template_datasource(monitoring_config_dir)
-    Monitoring.template_dashboards(["dashboard.yml", "babylon-node-dashboard.json", "babylon-jvm-dashboard.json",
-                                    "network-gateway-dashboard.json"], monitoring_config_dir)
+    Monitoring.template_dashboards(
+        [
+            "dashboard.yml",
+            "babylon-node-dashboard.json",
+            "babylon-jvm-dashboard.json",
+            "network-gateway-dashboard.json",
+        ],
+        monitoring_config_dir,
+    )
 
     Monitoring.template_monitoring_containers(monitoring_config_dir)
     Monitoring.setup_external_volumes()
@@ -144,11 +190,20 @@ def install(args):
 
 @monitoringcommand(
     [
-        argument("-f", "--monitoringconfigfile",
-                 help=f"Path to config file. Default is '{Helpers.get_default_monitoring_config_dir()}/monitoring_config.yaml'",
-                 action="store", default=f"{Helpers.get_default_monitoring_config_dir()}/monitoring_config.yaml"),
-        argument("-a", "--autoapprove", help="Set this to true to run without any prompts", action="store_true",
-                 default=False)
+        argument(
+            "-f",
+            "--monitoringconfigfile",
+            help=f"Path to config file. Default is '{Helpers.get_default_monitoring_config_dir()}/monitoring_config.yaml'",
+            action="store",
+            default=f"{Helpers.get_default_monitoring_config_dir()}/monitoring_config.yaml",
+        ),
+        argument(
+            "-a",
+            "--autoapprove",
+            help="Set this to true to run without any prompts",
+            action="store_true",
+            default=False,
+        ),
     ]
 )
 def start(args):
@@ -165,11 +220,24 @@ def start(args):
     Monitoring.start_monitoring(monitoring_file_location, autoapprove)
 
 
-@monitoringcommand([
-    argument("-f", "--monitoringconfigfile",
-             help=f"Path to config file. Default is '{Helpers.get_default_monitoring_config_dir()}/monitoring_config.yaml'",
-             action="store", default=f"{Helpers.get_default_monitoring_config_dir()}/monitoring_config.yaml"),
-    argument("-v", "--removevolumes", help="Remove the volumes ", action="store_true", default=False)])
+@monitoringcommand(
+    [
+        argument(
+            "-f",
+            "--monitoringconfigfile",
+            help=f"Path to config file. Default is '{Helpers.get_default_monitoring_config_dir()}/monitoring_config.yaml'",
+            action="store",
+            default=f"{Helpers.get_default_monitoring_config_dir()}/monitoring_config.yaml",
+        ),
+        argument(
+            "-v",
+            "--removevolumes",
+            help="Remove the volumes ",
+            action="store_true",
+            default=False,
+        ),
+    ]
+)
 def stop(args):
     """
     This commands stops the docker containers

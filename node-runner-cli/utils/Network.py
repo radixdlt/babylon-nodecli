@@ -7,14 +7,14 @@ from utils.utils import Helpers, run_shell_command
 
 
 class Network:
-
     @staticmethod
     def get_network_id() -> int:
         # Network id
         Helpers.section_headline(f"Network connection")
         network_prompt = Helpers.input_guestion(
             "Enter the network_id. Enter M or 1 for mainnet and S or 2 for stokenet:",
-            QuestionKeys.select_network)
+            QuestionKeys.select_network,
+        )
         network_id = Network.validate_network_id(network_prompt)
         return network_id
 
@@ -35,9 +35,10 @@ class Network:
     def path_to_genesis_binary(network_id: int) -> str:
         if network_id not in [1, 2] and network_id == 14:
             if os.path.exists("zabanet_genesis_data_file.bin"):
-                run_shell_command('sudo rm zabanet_genesis_data_file.bin', shell=True)
+                run_shell_command("sudo rm zabanet_genesis_data_file.bin", shell=True)
             genesis_bin_file = GenesisConfig.copy_genesis_file(
-                "zabanet_genesis_data_file.bin")
+                "zabanet_genesis_data_file.bin"
+            )
         else:
             genesis_bin_file = None
 
@@ -53,7 +54,7 @@ class Network:
             33: "enkinet",
             34: "hammunet",
             35: "nerglanet",
-            36: "mardunet"
+            36: "mardunet",
         }
         return network_id_names
 
