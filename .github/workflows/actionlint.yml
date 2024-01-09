@@ -1,8 +1,6 @@
-name: Lint GitHub Actions workflows
+name: Lint workflows
 on:
   push:
-    paths:
-      - '.github/**/*.yml'
 
 jobs:
   python-lint:
