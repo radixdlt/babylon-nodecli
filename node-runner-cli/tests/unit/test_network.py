@@ -8,8 +8,10 @@ from utils.Network import Network
 
 
 class NetworkUtilsUnitTests(unittest.TestCase):
-
-    @mock.patch('sys.stdout', new_callable=StringIO, )
+    @mock.patch(
+        "sys.stdout",
+        new_callable=StringIO,
+    )
     def test_network_id_can_be_validated(self, mock_stdout):
         self.assertEqual(Network.validate_network_id("1"), 1)
         self.assertEqual(Network.validate_network_id("m"), 1)
@@ -43,11 +45,11 @@ class NetworkUtilsUnitTests(unittest.TestCase):
 
 
 def suite():
-    """ This defines all the tests of a module"""
+    """This defines all the tests of a module"""
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(NetworkUtilsUnitTests))
     return suite
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.TextTestRunner(verbosity=2).run(suite())

@@ -1,8 +1,10 @@
 def get_decorator(args, parent):
     def decorator(func):
-        parser = parent.add_parser(func.__name__.replace("_", "-"), description=func.__doc__)
-        required_args = parser.add_argument_group('required arguments')
-        optional_args = parser.add_argument_group('optional arguments')
+        parser = parent.add_parser(
+            func.__name__.replace("_", "-"), description=func.__doc__
+        )
+        required_args = parser.add_argument_group("required arguments")
+        optional_args = parser.add_argument_group("optional arguments")
 
         if len(args) > 0:
             for arg in args:

@@ -5,8 +5,8 @@ from setup.DockerSetup import DockerSetup
 from setup.SystemDSetup import SystemDSetup
 
 authcli = ArgumentParser(
-    description='Subcommand to aid creation of nginx basic auth users',
-    usage="babylonnode auth "
+    description="Subcommand to aid creation of nginx basic auth users",
+    usage="babylonnode auth ",
 )
 
 auth_parser = authcli.add_subparsers(dest="authcommand")
@@ -18,13 +18,30 @@ def authcommand(args=[], parent=auth_parser):
 
 @authcommand(
     [
-        argument("-m", "--setupmode", required=True, help="Setup type whether it is DOCKER or SYSTEMD",
-                 choices=["DOCKER", "SYSTEMD"], action="store"),
-        argument("-u", "--username", default="admin", help="Name of admin user. Default value is `admin` ",
-                 action="store"),
-        argument("-p", "--password", default="", help="Password of admin user", action="store")
-
-    ])
+        argument(
+            "-m",
+            "--setupmode",
+            required=True,
+            help="Setup type whether it is DOCKER or SYSTEMD",
+            choices=["DOCKER", "SYSTEMD"],
+            action="store",
+        ),
+        argument(
+            "-u",
+            "--username",
+            default="admin",
+            help="Name of admin user. Default value is `admin` ",
+            action="store",
+        ),
+        argument(
+            "-p",
+            "--password",
+            default="",
+            help="Password of admin user",
+            action="store",
+        ),
+    ]
+)
 def set_admin_password(args):
     """
     This sets up admin password on nginx basic auth. Refer this link for all the paths.
@@ -37,12 +54,30 @@ def set_admin_password(args):
 
 @authcommand(
     [
-        argument("-m", "--setupmode", required=True, help="Setup type whether it is DOCKER or SYSTEMD",
-                 choices=["DOCKER", "SYSTEMD"], action="store"),
-        argument("-u", "--username", default="metrics", help="Name of metrics user. Default value is `metrics`",
-                 action="store"),
-        argument("-p", "--password", default="", help="Password of metrics user", action="store")
-    ])
+        argument(
+            "-m",
+            "--setupmode",
+            required=True,
+            help="Setup type whether it is DOCKER or SYSTEMD",
+            choices=["DOCKER", "SYSTEMD"],
+            action="store",
+        ),
+        argument(
+            "-u",
+            "--username",
+            default="metrics",
+            help="Name of metrics user. Default value is `metrics`",
+            action="store",
+        ),
+        argument(
+            "-p",
+            "--password",
+            default="",
+            help="Password of metrics user",
+            action="store",
+        ),
+    ]
+)
 def set_metrics_password(args):
     """
     This sets up metrics password on nginx basic auth. Refer this link for all the paths.
@@ -54,12 +89,30 @@ def set_metrics_password(args):
 
 @authcommand(
     [
-        argument("-m", "--setupmode", required=True, help="Setup type whether it is DOCKER or SYSTEMD",
-                 choices=["DOCKER", "SYSTEMD"], action="store"),
-        argument("-u", "--username", default="superadmin",
-                 help="Name of superadmin user. Default value is `superadmin` ", action="store"),
-        argument("-p", "--password", default="", help="Password of superadmin user", action="store")
-    ])
+        argument(
+            "-m",
+            "--setupmode",
+            required=True,
+            help="Setup type whether it is DOCKER or SYSTEMD",
+            choices=["DOCKER", "SYSTEMD"],
+            action="store",
+        ),
+        argument(
+            "-u",
+            "--username",
+            default="superadmin",
+            help="Name of superadmin user. Default value is `superadmin` ",
+            action="store",
+        ),
+        argument(
+            "-p",
+            "--password",
+            default="",
+            help="Password of superadmin user",
+            action="store",
+        ),
+    ]
+)
 def set_superadmin_password(args):
     """
     This sets up superadmin password on nginx basic auth. Refer this link for all the paths.
@@ -71,12 +124,30 @@ def set_superadmin_password(args):
 
 @authcommand(
     [
-        argument("-m", "--setupmode", required=True, help="Setup type whether it is DOCKER or SYSTEMD",
-                 choices=["DOCKER", "SYSTEMD"], action="store"),
-        argument("-u", "--username", default="gateway",
-                 help="Name of gateway user. Default value is `gateway` ", action="store"),
-        argument("-p", "--password", default="", help="Password of gateway user", action="store")
-    ])
+        argument(
+            "-m",
+            "--setupmode",
+            required=True,
+            help="Setup type whether it is DOCKER or SYSTEMD",
+            choices=["DOCKER", "SYSTEMD"],
+            action="store",
+        ),
+        argument(
+            "-u",
+            "--username",
+            default="gateway",
+            help="Name of gateway user. Default value is `gateway` ",
+            action="store",
+        ),
+        argument(
+            "-p",
+            "--password",
+            default="",
+            help="Password of gateway user",
+            action="store",
+        ),
+    ]
+)
 def set_gateway_password(args):
     """
     This sets up gateway password on nginx basic auth. Refer this link for all the paths.
@@ -92,6 +163,8 @@ def set_auth(args, usertype, password=None):
     elif args.setupmode == "SYSTEMD":
         SystemDSetup.checkUser()
         SystemDSetup.install_nginx()
-        SystemDSetup.setup_nginx_password("/etc/nginx/secrets", usertype, args.username, password)
+        SystemDSetup.setup_nginx_password(
+            "/etc/nginx/secrets", usertype, args.username, password
+        )
     else:
         print("Invalid setupmode specified. It should be either DOCKER or SYSTEMD.")

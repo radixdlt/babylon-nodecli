@@ -24,14 +24,16 @@ class SystemdNginxConfig(BaseConfig):
             config_dict = dict()
         self.mode: str = "systemd"
         self.protect_core: str = "true"
-        self.dir: str = '/etc/nginx'
-        self.secrets_dir: str = '/etc/nginx/secrets'
+        self.dir: str = "/etc/nginx"
+        self.secrets_dir: str = "/etc/nginx/secrets"
         self.release: str = ""
         self.config_url: str = ""
         self.mode = "systemd"
         super().__init__(config_dict)
 
     def generate_nginx_config_url(self):
-        self.config_url = os.getenv(NGINX_BINARY_OVERIDE,
-                                                   f"https://github.com/radixdlt/babylon-nginx/releases/download/"
-                                                   f"{self.release}/babylon-nginx-fullnode-conf.zip")
+        self.config_url = os.getenv(
+            NGINX_BINARY_OVERIDE,
+            f"https://github.com/radixdlt/babylon-nginx/releases/download/"
+            f"{self.release}/babylon-nginx-fullnode-conf.zip",
+        )

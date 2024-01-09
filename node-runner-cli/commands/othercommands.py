@@ -4,8 +4,7 @@ from commands.subcommand import get_decorator, argument
 from setup.BaseSetup import BaseSetup
 from utils.utils import Helpers
 
-other_command_cli = ArgumentParser(
-    description='Other CLI commands')
+other_command_cli = ArgumentParser(description="Other CLI commands")
 other_command_parser = other_command_cli.add_subparsers(dest="othercommands")
 
 
@@ -19,25 +18,39 @@ def version(args):
     Run this command td display the version of CLI been used.
     """
     print(f"Cli - Version : {Helpers.cli_version()}")
-    print(f"The Babylon Node CLI is licensed under the Radix Software EULA. "
-          f"\nBy using this application you agree to the terms and conditions stated here:"
-          f"\nhttp://www.radixdlt.com/terms/genericEULA")
+    print(
+        f"The Babylon Node CLI is licensed under the Radix Software EULA. "
+        f"\nBy using this application you agree to the terms and conditions stated here:"
+        f"\nhttp://www.radixdlt.com/terms/genericEULA"
+    )
+
 
 @othercommands()
 def eula(args):
     """
     Run this command td display the EULA.
     """
-    print(f"The Babylon Node CLI is licensed under the Radix Software EULA. "
-          f"\nBy using this application you agree to the terms and conditions stated here:"
-          f"\nhttp://www.radixdlt.com/terms/genericEULA")
+    print(
+        f"The Babylon Node CLI is licensed under the Radix Software EULA. "
+        f"\nBy using this application you agree to the terms and conditions stated here:"
+        f"\nhttp://www.radixdlt.com/terms/genericEULA"
+    )
 
 
-@othercommands([
-    argument("-u", "--setup_ulimit", help="", action="store_true", default=None),
-    argument("-s", "--setup_swap", help=f"", action="store_true", default=None),
-    argument("-ss", "--swap_space", help=f"", action="store", default="3G", choices=["1G", "3G", "8G"])
-])
+@othercommands(
+    [
+        argument("-u", "--setup_ulimit", help="", action="store_true", default=None),
+        argument("-s", "--setup_swap", help=f"", action="store_true", default=None),
+        argument(
+            "-ss",
+            "--swap_space",
+            help=f"",
+            action="store",
+            default="3G",
+            choices=["1G", "3G", "8G"],
+        ),
+    ]
+)
 def optimise_node(args):
     """
     Run this command to setup ulimits and swap size on the fresh ubuntu machine
@@ -45,7 +58,10 @@ def optimise_node(args):
     . Prompts asking to setup limits
     . Prompts asking to setup swap and size of swap in GB
     """
-    BaseSetup.setup_node_optimisation_config(Helpers.cli_version(), args.setup_ulimit, args.setup_swap, args.swap_space)
+    BaseSetup.setup_node_optimisation_config(
+        Helpers.cli_version(), args.setup_ulimit, args.setup_swap, args.swap_space
+    )
+
 
 # @othercommands()
 # def sync_status(args):

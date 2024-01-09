@@ -7,8 +7,7 @@ from setup.BaseSetup import BaseSetup
 
 # Setup key subcommand parser
 keycli = ArgumentParser(
-    description='Subcommand to aid interaction with key',
-    usage="babylonnode key "
+    description="Subcommand to aid interaction with key", usage="babylonnode key "
 )
 key_parser = keycli.add_subparsers(dest="keycommand")
 
@@ -17,30 +16,52 @@ def keycommand(args=[], parent=key_parser):
     return get_decorator(args, parent)
 
 
-@keycommand([
-    argument("-p", "--password", required=True,
-             help="Password of the keystore",
-             action="store"),
-    argument("-f", "--filelocation", required=True,
-             help="Location of keystore on the disk",
-             action="store"),
-])
+@keycommand(
+    [
+        argument(
+            "-p",
+            "--password",
+            required=True,
+            help="Password of the keystore",
+            action="store",
+        ),
+        argument(
+            "-f",
+            "--filelocation",
+            required=True,
+            help="Location of keystore on the disk",
+            action="store",
+        ),
+    ]
+)
 def info(args):
     """
     Using CLI, for a key file, you can print out the validator address. This feature is in beta.
     """
-    key = KeyInteraction(keystore_password=str.encode(args.password), keystore_path=args.filelocation)
+    key = KeyInteraction(
+        keystore_password=str.encode(args.password), keystore_path=args.filelocation
+    )
     print(f"Validator hex public key  {key.get_validator_hex_public_key()}")
 
 
-@keycommand([
-    argument("-p", "--password", required=True,
-             help="Password of the keystore",
-             action="store"),
-    argument("-f", "--filelocation", required=True,
-             help="Location of keystore on the disk",
-             action="store"),
-])
+@keycommand(
+    [
+        argument(
+            "-p",
+            "--password",
+            required=True,
+            help="Password of the keystore",
+            action="store",
+        ),
+        argument(
+            "-f",
+            "--filelocation",
+            required=True,
+            help="Location of keystore on the disk",
+            action="store",
+        ),
+    ]
+)
 def generate(args):
     """
     Using CLI to generate a new keystore
@@ -48,6 +69,7 @@ def generate(args):
     SetupMode.instance().mode = "DETAILED"
 
     BaseSetup.ask_keydetails(args.password, args.filelocation)
+
 
 # @keycommand([
 #     argument("-p", "--password", required=True,

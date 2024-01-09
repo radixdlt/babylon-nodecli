@@ -28,8 +28,12 @@ class SystemDConfigArguments:
         self.setupmode = SetupMode.instance()
         self.setupmode.mode = args.setupmode
         self.trustednode = args.trustednode if args.trustednode != "" else None
-        self.keystore_password = args.keystorepassword if args.keystorepassword != "" else None
-        self.nginx_on_core = args.disablenginxforcore if args.disablenginxforcore != "" else None
+        self.keystore_password = (
+            args.keystorepassword if args.keystorepassword != "" else None
+        )
+        self.nginx_on_core = (
+            args.disablenginxforcore if args.disablenginxforcore != "" else None
+        )
         self.data_directory = args.data_directory
         self.new_keystore = args.newkeystore
         self.olympia_node_url = args.migration_url

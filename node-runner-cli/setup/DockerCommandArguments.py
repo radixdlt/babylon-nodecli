@@ -26,10 +26,18 @@ class DockerConfigArguments:
         self.setupmode = SetupMode.instance()
         self.setupmode.mode = args.setupmode
         self.trustednode = args.trustednode if args.trustednode != "" else None
-        self.keystore_password = args.keystorepassword if args.keystorepassword != "" else None
-        self.nginx_on_core = args.disablenginxforcore if args.disablenginxforcore != "" else None
-        self.nginx_on_gateway = args.disablenginxforgateway if args.disablenginxforgateway != "" else None
-        self.postgrespassword = args.postgrespassword if args.postgrespassword != "" else None
+        self.keystore_password = (
+            args.keystorepassword if args.keystorepassword != "" else None
+        )
+        self.nginx_on_core = (
+            args.disablenginxforcore if args.disablenginxforcore != "" else None
+        )
+        self.nginx_on_gateway = (
+            args.disablenginxforgateway if args.disablenginxforgateway != "" else None
+        )
+        self.postgrespassword = (
+            args.postgrespassword if args.postgrespassword != "" else None
+        )
         self.autoapprove = args.autoapprove
         self.new_keystore = args.newkeystore
         self.validator = args.validator

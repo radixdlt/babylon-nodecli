@@ -3,8 +3,13 @@ from utils.Prompts import Prompts
 
 class MigrationSetup:
     @staticmethod
-    def ask_migration_config(current_config, olympia_node_url, olympia_node_auth_user, olympia_node_auth_password,
-                             olympia_node_bech32_address):
+    def ask_migration_config(
+        current_config,
+        olympia_node_url,
+        olympia_node_auth_user,
+        olympia_node_auth_password,
+        olympia_node_bech32_address,
+    ):
         new_config = current_config
         new_config.migration.use_olympia = True
 
