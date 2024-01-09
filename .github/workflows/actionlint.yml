@@ -5,6 +5,15 @@ on:
       - '.github/**/*.yml'
 
 jobs:
+  python-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: psf/black@stable
+        with:
+          options: "--check --verbose"
+          src: "node-runner-cli"
+
   actionlint:
     runs-on: ubuntu-latest
     steps:
