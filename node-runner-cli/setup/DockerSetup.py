@@ -1,4 +1,5 @@
 import getpass
+import json
 import os
 import sys
 
@@ -179,11 +180,14 @@ class DockerSetup(BaseSetup):
     @staticmethod
     def update_versions(docker_config: DockerConfig, autoapprove=False) -> DockerConfig:
         if hasattr(docker_config, "core_node"):
-            current_core_release = docker_config.core_node.core_release
-            latest_core_release = github.latest_release("radixdlt/babylon-node")
-            docker_config.core_node.core_release = Prompts.confirm_version_updates(
-                current_core_release, latest_core_release, "CORE", autoapprove
-            )
+            if docker_config.core_node is not None:
+                current_core_release = docker_config.core_node.core_release
+                latest_core_release = github.latest_release("radixdlt/babylon-node")
+                docker_config.core_node.core_release = Prompts.confirm_version_updates(
+                    current_core_release,
+                    latest_core_release, 'CORE',
+                    autoapprove
+                )
         if hasattr(docker_config, "gateway"):
             if docker_config.gateway is not None:
                 if docker_config.gateway.enabled:

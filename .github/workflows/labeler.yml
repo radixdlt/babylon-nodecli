@@ -6,6 +6,6 @@ jobs:
   label_pr:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/labeler@v3
+      - uses: RDXWorks-actions/labeler@main
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
