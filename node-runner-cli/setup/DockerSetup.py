@@ -184,9 +184,7 @@ class DockerSetup(BaseSetup):
                 current_core_release = docker_config.core_node.core_release
                 latest_core_release = github.latest_release("radixdlt/babylon-node")
                 docker_config.core_node.core_release = Prompts.confirm_version_updates(
-                    current_core_release,
-                    latest_core_release, 'CORE',
-                    autoapprove
+                    current_core_release, latest_core_release, "CORE", autoapprove
                 )
         if hasattr(docker_config, "gateway"):
             if docker_config.gateway is not None:
