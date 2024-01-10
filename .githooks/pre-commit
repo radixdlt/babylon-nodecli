@@ -1,0 +1,13 @@
+#!/bin/sh
+#
+# A simple pre-commit hook to ensure that the documentation is rendered.
+
+if git diff --cached --quiet -- "./node-runner-cli/commands/*.py"; then
+    echo "Commands were not changed. No need to re-generate documentation. Skipped."
+else
+    echo "Commands have been changed. Generating documentation new."
+	cd node-runner-cli
+	./generate-cmds-help.sh
+	git add ../docs/command_reference.adoc
+	echo "Successfully updated the documentation and added it to the commit."
+fi
