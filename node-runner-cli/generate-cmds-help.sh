@@ -114,6 +114,19 @@ do
   command_help_doc "key" "$subcommand" "$filename"
 done
 
+
+cat <<EOT >>"$filename"
+=== Ret commands supported by CLI
+You can derive babylon addresses from both private key and olympia address using this cli.
+EOT
+
+declare -a othercommands=("derive" "derive-from-olympia")
+for subcommand in "${othercommands[@]}"; do
+  export DISABLE_VERSION_CHECK="true"
+  command_help_doc "ret" "$subcommand" "$filename"
+done
+
+
 cat <<EOT >>"$filename"
 === Other commands supported by CLI
 List of other commands supported by cli are to check the version of CLI being used and optimise-node
