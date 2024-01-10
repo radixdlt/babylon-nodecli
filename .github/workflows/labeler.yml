@@ -2,6 +2,11 @@ name: "Pull Request Labeler"
 on:
   - pull_request_target
 
+permissions:
+  checks: write
+  contents: read
+  pull-requests: write
+
 jobs:
   label_pr:
     runs-on: ubuntu-latest
