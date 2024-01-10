@@ -1,6 +1,11 @@
 name: "Pull Request Labeler"
 on:
-  - pull_request_target
+  - pull_request
+
+permissions:
+  checks: write
+  contents: read
+  pull-requests: write
 
 jobs:
   label_pr:
