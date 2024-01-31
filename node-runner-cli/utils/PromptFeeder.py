@@ -29,6 +29,7 @@ class QuestionKeys:
     basic_auth_password = "basic_auth_password"
     core_api_disable_https_verify = "core_api_disable_https_verify"
     core_api_node_name = "core_api_node_name"
+    core_api_port = "core_api_port"
     postgres_location = "postgres_location"
     postgres_db_host = "postgres_db_host"
     postgres_db_port = "postgres_db_port"

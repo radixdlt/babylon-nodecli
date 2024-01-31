@@ -76,3 +76,7 @@ class CoreSystemdConfig(BaseConfig):
         if validator_address is None:
             validator_address = Prompts.ask_validator_address()
         self.set_validator_address(validator_address)
+
+    def ask_core_api_port(self):
+        core_api_port = Prompts.ask_core_api_port()
+        self.core_api_port = core_api_port

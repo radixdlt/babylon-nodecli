@@ -525,6 +525,7 @@ class SystemDSetup(BaseSetup):
         systemd_config.core_node.generate_download_urls()
         systemd_config.core_node.ask_data_directory(argument_object.data_directory)
         systemd_config.core_node.ask_validator_address(argument_object.validator)
+        systemd_config.core_node.ask_core_api_port()
         systemd_config.core_node.keydetails = BaseSetup.ask_keydetails(
             argument_object.keystore_password, argument_object.new_keystore
         )

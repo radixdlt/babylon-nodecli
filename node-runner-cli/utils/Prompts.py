@@ -23,6 +23,7 @@ class Prompts:
         )
         return answer
 
+
     @staticmethod
     def get_postgress_user() -> str:
         print(
@@ -101,6 +102,17 @@ class Prompts:
         answer = Helpers.input_guestion(
             f"Default value is '{default}'. Press ENTER to accept default value or type in new name':",
             QuestionKeys.core_api_node_name,
+        )
+        return Prompts.check_default(answer, default)
+
+    @staticmethod
+    def ask_core_api_port(default: str = "3334") -> str :
+        print(
+            "\nCORE API PORT: This is the port number used by core api. This config only support systemD setup"
+        )
+        answer = Helpers.input_guestion(
+            f"Default value is '{default}'. Press ENTER to accept default value or type in new name':",
+            QuestionKeys.core_api_port,
         )
         return Prompts.check_default(answer, default)
 
