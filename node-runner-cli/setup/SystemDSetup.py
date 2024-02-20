@@ -275,13 +275,13 @@ class SystemDSetup(BaseSetup):
                 answer = input("Do you want to regenerate y/n :")
                 if Helpers.check_Yes(answer):
                     run_shell_command(
-                        f"sudo openssl dhparam -out {secrets_dir}/dhparam.pem  4096",
+                        f"sudo openssl dhparam -dsaparam -out {secrets_dir}/dhparam.pem 4096",
                         shell=True,
                     )
         else:
             print("Generating a dhparam.pem file")
             run_shell_command(
-                f"sudo openssl dhparam -out {secrets_dir}/dhparam.pem  4096", shell=True
+                f"sudo openssl dhparam -dsaparam -out {secrets_dir}/dhparam.pem 4096", shell=True
             )
 
     @staticmethod
