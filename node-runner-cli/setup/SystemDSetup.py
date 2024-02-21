@@ -269,21 +269,6 @@ class SystemDSetup(BaseSetup):
                 shell=True,
             )
 
-        if os.path.isfile(f"{secrets_dir}/dhparam.pem"):
-            if auto_approve is None:
-                print(f"File {secrets_dir}/dhparam.pem already exists")
-                answer = input("Do you want to regenerate y/n :")
-                if Helpers.check_Yes(answer):
-                    run_shell_command(
-                        f"sudo openssl dhparam -out {secrets_dir}/dhparam.pem  4096",
-                        shell=True,
-                    )
-        else:
-            print("Generating a dhparam.pem file")
-            run_shell_command(
-                f"sudo openssl dhparam -out {secrets_dir}/dhparam.pem  4096", shell=True
-            )
-
     @staticmethod
     def setup_nginx_password(secrets_dir, usertype, username, password=None):
         run_shell_command(f"sudo mkdir -p {secrets_dir}", shell=True)
