@@ -139,6 +139,9 @@ jobs:
   tests:
     name: "Unit tests"
     runs-on: ubuntu-22.04
+    permissions:
+      checks: write
+      pull-requests: write
     steps:
       - name: cancel running workflows
         uses: RDXWorks-actions/cancel-workflow-action@main
