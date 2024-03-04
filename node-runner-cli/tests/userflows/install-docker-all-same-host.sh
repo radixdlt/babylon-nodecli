@@ -111,7 +111,11 @@ docker ps
 #done
 set -e
 
-docker logs $(whoami)-core-1 --tail 100
+echo "Checking radixdlt container logs"
+docker logs $(whoami)-core-1 --tail 20
+
+echo "Checking nginx container logs"
+docker logs $(whoami)-nginx-1 --tail 20
 
 echo "Testing postgres is set up correctly"
 sudo systemctl status postgresql@12-main.service --no-pager

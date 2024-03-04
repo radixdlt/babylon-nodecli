@@ -49,8 +49,14 @@ sleep 10
 echo "Checking radixdlt service status again"
 sudo systemctl status radixdlt-node.service --no-pager
 
+echo "Checking radixdlt service logs"
+journalctl -u radixdlt-node.service --no-pager --lines 20
+
 echo "Checking nginx service status again"
 sudo systemctl status nginx.service --no-pager
+
+echo "Checking nginx service logs"
+journalctl -u nginx.service --no-pager --lines 20
 
 echo "Set credentials"
 ./babylonnode auth set-admin-password --setupmode SYSTEMD -p ${NGINX_ADMIN_PASSWORD}
