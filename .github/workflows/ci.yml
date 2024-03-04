@@ -405,6 +405,8 @@ jobs:
           chmod +x  ./node-runner-cli/tests/userflows/install-docker-all-same-host.sh
           ./node-runner-cli/tests/userflows/install-docker-all-same-host.sh
         env:
+          RADIXDLT_NGINX_VERSION_OVERRIDE: 1.0.5-rc1
+          NGINX_BINARY_OVERIDE: "https://github.com/radixdlt/babylon-nginx/releases/download/1.0.5-rc1/babylon-nginx-fullnode-conf.zip"
           NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
           NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
           NGINX_GATEWAY_PASSWORD: ${{secrets.NGINX_GATEWAY_PASSWORD}}
@@ -441,6 +443,8 @@ jobs:
           chmod +x  ./node-runner-cli/tests/userflows/install-systemd-simple.sh
           ./node-runner-cli/tests/userflows/install-systemd-simple.sh
         env:
+          RADIXDLT_NGINX_VERSION_OVERRIDE: 1.0.5-rc1
+          NGINX_BINARY_OVERIDE: "https://github.com/radixdlt/babylon-nginx/releases/download/1.0.5-rc1/babylon-nginx-fullnode-conf.zip"
           NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
           NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
           NGINX_GATEWAY_PASSWORD: ${{secrets.NGINX_GATEWAY_PASSWORD}}
