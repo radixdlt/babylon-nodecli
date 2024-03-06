@@ -80,7 +80,7 @@ Pull requests will be reviewed by project maintainers. Reviewers may provide fee
 # License
 By contributing to babylon-nodecli, you agree that your contributions will be licensed under the Radix Software license.
 
-The Babylon Node CLI is licensed under the Radix Software http://www.radixdlt.com/terms/genericEULA[EULA].
+The Babylon Node CLI is licensed under the [Radix Software EULA](http://www.radixdlt.com/terms/genericEULA).
 
 The Babylon Node CLI code is released under Apache 2.0 link:LICENSE[license]. 
 
