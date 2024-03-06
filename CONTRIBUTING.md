@@ -1,6 +1,6 @@
 # Contributing Guidelines
 
-Thank you for your interest in contributing to [PROJECT NAME]! 
+Thank you for your interest in contributing to babylon-nodecli! 
 
 ## Clarification on GitHub Issue Usage and Feature Requests
 
@@ -78,6 +78,6 @@ Pull requests will be reviewed by project maintainers. Reviewers may provide fee
 
 
 # License
-By contributing to [PROJECT NAME], you agree that your contributions will be licensed under the [PROJECT NAME] license.
+By contributing to babylon-nodecli, you agree that your contributions will be licensed under the babylon-nodecli license.
 
 Insert license as in the README
