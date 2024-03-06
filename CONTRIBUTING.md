@@ -1,76 +1,83 @@
-# Radix DLT Code of Conduct
+# Contributing Guidelines
 
-## Our Pledge
+Thank you for your interest in contributing to [PROJECT NAME]! 
 
-In the interest of fostering an open and welcoming environment, we as
-contributors and maintainers pledge to making participation in our project and
-our community a harassment-free experience for everyone, regardless of age, body
-size, disability, ethnicity, sex characteristics, gender identity and expression,
-level of experience, education, socio-economic status, nationality, personal
-appearance, race, religion, or sexual identity and orientation.
+## Clarification on GitHub Issue Usage and Feature Requests
 
-## Our Standards
+We want to clarify that Github Issues are primarily meant for the purpose of reporting problems or concerns, rather than functioning as an open bug tracker. This means that reported issues on Github may be closed and reported in our internal tracking system or added to our roadmap. 
 
-Examples of behavior that contributes to creating a positive environment
-include:
+If you are thinking of requesting a feature, make sure it’s not already part of our upcoming features outlined in the [Roadmap](https://docs.radixdlt.com/docs/roadmap). If you have a feature suggestion, we kindly ask that you share it through [Discord](http://discord.gg/radixdlt) or [Telegram](https://t.me/RadixDevelopers).
 
-* Using welcoming and inclusive language
-* Being respectful of differing viewpoints and experiences
-* Gracefully accepting constructive criticism
-* Focusing on what is best for the community
-* Showing empathy towards other community members
+Our primary focus is on the priorities outlined in our Roadmap. We appreciate your understanding that addressing reported issues may not always align with our immediate roadmap goals.
 
-Examples of unacceptable behavior by participants include:
 
-* The use of sexualized language or imagery and unwelcome sexual attention or
- advances
-* Trolling, insulting/derogatory comments, and personal or political attacks
-* Public or private harassment
-* Publishing others' private information, such as a physical or electronic
- address, without explicit permission
-* Other conduct which could reasonably be considered inappropriate in a
- professional setting
+# Table of Contents
+- [Contributing Guidelines](#contributing-guidelines)
+  - [Clarification on GitHub Issue Usage and Feature Requests](#clarification-on-github-issue-usage-and-feature-requests)
+- [Table of Contents](#table-of-contents)
+- [Code of Conduct](#code-of-conduct)
+- [Reporting Issues](#reporting-issues)
+- [Contributing Code](#contributing-code)
+  - [Setting Up Your Development Environment](#setting-up-your-development-environment)
+  - [Making Changes](#making-changes)
+  - [Testing](#testing)
+  - [Submitting a Pull Request](#submitting-a-pull-request)
+- [Review Process](#review-process)
+- [License](#license)
 
-## Our Responsibilities
+# Code of Conduct
+This project adheres to the Contributor Covenant [code of conduct](CODE_OF_CONDUCT.md).
+By participating, you are expected to uphold this code.
+Please report unacceptable behavior to [hello@radixdlt.com](mailto:hello@radixdlt.com).
 
-Project maintainers are responsible for clarifying the standards of acceptable
-behavior and are expected to take appropriate and fair corrective action in
-response to any instances of unacceptable behavior.
+# Reporting Issues
+Ensure the bug was not already reported by searching on GitHub under [Issues](https://github.com/radixdlt/XYZ/issues).
 
-Project maintainers have the right and responsibility to remove, edit, or
-reject comments, commits, code, wiki edits, issues, and other contributions
-that are not aligned to this Code of Conduct, or to ban temporarily or
-permanently any contributor for other behaviors that they deem inappropriate,
-threatening, offensive, or harmful.
+If you encounter a bug or have a problem with the project, please open an issue on our [issue tracker](https://github.com/radixdlt/XYZ/issues). Make sure to provide as much detail as possible, including:
 
-## Scope
+- A clear and descriptive title.
+- Steps to reproduce the issue.
+- Expected behavior and actual behavior.
+- Your operating system, browser, or other relevant information.
+- If possible, include screenshots or code snippets that illustrate the issue.
 
-This Code of Conduct applies both within project spaces and in public spaces
-when an individual is representing the project or its community. Examples of
-representing a project or community include using an official project e-mail
-address, posting via an official social media account, or acting as an appointed
-representative at an online or offline event. Representation of a project may be
-further defined and clarified by project maintainers.
 
-## Enforcement
+# Contributing Code
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported by contacting the project team at hello@radixdlt.com. All
-complaints will be reviewed and investigated and will result in a response that
-is deemed necessary and appropriate to the circumstances. The project team is
-obligated to maintain confidentiality with regard to the reporter of an incident.
-Further details of specific enforcement policies may be posted separately.
+Submitting a Pull Request does not guarantee the acceptance of your proposed changes. We strongly advise initiating a discussion with the team via Discord, Telegram, or Github Issues (for bugs) prior to commencing work on a PR.
 
-Project maintainers who do not follow or enforce the Code of Conduct in good
-faith may face temporary or permanent repercussions as determined by other
-members of the project's leadership.
+## Setting Up Your Development Environment
 
-## Attribution
+Note: adapt this as required for your repository
 
-This Code of Conduct is adapted from the [Contributor Covenant][homepage], version 1.4,
-available at https://www.contributor-covenant.org/version/1/4/code-of-conduct.html
+1. Fork the repository to your GitHub account.
+2. Clone your forked repository to your local machine.
+3. Create a new branch for your changes.
 
-[homepage]: https://www.contributor-covenant.org
+## Making Changes
+1. Write clear, concise, and well-documented code.
+2. Commit your changes with a descriptive commit message. Please follow the PROJECT’s commit message format.
 
-For answers to common questions about this code of conduct, see
-https://www.contributor-covenant.org/faq
+## Testing
+Note: adapt this as required for your repository
+
+1. Ensure that your changes do not break existing tests.
+2. Write new tests for your code if applicable.
+3. Run the test suite to make sure everything is passing.
+
+## Submitting a Pull Request
+Note: adapt this as required for your repository (the target branch for the PR may change)
+
+1. Push your changes to your forked repository:
+2. Open a pull request against the `develop` branch of the original repository.
+3. Provide a clear and informative title and description for your pull request.
+4. Be prepared to address any feedback or questions during the review process.
+
+# Review Process
+Pull requests will be reviewed by project maintainers. Reviewers may provide feedback, request changes, or approve the pull request. We appreciate your patience during this process, and we aim to be responsive and constructive in our feedback.
+
+
+# License
+By contributing to [PROJECT NAME], you agree that your contributions will be licensed under the [PROJECT NAME] license.
+
+Insert license as in the README
