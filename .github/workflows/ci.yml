@@ -11,6 +11,12 @@ on:
   pull_request:
     branches:
       - main
+      
+permissions:
+  id-token: write
+  packages: write
+  contents: write
+  
 jobs:
 
   snyk-scan:
