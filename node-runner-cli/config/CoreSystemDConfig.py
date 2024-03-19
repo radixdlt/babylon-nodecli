@@ -24,6 +24,7 @@ class CoreSystemdConfig(BaseConfig):
         self.node_dir: str = "/etc/radixdlt/node"
         self.node_secrets_dir: str = "/etc/radixdlt/node/secrets"
         self.validator_address: str = ""
+        self.core_api_port: str = "3334"
         self.java_opts: str = (
             "--enable-preview -server -Xms12g -Xmx12g  "
             "-XX:MaxDirectMemorySize=2048m "
@@ -75,3 +76,7 @@ class CoreSystemdConfig(BaseConfig):
         if validator_address is None:
             validator_address = Prompts.ask_validator_address()
         self.set_validator_address(validator_address)
+
+    def ask_core_api_port(self):
+        core_api_port = Prompts.ask_core_api_port()
+        self.core_api_port = core_api_port
