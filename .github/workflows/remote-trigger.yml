@@ -2,7 +2,7 @@ name: Test Babylon-Nginx
 
 on:
   repository_dispatch:
-    types: [trigger-workflow]
+    types: [workflow_dispatch]
     
 jobs:
   build:
