@@ -16,6 +16,8 @@ jobs:
         uses: RDXWorks-actions/checkout@main
         with:
           fetch-depth: 0
+      - name: Output Inputs
+        run: echo "${{ toJSON(github.event.inputs) }}"
       - name: Download packaged cli
         run: |
           wget -O babylonnode https://github.com/radixdlt/babylon-nodecli/releases/download/2.1.1/babylonnode-ubuntu-22.04
@@ -49,6 +51,8 @@ jobs:
         uses: RDXWorks-actions/checkout@main
         with:
           fetch-depth: 0
+      - name: Output Inputs
+        run: echo "${{ toJSON(github.event.inputs) }}"
       - name: Download packaged cli
         run: |
           wget -O babylonnode https://github.com/radixdlt/babylon-nodecli/releases/download/2.1.1/babylonnode-ubuntu-22.04
