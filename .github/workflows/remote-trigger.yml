@@ -1,8 +1,13 @@
 name: Test Babylon-Nginx
 
 on:
-  repository_dispatch:
-    types: [workflow_dispatch]
+  workflow_dispatch:
+    inputs:
+      nginx_version:
+        description: 'The version of nginx to test'
+        required: true
+        default: '1.0.0'
+        type: string
     
 jobs:
   build:
@@ -42,8 +47,8 @@ jobs:
           SEED_NODE: ${{ vars.SEED_NODE }}
           NETWORK_ID: ${{ vars.NETWORK_ID }}
           NETWORK_NAME: ${{ vars.NETWORK_NAME }}
-          RADIXDLT_NGINX_VERSION_OVERRIDE: 1.0.5-rc1
-          NGINX_BINARY_OVERIDE: "https://github.com/radixdlt/babylon-nginx/releases/download/1.0.5-rc1/babylon-nginx-fullnode-conf.zip"
+          RADIXDLT_NGINX_VERSION_OVERRIDE: ${{ inputs.nginx_version }}
+          NGINX_BINARY_OVERIDE: "https://github.com/radixdlt/babylon-nginx/releases/download/${{ inputs.nginx_version }}/babylon-nginx-fullnode-conf.zip"
 
   test-userflow-systemd-simple:
     runs-on: gh-ephemeral-nodecli-systemd-runner
@@ -77,7 +82,7 @@ jobs:
           SEED_NODE: ${{ vars.SEED_NODE }}
           NETWORK_ID: ${{ vars.NETWORK_ID }}
           NETWORK_NAME: ${{ vars.NETWORK_NAME }}
-          RADIXDLT_NGINX_VERSION_OVERRIDE: 1.0.5-rc1
-          NGINX_BINARY_OVERIDE: "https://github.com/radixdlt/babylon-nginx/releases/download/1.0.5-rc1/babylon-nginx-fullnode-conf.zip"
+          RADIXDLT_NGINX_VERSION_OVERRIDE: ${{ inputs.nginx_version }}
+          NGINX_BINARY_OVERIDE: "https://github.com/radixdlt/babylon-nginx/releases/download/${{ inputs.nginx_version }}/babylon-nginx-fullnode-conf.zip"
     
     
