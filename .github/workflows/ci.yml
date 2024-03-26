@@ -336,9 +336,7 @@ jobs:
         run: |
           ls -a
           chmod +x ./babylonnode
-          mkdir -p $HOME/node-config
-          echo "HOME=$HOME"
-          echo "PATH=$PWD"
+          mkdir -p "$HOME/node-config"
           export PROMPT_FEEDS="node-runner-cli/test-prompts/core-gateway-all-local.yml"
           ./babylonnode docker config -m DETAILED \
            -d $HOME/node-config \
@@ -352,7 +350,7 @@ jobs:
           chmod +x ./babylonnode
           export PROMPT_FEEDS="node-runner-cli/test-prompts/corenode-01.yml"
           ./babylonnode docker config -m DETAILED \
-           -d $HOME/node-config \
+           -d "$HOME/node-config" \
            -k $KEYSTORE_PASSWORD -nk -a
         env:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
@@ -362,8 +360,8 @@ jobs:
           ls -a
           export PROMPT_FEEDS="node-runner-cli/test-prompts/corenode-02.yml"
           ./babylonnode docker config -m DETAILED \
-           -d $HOME/node-config \
-           -k $KEYSTORE_PASSWORD -nk -a
+           -d "$HOME/node-config" \
+           -k "$KEYSTORE_PASSWORD" -nk -a
         env:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -372,8 +370,8 @@ jobs:
           ls -a
           export PROMPT_FEEDS="node-runner-cli/test-prompts/gateway-remote-core-local-postgress.yml"
           ./babylonnode docker config -m DETAILED \
-           -d $HOME/node-config \
-           -k $KEYSTORE_PASSWORD -nk -a
+           -d "$HOME/node-config" \
+           -k "$KEYSTORE_PASSWORD" -nk -a
         env:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
       - name: gateway-remote-core-remote-postgress
@@ -381,8 +379,8 @@ jobs:
           ls -a
           export PROMPT_FEEDS="node-runner-cli/test-prompts/gateway-remote-core-remote-postgress.yml"
           ./babylonnode docker config -m DETAILED \
-           -d $HOME/node-config \
-           -k $KEYSTORE_PASSWORD -nk -a
+           -d "$HOME/node-config" \
+           -k "$KEYSTORE_PASSWORD" -nk -a
         env:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
 
@@ -484,14 +482,14 @@ jobs:
       - name: Setup config
         run: |
           chmod +x ./babylonnode
-          mkdir -p $HOME/babylon-node-config
+          mkdir -p "$HOME/babylon-node-config"
           export DISABLE_VERSION_CHECK=true
           export RADIXDLT_APP_VERSION_OVERRIDE="rcnet-v2-phase2-r4"
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
           export PROMPT_FEEDS="node-runner-cli/test-prompts/core-gateway-all-local.yml"
           ./babylonnode docker config -m DETAILED \
-            -d $HOME/babylon-node-config \
-            -k $KEYSTORE_PASSWORD -nk -a
+            -d "$HOME/babylon-node-config" \
+            -k "$KEYSTORE_PASSWORD" -nk -a
         env:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -499,14 +497,13 @@ jobs:
         run: |
           export DISABLE_VERSION_CHECK=true
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
-          ./babylonnode docker install -f $HOME/babylon-node-config/config.yaml -a
-          # ToDo: Fix Authorization error export DOCKER_COMPOSE_FOLDER_PREFIX=runner ?
+          ./babylonnode docker install -f "$HOME/babylon-node-config/config.yaml" -a
           sleep 60
-          ./babylonnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
-          ./babylonnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
-          ./babylonnode auth set-superadmin-password -m DOCKER -p $NGINX_SUPERADMIN_PASSWORD
-          NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./babylonnode api system health
-          NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./babylonnode api system version
+          ./babylonnode auth set-admin-password -m DOCKER -p "$NGINX_ADMIN_PASSWORD"
+          ./babylonnode auth set-metrics-password -m DOCKER -p "$NGINX_METRICS_PASSWORD"
+          ./babylonnode auth set-superadmin-password -m DOCKER -p "$NGINX_SUPERADMIN_PASSWORD"
+          NGINX_ADMIN_PASSWORD="$NGINX_ADMIN_PASSWORD" ./babylonnode api system health
+          NGINX_ADMIN_PASSWORD="$NGINX_ADMIN_PASSWORD" ./babylonnode api system version
         env:
           NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
           NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
