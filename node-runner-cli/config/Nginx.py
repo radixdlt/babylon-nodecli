@@ -1,7 +1,7 @@
 import os
 
 from config.BaseConfig import BaseConfig
-from config.EnvVars import NGINX_BINARY_OVERIDE
+from config.EnvVars import NGINX_DOCKER_REPO_OVERRIDE, NGINX_BINARY_OVERIDE
 
 
 class DockerNginxConfig(BaseConfig):
@@ -13,7 +13,7 @@ class DockerNginxConfig(BaseConfig):
         self.gateway_behind_auth: str = "true"
         self.protect_core: str = "true"
         self.release = ""
-        self.repo = "radixdlt/babylon-nginx"
+        self.repo: str = os.getenv(NGINX_DOCKER_REPO_OVERRIDE, "radixdlt/babylon-nginx")
         self.mode = "docker"
         super().__init__(config_dict)
 
