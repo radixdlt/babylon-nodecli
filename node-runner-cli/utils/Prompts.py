@@ -249,7 +249,9 @@ class Prompts:
         return keyfile_name
 
     @staticmethod
-    def ask_engine_state_api() -> str:
+    def ask_engine_state_api(auto_approve: bool) -> str:
+        if auto_approve:
+            return 'true'
         answer = Helpers.input_guestion(
             "Do you want to enable the engine state api? (Y/N) (default: false):",
             QuestionKeys.enable_engine_state_api

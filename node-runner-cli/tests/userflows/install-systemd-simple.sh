@@ -99,6 +99,9 @@ NGINX_ADMIN_PASSWORD=${NGINX_ADMIN_PASSWORD} ./babylonnode api system peers
 echo "Testing Core node identity"
 NGINX_ADMIN_PASSWORD=${NGINX_ADMIN_PASSWORD} ./babylonnode api system identity
 
+echo "Test engine state api"
+curl -v -k -u "admin:${NGINX_ADMIN_PASSWORD}" -X POST --header "Content-Type: application/json" https://localhost:443/engine-state/entity/info --data '{"entity_address": "account_rdx12y386tpv29ndwslkf4drm9d5tsn6eulxg2uuxjq5ykhanuudcs7827"}'
+
 echo "Restarting systemd service"
 ./babylonnode systemd restart
 

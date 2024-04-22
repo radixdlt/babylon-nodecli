@@ -343,7 +343,7 @@ class DockerSetup(BaseSetup):
             else:
                 del docker_config.gateway
 
-        docker_config.core_node.engine_state_enabled = BaseSetup.ask_engine_state_api()
+        docker_config.core_node.engine_state_enabled = BaseSetup.ask_engine_state_api(argument_object.autoapprove)
 
         if (
             "MIGRATION" in argument_object.setupmode.mode

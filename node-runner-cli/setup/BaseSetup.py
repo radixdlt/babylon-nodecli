@@ -141,8 +141,8 @@ class BaseSetup:
         return keydetails
 
     @staticmethod
-    def ask_engine_state_api():
-        return Prompts.ask_engine_state_api()
+    def ask_engine_state_api(auto_approve: bool):
+        return Prompts.ask_engine_state_api(auto_approve)
 
     @staticmethod
     def setup_node_optimisation_config(
