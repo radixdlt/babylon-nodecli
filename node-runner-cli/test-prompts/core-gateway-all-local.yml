@@ -9,6 +9,7 @@
 - input_ledger_path: "/tmp/babylon-ledger"
 - core_nginx_setup: "true"
 - setup_gateway: N
+- enable_engine_state_api: N
 #- input_core_api_address: "http://core_node"
 #- core_api_node_name: "core"
 #- postgres_location: "local"

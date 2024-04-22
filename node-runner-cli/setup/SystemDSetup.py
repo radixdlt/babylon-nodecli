@@ -513,6 +513,7 @@ class SystemDSetup(BaseSetup):
         systemd_config.core_node.keydetails = BaseSetup.ask_keydetails(
             argument_object.keystore_password, argument_object.new_keystore
         )
+        systemd_config.core_node.engine_state_enabled = BaseSetup.ask_engine_state_api()
         return systemd_config.core_node
 
     @staticmethod

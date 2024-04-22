@@ -141,6 +141,10 @@ class BaseSetup:
         return keydetails
 
     @staticmethod
+    def ask_engine_state_api():
+        return Prompts.ask_engine_state_api()
+
+    @staticmethod
     def setup_node_optimisation_config(
         version, setup_ulimit: bool, setup_swap_space_argument: bool, swap_space: str
     ):

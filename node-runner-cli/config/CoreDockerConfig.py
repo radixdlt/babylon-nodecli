@@ -22,6 +22,9 @@ class CoreDockerConfig(BaseConfig):
         self.trusted_node: str = ""
         self.memory_limit: str = "14000m"
         self.validator_address: str = ""
+        self.engine_state_enabled: str = "false"
+        self.engine_state_port: str = "3336"
+        self.engine_state_address: str = "0.0.0.0"
         self.java_opts: str = (
             "--enable-preview -server -Xms12g -Xmx12g  "
             "-XX:MaxDirectMemorySize=2048m "
