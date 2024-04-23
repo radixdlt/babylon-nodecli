@@ -78,8 +78,10 @@ services:
     {% endif %}
       RADIXDLT_GATEWAY_API_ENABLE: '{{common_config.nginx_settings.protect_gateway or 'false'}}'
       RADIXDLT_GATEWAY_BEHIND_AUTH: '{{common_config.nginx_settings.gateway_behind_auth or 'false'}}'
+    {% if core_node is not none and core_node is defined %}
       RADIXDLT_ENGINE_STATE_ENABLE: '{{core_node.engine_state_enabled or 'false'}}'
       RADIXDLT_ENGINE_STATE_PORT: '{{core_node.engine_state_port}}'
+    {% endif %}
     image: {{common_config.nginx_settings.repo}}:{{common_config.nginx_settings.release}}
     ports:
     - 443:443
