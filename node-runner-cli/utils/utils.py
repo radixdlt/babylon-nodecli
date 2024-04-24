@@ -339,7 +339,7 @@ class Helpers:
         if not prompt_feed:
             return input(f"\n{bcolors.WARNING}{question}{bcolors.ENDC}")
         else:
-            print("Got from promptfeeder")
+            print(f"Got from question_key from promptfeeder {question_key}")
             print(f"Question is {question}")
             print(f"Answer is {prompt_feed}")
             return prompt_feed
