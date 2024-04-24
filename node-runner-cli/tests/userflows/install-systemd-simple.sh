@@ -114,7 +114,7 @@ echo "Checking radixdlt service status again"
 sudo systemctl status radixdlt-node.service --no-pager | true
 
 echo "Checking nginx service status again"
-sudo systemctl status nginx.service --no-pager| true
+sudo systemctl status nginx.service --no-pager | true
 
 echo "Starting systemd service"
 ./babylonnode systemd start

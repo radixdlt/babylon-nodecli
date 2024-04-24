@@ -24,7 +24,7 @@ class CoreSystemdConfig(BaseConfig):
         self.node_dir: str = "/etc/radixdlt/node"
         self.node_secrets_dir: str = "/etc/radixdlt/node/secrets"
         self.validator_address: str = ""
-        self.engine_state_enabled: str = "false"
+        self.engine_state_enabled: bool = False
         self.engine_state_port: str = "3336"
         self.engine_state_address: str = "0.0.0.0"
         self.java_opts: str = (

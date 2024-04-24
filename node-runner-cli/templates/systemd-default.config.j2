@@ -42,3 +42,12 @@ genesis.olympia.node_end_state_api_auth_password={{migration.olympia_node_auth_p
 genesis.olympia.node_bech32_address={{migration.olympia_node_bech32_address}}
 {% endif %}
 {% endif %}
+
+
+{% if core_node.engine_state_enabled %}
+api.engine_state.port={{core_node.engine_state_port}}
+api.engine_state.bind_address={{core_node.engine_state_address}}
+db.local_transaction_execution_index.enable={{core_node.engine_state_enabled}}
+db.re_node_listing_indices.enable={{core_node.engine_state_enabled}}
+db.historical_substate_values.enable=60000
+{% endif %}
