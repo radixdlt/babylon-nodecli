@@ -17,7 +17,7 @@ RUN set -ex \
     && curl https://pyenv.run | bash
 
 RUN /root/.pyenv/bin/pyenv install -v 3.10.6
-RUN pip install pipenv
+RUN pip install pipenv==2023.7.23
 
 WORKDIR /app
 COPY Pipfile Pipfile.lock /app/
@@ -25,6 +25,7 @@ RUN PIPENV_VENV_IN_PROJECT=1 pipenv --python=/root/.pyenv/versions/3.10.6/bin/py
 RUN pipenv --python=/root/.pyenv/versions/3.10.6/bin/python run pip install pyinstaller==4.10
 
 COPY . /app
+RUN rm /app/.venv/lib/python3.10/site-packages/_pyinstaller_hooks_contrib/hooks/stdhooks/hook-cryptography.py
 RUN pipenv run --python=/root/.pyenv/versions/3.10.6/bin/python pyinstaller --onefile --windowed babylonnode.spec
 
 RUN DISABLE_VERSION_CHECK=true /app/dist/babylonnode version
