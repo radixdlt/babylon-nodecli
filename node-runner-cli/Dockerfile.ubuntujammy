@@ -19,11 +19,10 @@ RUN pip install pipenv==2023.7.23
 WORKDIR /app
 COPY Pipfile Pipfile.lock /app/
 RUN PIPENV_VENV_IN_PROJECT=1 pipenv run pipenv install
-RUN pipenv run pip install pyinstaller==4.10
+RUN pipenv run pip install pyinstaller
 
 COPY . /app
-RUN rm /app/.venv/lib/python3.10/site-packages/_pyinstaller_hooks_contrib/hooks/stdhooks/hook-cryptography.py
-RUN pipenv run pyinstaller --onefile --windowed babylonnode.spec
+RUN pipenv run pyinstaller babylonnode.spec
 
 RUN DISABLE_VERSION_CHECK=true /app/dist/babylonnode version
 
