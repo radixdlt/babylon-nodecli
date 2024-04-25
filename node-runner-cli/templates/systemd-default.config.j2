@@ -47,7 +47,7 @@ genesis.olympia.node_bech32_address={{migration.olympia_node_bech32_address}}
 {% if core_node.engine_state_enabled %}
 api.engine_state.port={{core_node.engine_state_port}}
 api.engine_state.bind_address={{core_node.engine_state_address}}
-db.local_transaction_execution_index.enable={{core_node.engine_state_enabled}}
 db.re_node_listing_indices.enable={{core_node.engine_state_enabled}}
-db.historical_substate_values.enable=60000
+db.historical_substate_values.enable={{core_node.engine_state_enabled}}
+state_hash_tree.state_version_history_length=60000
 {% endif %}
