@@ -9,3 +9,4 @@
 - input_ledger_path: "/tmp/babylon-ledger"
 - core_nginx_setup: "false"
 - setup_gateway: "false"
+- enable_engine_state_api: N

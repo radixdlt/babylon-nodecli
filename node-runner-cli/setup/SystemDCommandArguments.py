@@ -21,6 +21,7 @@ class SystemDConfigArguments:
     networkid: str
     hostip: str
     validator: str
+    auto_approve: bool
 
     def __init__(self, args):
         validate_ip(args.hostip)
@@ -44,6 +45,7 @@ class SystemDConfigArguments:
         self.config_file = f"{args.configdir}/config.yaml"
         self.networkid = args.networkid
         self.validator = args.validator
+        self.auto_approve = args.autoapprove
 
 
 def validate_ip(hostip: str):

@@ -129,6 +129,9 @@ curl -X POST -k -u "gateway:${NGINX_GATEWAY_PASSWORD}" https://localhost/status/
 echo "Metrics endpoint"
 curl -k -f -u "metrics:${NGINX_METRICS_PASSWORD}" https://localhost/gateway/metrics
 
+echo "Test engine state api"
+curl -v -k -u "admin:${NGINX_ADMIN_PASSWORD}" -X POST --header "Content-Type: application/json" https://localhost:443/engine-state/entity/info --data '{"entity_address": "account_rdx12y386tpv29ndwslkf4drm9d5tsn6eulxg2uuxjq5ykhanuudcs7827"}'
+
 # Endpoint does not exist
 #curl -k --user "gateway:${NGINX_GATEWAY_PASSWORD}" https://localhost/token/native --header 'Content-Type: application/json' -d '{ "network_identifier":{"network":"${NETWORK_NAME}"}}'
 

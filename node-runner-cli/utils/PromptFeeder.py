@@ -41,6 +41,7 @@ class QuestionKeys:
     genesis_bin_data_file = "genesis_bin_data_file"
     have_validator_address = "have_validator_address"
     validator_address = "validator_address"
+    enable_engine_state_api = "enable_engine_state_api"
 
 
 class PromptFeeder:

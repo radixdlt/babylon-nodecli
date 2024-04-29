@@ -9,3 +9,4 @@
 - core_nginx_setup: "true"
 - setup_gateway: Y
 - input_nginx_release: "development-latest"
+- enable_engine_state_api: N

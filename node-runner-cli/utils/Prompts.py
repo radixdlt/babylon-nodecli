@@ -249,6 +249,19 @@ class Prompts:
         return keyfile_name
 
     @staticmethod
+    def ask_engine_state_api(auto_approve: bool) -> bool:
+        if auto_approve:
+            return False
+        answer = Helpers.input_guestion(
+            "Do you want to enable the engine state api? (Y/N) (default: false):",
+            QuestionKeys.enable_engine_state_api
+        )
+        if answer == "":
+            return False
+        else:
+            return True
+
+    @staticmethod
     def ask_trusted_node() -> str:
         Helpers.section_headline("Trusted node settings")
         # Todo: add a map of trusted nodes for each network and propose defaults for the selected network id only.

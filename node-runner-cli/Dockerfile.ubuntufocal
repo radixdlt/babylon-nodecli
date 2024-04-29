@@ -17,15 +17,15 @@ RUN set -ex \
     && curl https://pyenv.run | bash
 
 RUN /root/.pyenv/bin/pyenv install -v 3.10.6
-RUN pip install pipenv
+RUN pip install pipenv==2023.7.23
 
 WORKDIR /app
 COPY Pipfile Pipfile.lock /app/
 RUN PIPENV_VENV_IN_PROJECT=1 pipenv --python=/root/.pyenv/versions/3.10.6/bin/python run pipenv install
-RUN pipenv --python=/root/.pyenv/versions/3.10.6/bin/python run pip install pyinstaller==4.10
+RUN pipenv --python=/root/.pyenv/versions/3.10.6/bin/python run pip install pyinstaller
 
 COPY . /app
-RUN pipenv run --python=/root/.pyenv/versions/3.10.6/bin/python pyinstaller --onefile --windowed babylonnode.spec
+RUN pipenv run --python=/root/.pyenv/versions/3.10.6/bin/python pyinstaller babylonnode.spec
 
 RUN DISABLE_VERSION_CHECK=true /app/dist/babylonnode version
 

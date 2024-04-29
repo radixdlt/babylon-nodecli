@@ -9,6 +9,8 @@
 - input_ledger_path: "/tmp/babylon-ledger"
 - core_nginx_setup: "true"
 - setup_gateway: N
+- input_nginx_release: "development-latest"
+- enable_engine_state_api: N
 #- input_core_api_address: "http://core_node"
 #- core_api_node_name: "core"
 #- postgres_location: "local"
@@ -18,4 +20,4 @@
 #- aggregator_release: "1.1.7"
 #- gateway_release: "1.1.7"
 #- gateway_nginx_setup: "true"
-- input_nginx_release: "development-latest"
+
