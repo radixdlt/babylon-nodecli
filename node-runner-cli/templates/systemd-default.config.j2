@@ -22,12 +22,12 @@ network.host_ip={{common_config.host_ip}}
 
 log.level=debug
 
-api.port=3333
+api.port={{core_node.core_api_port}}
 api.transactions.enable=true
 api.sign.enable=true
 api.bind.address=0.0.0.0
 
-api.system.port=3334
+api.system.port={{core_node.system_api_port}}
 api.system.bind_address=0.0.0.0
 
 db.location=/home/radixdlt/babylon-ledger
