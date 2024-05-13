@@ -15,7 +15,7 @@ class GenesisConfig:
 
     @staticmethod
     def copy_genesis_file(
-        genesis_bin_data_file: str, genesis_files="testnet-genesis"
+            genesis_bin_data_file: str, genesis_files="testnet-genesis"
     ) -> str:
         bundle_dir = getattr(sys, "_MEIPASS", os.getcwd())
         path_to_genesis_bin_file = getenv(

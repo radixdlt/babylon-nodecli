@@ -1,8 +1,6 @@
 import json
-import os
 
 from config.BaseConfig import BaseConfig, SetupMode
-from config.EnvVars import NGINX_BINARY_OVERIDE
 from config.Nginx import SystemdNginxConfig
 from github import github
 from utils.Network import Network

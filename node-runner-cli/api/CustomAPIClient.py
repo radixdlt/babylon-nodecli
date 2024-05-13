@@ -19,9 +19,9 @@ class CustomAPIClient:
         self.default_headers[header_name] = header_value
 
     def prepare(
-        self,
-        http_method,
-        http_path,
+            self,
+            http_method,
+            http_path,
     ):
         req = requests.Request(
             http_method, f"{self._base_path}{http_path}", headers=self.default_headers

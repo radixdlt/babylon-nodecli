@@ -111,7 +111,7 @@ class SystemDConfig(BaseConfig):
         f1.write(f2.read())
 
     def create_service_file(
-        self, service_file_path="/etc/systemd/system/radixdlt-node.service"
+            self, service_file_path="/etc/systemd/system/radixdlt-node.service"
     ):
         # This may need to be moved to jinja template
         tmp_service: str = "/tmp/radixdlt-node.service"
