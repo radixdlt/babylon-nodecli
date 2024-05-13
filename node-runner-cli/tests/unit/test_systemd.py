@@ -42,25 +42,25 @@ class SystemdUnitTests(unittest.TestCase):
     @unittest.skip("Can only be executed on Ubuntu")
     def test_systemd_config_can_run_without_prompt(self):
         with patch(
-            "sys.argv",
-            [
-                "main",
-                "systemd",
-                "config",
-                "-a",
-                "-t",
-                "somenode",
-                "-i",
-                "123.123.123.123",
-                "-k",
-                "password",
-                "-n",
-                "S",
-                "-d",
-                "/tmp/config",
-                "-dd",
-                "/tmp/babylon-ledger",
-            ],
+                "sys.argv",
+                [
+                    "main",
+                    "systemd",
+                    "config",
+                    "-a",
+                    "-t",
+                    "somenode",
+                    "-i",
+                    "123.123.123.123",
+                    "-k",
+                    "password",
+                    "-n",
+                    "S",
+                    "-d",
+                    "/tmp/config",
+                    "-dd",
+                    "/tmp/babylon-ledger",
+                ],
         ):
             main()
 
@@ -111,48 +111,48 @@ class SystemdUnitTests(unittest.TestCase):
         )
         with patch("builtins.input", side_effect=["Y"]):
             with patch(
-                "sys.argv",
-                [
-                    "main",
-                    "systemd",
-                    "config",
-                    "-m",
-                    "CORE",
-                    "-i",
-                    "18.133.170.30",
-                    "-t",
-                    "radix://tn1q28eygvxshszxk48jhjxdmyne06m3x6hfyvxg7a45qt8cksffx6z7uu6392@15.236.228.96",
-                    "-n",
-                    "2",
-                    "-k",
-                    "radix",
-                    "-d",
-                    "/tmp",
-                    "-dd",
-                    "/tmp",
-                    "-v",
-                    "randomvalidatoraddress",
-                    "-nk",
-                    "-a",
-                    "-r",
-                    "1",
-                ],
+                    "sys.argv",
+                    [
+                        "main",
+                        "systemd",
+                        "config",
+                        "-m",
+                        "CORE",
+                        "-i",
+                        "18.133.170.30",
+                        "-t",
+                        "radix://tn1q28eygvxshszxk48jhjxdmyne06m3x6hfyvxg7a45qt8cksffx6z7uu6392@15.236.228.96",
+                        "-n",
+                        "2",
+                        "-k",
+                        "radix",
+                        "-d",
+                        "/tmp",
+                        "-dd",
+                        "/tmp",
+                        "-v",
+                        "randomvalidatoraddress",
+                        "-nk",
+                        "-a",
+                        "-r",
+                        "1",
+                    ],
             ):
                 main()
 
     @unittest.skip("For verification only")
     def test_systemd_install_manual(self):
         with patch(
-            "sys.argv",
-            [
-                "main",
-                "systemd",
-                "install",
-                "-a",
-                "-m",
-                "-f",
-                "/tmp/babylon-node/test-config.yaml",
-            ],
+                "sys.argv",
+                [
+                    "main",
+                    "systemd",
+                    "install",
+                    "-a",
+                    "-m",
+                    "-f",
+                    "/tmp/babylon-node/test-config.yaml",
+                ],
         ):
             main()
 
