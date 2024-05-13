@@ -196,10 +196,13 @@ network.host_ip=1.1.1.1
 
 log.level=debug
 
-api.port=3334
+api.port=3333
 api.transactions.enable=true
 api.sign.enable=true
 api.bind.address=0.0.0.0
+
+api.system.port=3334
+api.system.bind_address=0.0.0.0
 
 db.location=/home/radixdlt/babylon-ledger
 
@@ -247,10 +250,13 @@ network.host_ip=1.1.1.1
 
 log.level=debug
 
-api.port=3334
+api.port=3333
 api.transactions.enable=true
 api.sign.enable=true
 api.bind.address=0.0.0.0
+
+api.system.port=3334
+api.system.bind_address=0.0.0.0
 
 db.location=/home/radixdlt/babylon-ledger
 """
@@ -298,10 +304,13 @@ network.host_ip=1.1.1.1
 
 log.level=debug
 
-api.port=3334
+api.port=3333
 api.transactions.enable=true
 api.sign.enable=true
 api.bind.address=0.0.0.0
+
+api.system.port=3334
+api.system.bind_address=0.0.0.0
 
 db.location=/home/radixdlt/babylon-ledger
 

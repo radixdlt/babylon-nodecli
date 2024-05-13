@@ -8,6 +8,7 @@ services:
         -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts
         -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
       RADIXDLT_CORE_API_PORT: 3333
+      RADIXDLT_SYSTEM_API_PORT: 3334
       RADIXDLT_GENESIS_DATA_FILE: /home/radixdlt/genesis_data_file.bin
       RADIXDLT_LOG_LEVEL: info
       RADIXDLT_NETWORK_ID: 33
