@@ -404,7 +404,7 @@ class Prompts:
 
     @staticmethod
     def confirm_version_updates(
-        config_version, latest_version, software="CORE", autoapprove=False
+            config_version, latest_version, software="CORE", autoapprove=False
     ):
         if autoapprove:
             return latest_version

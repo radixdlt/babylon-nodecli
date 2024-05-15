@@ -22,10 +22,13 @@ network.host_ip={{common_config.host_ip}}
 
 log.level=debug
 
-api.port=3334
+api.port={{core_node.core_api_port}}
 api.transactions.enable=true
 api.sign.enable=true
 api.bind.address=0.0.0.0
+
+api.system.port={{core_node.system_api_port}}
+api.system.bind_address=0.0.0.0
 
 db.location=/home/radixdlt/babylon-ledger
 
@@ -45,7 +48,7 @@ genesis.olympia.node_bech32_address={{migration.olympia_node_bech32_address}}
 
 
 {% if core_node.engine_state_enabled %}
-api.engine_state.port={{core_node.engine_state_port}}
+api.engine_state.port={{core_node.engine_state_api_port}}
 api.engine_state.bind_address={{core_node.engine_state_address}}
 db.re_node_listing_indices.enable={{core_node.engine_state_enabled}}
 db.historical_substate_values.enable={{core_node.engine_state_enabled}}

@@ -46,16 +46,16 @@ jobs:
         run: |
           cd node-runner-cli/
           pipenv install --python /usr/local/bin/python
-          snyk auth ${{ env.SNYK_TOKEN }}
-          snyk test --file=Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --severity-threshold=critical
+          snyk auth "${{ env.SNYK_TOKEN }}"
+          snyk test --file=Pipfile --org="${{ env.SNYK_NETWORK_ORG_ID }}" --severity-threshold=critical
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Run Snyk to check for code vulnerabilities
-        run: snyk code test --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --severity-threshold=high
+        run: snyk code test --file=./node-runner-cli/Pipfile --org="${{ env.SNYK_NETWORK_ORG_ID }}" --severity-threshold=high
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Test SBOM generation
-        run: snyk sbom --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --format=cyclonedx1.4+json > sbom.json
+        run: snyk sbom --file=./node-runner-cli/Pipfile --org="${{ env.SNYK_NETWORK_ORG_ID }}" --format=cyclonedx1.4+json > sbom.json
 
   snyk-monitor:
     runs-on: ubuntu-latest
@@ -95,11 +95,11 @@ jobs:
         run: |
           npm install snyk -g
           snyk -v
-          snyk auth ${{ env.SNYK_TOKEN }}
+          snyk auth "${{ env.SNYK_TOKEN }}"
       - name: Enable Snyk online monitoring - Devops
-        run: snyk monitor --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_DEVOPS_ORG_ID }} --target-reference=${{ github.ref_name }}
+        run: snyk monitor --file=./node-runner-cli/Pipfile --org="${{ env.SNYK_DEVOPS_ORG_ID }}" --target-reference="${{ github.ref_name }}"
       - name: Enable Snyk online monitoring - Network
-        run: snyk monitor --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --target-reference=${{ github.ref_name }}
+        run: snyk monitor --file=./node-runner-cli/Pipfile --org="${{ env.SNYK_NETWORK_ORG_ID }}" --target-reference="${{ github.ref_name }}"
 
   upload-sbom:
     runs-on: ubuntu-latest
@@ -134,9 +134,9 @@ jobs:
         run: |
           npm install snyk -g
           snyk -v
-          snyk auth ${{ env.SNYK_TOKEN }}
+          snyk auth "${{ env.SNYK_TOKEN }}"
       - name: Generate SBOM
-        run: snyk sbom --file=./node-runner-cli/Pipfile --org=${{ env.SNYK_NETWORK_ORG_ID }} --format=cyclonedx1.4+json > sbom.json
+        run: snyk sbom --file=./node-runner-cli/Pipfile --org="${{ env.SNYK_NETWORK_ORG_ID }}" --format=cyclonedx1.4+json > sbom.json
       - name: Upload SBOM
         uses: RDXWorks-actions/action-gh-release@master
         with:
@@ -339,8 +339,8 @@ jobs:
           mkdir -p "$HOME/node-config"
           export PROMPT_FEEDS="node-runner-cli/test-prompts/core-gateway-all-local.yml"
           ./babylonnode docker config -m DETAILED \
-           -d $HOME/node-config \
-           -k $KEYSTORE_PASSWORD -nk -a
+           -d "$HOME/node-config" \
+           -k "$KEYSTORE_PASSWORD" -nk -a
         env:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
