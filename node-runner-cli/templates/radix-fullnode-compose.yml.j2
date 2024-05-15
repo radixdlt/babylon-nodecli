@@ -39,7 +39,7 @@ services:
       {% if core_node.validator_address is defined %}
       RADIXDLT_CONSENSUS_VALIDATOR_ADDRESS: '{{core_node.validator_address}}'
       {% endif %}
-      RADIXDLT_ENGINE_STATE_API_PORT: {{core_node.engine_state_port}}
+      RADIXDLT_ENGINE_STATE_API_PORT: {{core_node.engine_state_api_port}}
       RADIXDLT_ENGINE_STATE_API_BIND_ADDRESS: {{core_node.engine_state_address}}
     image: {{core_node.repo}}:{{core_node.core_release}}
     init: true
@@ -80,7 +80,7 @@ services:
       RADIXDLT_GATEWAY_BEHIND_AUTH: '{{common_config.nginx_settings.gateway_behind_auth or 'false'}}'
     {% if core_node is not none and core_node is defined %}
       RADIXDLT_ENGINE_STATE_ENABLE: '{{core_node.engine_state_enabled or 'false'}}'
-      RADIXDLT_ENGINE_STATE_PORT: '{{core_node.engine_state_port}}'
+      RADIXDLT_engine_state_api_port: '{{core_node.engine_state_api_port}}'
     {% endif %}
     image: {{common_config.nginx_settings.repo}}:{{common_config.nginx_settings.release}}
     ports:

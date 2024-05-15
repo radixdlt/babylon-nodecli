@@ -25,7 +25,7 @@ class CoreDockerConfig(BaseConfig):
         self.engine_state_enabled: bool = False
         self.core_api_port: str = "3333"
         self.system_api_port: str = "3334"
-        self.engine_state_port: str = "3336"
+        self.engine_state_api_port: str = "3336"
         self.engine_state_address: str = "0.0.0.0"
         self.java_opts: str = (
             "--enable-preview -server -Xms12g -Xmx12g  "
