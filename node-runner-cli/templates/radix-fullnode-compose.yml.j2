@@ -40,7 +40,7 @@ services:
       RADIXDLT_CONSENSUS_VALIDATOR_ADDRESS: '{{core_node.validator_address}}'
       {% endif %}
       RADIXDLT_ENGINE_STATE_API_PORT: {{core_node.engine_state_api_port}}
-      RADIXDLT_ENGINE_STATE_API_BIND_ADDRESS: {{core_node.engine_state_address}}
+      RADIXDLT_ENGINE_STATE_API_BIND_ADDRESS: {{core_node.engine_state_api_address}}
     image: {{core_node.repo}}:{{core_node.core_release}}
     init: true
     mem_limit: {{core_node.memory_limit or '14000m'}}
