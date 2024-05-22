@@ -399,14 +399,14 @@ class SystemDSetup(BaseSetup):
     def compare_old_and_new_config(config_file: str, systemd_config: SystemDConfig):
         old_config_object = SystemDSetup.load_settings(config_file)
         old_config = old_config_object.to_dict()
-        config_to_dump = systemd_config.to_dict()
         if old_config is not None:
             if len(old_config) != 0:
+                differences = systemd_config.compare_to_dict(old_config)
                 print(
                     f"""
                         {Helpers.section_headline("Differences")}
                         Difference between existing config file and new config that you are creating
-                        {dict(DeepDiff(old_config, config_to_dump))}
+                        {differences}
                           """
                 )
 

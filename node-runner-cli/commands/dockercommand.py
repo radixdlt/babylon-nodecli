@@ -242,6 +242,9 @@ def install(args):
 
     ########## Update existing Config
     docker_config: DockerConfig = DockerSetup.load_settings(argument_object.config_file)
+
+    original_config_dict = docker_config.to_dict()
+
     docker_config_updated_versions = (
         DockerSetup.update_versions(docker_config, argument_object.autoapprove)
         if argument_object.update
@@ -251,8 +254,9 @@ def install(args):
     docker_config_updated_versions = DockerSetup.check_set_passwords(
         docker_config_updated_versions
     )
+
     DockerSetup.confirm_config_changes(
-        argument_object, docker_config, docker_config_updated_versions
+        argument_object, original_config_dict, docker_config_updated_versions
     )
 
     ########## Install dependent services

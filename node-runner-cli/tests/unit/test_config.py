@@ -3,9 +3,15 @@ import unittest
 
 import yaml
 from yaml import UnsafeLoader
+from deepdiff import DeepDiff
 
+import copy
+
+from config.DockerConfig import DockerConfig
 from config.Nginx import SystemdNginxConfig
 from config.SystemDConfig import SystemDConfig
+from setup.DockerCommandArguments import DockerInstallArguments
+from setup.DockerSetup import DockerSetup
 from utils.Network import Network
 
 
@@ -39,6 +45,29 @@ class ConfigUnitTests(unittest.TestCase):
         self.assertEqual(Network.validate_network_id("S"), 2)
         self.assertEqual(Network.validate_network_id("stokenet"), 2)
 
+
+    def test_config_is_changed_and_compared_properly(self):
+        config: DockerConfig = DockerConfig({})
+        config_dict = config.to_dict()
+        config_differences = dict(
+            DeepDiff(config_dict, config_dict)
+        )
+        # Compares to 0 differences
+        self.assertEqual(len(config_differences),0)
+
+        config.core_node.core_release = "otherrelease"
+        updated_config_dict = config.to_dict()
+        config_differences = dict(
+            DeepDiff(config_dict, updated_config_dict)
+        )
+        # Compares to 0 differences
+        self.assertEqual(len(config_differences), 1)
+
+    def test_compare_to_dict(self):
+        config: DockerConfig = DockerConfig({})
+        config_dict = config.to_dict()
+        config.core_node.core_release = "randomvalue"
+        self.assertTrue(len(config.compare_to_dict(config_dict)) != 0)
 
 def suite():
     """This defines all the tests of a module"""

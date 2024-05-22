@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import yaml
 
+from deepdiff import DeepDiff
+
 
 class BaseConfig:
     def __iter__(self):
@@ -79,6 +81,16 @@ class BaseConfig:
             f.write("# than manually edit this file\n")
             yaml.dump(config_to_dump, f, sort_keys=True, default_flow_style=False)
 
+
+    def compare_to_dict(self, config_as_dict: dict) -> dict:
+        return dict(
+            DeepDiff(config_as_dict, self.to_dict())
+        )
+
+    def compare_to_object(self, config_object: BaseConfig) -> dict:
+        return dict(
+            DeepDiff(config_object.to_dict(), self.to_dict())
+        )
 
 class SetupMode:
     _instance = None
