@@ -213,10 +213,9 @@ class Helpers:
     @staticmethod
     def parse_trustednode(trustednode):
         import re
+
         regex = r"radix://(.*)@((\d{1,3}\.){3}\d{1,3}|([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,})$"
-        if not bool(
-            re.match(regex, trustednode)
-        ):
+        if not bool(re.match(regex, trustednode)):
             print(
                 f"Trusted node {trustednode} does match pattern radix://public_key@ip. Please enter right value"
             )

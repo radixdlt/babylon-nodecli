@@ -52,8 +52,8 @@ class BaseConfig:
         for attr, value in class_variables.items():
             returning_dict[attr] = ""
             if (
-                    type(self.__getattribute__(attr)) not in (str, int, bool, dict)
-                    and self.__getattribute__(attr) is not None
+                type(self.__getattribute__(attr)) not in (str, int, bool, dict)
+                and self.__getattribute__(attr) is not None
             ):
                 returning_dict[attr] = self.__getattribute__(attr).to_dict()
             else:
