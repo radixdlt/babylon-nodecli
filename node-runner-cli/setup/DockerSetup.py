@@ -34,7 +34,6 @@ def print_questionary_header(config_file):
     )
 
 
-
 class DockerSetup(BaseSetup):
 
     @staticmethod
@@ -331,8 +330,9 @@ class DockerSetup(BaseSetup):
                 docker_config.common_config.ask_enable_nginx_for_core(
                     argument_object.nginx_on_core
                 )
-                docker_config.core_node.engine_state_enabled = BaseSetup.ask_engine_state_api(
-                    argument_object.autoapprove)
+                docker_config.core_node.engine_state_enabled = (
+                    BaseSetup.ask_engine_state_api(argument_object.autoapprove)
+                )
             else:
                 del docker_config.core_node
 
@@ -345,7 +345,6 @@ class DockerSetup(BaseSetup):
                 )
             else:
                 del docker_config.gateway
-
 
         if (
             "MIGRATION" in argument_object.setupmode.mode
@@ -403,7 +402,7 @@ class DockerSetup(BaseSetup):
     def confirm_config_changes(
         argument_object: DockerInstallArguments,
         original_config_dict: dict,
-        updated_config_object: DockerConfig ,
+        updated_config_object: DockerConfig,
     ):
         config_differences = updated_config_object.compare_to_dict(original_config_dict)
 
@@ -424,13 +423,17 @@ class DockerSetup(BaseSetup):
     def confirm_docker_compose_file_changes(
         docker_config: DockerConfig, autoapprove: bool
     ):
-        docker_compose_yaml_rendered: yaml = DockerSetup.render_docker_compose(docker_config)
+        docker_compose_yaml_rendered: yaml = DockerSetup.render_docker_compose(
+            docker_config
+        )
         backup_time = Helpers.get_current_date_time()
         docker_compose_yaml_from_file = DockerSetup.get_existing_compose_file(
             docker_config.common_config.docker_compose
         )
         compose_file = docker_config.common_config.docker_compose
-        compose_file_difference = dict(DeepDiff(docker_compose_yaml_from_file, docker_compose_yaml_rendered))
+        compose_file_difference = dict(
+            DeepDiff(docker_compose_yaml_from_file, docker_compose_yaml_rendered)
+        )
         if len(compose_file_difference) != 0:
             logger.info(
                 f"""
@@ -450,7 +453,9 @@ class DockerSetup(BaseSetup):
             if Helpers.check_Yes(to_update) or autoapprove:
                 if os.path.exists(compose_file):
                     Helpers.backup_file(compose_file, f"{compose_file}_{backup_time}")
-                DockerSetup.save_compose_file(compose_file, docker_compose_yaml_rendered)
+                DockerSetup.save_compose_file(
+                    compose_file, docker_compose_yaml_rendered
+                )
         run_shell_command(f"cat {compose_file}", shell=True)
         return compose_file
 

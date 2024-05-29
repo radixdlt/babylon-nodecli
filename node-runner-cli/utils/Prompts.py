@@ -254,7 +254,7 @@ class Prompts:
             return False
         answer = Helpers.input_guestion(
             "Do you want to enable the engine state api? (Y/N) (default: false):",
-            QuestionKeys.enable_engine_state_api
+            QuestionKeys.enable_engine_state_api,
         )
         if answer == "":
             return False
@@ -404,7 +404,7 @@ class Prompts:
 
     @staticmethod
     def confirm_version_updates(
-            config_version, latest_version, software="CORE", autoapprove=False
+        config_version, latest_version, software="CORE", autoapprove=False
     ):
         if autoapprove:
             return latest_version

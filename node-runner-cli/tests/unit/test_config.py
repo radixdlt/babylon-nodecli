@@ -49,6 +49,7 @@ class ConfigUnitTests(unittest.TestCase):
         config_dict = config.to_dict()
         self.assertTrue(len(config.compare_to_dict(config_dict)) == 0)
 
+
 def suite():
     """This defines all the tests of a module"""
     suite = unittest.TestSuite()

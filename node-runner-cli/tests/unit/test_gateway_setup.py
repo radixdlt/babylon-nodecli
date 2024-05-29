@@ -209,7 +209,7 @@ services:
                 self.assertEqual(f1.read(), f2.read())
 
     def expect_ask_gateway_inputs_get_inserted_into_object(
-            self, config, questionary_keyboard_input
+        self, config, questionary_keyboard_input
     ):
         self.assertEqual(
             questionary_keyboard_input[0],
