@@ -3,7 +3,9 @@ import unittest
 
 import yaml
 from yaml import UnsafeLoader
+from deepdiff import DeepDiff
 
+from config.DockerConfig import DockerConfig
 from config.Nginx import SystemdNginxConfig
 from config.SystemDConfig import SystemDConfig
 from utils.Network import Network
@@ -38,6 +40,14 @@ class ConfigUnitTests(unittest.TestCase):
         self.assertEqual(Network.validate_network_id("s"), 2)
         self.assertEqual(Network.validate_network_id("S"), 2)
         self.assertEqual(Network.validate_network_id("stokenet"), 2)
+
+    def test_compare_to_dict(self):
+        config: DockerConfig = DockerConfig({})
+        config_dict = config.to_dict()
+        config.core_node.core_release = "randomvalue"
+        self.assertTrue(len(config.compare_to_dict(config_dict)) != 0)
+        config_dict = config.to_dict()
+        self.assertTrue(len(config.compare_to_dict(config_dict)) == 0)
 
 
 def suite():

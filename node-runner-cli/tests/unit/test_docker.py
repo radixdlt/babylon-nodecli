@@ -15,24 +15,24 @@ class DockerUnitTests(unittest.TestCase):
     def test_docker_config(self, mockout):
         urllib3.disable_warnings()
         with patch(
-                "builtins.input",
-                side_effect=["N", "N", "/home/runner/docker-compose.yml", "N"],
+            "builtins.input",
+            side_effect=["N", "N", "/home/runner/docker-compose.yml", "N"],
         ):
             with patch(
-                    "sys.argv",
-                    [
-                        "main",
-                        "docker",
-                        "config",
-                        "-m",
-                        "DETAILED",
-                        "-n",
-                        "2",
-                        "-k",
-                        "radix",
-                        "-nk",
-                        "-a",
-                    ],
+                "sys.argv",
+                [
+                    "main",
+                    "docker",
+                    "config",
+                    "-m",
+                    "DETAILED",
+                    "-n",
+                    "2",
+                    "-k",
+                    "radix",
+                    "-nk",
+                    "-a",
+                ],
             ):
                 main()
 

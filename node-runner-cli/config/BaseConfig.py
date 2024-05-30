@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import yaml
 
+from deepdiff import DeepDiff
+
 
 class BaseConfig:
     def __iter__(self):
@@ -52,8 +54,8 @@ class BaseConfig:
         for attr, value in class_variables.items():
             returning_dict[attr] = ""
             if (
-                    type(self.__getattribute__(attr)) not in (str, int, bool, dict)
-                    and self.__getattribute__(attr) is not None
+                type(self.__getattribute__(attr)) not in (str, int, bool, dict)
+                and self.__getattribute__(attr) is not None
             ):
                 returning_dict[attr] = self.__getattribute__(attr).to_dict()
             else:
@@ -78,6 +80,12 @@ class BaseConfig:
             f.write("# Please consider re-running config/install commands rather\n")
             f.write("# than manually edit this file\n")
             yaml.dump(config_to_dump, f, sort_keys=True, default_flow_style=False)
+
+    def compare_to_dict(self, config_as_dict: dict) -> dict:
+        return dict(DeepDiff(config_as_dict, self.to_dict()))
+
+    def compare_to_object(self, config_object: BaseConfig) -> dict:
+        return dict(DeepDiff(config_object.to_dict(), self.to_dict()))
 
 
 class SetupMode:

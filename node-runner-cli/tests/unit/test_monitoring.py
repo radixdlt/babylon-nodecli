@@ -67,24 +67,24 @@ class MonitoringTests(unittest.TestCase):
     @mock.patch("sys.stdout", new_callable=StringIO)
     def test_monitoring_config(self, mock_out):
         with mock.patch(
-                "builtins.input",
-                side_effect=["Y", "https://45.152.180.182", "metrics", "testpassword", "n"],
+            "builtins.input",
+            side_effect=["Y", "https://45.152.180.182", "metrics", "testpassword", "n"],
         ):
             with mock.patch("sys.argv", ["main", "monitoring", "config"]):
                 main()
 
         with mock.patch(
-                "sys.argv",
-                ["main", "monitoring", "config", "-m", "MONITOR_CORE", "-cm", "test"],
+            "sys.argv",
+            ["main", "monitoring", "config", "-m", "MONITOR_CORE", "-cm", "test"],
         ):
             main()
 
         with mock.patch(
-                "builtins.input",
-                side_effect=["Y", "https://45.152.180.182", "metrics", "testpassword", "n"],
+            "builtins.input",
+            side_effect=["Y", "https://45.152.180.182", "metrics", "testpassword", "n"],
         ):
             with mock.patch(
-                    "sys.argv", ["main", "monitoring", "config", "-m", "DETAILED"]
+                "sys.argv", ["main", "monitoring", "config", "-m", "DETAILED"]
             ):
                 main()
 
