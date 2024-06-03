@@ -1,0 +1,7 @@
+id: 2f068ab5-008d-425a-94ac-dbe87fbb86c2
+name: babylon-nodecli
+created_at: 2024-06-03T08:48:04.476439+02:00
+group_name: Interfaces
+depfiles:
+- path: ./node-runner-cli/Pipfile.lock
+  type: pipenv
