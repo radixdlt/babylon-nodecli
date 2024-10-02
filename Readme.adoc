@@ -109,5 +109,37 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
+----
 
+== Upgrading Postgres from 12 to 15
+From gateway release 1.7.0, upgrading Postgres is required. Follow the steps below to upgrade Postgres from version 12 to 15:
+
+=== Shutdown the node, and gateway:
+[source, bash]
+----
+./babylonnode docker stop
+----
+
+=== Install the new Postgres 15
+This is part of cli docker install process. The ansible provision.yml is updated to take care of uninstalling the old version and installing the new version. This removes the existing data on gateway and will reingest. So if you running production gateway, suggestion is to setup new instance and switch over to new instance once it is all synced up.
+
+[source, bash]
+----
+./babyonnode docker install
+----
+
+=== Check if node is running:
+For more information on node monitoring and health, refer to the documentation at https://docs.radixdlt.com/docs/node-monitoring-health.
+
+
+=== Check if the gateway is running:
+For more information on ensuring the gateway is running, refer to the documentation at https://docs.radixdlt.com/docs/setup-with-cli#6-make-sure-the-gateway-is-running.
+
+
+=== Gateway still reporting issues
+Both gateway_api and data_aggregator might need a restart. Try below commands
+[source, bash]
+----
+docker compose down data_aggregator gateway_api
+docker compose up data_aggregator gateway_api -d
 ----
