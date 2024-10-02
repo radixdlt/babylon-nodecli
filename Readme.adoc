@@ -126,9 +126,7 @@ From gateway release 1.7.3, upgrading Postgres is required. Follow the steps bel
 ./babyonnode docker install
 ----
 
-3.Check if node is running:
-
-For more information on node monitoring and health, refer to the documentation at https://docs.radixdlt.com/docs/node-monitoring-health.
+3. Check if node is running: For more information on node monitoring and health, refer to the documentation at https://docs.radixdlt.com/docs/node-monitoring-health.
 
 4. Check if the gateway is running:
 For more information on ensuring the gateway is running, refer to the documentation at https://docs.radixdlt.com/docs/setup-with-cli#6-make-sure-the-gateway-is-running.
