@@ -9,7 +9,7 @@
     setup_swap: false
     setup_limits: false
     postgres_local: false
-    postgresql_version: 12
+    postgresql_version: 15
     postgresql_user: postgres
     postgresql_db_name: radixdlt_ledger
   tasks:
@@ -78,6 +78,12 @@
             state: present
             filename: pgdg
 
+        - name: Remove PostgreSQL 12 if installed
+          ansible.builtin.package:
+            name: postgresql-12
+            state: absent
+          ignore_errors: true
+        
         - name: install PostgreSQL
           ansible.builtin.package:
             name:
@@ -86,6 +92,54 @@
               - postgresql-contrib-{{ postgresql_version }}
               - acl
             state: present
+
+        - name: Debug print command pg_lsclusters
+          command: pg_lsclusters
+          register: pg_lsclusters_output
+          changed_when: false
+
+        - name: Print pg_lsclusters output
+          debug:
+            var: pg_lsclusters_output.stdout_lines
+
+        - name: Remove PostgreSQL 12 cluster if exists
+          shell: |
+            pg_lsclusters | grep '12' && pg_dropcluster --stop 12 main
+          ignore_errors: true
+
+        - name: Check if PostgreSQL {{postgresql_version}} is listening on port 5432
+          shell: |
+            ss -ltn | grep ':5432'
+          register: postgres_port_check
+          changed_when: false
+          ignore_errors: true
+
+        - name: Stop PostgreSQL {{postgresql_version}} if it is running
+          service:
+            name: postgresql
+            state: stopped
+          when: postgres_port_check.stdout != ""
+
+        - name: Modify PostgreSQL {{postgresql_version}} to listen on port 5432
+          lineinfile:
+            path: /etc/postgresql/{{ postgresql_version }}/main/postgresql.conf
+            regexp: '^#?port ='
+            line: 'port = 5432'
+            state: present
+
+        - name: Stop PostgreSQL service
+          service:
+            name: postgresql
+            state: stopped
+
+
+        - name: Reload systemd daemon
+          command: systemctl daemon-reload
+
+        - name: Start PostgreSQL {{postgresql_version}}
+          service:
+            name: postgresql
+            state: started
 
         - name: Install psycopg2-binary python package
           ansible.builtin.pip:
