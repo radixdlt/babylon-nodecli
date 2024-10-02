@@ -112,7 +112,7 @@ optional arguments:
 ----
 
 == Upgrading Postgres from 12 to 15
-From release 1.7.3, upgrading Postgres is required. Follow the steps below to upgrade Postgres from version 12 to 15:
+From gateway release 1.7.3, upgrading Postgres is required. Follow the steps below to upgrade Postgres from version 12 to 15:
 
 1. Shutdown the node, and gateway:
 [source, bash]
