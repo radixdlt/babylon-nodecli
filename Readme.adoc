@@ -125,7 +125,7 @@ This is part of cli docker install process. The ansible provision.yml is updated
 
 [source, bash]
 ----
-./babyonnode docker install
+./babylonnode docker install
 ----
 
 === Check if node is running:
@@ -138,6 +138,13 @@ For more information on ensuring the gateway is running, refer to the documentat
 
 === Gateway still reporting issues
 Both gateway_api and data_aggregator might need a restart. Try below commands
+[source, bash]
+----
+./babylonnode docker stop
+./babylonnode docker start
+----
+
+You can also use docker-compose to restart the services
 [source, bash]
 ----
 docker compose down data_aggregator gateway_api
