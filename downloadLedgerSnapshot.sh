@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Ledger default folder
-DATA_DIR="./data"
+DATA_DIR="/data"
 
 # Ensure that the /data directory exists
 if [ ! -d "$DATA_DIR" ]; then

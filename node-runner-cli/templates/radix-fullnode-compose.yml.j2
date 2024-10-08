@@ -6,14 +6,12 @@
 version: '3.8'
 services:
 {% if core_node is not none and core_node is defined %}
-  {% if download-community-snapshot == "true" %}
   download-community-ledger-snapshot:
     build:
       context: .                     
       dockerfile: Dockerfile.ledgerdownloader
       volumes:
-          - ./data:/data
-  {% endif %}
+          - /data:/data
   core:
     cap_add:
     - NET_ADMIN
