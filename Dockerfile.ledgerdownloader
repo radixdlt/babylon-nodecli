@@ -1,0 +1,17 @@
+FROM ubuntu:20.04 as BUILD
+MAINTAINER radixdlt <devops@radixdlt.com>
+
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+    build-essential \
+    curl \
+    bash
+
+# Create a directory to hold the script (optional)
+RUN mkdir -p /usr/local/scripts
+
+# Copy the script from the host into the container
+COPY downloadLedgerSnapshot.sh /usr/local/scripts/downloadLedgerSnapshot.sh
+
+ENTRYPOINT ["/usr/local/scripts/downloadLedgerSnapshot.sh"]
