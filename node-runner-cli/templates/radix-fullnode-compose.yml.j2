@@ -8,14 +8,12 @@ services:
 {% if core_node is not none and core_node is defined %}
   {% if download-community-snapshot == "true" %}
   download-community-ledger-snapshot:
-      command: /downloadLedgerSnapshot.sh
-      environment:
-          <<: *cenv
+    build:
+      context: .                     
+      dockerfile: Dockerfile.ledgerdownloader
       volumes:
-          - ./downloadLedgerSnapshot.sh:/downloadLedgerSnapshot.sh
           - ./data:/data
   {% endif %}
-
   core:
     cap_add:
     - NET_ADMIN
