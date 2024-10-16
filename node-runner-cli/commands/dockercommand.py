@@ -144,6 +144,16 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
             default="",
             choices=["true", "false"],
         ),
+        argument(
+            "-dcs",
+            "--downloadcommunitysnapshot",
+            help="Boolean to indicate if in case of empty ledger, download latest community snapshot"
+            "Set this to false to not download the latest community snapshot"
+            f"The default value is true if not provided",
+            default="true",
+            action="store",
+            choices=["true", "false"],
+        )
     ]
 )
 def config(args):
@@ -229,15 +239,6 @@ def config(args):
             help="Pass this option to update the deployed softwares to latest version."
             " CLI prompts to confirm the versions if '-a' is not passed",
             action="store_true",
-        ),
-        argument(
-            "-dcs",
-            "--downloadcommunitysnapshot",
-            help="Boolean to indicate if in case of empty ledger, downloads latest community snapshot"
-            "It is templated into default.config and acts as custom configuration that is not overwritten on install. "
-            f"The default value is true if not provided",
-            default="true",
-            action="store",
         )
     ]
 )
