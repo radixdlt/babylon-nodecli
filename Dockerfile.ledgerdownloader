@@ -8,7 +8,8 @@ RUN apt-get update \
     curl \
     wget \
     bash \ 
-    aria2
+    aria2 \
+    zstd
 
 # Copy the script from the host into the container
 COPY downloadLedgerSnapshot.sh /usr/local/scripts/downloadLedgerSnapshot.sh

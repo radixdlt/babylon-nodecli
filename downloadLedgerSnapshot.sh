@@ -31,4 +31,9 @@ else
     ls -l "$DATA_DIR"
 fi
 
+tar --use-compress-program=zstdmt -xvf RADIXDB-INDEX.tar.zst --exclude=./address_book -C .
+rm -rf RADIXDB-INDEX.*
+rm -rf latest-snapshot-INDEX.sh*
+echo "Snapshot restored"
+
 
