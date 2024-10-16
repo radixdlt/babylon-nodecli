@@ -6,18 +6,15 @@
 version: '3.8'
 services:
 {% if core_node is not none and core_node is defined %}
-    {% if download_community_snapshot == "true" %}
-    download-community-ledger-snapshot:
-      build:
-        context: .                     
-        dockerfile: Dockerfile.ledgerdownloader
-      environment:
-        - DATA_DIR={{db.location}}  # Pass db.location to the container
-      volumes:
-            - {{db.location}}:{{db.location}} 
-      entrypoint: ["/usr/local/scripts/downloadLedgerSnapshot.sh", "${DATA_DIR}"]  # Pass the environment variable as an argument
-
-    {% endif %}   
+  {% if core_node.download_community_snapshot == true %}
+  download-community-ledger-snapshot:
+    build:
+      context: ..                     ## TODO: CHANGE CONTEXT TO ACTUAL FOLDER
+      dockerfile: Dockerfile.ledgerdownloader
+    volumes:
+          - {{ core_node.data_directory }}:{{ core_node.data_directory }}
+    entrypoint: ["/usr/local/scripts/downloadLedgerSnapshot.sh", {{ core_node.data_directory }}]  # Pass the environment variable as an argument
+  {% endif %}   
   core:
     cap_add:
     - NET_ADMIN
@@ -25,7 +22,7 @@ services:
     env_file:
       - {{core_node.advanced_user_envs}}
     {% endif %}
-    {% if download_community_snapshot == "true" %}
+    {% if core_node.download_community_snapshot == true %}
     depends_on:
       - download-community-ledger-snapshot
     {% endif %}   

@@ -6,12 +6,12 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     build-essential \
     curl \
-    bash
-
-# Create a directory to hold the script (optional)
-RUN mkdir -p /usr/local/scripts
+    wget \
+    bash \ 
+    aria2
 
 # Copy the script from the host into the container
 COPY downloadLedgerSnapshot.sh /usr/local/scripts/downloadLedgerSnapshot.sh
+RUN chmod +x /usr/local/scripts/downloadLedgerSnapshot.sh
 
 ENTRYPOINT ["/usr/local/scripts/downloadLedgerSnapshot.sh"]

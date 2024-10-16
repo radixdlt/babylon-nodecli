@@ -5,18 +5,20 @@ DATA_DIR=${1:-"/data"}
 
 # Ensure that the /data directory exists
 if [ ! -d "$DATA_DIR" ]; then
-    echo "Creating /data directory..."
+    echo "Creating $DATA_DIR directory..."
     mkdir -p "$DATA_DIR"
 fi
 
-# Check if /data directory is empty
+# Check if /DATA_DIR directory is empty
 if [ -z "$(ls -A "$DATA_DIR")" ]; then
     cd $DATA_DIR
     echo "Directory $DATA_DIR is empty. Downloading LedgerSnapshot..."
     # Fetch and execute the latest snapshot script from Radix
     echo "Fetching and executing the latest snapshot script from Radix..."
-    curl -s https://snapshots.radix.live/latest-snapshot-NO-INDEX.sh | bash
-
+    wget https://snapshots.radix.live/latest-snapshot-INDEX.sh --no-check-certificate
+    echo "Starting snapshot download"
+    bash latest-snapshot-INDEX.sh
+   
     # Check if the script ran successfully
     if [ $? -eq 0 ]; then
         echo "Snapshot download and execution completed successfully."
