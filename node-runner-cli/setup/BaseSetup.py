@@ -198,7 +198,7 @@ class BaseSetup:
             f"Downloading latest snapshot of the ledger will allow to sync faster when starting the node"
             f"if the ledger folder is empty."
             f'\n{bcolors.WARNING}Press Enter to accept default or choose to download latest snapshot of the ledger [true/false] ',
-            QuestionKeys.input_ledger_path,
+            QuestionKeys.input_download_snapshot_ledger,
         )
         if download_community_snapshot_string == "":
             download_community_snapshot = True
