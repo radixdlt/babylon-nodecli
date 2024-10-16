@@ -230,6 +230,15 @@ def config(args):
             " CLI prompts to confirm the versions if '-a' is not passed",
             action="store_true",
         ),
+        argument(
+            "-dcs",
+            "--downloadcommunitysnapshot",
+            help="Boolean to indicate if in case of empty ledger, downloads latest community snapshot"
+            "It is templated into default.config and acts as custom configuration that is not overwritten on install. "
+            f"The default value is true if not provided",
+            default="true",
+            action="store",
+        )
     ]
 )
 def install(args):
