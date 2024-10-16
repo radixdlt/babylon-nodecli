@@ -11,8 +11,12 @@ services:
       build:
         context: .                     
         dockerfile: Dockerfile.ledgerdownloader
-        volumes:
-            - /data:/data
+      environment:
+        - DATA_DIR={{db.location}}  # Pass db.location to the container
+      volumes:
+            - {{db.location}}:{{db.location}} 
+      entrypoint: ["/usr/local/scripts/downloadLedgerSnapshot.sh", "${DATA_DIR}"]  # Pass the environment variable as an argument
+
     {% endif %}   
   core:
     cap_add:
