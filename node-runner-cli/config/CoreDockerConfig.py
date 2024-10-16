@@ -19,6 +19,7 @@ class CoreDockerConfig(BaseConfig):
         self.core_release: str = ""
         self.repo: str = os.getenv(CORE_DOCKER_REPO_OVERRIDE, "radixdlt/babylon-node")
         self.data_directory: str = f"{Helpers.get_home_dir()}/babylon-ledger"
+        self.download_community_snapshot: bool = True
         self.trusted_node: str = ""
         self.memory_limit: str = "14000m"
         self.validator_address: str = ""
@@ -53,6 +54,10 @@ class CoreDockerConfig(BaseConfig):
         if self.data_directory:
             Path(self.data_directory).mkdir(parents=True, exist_ok=True)
 
+    def ask_download_community_sanpshot(self):
+        if "DETAILED" in SetupMode.instance().mode:
+            self.download_community_snapshot = BaseSetup.get_download_community_snapshot()
+
     def set_trusted_node(self, trusted_node):
         if not trusted_node:
             trusted_node = Prompts.ask_trusted_node()
@@ -64,6 +69,7 @@ class CoreDockerConfig(BaseConfig):
         self.ask_validator_address(validator)
         self.keydetails = BaseSetup.ask_keydetails(ks_password, new_keystore)
         self.ask_data_directory()
+        self.ask_download_community_sanpshot()
         return self
 
     def set_validator_address(self, validator_address: str):

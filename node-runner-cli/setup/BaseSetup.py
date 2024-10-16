@@ -190,6 +190,25 @@ class BaseSetup:
         return data_dir_path
 
     @staticmethod
+    def get_download_community_snapshot():
+        Helpers.section_headline("DOWNLOAD COMMUNITY SNAPSHOT")
+        print(f"\n Latest snapshot version of the ledger can be downloaded")
+        download_community_snapshot_string = Helpers.input_guestion(
+            f"\nRadix node stores all the ledger data on a folder."
+            f"Downloading latest snapshot of the ledger will allow to sync faster when starting the node"
+            f"if the ledger folder is empty."
+            f'\n{bcolors.WARNING}Press Enter to accept default or choose to download latest snapshot of the ledger [true/false] ',
+            QuestionKeys.input_ledger_path,
+        )
+        if download_community_snapshot_string == "":
+            download_community_snapshot = True
+        elif download_community_snapshot_string == "false":
+            download_community_snapshot = False
+        else :
+             download_community_snapshot = True
+        return download_community_snapshot
+
+    @staticmethod
     def load_all_config(configfile):
         yaml.add_representer(type(None), Helpers.represent_none)
 
