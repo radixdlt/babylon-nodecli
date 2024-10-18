@@ -8,10 +8,66 @@ services:
 {% if core_node is not none and core_node is defined %}
   {% if core_node.download_community_snapshot == true %}
   download-community-ledger-snapshot:
-    image: radixdlt/radixdlt-download-latest-community-ledger-snapshot:latest
+    image: download-community-ledger-snapshot::latest  # Name of the custom image to be built
+    build:
+      context: .  # You can point this to a dummy directory if needed
+      dockerfile: inline_dockerfile  # Give a name for the dockerfile, no actual file needed
+      args:
+        - BASE_IMAGE=ubuntu:20.04  # Define base image here    
     volumes:
-          - {{ core_node.data_directory }}:{{ core_node.data_directory }}
-    entrypoint: ["/usr/local/scripts/downloadLedgerSnapshot.sh", {{ core_node.data_directory }}]  # Pass the environment variable as an argument
+      - {{ core_node.data_directory }}:{{ core_node.data_directory }}
+    entrypoint: ["/app/downloadLedgerSnapshot.sh", {{ core_node.data_directory }}]  # Pass the environment variable as an argument
+    # Inline the Dockerfile as part of build instructions
+    inline_dockerfile: |
+      ARG BASE_IMAGE
+      FROM ${BASE_IMAGE}
+
+      # Install necessary dependencies
+      RUN apt-get update && apt-get install -y \
+          wget \
+          zstd \
+          bash \
+          && rm -rf /var/lib/apt/lists/*
+
+      # Set the working directory
+      WORKDIR /app
+
+      # Inline the script directly in the docker-compose file
+      COPY <<EOF /app/downloadLedgerSnapshot.sh
+      #!/bin/bash
+
+      DATA_DIR=\${1:-"/data"}
+
+      if [ ! -d "\$DATA_DIR" ]; then
+          echo "Creating \$DATA_DIR directory..."
+          mkdir -p "\$DATA_DIR"
+      fi
+
+      if [ -z "\$(ls -A "\$DATA_DIR")" ]; then
+          cd \$DATA_DIR
+          echo "Directory \$DATA_DIR is empty. Downloading LedgerSnapshot..."
+          wget https://snapshots.radix.live/latest-snapshot-INDEX.sh --no-check-certificate
+          echo "Starting snapshot download"
+          bash latest-snapshot-INDEX.sh
+      
+          if [ \$? -eq 0 ]; then
+              echo "Snapshot download and execution completed successfully."
+          else
+              echo "Snapshot download or execution failed."
+              exit 1
+          fi
+          tar --use-compress-program=zstdmt -xvf RADIXDB-INDEX.tar.zst --exclude=./address_book -C .
+          rm -rf RADIXDB-INDEX.*
+          rm -rf latest-snapshot-INDEX.sh*
+          echo "Snapshot restored"
+      else
+          echo "Directory \$DATA_DIR is not empty. Downloading Ledger Snapshot aborted:"
+          ls -l "\$DATA_DIR"
+      fi
+      EOF
+
+      # Make the script executable
+      RUN chmod +x /app/downloadLedgerSnapshot.sh
   {% endif %}   
   core:
     cap_add:
