@@ -21,6 +21,7 @@ class PromptFeederUnitTests(unittest.TestCase):
         PROMPT_KEYSTORE_LOCATION = ""
         PROMPT_KEYSTORE_FILE_NAME = ""
         PROMPT_LEDGER_LOCATION = ""
+        PROMPT_LEDGER_SNAPSHOT = ""
         PROMPT_NGINX_PROTECT_CORE_API = ""
         PROMPT_ENABLE_GATEWAY = "Y"
         PROMPT_GATEWAY_CORE_API_URL = "http://core:3333/core"
@@ -48,6 +49,7 @@ class PromptFeederUnitTests(unittest.TestCase):
                 PROMPT_KEYSTORE_LOCATION,
                 PROMPT_KEYSTORE_FILE_NAME,
                 PROMPT_LEDGER_LOCATION,
+                PROMPT_LEDGER_SNAPSHOT,
                 PROMPT_NGINX_PROTECT_CORE_API,
                 PROMPT_ENABLE_GATEWAY,
                 PROMPT_GATEWAY_CORE_API_URL,
@@ -97,6 +99,7 @@ class PromptFeederUnitTests(unittest.TestCase):
         PROMPT_KEYSTORE_LOCATION = "/tmp/babylon-node-config"
         PROMPT_KEYSTORE_FILE_NAME = "node-keystore.ks"
         PROMPT_LEDGER_LOCATION = "/tmp/data"
+        PROMPT_LEDGER_SNAPSHOT = "true"
         PROMPT_NGINX_PROTECT_CORE_API = "true"
         PROMPT_ENABLE_GATEWAY = "Y"
         PROMPT_GATEWAY_CORE_API_URL = "http://core:3333/core"
@@ -122,6 +125,7 @@ class PromptFeederUnitTests(unittest.TestCase):
                 PROMPT_KEYSTORE_LOCATION,
                 PROMPT_KEYSTORE_FILE_NAME,
                 PROMPT_LEDGER_LOCATION,
+                PROMPT_LEDGER_SNAPSHOT,
                 PROMPT_NGINX_PROTECT_CORE_API,
                 PROMPT_ENABLE_GATEWAY,
                 PROMPT_GATEWAY_CORE_API_URL,
