@@ -54,7 +54,7 @@ class CoreDockerConfig(BaseConfig):
         if self.data_directory:
             Path(self.data_directory).mkdir(parents=True, exist_ok=True)
 
-    def ask_download_community_sanpshot(self):
+    def ask_download_community_snapshot(self):
         if "DETAILED" in SetupMode.instance().mode:
             self.download_community_snapshot = (
                 BaseSetup.get_download_community_snapshot()
@@ -71,7 +71,7 @@ class CoreDockerConfig(BaseConfig):
         self.ask_validator_address(validator)
         self.keydetails = BaseSetup.ask_keydetails(ks_password, new_keystore)
         self.ask_data_directory()
-        self.ask_download_community_sanpshot()
+        self.ask_download_community_snapshot()
         return self
 
     def set_validator_address(self, validator_address: str):
