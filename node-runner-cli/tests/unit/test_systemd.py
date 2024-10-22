@@ -182,6 +182,7 @@ class SystemdUnitTests(unittest.TestCase):
 
 ntp=false
 ntp.pool=pool.ntp.org
+download_community_snapshot=true
 
 network.id=1
 
@@ -236,6 +237,7 @@ consensus.validator_address=validatorAddress"""
 
 ntp=false
 ntp.pool=pool.ntp.org
+download_community_snapshot=true
 
 network.id=1
 
@@ -290,6 +292,7 @@ db.location=/home/radixdlt/babylon-ledger
 
 ntp=false
 ntp.pool=pool.ntp.org
+download_community_snapshot=true
 
 network.id=1
 
