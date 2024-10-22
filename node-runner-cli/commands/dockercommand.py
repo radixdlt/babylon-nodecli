@@ -153,7 +153,7 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
             default="true",
             action="store",
             choices=["true", "false"],
-        )
+        ),
     ]
 )
 def config(args):
@@ -239,7 +239,7 @@ def config(args):
             help="Pass this option to update the deployed softwares to latest version."
             " CLI prompts to confirm the versions if '-a' is not passed",
             action="store_true",
-        )
+        ),
     ]
 )
 def install(args):
