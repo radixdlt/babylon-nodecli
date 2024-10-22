@@ -183,7 +183,6 @@ class SystemdUnitTests(unittest.TestCase):
 ntp=false
 ntp.pool=pool.ntp.org
 download_community_snapshot=true
-
 network.id=1
 
 node.key.path=/home/radixdlt/babylon-node-config/node-keystore.ks
@@ -292,7 +291,6 @@ db.location=/home/radixdlt/babylon-ledger
 ntp=false
 ntp.pool=pool.ntp.org
 download_community_snapshot=true
-
 network.id=1
 
 node.key.path=/home/radixdlt/babylon-node-config/node-keystore.ks
