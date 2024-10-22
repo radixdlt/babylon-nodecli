@@ -7,6 +7,7 @@
 - input_path_keystore: "/home/runner/babylon-node"
 - enter_keystore_name: "node-keystore.ks"
 - input_ledger_path: "/tmp/babylon-ledger"
+- input_ledger_snapshot: "true"
 - core_nginx_setup: "false"
 - setup_gateway: "false"
 - enable_engine_state_api: N
