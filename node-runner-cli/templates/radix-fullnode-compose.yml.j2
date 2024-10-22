@@ -60,7 +60,6 @@ services:
     volumes:
       - {{ core_node.data_directory }}:{{ core_node.data_directory }}
     entrypoint: ["/usr/local/scripts/downloadLedgerSnapshot.sh", {{ core_node.data_directory }}]  # Pass the environment variable as an argument
-    # Inline the Dockerfile as part of build instructions
   {% endif %}   
   core:
     cap_add:

@@ -56,7 +56,9 @@ class CoreDockerConfig(BaseConfig):
 
     def ask_download_community_sanpshot(self):
         if "DETAILED" in SetupMode.instance().mode:
-            self.download_community_snapshot = BaseSetup.get_download_community_snapshot()
+            self.download_community_snapshot = (
+                BaseSetup.get_download_community_snapshot()
+            )
 
     def set_trusted_node(self, trusted_node):
         if not trusted_node:
