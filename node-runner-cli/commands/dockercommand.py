@@ -12,6 +12,7 @@ from setup.DockerCommandArguments import DockerInstallArguments, DockerConfigArg
 from setup.DockerCompose import DockerCompose
 from setup.DockerSetup import DockerSetup
 from utils.utils import Helpers, bcolors
+from ledger_snapshot import download_and_extract_snapshot
 
 logger = get_logger(__name__)
 
@@ -145,7 +146,7 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
             choices=["true", "false"],
         ),
         argument(
-            "-dcs",
+            "-dl",
             "--downloadcommunitysnapshot",
             help="Boolean to indicate if in case of empty ledger, download latest community snapshot"
             "Set this to false to not download the latest community snapshot"
@@ -247,11 +248,15 @@ def install(args):
     This commands setups up the software and deploys it based on what is stored in the config.yaml file.
     To update software versions, most of the time it is required to update the versions in config file and run this command
     """
+
     ########## Parse Arguments
     argument_object = DockerInstallArguments(args)
 
     ########## Update existing Config
     docker_config: DockerConfig = DockerSetup.load_settings(argument_object.config_file)
+
+    if argument_object.download_community_snapshot is not None:
+        download_and_extract_snapshot(docker_config.core_node.data_directory)
 
     original_config_dict = docker_config.to_dict()
 
