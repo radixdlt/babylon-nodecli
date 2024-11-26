@@ -18,7 +18,7 @@ class CoreDockerConfig(BaseConfig):
         self.keydetails: KeyDetails = KeyDetails(config_dict.get("keydetails"))
         self.core_release: str = ""
         self.repo: str = os.getenv(CORE_DOCKER_REPO_OVERRIDE, "radixdlt/babylon-node")
-        self.data_directory: str = f"{Helpers.get_home_dir()}/babylon-ledger"
+        self.data_directory: str = f"{Helpers.get_default_ledger_dir()}"
         self.download_community_snapshot: bool = True
         self.trusted_node: str = ""
         self.memory_limit: str = "14000m"

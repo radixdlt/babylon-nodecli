@@ -49,7 +49,7 @@ class DockerConfigArguments:
         self.release = getenv("LATEST_RELEASE", latest_release())
         self.config_file = f"{args.configdir}/config.yaml"
         self.networkid = args.networkid
-        self.download_community_snapshot = args.download_community_snapshot
+        self.download_community_snapshot = args.downloadcommunitysnapshot
 
 
 class DockerInstallArguments:

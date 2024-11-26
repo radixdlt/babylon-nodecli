@@ -12,7 +12,6 @@ from setup.DockerCommandArguments import DockerInstallArguments, DockerConfigArg
 from setup.DockerCompose import DockerCompose
 from setup.DockerSetup import DockerSetup
 from utils.utils import Helpers, bcolors
-from ledger_snapshot import download_and_extract_snapshot
 
 logger = get_logger(__name__)
 
@@ -255,8 +254,8 @@ def install(args):
     ########## Update existing Config
     docker_config: DockerConfig = DockerSetup.load_settings(argument_object.config_file)
 
-    if argument_object.download_community_snapshot is not None:
-        download_and_extract_snapshot(docker_config.core_node.data_directory)
+    # if docker_config.core_node.download_community_snapshot is not None and docker_config.core_node.download_community_snapshot:
+    #     download_and_extract_snapshot(docker_config.core_node.data_directory)
 
     original_config_dict = docker_config.to_dict()
 

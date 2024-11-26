@@ -120,11 +120,7 @@ def main():
         if ledgercli_args.ledgercommand is None:
             ledgercli.print_help()
         else:
-            if ledgercli_args.ledgercommand == "sync":
-                logger.info(f"Syncing fullnode ledger {sys.argv[3:]}")
-                ledgercli_args.func(ledgercli_args)
-            else:
-                logger.info(f"Invalid ledger command {ledgercli_args.ledgercommand}")
+            ledgercli_args.func(ledgercli_args)
 
     elif args.subcommand == "monitoring":
         monitoringcli_args = monitoringcli.parse_args(sys.argv[2:])

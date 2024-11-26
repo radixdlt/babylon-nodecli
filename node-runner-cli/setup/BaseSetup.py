@@ -29,7 +29,7 @@ class BaseSetup:
                 BaseSetup.add_user_docker_group()
                 logger.info("Docker successfully installed")
             run_shell_command(
-                "sudo apt install -y wget unzip rng-tools ansible", shell=True
+                "sudo apt install -y wget unzip rng-tools ansible zstd", shell=True
             )
             run_shell_command("sudo rngd -r /dev/random | true", shell=True)
             try:
@@ -179,12 +179,12 @@ class BaseSetup:
             f"\nRadix node stores all the ledger data on a folder. "
             f"Mounting this location as a docker volume, "
             f"will allow to restart the node without a need to download the ledger."
-            f'\n{bcolors.WARNING}Press Enter to store ledger in the "{Helpers.get_home_dir()}/babylon-ledger" directory OR '
+            f'\n{bcolors.WARNING}Press Enter to store ledger in the "{Helpers.get_default_ledger_dir()}" directory OR '
             f"type the absolute path of an existing ledger data folder:{bcolors.ENDC}",
             QuestionKeys.input_ledger_path,
         )
         if data_dir_path == "":
-            data_dir_path = f"{Helpers.get_home_dir()}/babylon-ledger"
+            data_dir_path = f"{Helpers.get_default_ledger_dir()}"
         if create_dir:
             run_shell_command(f"sudo mkdir -p {data_dir_path}", shell=True)
         return data_dir_path

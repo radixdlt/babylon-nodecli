@@ -1,13 +1,14 @@
 from argparse import ArgumentParser
 from argparse import RawTextHelpFormatter
-
+from ledger_snapshot import download_and_extract_snapshot
+from utils.utils import Helpers
 import boto3
 import botocore
 
 from commands.subcommand import get_decorator, argument
 
 ledgercli = ArgumentParser(
-    description="Subcommand to help to sync up the ledger from a S3 bucket",
+    description="Subcommand to assist with ledger download",
     usage="babylonnode ledger ",
     formatter_class=RawTextHelpFormatter,
 )
@@ -43,11 +44,21 @@ def ledgercommand(ledgercommand_args=[], parent=ledger_parser):
         ),
     ]
 )
-def sync(args):
+def s3_download(args):
     """
-    This commands allows to download the content of an external S3 bucket to the ledger folder.
-    The ledger folder and the name and folder of an external S3 bucket should be indicated
+    Downloads a backuped ledger from an S3 bucket.
+    Args:
+        args: An object containing the following attributes:
+            - bucketname (str): The name of the S3 bucket.
+            - bucketfolder (str): The folder within the S3 bucket.
+            - dest (str): The destination path where the backup ledger will be downloaded.
+    Raises:
+        ValueError: If the bucket name is not provided.
+    Example:
+        args = Namespace(bucketname='my-bucket', bucketfolder='backups', dest='/local/path')
+        s3_download(args)
     """
+
     bucketName = args.bucketname
     bucketFolder = args.bucketfolder
     dest = args.dest
@@ -55,12 +66,10 @@ def sync(args):
         print("No S3 bucket was indicated")
     else:
         print(f"Downloading backup ledger {bucketName}  {bucketFolder} ...")
-        download_mainnet_backup_ledger(bucketName, bucketFolder, dest)
+        s3_fetch_ledger_files(bucketName, bucketFolder, dest)
 
 
-def download_mainnet_backup_ledger(
-    bucketName: str, bucketFolder: str, destinationPath: str
-):
+def s3_fetch_ledger_files(bucketName: str, bucketFolder: str, destinationPath: str):
     #     """
     #     Downloads validator or fullnode mainnet ledger into destinationPath
     #     :param bucketName: Indicates the name of the s3 bucket that contains the backup ledger to download
@@ -99,3 +108,37 @@ def download_mainnet_backup_ledger(
                         error.response["Error"]["Message"]
                     )  # explanation of what went wrong
                     return False
+
+
+@ledgercommand(
+    [
+        argument(
+            "-d",
+            "--dest",
+            help="Destination path where the backup of the ledger will be downloaded ",
+            action="store",
+            default=f"{Helpers.get_default_ledger_dir()}",
+        ),
+        argument(
+            "-s",
+            "--source",
+            default="radix.live",
+            choices=["radix.live"],
+            action="store",
+            help="Source to download the ledger from. Radix.live is the only supported source at the moment.",
+        ),
+    ]
+)
+def fetch_community_snapshot(args):
+    """
+    Downloads the latest community snapshot of the ledger.
+    Args:
+        args: An object containing the following attributes:
+            - dest (str): The destination path where the backup ledger will be downloaded.
+    Raises:
+        ValueError: If the source is not provided.
+    Example:
+        args = Namespace(dest='/local/path')
+        download_and_extract_snapshot(args)
+    """
+    download_and_extract_snapshot(args.dest)
