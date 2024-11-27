@@ -144,6 +144,7 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
             default="",
             choices=["true", "false"],
         )
+    ]
 )
 def config(args):
     """
