@@ -33,9 +33,9 @@ def file_contains_regular_expression(re_str: str, file: str) -> bool:
 class SystemdUnitTests(unittest.TestCase):
     @unittest.skip("Tests with PROMPT_FEEDS can only be run individually")
     def test_systemd_install_continue_prompt_feed(self):
-        os.environ["PROMPT_FEEDS"] = (
-            "test-prompts/individual-prompts/systemd_install_continue.yml"
-        )
+        os.environ[
+            "PROMPT_FEEDS"
+        ] = "test-prompts/individual-prompts/systemd_install_continue.yml"
         PromptFeeder.instance().load_prompt_feeds()
         SystemDSetup.confirm_config("dummy1", "dummy2", "dummy3", "dummy4")
 
