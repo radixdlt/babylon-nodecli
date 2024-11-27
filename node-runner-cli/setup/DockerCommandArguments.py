@@ -21,7 +21,6 @@ class DockerConfigArguments:
     new_keystore: bool
     config_file: str
     networkid: str
-    download_community_snapshot: bool
 
     def __init__(self, args):
         self.setupmode = SetupMode.instance()
@@ -49,7 +48,6 @@ class DockerConfigArguments:
         self.release = getenv("LATEST_RELEASE", latest_release())
         self.config_file = f"{args.configdir}/config.yaml"
         self.networkid = args.networkid
-        self.download_community_snapshot = args.downloadcommunitysnapshot
 
 
 class DockerInstallArguments:

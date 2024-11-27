@@ -143,18 +143,7 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
             action="store",
             default="",
             choices=["true", "false"],
-        ),
-        argument(
-            "-dl",
-            "--downloadcommunitysnapshot",
-            help="Boolean to indicate if in case of empty ledger, download latest community snapshot"
-            "Set this to false to not download the latest community snapshot"
-            f"The default value is true if not provided",
-            default="true",
-            action="store",
-            choices=["true", "false"],
-        ),
-    ]
+        )
 )
 def config(args):
     """
@@ -253,9 +242,6 @@ def install(args):
 
     ########## Update existing Config
     docker_config: DockerConfig = DockerSetup.load_settings(argument_object.config_file)
-
-    # if docker_config.core_node.download_community_snapshot is not None and docker_config.core_node.download_community_snapshot:
-    #     download_and_extract_snapshot(docker_config.core_node.data_directory)
 
     original_config_dict = docker_config.to_dict()
 

@@ -20,7 +20,6 @@ class QuestionKeys:
     input_path_keystore = "input_path_keystore"
     enter_keystore_name = "enter_keystore_name"
     input_ledger_path = "input_ledger_path"
-    input_ledger_snapshot = "input_ledger_snapshot"
     core_nginx_setup = "core_nginx_setup"
     gateway_nginx_setup = "gateway_nginx_setup"
     setup_gateway = "setup_gateway"

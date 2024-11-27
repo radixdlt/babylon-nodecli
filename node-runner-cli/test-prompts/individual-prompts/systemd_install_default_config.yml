@@ -1,5 +1,4 @@
 ---
 - select_network: S
 - input_ledger_path: "/tmp/babylon-ledger"
-- input_ledger_snapshot: "true"
 - continue_systemd_install: Y
