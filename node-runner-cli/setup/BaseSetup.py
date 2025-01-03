@@ -198,5 +198,5 @@ class BaseSetup:
                 all_config = yaml.safe_load(file)
                 return all_config
         else:
-            print(f"Config file '{configfile}' doesn't exist")
+            print(f"Config file '{configfile}' does not exist")
             return {}
