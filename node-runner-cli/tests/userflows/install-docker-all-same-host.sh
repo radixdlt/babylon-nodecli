@@ -114,7 +114,7 @@ set -e
 docker logs $(whoami)-core-1 --tail 100
 
 echo "Testing postgres is set up correctly"
-sudo systemctl status postgresql@12-main.service --no-pager
+sudo systemctl status postgresql@15-main.service --no-pager
 PGPASSWORD=$POSTGRES_PASSWORD psql -h localhost -U postgres -d radixdlt_ledger -P pager=off -c "\dt"
 
 echo "Testing gateway endpoints available"
