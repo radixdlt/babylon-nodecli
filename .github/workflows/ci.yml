@@ -457,7 +457,7 @@ jobs:
 
 
   test-core-only-node:
-    runs-on: ubuntu-22.04
+    runs-on: gh-ephemeral-nodecli-docker-runner
     permissions:
       id-token: write
       pull-requests: read
