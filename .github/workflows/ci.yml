@@ -476,9 +476,10 @@ jobs:
           name: ubuntu 22.04
       - name: Run configure command
         run: |
+          set -x
           chmod +x ./babylonnode
-          sudo apt-get update
-          sudo apt-get install containerd runc
+          sudo apt-get update -y
+          sudo apt-get install containerd runc jq -y
           ./babylonnode docker dependencies
       - name: Setup config
         run: |
