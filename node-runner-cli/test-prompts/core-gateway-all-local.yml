@@ -4,7 +4,7 @@
 - input_seednode: "radix://node_tdx_e_1q0gm3fwqh8ggl09g7l8ru96krzlxdyrc694mqw8cf227v62vjyrmccv8md5@13.126.65.118"
 - have_validator_address: "N"
 - have_keystore_file: Y
-- input_path_keystore: "/home/runner/babylon-node"
+- input_path_keystore: "/home/ubuntu/babylon-node"
 - enter_keystore_name: "node-keystore.ks"
 - input_ledger_path: "/tmp/babylon-ledger"
 - core_nginx_setup: "true"
