@@ -498,7 +498,6 @@ jobs:
         run: |
           export DISABLE_VERSION_CHECK=true
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
-          docker compose ps
           ./babylonnode docker install -f "$HOME/babylon-node-config/config.yaml" -a
           sleep 60
           ./babylonnode auth set-admin-password -m DOCKER -p "$NGINX_ADMIN_PASSWORD"
@@ -520,6 +519,9 @@ jobs:
                         -cm "$NGINX_METRICS_PASSWORD"  \
                         -gm "$NGINX_METRICS_PASSWORD"  \
                         -am "$NGINX_METRICS_PASSWORD"
+          ls -la
+          docker compose ps
+
           ./babylonnode monitoring install -a
         env:
           NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
