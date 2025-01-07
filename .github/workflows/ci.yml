@@ -479,13 +479,17 @@ jobs:
           set -x
           pwd
           chmod +x ./babylonnode
+          mv ./babylonnode $HOME/babylonnode && cd $HOME
           sudo apt-get update -y
           sudo apt-get install containerd runc jq -y
           ./babylonnode docker dependencies
       - name: Setup config
         run: |
+          set -x
           chmod +x ./babylonnode
-          pwd
+          pwd && ls -la
+          cd $HOME
+
           mkdir -p "$HOME/babylon-node-config"
           export DISABLE_VERSION_CHECK=true
           export RADIXDLT_APP_VERSION_OVERRIDE="rcnet-v2-phase2-r4"
@@ -499,6 +503,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Run CLI setup
         run: |
+          set -x
           export DISABLE_VERSION_CHECK=true
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
           pwd && ls -la
@@ -518,6 +523,7 @@ jobs:
 
       - name: Run Monitoring setup
         run: |
+          set -x
           pwd && ls -la
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
           cd $HOME
