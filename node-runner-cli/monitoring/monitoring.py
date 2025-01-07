@@ -194,7 +194,7 @@ class Monitoring:
         Helpers.dump_rendered_template(render_template, file_location)
 
     @staticmethod
-    def start_monitoring(composefile, auto_approve=False, remove_volumes=False):
+    def start_monitoring(composefile, auto_approve=False):
         print(f"----- output of node monitoring docker compose file {composefile}")
         run_shell_command(f"cat {composefile}", shell=True)
         start_monitoring_answer = ""
@@ -208,7 +208,7 @@ class Monitoring:
             )
 
         if Helpers.check_Yes(start_monitoring_answer) or auto_approve:
-            DockerCompose.run_docker_compose_up(composefile,remove_volumes)
+            DockerCompose.run_docker_compose_up(composefile)
         else:
             print(
                 f"""Exiting the command ..
