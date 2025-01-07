@@ -194,7 +194,7 @@ class Monitoring:
         Helpers.dump_rendered_template(render_template, file_location)
 
     @staticmethod
-    def start_monitoring(composefile, auto_approve=False):
+    def start_monitoring(composefile, auto_approve=False, remove_volumes=False):
         print(f"----- output of node monitoring docker compose file {composefile}")
         run_shell_command(f"cat {composefile}", shell=True)
         start_monitoring_answer = ""
@@ -208,14 +208,7 @@ class Monitoring:
             )
 
         if Helpers.check_Yes(start_monitoring_answer) or auto_approve:
-            docker_compose_binary = os.getenv(
-                "DOCKER_COMPOSE_LOCATION", "docker-compose"
-            )
-            run_shell_command(
-                [docker_compose_binary, "-f", composefile, "up", "-d"],
-                env={COMPOSE_HTTP_TIMEOUT: os.getenv(COMPOSE_HTTP_TIMEOUT, "200")},
-                fail_on_error=False,
-            )
+            DockerCompose.run_docker_compose_up(composefile,remove_volumes)
         else:
             print(
                 f"""Exiting the command ..
