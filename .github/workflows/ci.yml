@@ -486,7 +486,6 @@ jobs:
       - name: Setup config
         run: |
           set -x
-          chmod +x ./babylonnode
           pwd && ls -la
           cd $HOME
 
