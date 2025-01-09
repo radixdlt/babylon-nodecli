@@ -22,4 +22,4 @@ pyinstaller-hooks-contrib = "==2023.12"
 zstandard= "==0.15.2"
 
 [requires]
-python_version = "3.10.6"
+python_version = "3.10.13"

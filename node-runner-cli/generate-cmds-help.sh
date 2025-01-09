@@ -52,7 +52,7 @@ cat <<EOT >>"$filename"
 Below are the list of commands that can be used with cli to sync the ledger with a S3 bucket.
 EOT
 
-declare -a ledgersubcommands=("sync")
+declare -a ledgersubcommands=("s3-download" "fetch-community-snapshot")
 for subcommand in "${ledgersubcommands[@]}"; do
   command_help_doc "ledger" "$subcommand" "$filename"
 done

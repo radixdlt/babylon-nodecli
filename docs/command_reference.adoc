@@ -5,26 +5,171 @@ Below are the list of commands that can be used with cli to setup a core node or
 ==== babylonnode docker dependencies
 [source, bash,subs="+quotes, +attributes" ]
 ----
+usage: babylonnode docker dependencies [-h]
+
+This commands installs all necessary software on the Virtual Machine(VM). Run
+this command on fresh VM or on a existing VM as the command is tested to be
+idempotent
+
+options:
+  -h, --help  show this help message and exit
 ----
 
 ==== babylonnode docker config
 [source, bash,subs="+quotes, +attributes" ]
 ----
+usage: babylonnode docker config [-h] [-a] [-d CONFIGDIR]
+                                 [-k KEYSTOREPASSWORD] -m
+                                 {CORE,GATEWAY,DETAILED,MIGRATION}
+                                 [{CORE,GATEWAY,DETAILED,MIGRATION} ...]
+                                 [-miu MIGRATION_URL]
+                                 [-miau MIGRATION_AUTH_USER]
+                                 [-miap MIGRATION_AUTH_PASSWORD]
+                                 [-miba MIGRATION_BECH_ADDRESS] [-n NETWORKID]
+                                 [-nk] [-p POSTGRESPASSWORD] [-t TRUSTEDNODE]
+                                 [-v VALIDATOR] [-xc {true,false}]
+                                 [-xg {true,false}]
+
+This commands allows node-runners and gateway admins to create a config file,
+which can persist their custom settings. Thus it allows is to decouple the
+updates from docker_config. Config is created only once as such and if there
+is a version change in the config file, then it updated by doing a migration
+to newer version
+
+options:
+  -h, --help            show this help message and exit
+
+required arguments:
+  -m {CORE,GATEWAY,DETAILED,MIGRATION} [{CORE,GATEWAY,DETAILED,MIGRATION} ...], --setupmode {CORE,GATEWAY,DETAILED,MIGRATION} [{CORE,GATEWAY,DETAILED,MIGRATION} ...]
+                        Quick config mode with assumed defaults. It supports
+                        two quick modes and a detailed config mode. CORE: Use
+                        this value to setup CORE using defaults. GATEWAY: Use
+                        this value to setup GATEWAY using defaults. DETAILED:
+                        Default value if not provided. This mode takes your
+                        through series of questions.
+
+optional arguments:
+  -a, --autoapprove     Set this to true to run without any prompts and in
+                        mode CORE or GATEWAY.Prompts still appear if you run
+                        in DETAILED mode Use this for automation purpose only
+  -d CONFIGDIR, --configdir CONFIGDIR
+                        Path to node-config directory where config file will
+                        stored. Default value is /Users/shambu/babylon-node-
+                        config
+  -k KEYSTOREPASSWORD, --keystorepassword KEYSTOREPASSWORD
+                        Core Node requires a keystore. This is the password
+                        for the keystore file the CLI will create new key with
+                        name `node-keystore.ks` in config directory. If the
+                        keystore exists in config directory, CLI finds it ,
+                        and uses the password from -k parameter or prompt for
+                        the password to be entered. CLI never modifies the
+                        password of keystore
+  -miu MIGRATION_URL, --migration_url MIGRATION_URL
+                        The root url of the olympia node to migrate the ledger
+                        from. Do not add /olympia-end-state.
+  -miau MIGRATION_AUTH_USER, --migration_auth_user MIGRATION_AUTH_USER
+                        The user to authenticate to the olympia node for
+                        migration
+  -miap MIGRATION_AUTH_PASSWORD, --migration_auth_password MIGRATION_AUTH_PASSWORD
+                        The password to authenticate to the olympia node for
+                        migration
+  -miba MIGRATION_BECH_ADDRESS, --migration_bech_address MIGRATION_BECH_ADDRESS
+                        The bech address of the olympia node to migrate the
+                        ledger from
+  -n NETWORKID, --networkid NETWORKID
+                        Network id of network you want to connect.For stokenet
+                        it is 2 and for mainnet it is 1.If not provided you
+                        will be prompted to enter a value
+  -nk, --newkeystore    Set this to true to create a new store without any
+                        prompts using location defined in argument configdir
+  -p POSTGRESPASSWORD, --postgrespassword POSTGRESPASSWORD
+                        Network Gateway uses Postgres as datastore. This is
+                        password for the user `postgres`.
+  -t TRUSTEDNODE, --trustednode TRUSTEDNODE
+                        Trusted node on radix network.Example format: 'radix:/
+                        /node_tdx_e_1q0gm3fwqh8ggl09g7l8ru96krzlxdyrc694mqw8cf
+                        227v62vjyrmccv8md5@13.126.65.118'.This is required
+                        only if you are creating config to run a CORE node and
+                        if not provided you will be prompted to enter a value
+  -v VALIDATOR, --validator VALIDATOR
+                        Address of the validator
+  -xc {true,false}, --disablenginxforcore {true,false}
+                        Core Node API's are protected by Basic auth
+                        setting.Set this to disable to nginx for core
+  -xg {true,false}, --disablenginxforgateway {true,false}
+                        GateWay API's end points are protected by Basic auth
+                        settings. Set this to disable to nginx for gateway
 ----
 
 ==== babylonnode docker install
 [source, bash,subs="+quotes, +attributes" ]
 ----
+usage: babylonnode docker install [-h] [-a] [-aue ADVANCEDUSERENVS]
+                                  [-f CONFIGFILE] [-u]
+
+This commands setups up the software and deploys it based on what is stored in
+the config.yaml file. To update software versions, most of the time it is
+required to update the versions in config file and run this command
+
+options:
+  -h, --help            show this help message and exit
+
+optional arguments:
+  -a, --autoapprove     Pass this option to run without any prompts. Use this
+                        for automation purpose only
+  -aue ADVANCEDUSERENVS, --advanceduserenvs ADVANCEDUSERENVS
+                        Path to advanced config file. This file can directly
+                        configure the core node. It is templated into
+                        default.config and acts as custom configuration that
+                        is not overwritten on install. The default value is
+                        `/Users/shambu/babylon-node-config/advanced-user.env-
+                        file` if not provided
+  -f CONFIGFILE, --configfile CONFIGFILE
+                        Path to config file. This file is generated by running
+                        'babylonnode docker config'The default value is
+                        `/Users/shambu/babylon-node-config/config.yaml` if not
+                        provided
+  -u, --update          Pass this option to update the deployed softwares to
+                        latest version. CLI prompts to confirm the versions if
+                        '-a' is not passed
 ----
 
 ==== babylonnode docker start
 [source, bash,subs="+quotes, +attributes" ]
 ----
+usage: babylonnode docker start [-h] [-f CONFIGFILE]
+
+This commands starts the docker containers based on what is stored in the
+config.yaml file. If you have modified the config file, it is advised to use
+setup command.
+
+options:
+  -h, --help            show this help message and exit
+
+optional arguments:
+  -f CONFIGFILE, --configfile CONFIGFILE
+                        Path to config file. This file is generated by running
+                        'babylonnode docker config'The default value is
+                        `/Users/shambu/babylon-node-config/config.yaml` if not
+                        provided
 ----
 
 ==== babylonnode docker stop
 [source, bash,subs="+quotes, +attributes" ]
 ----
+usage: babylonnode docker stop [-h] [-f COMPOSEFILE] [-v]
+
+This commands stops the docker containers
+
+options:
+  -h, --help            show this help message and exit
+
+optional arguments:
+  -f COMPOSEFILE, --composefile COMPOSEFILE
+                        Path to docker-compose file. This file is generated by
+                        running 'babylonnode docker install'The default value
+                        is `/Users/shambu/docker-compose.yml` if not provided
+  -v, --removevolumes   Remove the volumes
 ----
 === Radix node CLI command reference
 Below are the list of commands supported in cli to setup a core node process as a systemd process
@@ -32,33 +177,221 @@ Below are the list of commands supported in cli to setup a core node process as 
 ==== babylonnode systemd dependencies
 [source, bash,subs="+quotes, +attributes" ]
 ----
+usage: babylonnode systemd dependencies [-h] [-s]
+
+This commands installs all necessary software on the Virtual Machine(VM). Run
+this command on fresh VM or on an existing VM as the command is tested to be
+idempotent
+
+options:
+  -h, --help  show this help message and exit
+
+optional arguments:
+  -s, --skip  Skip installation of base dependencies
 ----
 
 ==== babylonnode systemd config
 [source, bash,subs="+quotes, +attributes" ]
 ----
+usage: babylonnode systemd config [-h] [-a] [-d CONFIGDIR]
+                                  [-dd DATA_DIRECTORY] [-i HOSTIP]
+                                  [-k KEYSTOREPASSWORD] -m
+                                  {CORE,MIGRATION,GATEWAY}
+                                  [{CORE,MIGRATION,GATEWAY} ...]
+                                  [-miu MIGRATION_URL]
+                                  [-miau MIGRATION_AUTH_USER]
+                                  [-miap MIGRATION_AUTH_PASSWORD]
+                                  [-miba MIGRATION_BECH_ADDRESS]
+                                  [-n NETWORKID] [-nk] [-r RELEASE]
+                                  [-t TRUSTEDNODE] [-v VALIDATOR]
+                                  [-x NGINXRELEASE] [-xc {true,false}]
+
+This commands allows node-runners and gateway admins to create a config file,
+which can persist their custom settings. Thus, it allows is to decouple the
+updates from systemd_config. Config is created only once as such and if there
+is a version change in the config file, then it updated by doing a migration
+to newer version
+
+options:
+  -h, --help            show this help message and exit
+
+required arguments:
+  -m {CORE,MIGRATION,GATEWAY} [{CORE,MIGRATION,GATEWAY} ...], --setupmode {CORE,MIGRATION,GATEWAY} [{CORE,MIGRATION,GATEWAY} ...]
+                        Quick config mode with assumed defaults. It supports
+                        two quick modes and a detailed config mode. CORE: Use
+                        this value to setup CORE using defaults. GATEWAY: This
+                        mode adds questions regarding the Network Gateway API
+                        and enables it for installation MIGRATION: This mode
+                        adds questions regarding the migration from an Olympia
+                        End-State node to a Babylon node
+
+optional arguments:
+  -a, --autoapprove     Set this to true to run without any prompts and in
+                        mode CORE.Prompts still appear if you run in DETAILED
+                        mode Use this for automation purpose only
+  -d CONFIGDIR, --configdir CONFIGDIR
+                        Path to node-config directory where config file will
+                        stored. Default value is /Users/shambu/babylon-node-
+                        config
+  -dd DATA_DIRECTORY, --data_directory DATA_DIRECTORY
+                        Folder for data generated by the node
+  -i HOSTIP, --hostip HOSTIP
+                        Static Public IP of the node
+  -k KEYSTOREPASSWORD, --keystorepassword KEYSTOREPASSWORD
+                        Core Node requires a keystore. This is the password
+                        for the keystore file the CLI will create new key with
+                        name `node-keystore.ks` in config directory. If the
+                        keystore exists in config directory, CLI finds it ,
+                        and uses the password from -k parameter or prompt for
+                        the password to be entered. CLI never modifies the
+                        password of keystore
+  -miu MIGRATION_URL, --migration_url MIGRATION_URL
+                        The root url of the olympia node to migrate the ledger
+                        from. Do not add /olympia-end-state.
+  -miau MIGRATION_AUTH_USER, --migration_auth_user MIGRATION_AUTH_USER
+                        The user to authenticate to the olympia node for
+                        migration
+  -miap MIGRATION_AUTH_PASSWORD, --migration_auth_password MIGRATION_AUTH_PASSWORD
+                        The password to authenticate to the olympia node for
+                        migration
+  -miba MIGRATION_BECH_ADDRESS, --migration_bech_address MIGRATION_BECH_ADDRESS
+                        The bech address of the olympia node to migrate the
+                        ledger from
+  -n NETWORKID, --networkid NETWORKID
+                        Network id of network you want to connect.For stokenet
+                        it is 2 and for mainnet it is 1.If not provided you
+                        will be prompted to enter a value
+  -nk, --newkeystore    Set this to true to create a new store without any
+                        prompts using location defined in argument configdir
+  -r RELEASE, --release RELEASE
+                        Version of node software to install
+  -t TRUSTEDNODE, --trustednode TRUSTEDNODE
+                        Trusted node on radix network
+  -v VALIDATOR, --validator VALIDATOR
+                        Address of the validator
+  -x NGINXRELEASE, --nginxrelease NGINXRELEASE
+                        Version of radixdlt nginx release
+  -xc {true,false}, --disablenginxforcore {true,false}
+                        Core Node API's are protected by Basic auth
+                        setting.Set this to disable to nginx for core
 ----
 
 ==== babylonnode systemd install
 [source, bash,subs="+quotes, +attributes" ]
 ----
+usage: babylonnode systemd install [-h] [-a] [-u] [-f CONFIGFILE]
+                                   [-auc ADVANCEDUSERCONFIG] [-m]
+
+This sets up the systemd service for the core node.
+
+options:
+  -h, --help            show this help message and exit
+
+optional arguments:
+  -a, --auto            Automatically approve all Yes/No prompts
+  -u, --update          Update the node to new version of node
+  -f CONFIGFILE, --configfile CONFIGFILE
+                        Path to config file. This file is generated by running
+                        'babylonnode systemd config'The default value is
+                        `/Users/shambu/babylon-node-config/config.yaml` if not
+                        provided
+  -auc ADVANCEDUSERCONFIG, --advanceduserconfig ADVANCEDUSERCONFIG
+                        Path to advanced config file. This file can directly
+                        configure the core node. It is templated into
+                        default.config and acts as custom configuration that
+                        is not overwritten on install. The default value is
+                        `/Users/shambu/babylon-node-config/advanced-
+                        user.default.config` if not provided
+  -m, --manual          Only generate systemd file but not put it into systemd
+                        folder.This is mainly used for automation in
+                        unprivileged environments.
 ----
 
 ==== babylonnode systemd restart
 [source, bash,subs="+quotes, +attributes" ]
 ----
+usage: babylonnode systemd restart [-h] [-s {all,nginx,radixdlt-node}]
+
+This restarts the CORE node systemd service.
+
+options:
+  -h, --help            show this help message and exit
+
+optional arguments:
+  -s {all,nginx,radixdlt-node}, --services {all,nginx,radixdlt-node}
+                        Name of the service either to be started. Valid values
+                        nginx or radixdlt-node
 ----
 
 ==== babylonnode systemd stop
 [source, bash,subs="+quotes, +attributes" ]
 ----
+usage: babylonnode systemd stop [-h] [-s {all,nginx,radixdlt-node}]
+
+This stops the CORE node systemd service.
+
+options:
+  -h, --help            show this help message and exit
+
+optional arguments:
+  -s {all,nginx,radixdlt-node}, --services {all,nginx,radixdlt-node}
+                        Name of the service either to be stopped. Valid values
+                        nginx or radixdlt-node
 ----
 === Ledger sync using an external S3 bucket
 Below are the list of commands that can be used with cli to sync the ledger with a S3 bucket.
 
-==== babylonnode ledger sync
+==== babylonnode ledger s3-download
 [source, bash,subs="+quotes, +attributes" ]
 ----
+usage: babylonnode ledger s3-download [-h] -d DEST -bn BUCKETNAME
+                                      [-bf BUCKETFOLDER]
+
+Downloads a backuped ledger from an S3 bucket. Args: args: An object
+containing the following attributes: - bucketname (str): The name of the S3
+bucket. - bucketfolder (str): The folder within the S3 bucket. - dest (str):
+The destination path where the backup ledger will be downloaded. Raises:
+ValueError: If the bucket name is not provided. Example: args =
+Namespace(bucketname='my-bucket', bucketfolder='backups', dest='/local/path')
+s3_download(args)
+
+options:
+  -h, --help            show this help message and exit
+
+required arguments:
+  -d DEST, --dest DEST  Destination path where the backup of the ledger will
+                        be downloaded
+  -bn BUCKETNAME, --bucketname BUCKETNAME
+                        S3 bucket name to download the backup of the ledger
+                        from
+
+optional arguments:
+  -bf BUCKETFOLDER, --bucketfolder BUCKETFOLDER
+                        S3 bucket folder to download the backup of the ledger
+                        from
+----
+
+==== babylonnode ledger fetch-community-snapshot
+[source, bash,subs="+quotes, +attributes" ]
+----
+usage: babylonnode ledger fetch-community-snapshot [-h] [-d DEST]
+                                                   [-s {radix.live}]
+
+Downloads the latest community snapshot of the ledger. Args: args: An object
+containing the following attributes: - dest (str): The destination path where
+the backup ledger will be downloaded. Raises: ValueError: If the source is not
+provided. Example: args = Namespace(dest='/local/path')
+download_and_extract_snapshot(args)
+
+options:
+  -h, --help            show this help message and exit
+
+optional arguments:
+  -d DEST, --dest DEST  Destination path where the backup of the ledger will
+                        be downloaded
+  -s {radix.live}, --source {radix.live}
+                        Source to download the ledger from. Radix.live is the
+                        only supported source at the moment.
 ----
 === Core node setup using systemd
 Below are the list of commands supported in cli to setup a core node process as a systemd process
@@ -66,21 +399,80 @@ Below are the list of commands supported in cli to setup a core node process as 
 ==== babylonnode systemd dependencies
 [source, bash,subs="+quotes, +attributes" ]
 ----
+usage: babylonnode systemd dependencies [-h] [-s]
+
+This commands installs all necessary software on the Virtual Machine(VM). Run
+this command on fresh VM or on an existing VM as the command is tested to be
+idempotent
+
+options:
+  -h, --help  show this help message and exit
+
+optional arguments:
+  -s, --skip  Skip installation of base dependencies
 ----
 
 ==== babylonnode systemd install
 [source, bash,subs="+quotes, +attributes" ]
 ----
+usage: babylonnode systemd install [-h] [-a] [-u] [-f CONFIGFILE]
+                                   [-auc ADVANCEDUSERCONFIG] [-m]
+
+This sets up the systemd service for the core node.
+
+options:
+  -h, --help            show this help message and exit
+
+optional arguments:
+  -a, --auto            Automatically approve all Yes/No prompts
+  -u, --update          Update the node to new version of node
+  -f CONFIGFILE, --configfile CONFIGFILE
+                        Path to config file. This file is generated by running
+                        'babylonnode systemd config'The default value is
+                        `/Users/shambu/babylon-node-config/config.yaml` if not
+                        provided
+  -auc ADVANCEDUSERCONFIG, --advanceduserconfig ADVANCEDUSERCONFIG
+                        Path to advanced config file. This file can directly
+                        configure the core node. It is templated into
+                        default.config and acts as custom configuration that
+                        is not overwritten on install. The default value is
+                        `/Users/shambu/babylon-node-config/advanced-
+                        user.default.config` if not provided
+  -m, --manual          Only generate systemd file but not put it into systemd
+                        folder.This is mainly used for automation in
+                        unprivileged environments.
 ----
 
 ==== babylonnode systemd restart
 [source, bash,subs="+quotes, +attributes" ]
 ----
+usage: babylonnode systemd restart [-h] [-s {all,nginx,radixdlt-node}]
+
+This restarts the CORE node systemd service.
+
+options:
+  -h, --help            show this help message and exit
+
+optional arguments:
+  -s {all,nginx,radixdlt-node}, --services {all,nginx,radixdlt-node}
+                        Name of the service either to be started. Valid values
+                        nginx or radixdlt-node
 ----
 
 ==== babylonnode systemd stop
 [source, bash,subs="+quotes, +attributes" ]
 ----
+usage: babylonnode systemd stop [-h] [-s {all,nginx,radixdlt-node}]
+
+This stops the CORE node systemd service.
+
+options:
+  -h, --help            show this help message and exit
+
+optional arguments:
+  -s {all,nginx,radixdlt-node}, --services {all,nginx,radixdlt-node}
+                        Name of the service either to be stopped. Valid values
+                        nginx or radixdlt-node
 ----
 === Set passwords for the Nginx server
 This will set up the admin user and password for access to the general system endpoints.
@@ -88,21 +480,97 @@ This will set up the admin user and password for access to the general system en
 ==== babylonnode auth set-admin-password
 [source, bash,subs="+quotes, +attributes" ]
 ----
+usage: babylonnode auth set-admin-password [-h] -m {DOCKER,SYSTEMD}
+                                           [-u USERNAME] [-p PASSWORD]
+
+This sets up admin password on nginx basic auth. Refer this link for all the
+paths. https://docs.radixdlt.com/main/node-and-gateway/port-
+reference.html#_endpoint_usage
+
+options:
+  -h, --help            show this help message and exit
+
+required arguments:
+  -m {DOCKER,SYSTEMD}, --setupmode {DOCKER,SYSTEMD}
+                        Setup type whether it is DOCKER or SYSTEMD
+
+optional arguments:
+  -u USERNAME, --username USERNAME
+                        Name of admin user. Default value is `admin`
+  -p PASSWORD, --password PASSWORD
+                        Password of admin user
 ----
 
 ==== babylonnode auth set-superadmin-password
 [source, bash,subs="+quotes, +attributes" ]
 ----
+usage: babylonnode auth set-superadmin-password [-h] -m {DOCKER,SYSTEMD}
+                                                [-u USERNAME] [-p PASSWORD]
+
+This sets up superadmin password on nginx basic auth. Refer this link for all
+the paths. https://docs.radixdlt.com/main/node-and-gateway/port-
+reference.html#_endpoint_usage
+
+options:
+  -h, --help            show this help message and exit
+
+required arguments:
+  -m {DOCKER,SYSTEMD}, --setupmode {DOCKER,SYSTEMD}
+                        Setup type whether it is DOCKER or SYSTEMD
+
+optional arguments:
+  -u USERNAME, --username USERNAME
+                        Name of superadmin user. Default value is `superadmin`
+  -p PASSWORD, --password PASSWORD
+                        Password of superadmin user
 ----
 
 ==== babylonnode auth set-metrics-password
 [source, bash,subs="+quotes, +attributes" ]
 ----
+usage: babylonnode auth set-metrics-password [-h] -m {DOCKER,SYSTEMD}
+                                             [-u USERNAME] [-p PASSWORD]
+
+This sets up metrics password on nginx basic auth. Refer this link for all the
+paths. https://docs.radixdlt.com/main/node-and-gateway/port-
+reference.html#_endpoint_usage
+
+options:
+  -h, --help            show this help message and exit
+
+required arguments:
+  -m {DOCKER,SYSTEMD}, --setupmode {DOCKER,SYSTEMD}
+                        Setup type whether it is DOCKER or SYSTEMD
+
+optional arguments:
+  -u USERNAME, --username USERNAME
+                        Name of metrics user. Default value is `metrics`
+  -p PASSWORD, --password PASSWORD
+                        Password of metrics user
 ----
 
 ==== babylonnode auth set-gateway-password
 [source, bash,subs="+quotes, +attributes" ]
 ----
+usage: babylonnode auth set-gateway-password [-h] -m {DOCKER,SYSTEMD}
+                                             [-u USERNAME] [-p PASSWORD]
+
+This sets up gateway password on nginx basic auth. Refer this link for all the
+paths. https://docs.radixdlt.com/main/node-and-gateway/port-
+reference.html#_endpoint_usage
+
+options:
+  -h, --help            show this help message and exit
+
+required arguments:
+  -m {DOCKER,SYSTEMD}, --setupmode {DOCKER,SYSTEMD}
+                        Setup type whether it is DOCKER or SYSTEMD
+
+optional arguments:
+  -u USERNAME, --username USERNAME
+                        Name of gateway user. Default value is `gateway`
+  -p PASSWORD, --password PASSWORD
+                        Password of gateway user
 ----
 === Accessing core endpoints using CLI
 Once the nginx basic auth passwords for admin, superadmin, metrics users are setup , babylonnode cli can be used to access the node endpoints
@@ -110,36 +578,81 @@ Once the nginx basic auth passwords for admin, superadmin, metrics users are set
 ==== babylonnode system health
 [source, bash,subs="+quotes, +attributes" ]
 ----
+usage: babylonnode api system health [-h]
+
+This command displays the health of the node on whether it is syncing, or
+booting or up
+
+options:
+  -h, --help  show this help message and exit
 ----
 
 ==== babylonnode system version
 [source, bash,subs="+quotes, +attributes" ]
 ----
+usage: babylonnode api system version [-h]
+
+This command displays the version of node software that is currently running
+
+options:
+  -h, --help  show this help message and exit
 ----
 
 ==== babylonnode system configuration
 [source, bash,subs="+quotes, +attributes" ]
 ----
+usage: babylonnode api system configuration [-h]
+
+This command displays the configuration of the node
+
+options:
+  -h, --help  show this help message and exit
 ----
 
 ==== babylonnode system peers
 [source, bash,subs="+quotes, +attributes" ]
 ----
+usage: babylonnode api system peers [-h]
+
+This command displays peers that node sees on the network
+
+options:
+  -h, --help  show this help message and exit
 ----
 
 ==== babylonnode system addressbook
 [source, bash,subs="+quotes, +attributes" ]
 ----
+usage: babylonnode api system addressbook [-h]
+
+This command displays address book on the data the node has stored
+
+options:
+  -h, --help  show this help message and exit
 ----
 
 ==== babylonnode system network-sync-status
 [source, bash,subs="+quotes, +attributes" ]
 ----
+usage: babylonnode api system network-sync-status [-h]
+
+This command displays information on the status with respect to syncing to
+network.
+
+options:
+  -h, --help  show this help message and exit
 ----
 
 ==== babylonnode system identity
 [source, bash,subs="+quotes, +attributes" ]
 ----
+usage: babylonnode api system identity [-h]
+
+This command displays information on the status with respect to syncing to
+network.
+
+options:
+  -h, --help  show this help message and exit
 ----
 === Setup monitoring using CLI
 Using CLI , one can setup monitoring of the node or gateway.
@@ -147,26 +660,115 @@ Using CLI , one can setup monitoring of the node or gateway.
 ==== babylonnode monitoring config
 [source, bash,subs="+quotes, +attributes" ]
 ----
+usage: babylonnode monitoring config [-h]
+                                     [-m {MONITOR_CORE,MONITOR_GATEWAY,DETAILED} [{MONITOR_CORE,MONITOR_GATEWAY,DETAILED} ...]]
+                                     [-cm COREMETRICSPASSWORD]
+                                     [-gm GATEWAYAPIMETRICSPASSWORD]
+                                     [-am AGGREGATORMETRICSPASSWORD]
+                                     [-d MONITORINGCONFIGDIR]
+
+This commands allows to create a config file, which can persist custom
+settings for monitoring. Thus it allows is to decouple the updates from
+configuration. Config is created only once as such and if there is a version
+change in the config file, then it updated by doing a migration to newer
+version
+
+options:
+  -h, --help            show this help message and exit
+
+optional arguments:
+  -m {MONITOR_CORE,MONITOR_GATEWAY,DETAILED} [{MONITOR_CORE,MONITOR_GATEWAY,DETAILED} ...], --setupmode {MONITOR_CORE,MONITOR_GATEWAY,DETAILED} [{MONITOR_CORE,MONITOR_GATEWAY,DETAILED} ...]
+                        Quick setup with assumed defaults. It supports three
+                        quick setup mode and a detailed setup mode.
+                        MONITOR_CORE: Use this value to monitor Core using
+                        defaults which assume core is run on same machine as
+                        monitoring. MONITOR_GATEWAY: Use this value to monitor
+                        GATEWAY using defaults which assume network gateway is
+                        run on same machine. DETAILED: Default value if not
+                        provided. This mode takes your through series of
+                        questions.
+  -cm COREMETRICSPASSWORD, --coremetricspassword COREMETRICSPASSWORD
+                        Password for core metrics basic auth user
+  -gm GATEWAYAPIMETRICSPASSWORD, --gatewayapimetricspassword GATEWAYAPIMETRICSPASSWORD
+                        Password for gateway api metrics basic auth user
+  -am AGGREGATORMETRICSPASSWORD, --aggregatormetricspassword AGGREGATORMETRICSPASSWORD
+                        Password for aggregator metrics basic auth user
+  -d MONITORINGCONFIGDIR, --monitoringconfigdir MONITORINGCONFIGDIR
+                        Path to monitoring directory where config file will
+                        stored
 ----
 
 ==== babylonnode monitoring install
 [source, bash,subs="+quotes, +attributes" ]
 ----
+usage: babylonnode monitoring install [-h] [-f MONITORINGCONFIGFILE] [-a]
+
+This commands setups up the software and deploys it based on what is stored in
+the config.yaml file. To update software versions, most of the time it is
+required to update the versions in config file and run this command
+
+options:
+  -h, --help            show this help message and exit
+
+optional arguments:
+  -f MONITORINGCONFIGFILE, --monitoringconfigfile MONITORINGCONFIGFILE
+                        Path to config file. Default is
+                        '/Users/shambu/monitoring/monitoring_config.yaml'
+  -a, --autoapprove     Set this to true to run without any prompts
 ----
 
 ==== babylonnode monitoring start
 [source, bash,subs="+quotes, +attributes" ]
 ----
+usage: babylonnode monitoring start [-h] [-f MONITORINGCONFIGFILE] [-a]
+
+This commands starts the docker containers based on what is stored in the
+config.yaml file. If you have modified the config file, it is advised to use
+setup command.
+
+options:
+  -h, --help            show this help message and exit
+
+optional arguments:
+  -f MONITORINGCONFIGFILE, --monitoringconfigfile MONITORINGCONFIGFILE
+                        Path to config file. Default is
+                        '/Users/shambu/monitoring/monitoring_config.yaml'
+  -a, --autoapprove     Set this to true to run without any prompts
 ----
 
 ==== babylonnode monitoring stop
 [source, bash,subs="+quotes, +attributes" ]
 ----
+usage: babylonnode monitoring stop [-h] [-f MONITORINGCONFIGFILE] [-v]
+
+This commands stops the docker containers
+
+options:
+  -h, --help            show this help message and exit
+
+optional arguments:
+  -f MONITORINGCONFIGFILE, --monitoringconfigfile MONITORINGCONFIGFILE
+                        Path to config file. Default is
+                        '/Users/shambu/monitoring/monitoring_config.yaml'
+  -v, --removevolumes   Remove the volumes
 ----
 
 ==== babylonnode key info
 [source, bash,subs="+quotes, +attributes" ]
 ----
+usage: babylonnode key info [-h] -p PASSWORD -f FILELOCATION
+
+Using CLI, for a key file, you can print out the validator address. This
+feature is in beta.
+
+options:
+  -h, --help            show this help message and exit
+
+required arguments:
+  -p PASSWORD, --password PASSWORD
+                        Password of the keystore
+  -f FILELOCATION, --filelocation FILELOCATION
+                        Location of keystore on the disk
 ----
 === Ret commands supported by CLI
 You can derive babylon addresses from both private key and olympia address using this cli.
@@ -174,11 +776,37 @@ You can derive babylon addresses from both private key and olympia address using
 ==== babylonnode ret derive
 [source, bash,subs="+quotes, +attributes" ]
 ----
+usage: babylonnode ret derive [-h] -k KEYSTORE -p PASSWORD -n NETWORK
+
+Derive a babylon address from a private key.
+
+options:
+  -h, --help            show this help message and exit
+
+required arguments:
+  -k KEYSTORE, --keystore KEYSTORE
+                        Keystore path
+  -p PASSWORD, --password PASSWORD
+                        Keystore password
+  -n NETWORK, --network NETWORK
+                        Network id
 ----
 
 ==== babylonnode ret derive-from-olympia
 [source, bash,subs="+quotes, +attributes" ]
 ----
+usage: babylonnode ret derive-from-olympia [-h] -oa OLYMPIA_ADDRESS -n NETWORK
+
+Derive a babylon address from a private key.
+
+options:
+  -h, --help            show this help message and exit
+
+required arguments:
+  -oa OLYMPIA_ADDRESS, --olympia-address OLYMPIA_ADDRESS
+                        Olympia address
+  -n NETWORK, --network NETWORK
+                        Network id. Int format
 ----
 === Other commands supported by CLI
 List of other commands supported by cli are to check the version of CLI being used and optimise-node
@@ -187,9 +815,28 @@ to setup some of the OS tweaks on ubuntu
 ==== babylonnode version 
 [source, bash,subs="+quotes, +attributes" ]
 ----
+usage: babylonnode.py version [-h]
+
+Run this command td display the version of CLI been used.
+
+options:
+  -h, --help  show this help message and exit
 ----
 
 ==== babylonnode optimise-node 
 [source, bash,subs="+quotes, +attributes" ]
 ----
+usage: babylonnode.py optimise-node [-h] [-u] [-s] [-ss {1G,3G,8G}]
+
+Run this command to setup ulimits and swap size on the fresh ubuntu machine .
+Prompts asking to setup limits . Prompts asking to setup swap and size of swap
+in GB
+
+options:
+  -h, --help            show this help message and exit
+
+optional arguments:
+  -u, --setup_ulimit
+  -s, --setup_swap
+  -ss {1G,3G,8G}, --swap_space {1G,3G,8G}
 ----
