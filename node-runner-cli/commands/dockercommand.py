@@ -237,6 +237,7 @@ def install(args):
     This commands setups up the software and deploys it based on what is stored in the config.yaml file.
     To update software versions, most of the time it is required to update the versions in config file and run this command
     """
+
     ########## Parse Arguments
     argument_object = DockerInstallArguments(args)
 

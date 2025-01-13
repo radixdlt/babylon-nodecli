@@ -98,6 +98,7 @@ class PromptFeederUnitTests(unittest.TestCase):
         PROMPT_KEYSTORE_FILE_NAME = "node-keystore.ks"
         PROMPT_LEDGER_LOCATION = "/tmp/data"
         PROMPT_NGINX_PROTECT_CORE_API = "true"
+        PROMPT_NGINX_PROTECT_CORE_API = "true"
         PROMPT_ENABLE_GATEWAY = "Y"
         PROMPT_GATEWAY_CORE_API_URL = "http://core:3333/core"
         PROMPT_GATEWAY_CORE_API_NAME = "core"

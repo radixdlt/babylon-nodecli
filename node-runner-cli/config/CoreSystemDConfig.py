@@ -19,7 +19,7 @@ class CoreSystemdConfig(BaseConfig):
         self.core_release: str = ""
         self.core_binary_url: str = ""
         self.core_library_url: str = ""
-        self.data_directory: str = f"{Helpers.get_home_dir()}/babylon-ledger"
+        self.data_directory: str = f"{Helpers.get_default_ledger_dir()}"
         self.trusted_node: str = ""
         self.node_dir: str = "/etc/radixdlt/node"
         self.node_secrets_dir: str = "/etc/radixdlt/node/secrets"

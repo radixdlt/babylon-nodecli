@@ -23,7 +23,7 @@ RUN pipenv run pip install pyinstaller
 
 COPY . /app
 RUN pipenv run pyinstaller babylonnode.spec
-
+RUN pipenv run python --version
 RUN DISABLE_VERSION_CHECK=true /app/dist/babylonnode version
 
 FROM scratch AS export-stage

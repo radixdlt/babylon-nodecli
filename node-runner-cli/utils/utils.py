@@ -320,6 +320,10 @@ class Helpers:
         return f"{Path.home()}/babylon-node-config"
 
     @staticmethod
+    def get_default_ledger_dir():
+        return f"{Path.home()}/babylon-ledger"
+
+    @staticmethod
     def get_default_monitoring_config_dir():
         return f"{Path.home()}/monitoring"
 

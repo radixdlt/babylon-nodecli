@@ -83,7 +83,7 @@ jobs:
       - name: Setup python
         uses: RDXWorks-actions/setup-python@main
         with:
-          python-version: 3.10.6
+          python-version: 3.10.13
       - name: Install pipenv
         run: python -m pip install --upgrade pipenv wheel
       - name: Install dependencies
@@ -122,7 +122,7 @@ jobs:
       - name: Setup python
         uses: RDXWorks-actions/setup-python@main
         with:
-          python-version: 3.10.6
+          python-version: 3.10.13
       - name: Install pipenv
         run: python -m pip install --upgrade pipenv wheel
       - name: Install dependencies
@@ -165,7 +165,7 @@ jobs:
       - name: setup python
         uses: RDXWorks-actions/setup-python@main
         with:
-          python-version: 3.10.6
+          python-version: 3.10.13
       - name: Install pipenv
         run: |
           pip install pipenv==2023.7.23
@@ -215,7 +215,7 @@ jobs:
       - name: setup python
         uses: RDXWorks-actions/setup-python@main
         with:
-          python-version: 3.10.6
+          python-version: 3.10.13
       - name: Install pipenv
         run: |
           pip install pipenv==2023.7.23
@@ -476,18 +476,24 @@ jobs:
           name: ubuntu 22.04
       - name: Run configure command
         run: |
+          set -x
+          pwd
           chmod +x ./babylonnode
-          sudo apt-get update
-          sudo apt-get install containerd runc
+          mv ./babylonnode $HOME/babylonnode && cd $HOME
+          sudo apt-get update -y
+          sudo apt-get install containerd runc jq -y
           ./babylonnode docker dependencies
       - name: Setup config
         run: |
-          chmod +x ./babylonnode
+          set -x
+          pwd && ls -la
+          CHECKOUT_PATH=$(pwd)
+          cd $HOME
+          ls -la work/babylon-nodecli/
           mkdir -p "$HOME/babylon-node-config"
           export DISABLE_VERSION_CHECK=true
-          export RADIXDLT_APP_VERSION_OVERRIDE="rcnet-v2-phase2-r4"
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
-          export PROMPT_FEEDS="node-runner-cli/test-prompts/core-gateway-all-local.yml"
+          export PROMPT_FEEDS="$CHECKOUT_PATH/node-runner-cli/test-prompts/core-gateway-all-local.yml"
           ./babylonnode docker config -m DETAILED \
             -d "$HOME/babylon-node-config" \
             -k "$KEYSTORE_PASSWORD" -nk -a
@@ -496,8 +502,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Run CLI setup
         run: |
+          set -x
           export DISABLE_VERSION_CHECK=true
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
+          pwd && ls -la
+          cd $HOME
           ./babylonnode docker install -f "$HOME/babylon-node-config/config.yaml" -a
           sleep 60
           ./babylonnode auth set-admin-password -m DOCKER -p "$NGINX_ADMIN_PASSWORD"
@@ -513,12 +522,18 @@ jobs:
 
       - name: Run Monitoring setup
         run: |
+          set -x
+          pwd && ls -la
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
+          cd $HOME
           ./babylonnode monitoring config \
                         -m MONITOR_CORE  \
                         -cm "$NGINX_METRICS_PASSWORD"  \
                         -gm "$NGINX_METRICS_PASSWORD"  \
                         -am "$NGINX_METRICS_PASSWORD"
+          ls -la
+          docker compose ps
+
           ./babylonnode monitoring install -a
         env:
           NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}

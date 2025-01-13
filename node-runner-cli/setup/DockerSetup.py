@@ -35,7 +35,6 @@ def print_questionary_header(config_file):
 
 
 class DockerSetup(BaseSetup):
-
     @staticmethod
     def save_config(config: DockerConfig, config_file: str, autoapprove=False):
         to_update = ""
