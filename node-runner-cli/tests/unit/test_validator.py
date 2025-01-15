@@ -84,9 +84,9 @@ class ValidatorUnitTests(unittest.TestCase):
 
     @mock.patch("sys.stdout", new_callable=StringIO)
     def test_validator_promptfeed(self, mock_out):
-        os.environ[
-            "PROMPT_FEEDS"
-        ] = "test-prompts/individual-prompts/validator_address.yml"
+        os.environ["PROMPT_FEEDS"] = (
+            "test-prompts/individual-prompts/validator_address.yml"
+        )
         PromptFeeder.prompts_feed = PromptFeeder.instance().load_prompt_feeds()
         address = Prompts.ask_validator_address()
         self.assertEqual("validator_mock", address)
