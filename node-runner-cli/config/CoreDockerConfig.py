@@ -28,7 +28,7 @@ class CoreDockerConfig(BaseConfig):
         self.engine_state_api_port: str = "3336"
         self.engine_state_api_address: str = "0.0.0.0"
         self.java_opts: str = (
-            "--enable-preview -server -Xms12g -Xmx12g  "
+            "--enable-preview -server -Xms6g -Xmx6g  "
             "-XX:MaxDirectMemorySize=2048m "
             "-XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops "
             "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts "

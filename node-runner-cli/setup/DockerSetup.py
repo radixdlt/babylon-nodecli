@@ -495,10 +495,10 @@ class DockerSetup(BaseSetup):
                     ):
                         if Prompts.ask_temporary_mem_limits_update():
                             docker_config.core_node.memory_limit = "14000m"
-                    if "-Xms12g -Xmx12g" in docker_config.core_node.java_opts:
+                    if "-Xms6g -Xmx6g" in docker_config.core_node.java_opts:
                         if Prompts.ask_temporary_java_opts_update():
                             docker_config.core_node.java_opts = (
-                                "--enable-preview -server -Xms12g -Xmx12g  "
+                                "--enable-preview -server -Xms6g -Xmx6g  "
                                 "-XX:MaxDirectMemorySize=2048m "
                                 "-XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops "
                                 "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts "

@@ -14,7 +14,7 @@ services:
       - {{core_node.advanced_user_envs}}
     {% endif %} 
     environment:
-      JAVA_OPTS: {{core_node.java_opts or '--enable-preview -server -Xms12g -Xmx12g  -XX:MaxDirectMemorySize=2048m -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector'}}
+      JAVA_OPTS: {{core_node.java_opts or '--enable-preview -server -Xms6g -Xmx6g  -XX:MaxDirectMemorySize=2048m -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector'}}
       RADIXDLT_CORE_API_PORT: {{core_node.core_api_port}}
       RADIXDLT_SYSTEM_API_PORT: {{core_node.system_api_port}}
       RADIXDLT_LOG_LEVEL: {{core_node.log_level or 'info'}}

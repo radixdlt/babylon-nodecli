@@ -95,7 +95,7 @@ class DockerUnitTests(unittest.TestCase):
         settings.common_config.nginx_settings.release = "test"
         docker_compose_yaml = DockerSetup.render_docker_compose(settings)
         java_opts = docker_compose_yaml["services"]["core"]["environment"]["JAVA_OPTS"]
-        self.assertRegex(java_opts, ".*-Xms12g -Xmx12g.*")
+        self.assertRegex(java_opts, ".*-Xms6g -Xmx6g.*")
 
     def test_docker_java_opts_increased_on_migration(self):
         self.maxDiff = None
@@ -107,7 +107,7 @@ class DockerUnitTests(unittest.TestCase):
         )
         docker_compose_yaml = DockerSetup.render_docker_compose(settings)
         java_opts = docker_compose_yaml["services"]["core"]["environment"]["JAVA_OPTS"]
-        self.assertRegex(java_opts, ".*-Xms12g -Xmx12g.*")
+        self.assertRegex(java_opts, ".*-Xms6g -Xmx6g.*")
 
     def test_docker_mem_limits_increased_on_migration(self):
         self.maxDiff = None
