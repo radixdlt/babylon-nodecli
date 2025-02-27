@@ -666,7 +666,7 @@ class SystemDSetup(BaseSetup):
                     if "-Xms6g -Xmx6g" in settings.core_node.java_opts:
                         if Prompts.ask_temporary_java_opts_update():
                             settings.core_node.java_opts = (
-                                "--enable-preview -server -Xms6g -Xmx6g  "
+                                "--enable-preview -server  "
                                 "-XX:MaxDirectMemorySize=2048m "
                                 "-XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops "
                                 "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts "
