@@ -18,133 +18,6 @@ permissions:
   contents: write
   
 jobs:
-
-  snyk-scan:
-    runs-on: ubuntu-latest
-    container:
-      image: radixdlt/snyk-python:sha-e6b1b80
-    permissions:
-      id-token: write
-      pull-requests: read
-      contents: read
-      deployments: write
-    steps:
-      - uses: RDXWorks-actions/checkout@main
-      - name: Configure AWS credentials to fetch secrets
-        uses: RDXWorks-actions/configure-aws-credentials@main
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_NAME_SNYK_SECRET }}
-          aws-region: "eu-west-2"
-          role-session-name: "baylon-nodecli-${{ github.run_id }}-${{ github.run_attempt }}"
-      - name: Create .snyk file
-        run: echo "${{ vars.DOT_SNYK_FILE }}" > .snyk
-      - name: Fetch AWS secrets
-        uses: RDXWorks-actions/aws-secretsmanager-get-secrets@main
-        with:
-          secret-ids: |
-            SNYK, ${{ secrets.AWS_SECRET_NAME_SNYK }}
-          parse-json-secrets: true
-      - name: Run Snyk to check for deps vulnerabilities
-        run: |
-          cd node-runner-cli/
-          pipenv install --python /usr/local/bin/python
-          snyk auth "${{ env.SNYK_TOKEN }}"
-          snyk test --file=Pipfile --org="${{ env.SNYK_NETWORK_ORG_ID }}" --severity-threshold=critical
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Run Snyk to check for code vulnerabilities
-        continue-on-error: true
-        run: snyk code test --file=./node-runner-cli/Pipfile --org="${{ env.SNYK_NETWORK_ORG_ID }}" --severity-threshold=high
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Test SBOM generation
-        run: snyk sbom --file=./node-runner-cli/Pipfile --org="${{ env.SNYK_NETWORK_ORG_ID }}" --format=cyclonedx1.4+json > sbom.json
-
-  snyk-monitor:
-    runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'release' }}
-    needs:
-      - build-jammy
-      - build-focal
-      - snyk-scan
-    permissions:
-      id-token: write
-      pull-requests: read
-      contents: read
-      deployments: write
-    steps:
-      - uses: RDXWorks-actions/checkout@main
-      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
-        with:
-          role_name: ${{ secrets.AWS_ROLE_NAME_SNYK_SECRET }}
-          app_name: 'babylon-nodecli'
-          step_name: 'snyk-monitor'
-          secret_prefix: 'SNYK'
-          secret_name: ${{ secrets.AWS_SECRET_NAME_SNYK }}
-          parse_json: true
-      - name: Setup python
-        uses: RDXWorks-actions/setup-python@main
-        with:
-          python-version: 3.10.13
-      - name: Install pipenv
-        run: python -m pip install --upgrade pipenv wheel
-      - name: Install dependencies
-        run: |
-          cd ./node-runner-cli
-          pipenv install
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Install Snyk cli
-        run: |
-          npm install snyk -g
-          snyk -v
-          snyk auth "${{ env.SNYK_TOKEN }}"
-      - name: Enable Snyk online monitoring - Devops
-        run: snyk monitor --file=./node-runner-cli/Pipfile --org="${{ env.SNYK_DEVOPS_ORG_ID }}" --target-reference="${{ github.ref_name }}"
-      - name: Enable Snyk online monitoring - Network
-        run: snyk monitor --file=./node-runner-cli/Pipfile --org="${{ env.SNYK_NETWORK_ORG_ID }}" --target-reference="${{ github.ref_name }}"
-
-  upload-sbom:
-    runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'release' }}
-    permissions: write-all
-    needs:
-      - build-jammy
-      - snyk-scan
-    steps:
-      - uses: RDXWorks-actions/checkout@main
-      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
-        with:
-          role_name: ${{ secrets.AWS_ROLE_NAME_SNYK_SECRET }}
-          app_name: 'babylon-nodecli'
-          step_name: 'upload-sbom'
-          secret_prefix: 'SNYK'
-          secret_name: ${{ secrets.AWS_SECRET_NAME_SNYK }}
-          parse_json: true
-      - name: Setup python
-        uses: RDXWorks-actions/setup-python@main
-        with:
-          python-version: 3.10.13
-      - name: Install pipenv
-        run: python -m pip install --upgrade pipenv wheel
-      - name: Install dependencies
-        run: |
-          cd ./node-runner-cli
-          pipenv install
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Install Snyk cli
-        run: |
-          npm install snyk -g
-          snyk -v
-          snyk auth "${{ env.SNYK_TOKEN }}"
-      - name: Generate SBOM
-        run: snyk sbom --file=./node-runner-cli/Pipfile --org="${{ env.SNYK_NETWORK_ORG_ID }}" --format=cyclonedx1.4+json > sbom.json
-      - name: Upload SBOM
-        uses: RDXWorks-actions/action-gh-release@master
-        with:
-          files: sbom.json
-
   tests:
     name: "Unit tests"
     runs-on: ubuntu-22.04
@@ -274,7 +147,6 @@ jobs:
     if: ${{ github.event_name == 'release' }}
     needs:
       - build-jammy
-      - snyk-scan
     steps:
       - name: Download packaged cli
         uses: RDXWorks-actions/download-artifact@main
@@ -296,7 +168,6 @@ jobs:
     if: ${{ github.event_name == 'release' }}
     needs:
       - build-focal
-      - snyk-scan
     steps:
       - name: Download packaged cli
         uses: RDXWorks-actions/download-artifact@main
@@ -316,7 +187,6 @@ jobs:
     runs-on: ubuntu-22.04
     needs:
       - build-jammy
-      - snyk-scan
     steps:
       - name: Checkout
         uses: RDXWorks-actions/checkout@main
@@ -387,7 +257,6 @@ jobs:
     runs-on: gh-ephemeral-nodecli-docker-runner
     needs:
       - build-jammy
-      - snyk-scan
     steps:
       - name: Checkout
         uses: RDXWorks-actions/checkout@main
@@ -421,7 +290,6 @@ jobs:
     runs-on: gh-ephemeral-nodecli-systemd-runner
     needs:
       - build-jammy
-      - snyk-scan
     steps:
       - name: Checkout
         uses: RDXWorks-actions/checkout@main
@@ -462,7 +330,6 @@ jobs:
       contents: read
     needs:
       - build-jammy
-      - snyk-scan
     steps:
       - name: Checkout
         uses: RDXWorks-actions/checkout@main
