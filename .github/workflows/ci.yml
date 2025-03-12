@@ -33,8 +33,6 @@ jobs:
         uses: RDXWorks-actions/checkout@main
         with:
           fetch-depth: 0
-      - name: Dump context
-        uses: RDXWorks-actions/ghaction-dump-context@master
       - name: Install build essentials
         run: sudo apt-get -y install build-essential
       - name: setup python
@@ -85,8 +83,6 @@ jobs:
         uses: RDXWorks-actions/checkout@main
         with:
           fetch-depth: 0
-      - name: Dump context
-        uses: RDXWorks-actions/ghaction-dump-context@master
       - name: setup python
         uses: RDXWorks-actions/setup-python@main
         with:
